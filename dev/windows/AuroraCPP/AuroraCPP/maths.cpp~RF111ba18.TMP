@@ -1,0 +1,364 @@
+#pragma once
+#include "maths.h"
+using namespace maths;
+
+#pragma region activation
+	double activation::evaluate(double x) {
+		return x;
+	}
+	double activation::derivative(double x) {
+		return x;
+	}
+#pragma endregion
+#pragma region tanh
+	double tanh::evaluate(double x) {
+		return std::tanh(x);
+	}
+	double tanh::derivative(double x) {
+		return 1 / pow(cosh(x), 2);
+	}
+#pragma endregion
+#pragma region softmax
+	double softmax::evaluate(double x) {
+		return 1 / (1 + exp(-x));
+	}
+	double softmax::derivative(double x) {
+		return x * (1 - x);
+	}
+#pragma endregion
+#pragma region leakyRelu
+	leakyRelu::leakyRelu(double m) {
+		this->m = m;
+	}
+	double leakyRelu::evaluate(double x) {
+		if (x > 0) {
+			return x;
+		}
+		else {
+			return m * x;
+		}
+	}
+	double leakyRelu::derivative(double x) {
+		if (x > 0) {
+			return 1;
+		}
+		else {
+			return m;
+		}
+	}
+#pragma endregion
+#pragma region tens1D
+	tens1D::tens1D() {
+
+	}
+	tens1D::tens1D(int a) {
+		for (int i = 0; i < a; i++) {
+			push_back(0);
+		}
+	}
+	tens1D::tens1D(int a, function<double()> construct) {
+		for (int i = 0; i < a; i++) {
+			push_back(construct());
+		}
+	}
+	tens1D::tens1D(int a, tens1D distribution, bool replace) {
+		for (int i = 0; i < a; i++) {
+			int index = rand() % distribution.size() - 1;
+			push_back(distribution[index]);
+			if (!replace) {
+				distribution.erase(distribution.begin() + index);
+			}
+		}
+	}
+	tens1D::tens1D(double minimum, double maximum, double increment) {
+		for (double d = minimum; d < maximum; d += increment) {
+			push_back(d);
+		}
+	}
+	tens1D::tens1D(initializer_list<double> vals) {
+		copy(vals.begin(), vals.end(), back_inserter(*this));
+	}
+	tens2D tens1D::repeat(int count) const {
+		tens2D result = tens2D();
+		for (int i = 0; i < count; i++) {
+			result.push_back(*this);
+		}
+		return result;
+	}
+	tens1D tens1D::elemWise(function<double(double)> function) const {
+		tens1D result = tens1D();
+		for (int i = 0; i < size(); i++) {
+			result.push_back(function(this->at(i)));
+		}
+		return result;
+	}
+	tens1D tens1D::concat(tens1D a) const {
+		tens1D result = *this;
+		result.insert(result.end(), a.begin(), a.end());
+		return result;
+	}
+	double tens1D::getSum() const {
+		double sum = 0;
+		for (int i = 0; i < size(); i++) {
+			sum += this->at(i);
+		}
+		return sum;
+	}
+	tens1D tens1D::getRange(int startIndex, int count) const {
+		tens1D result = tens1D();
+		for (int i = startIndex; i < startIndex + count; i++) {
+			result.push_back(this->at(i));
+		}
+		return result;
+	}
+	tens1D tens1D::operator^(const tens1D b) {
+		processInequalSizeException(*this, b);
+		tens1D result = tens1D();
+		for (int i = 0; i < this->size(); i++) {
+			result.push_back(this->at(i) * b.at(i));
+		}
+		return result;
+	} // Fundamental : includes exception handling
+	tens1D tens1D::operator+(const tens1D b) {
+		processInequalSizeException(*this, b);
+		tens1D result = tens1D();
+		for (int i = 0; i < this->size(); i++) {
+			result.push_back(this->at(i) + b.at(i));
+		}
+		return result;
+	} // Fundamental : includes exception handling
+	tens1D tens1D::operator-(const tens1D b) {
+		processInequalSizeException(*this, b);
+		tens1D result = tens1D();
+		for (int i = 0; i < this->size(); i++) {
+			result.push_back(this->at(i) - b.at(i));
+		}
+		return result;
+	}
+	tens2D tens1D::operator^(const tens2D b) {
+		tens2D result = tens2D();
+		for (int i = 0; i < b.getHeight(); i++) {
+			result.push_back(*this ^ b.at(i));
+		}
+		return result;
+	}
+	double tens1D::operator*(const tens1D b) {
+		tens1D product = *this ^ b;
+		double result = product.getSum();
+		return result;
+	}
+	tens1D tens1D::operator*(const tens2D b) {
+		tens2D product = *this ^ b;
+		tens1D result = product.sumDown();
+		return result;
+	}
+	tens1D tens1D::operator*(const double b) {
+		tens1D result = tens1D();
+		for (int i = 0; i < this->size(); i++) {
+			result.push_back(this->at(i) * b);
+		}
+		return result;
+	}
+	tens2D tens1D::operator+(const tens2D b) {
+		tens2D result = tens2D();
+		for (int i = 0; i < b.getWidth(); i++) {
+			result.push_back(*this + b.at(i));
+		}
+		return result;
+	}
+	tens2D tens1D::operator-(const tens2D b) {
+		tens2D result = tens2D();
+		for (int i = 0; i < b.size(); i++) {
+			result.push_back(*this - b.at(i));
+		}
+		return result;
+	}
+	tens1D tens1D::operator/(const double b) {
+		tens1D result = tens1D();
+		for (int i = 0; i < this->size(); i++) {
+			result.push_back(this->at(i) / b);
+		}
+		return result;
+	}
+	tens1D tens1D::operator/(const tens1D b) {
+		tens1D result = tens1D();
+		for (int i = 0; i < this->size(); i++) {
+			result.push_back(this->at(i) / b.at(i));
+		}
+		return result;
+	}
+	void tens1D::processInequalSizeException(const tens1D a, const tens1D b) {
+		int aSize = a.size();
+		int bSize = b.size();
+		if (aSize != bSize) {
+			stringstream exceptionDescription;
+			exceptionDescription << "operands are of invalid sizes; " << aSize << " != " << bSize;
+			throw exceptionDescription.str();
+		}
+	}
+#pragma endregion
+#pragma region tens2D
+	tens2D::tens2D() {
+
+	}
+	tens2D::tens2D(int a) {
+		for (int i = 0; i < a; i++) {
+			this->push_back(tens1D());
+		}
+	}
+	tens2D::tens2D(int a, int b) {
+		for (int i = 0; i < a; i++) {
+			this->push_back(tens1D(b));
+		}
+	}
+	tens2D::tens2D(int a, function<tens1D()> construct) {
+		for (int i = 0; i < a; i++) {
+			this->push_back(construct());
+		}
+	}
+	tens2D::tens2D(initializer_list<tens1D> vals) {
+		copy(vals.begin(), vals.end(), back_inserter(*this));
+	}
+	tens1D tens2D::getRow(int index) const {
+		return this->at(index);
+	}
+	tens1D tens2D::getCol(int index) const {
+		tens1D result = tens1D();
+		for (int i = 0; i < this->getHeight(); i++) {
+			result.push_back(this->at(i).at(index));
+		}
+		return result;
+	}
+	tens2D tens2D::getRows(int startIndex, int count) const {
+		tens2D result = tens2D();
+		for (int i = startIndex; i < startIndex + count; i++) {
+			result.push_back(this->getRow(i));
+		}
+		return result;
+	}
+	tens2D tens2D::getCols(int startIndex, int count) const {
+		tens2D result = tens2D();
+		for (int i = startIndex; i < startIndex + count; i++) {
+			result.push_back(this->getCol(i));
+		}
+		return result;
+	}
+	void tens2D::setRow(int index, tens1D values) {
+		this->at(index) = values;
+	}
+	void tens2D::setCol(int index, tens1D values) {
+		for (int i = 0; i < this->getHeight(); i++) {
+			this->at(i).at(index) = values[i];
+		}
+	}
+	tens1D tens2D::sumDown() const {
+		tens1D result = this->getRow(0);
+		for (int i = 1; i < getHeight(); i++) {
+			result = result + this->getRow(i);
+		}
+		return result;
+	}
+	tens1D tens2D::sumAcross() const {
+		tens1D result = this->getCol(0);
+		for (int i = 1; i < getWidth(); i++) {
+			result = result + this->getCol(i);
+		}
+		return result;
+	}
+	tens2D tens2D::flip() const {
+		tens2D result = tens2D(this->getWidth(), this->getHeight());
+		for (int i = 0; i < getHeight(); i++) {
+			result.setCol(i, this->getRow(i));
+		}
+		return result;
+	}
+	tens2D tens2D::elemWise(function<tens1D(tens1D)> function) const {
+		tens2D result = tens2D();
+		for (int i = 0; i < getHeight(); i++) {
+			result.push_back(function(this->getRow(i)));
+		}
+		return result;
+	}
+	tens2D tens2D::elemWise(function<double(double)> function) const {
+		tens2D result = tens2D();
+		for (int i = 0; i < getHeight(); i++) {
+			result.push_back(this->at(i).elemWise(function));
+		}
+		return result;
+	}
+	int tens2D::getHeight() const {
+		return size();
+	}
+	int tens2D::getWidth() const {
+		if (size() > 0) {
+			return this->at(0).size();
+		}
+		else {
+			return 0;
+		}
+	}
+	tens2D tens2D::operator^(const tens2D b) {
+		processInequalSizeException(*this, b);
+		tens2D result = tens2D();
+		for (int i = 0; i < getHeight(); i++) {
+			result.push_back(this->at(i) ^ b.at(i));
+		}
+		return result;
+	}
+	tens2D tens2D::operator*(const tens2D b) {
+		if (this->getWidth() != b.getHeight()) 
+		{
+			stringstream exceptionDescription;
+			exceptionDescription << "operands are of invalid sizes; " << this->getWidth() << " != " << b.getHeight();
+			throw exceptionDescription.str();
+		}
+		tens2D result = tens2D(this->getHeight(), b.getWidth());
+		for (int i = 0; i < this->getHeight(); i++) {
+			for (int j = 0; j < b.getWidth(); j++) {
+				tens1D row = this->getRow(i);
+				tens1D col = this->getCol(j);
+				result[i][j] = row * col;
+			}
+		}
+		return result;
+	}
+	tens2D tens2D::operator/(const double b) {
+		tens2D result = tens2D();
+		for (int i = 0; i < getHeight(); i++) {
+			result.push_back(this->at(i) / b);
+		}
+		return result;
+	}
+	tens2D tens2D::operator/(const tens2D b) {
+		tens2D result = tens2D();
+		for (int i = 0; i < this->getHeight(); i++) {
+			result.push_back(this->getRow(i) / b.getRow(i));
+		}
+		return result;
+	}
+	tens2D tens2D::operator+(const tens2D b) {
+		tens2D result = tens2D();
+		for (int i = 0; i < this->getHeight(); i++) {
+			result.push_back(this->getRow(i) + b.at(i));
+		}
+		return result;
+	}
+	tens2D tens2D::operator-(const tens2D b) {
+		tens2D result = tens2D();
+		for (int i = 0; i < this->getHeight(); i++) {
+			result.push_back(this->getRow(i) - b.at(i));
+		}
+		return result;
+	}
+	void tens2D::processInequalSizeException(const tens2D a, const tens2D b) {
+		int aSize = a.size();
+		int bSize = b.size();
+		if (aSize != bSize) {
+			stringstream exceptionDescription;
+			exceptionDescription << "operands are of invalid sizes; " << aSize << " != " << bSize;
+			throw exceptionDescription.str();
+		}
+	}
+#pragma endregion
+
+

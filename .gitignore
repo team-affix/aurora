@@ -1,0 +1,5 @@
+
+*.cache
+dev/windows/AuroraCS/.vs/AuroraCS/v16/.suo
+dev/windows/AuroraCS/.vs/AuroraCS/DesignTimeBuild/.dtbcache.v2
+dev/windows/AuroraCPP/.vs/AuroraCPP/v16/.suo
