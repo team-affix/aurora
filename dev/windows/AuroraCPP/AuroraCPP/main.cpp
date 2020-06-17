@@ -26,10 +26,10 @@ void main() {
 	});
 
 	std::uniform_real_distribution<double> unif(-1, 1);
-	std::default_random_engine re(6);
+	std::default_random_engine re(7);
 	for (auto ptr : parameterPtrs) {
 		parameter_sgd* p = new parameter_sgd();
-		p->learnRate = 0.0002;
+		p->learnRate = 0.02;
 		p->state = unif(re);
 		p->gradient = 0;
 		*ptr = p;
