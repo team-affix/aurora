@@ -20,6 +20,9 @@ public:
 	vector<sPtr<cType>> vVector;
 };
 
+void clear0D(sPtr<cType> a);
+void clear1D(sPtr<cType> a);
+
 void add0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void add1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 
