@@ -43,21 +43,21 @@ public:
 };
 
 // softmax activation function, return sigmoid of input
-class actFuncSm : actFunc {
+class actFuncSm : public actFunc {
 public:
 	virtual double eval(double x);
 	virtual double deriv(double y);
 };
 
 // tanh activation function, return hyperbolic tangent of input
-class actFuncTh {
+class actFuncTh : public actFunc {
 public:
 	virtual double eval(double x);
 	virtual double deriv(double y);
 };
 
 // leaky relu activation function, returns leaky relu of input
-class actFuncLR {
+class actFuncLR : public actFunc {
 public:
 	actFuncLR(double m);
 	virtual double eval(double x);

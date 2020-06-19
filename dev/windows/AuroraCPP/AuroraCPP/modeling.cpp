@@ -3,6 +3,26 @@
 
 #pragma region functions
 
+#pragma region external
+void initParam(model* m, vector<sPtr<sPtr<param>>>* paramVecOutput) {
+	if (bias* b = dynamic_cast<bias*>(m)) {
+		b->prm = new sPtr<param>();
+		paramVecOutput->push_back(b->prm);
+	}
+	else if (biasBpg* b = dynamic_cast<biasBpg*>(m)) {
+		b->prm = new sPtr<param>();
+		paramVecOutput->push_back(b->prm);
+	}
+	else if (weight* w = dynamic_cast<weight*>(m)) {
+		w->prm = new sPtr<param>();
+		paramVecOutput->push_back(w->prm);
+	}
+	else if (weightBpg* w = dynamic_cast<weightBpg*>(m)) {
+		w->prm = new sPtr<param>();
+		paramVecOutput->push_back(w->prm);
+	}
+}
+#pragma endregion
 #pragma region model
 void modelFwd(sPtr<cType> x, sPtr<cType> y) {
 	*y = *x;
@@ -114,6 +134,7 @@ void wJuncModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
 #pragma endregion
 #pragma region seq
 void seqFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
+
 	sPtr<cType> currentInput = x;
 	for (int i = 0; i < models->size(); i++) {
 		model* m = models->at(i).get();
@@ -122,6 +143,7 @@ void seqFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
 		currentInput = m->y;
 	}
 	*y = *currentInput;
+
 }
 void seqBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) {
 	sPtr<cType> currentGradient = yGrad;
@@ -175,9 +197,6 @@ void layerModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
 }
 #pragma endregion
 
-
-
-
 #pragma endregion
 
 #pragma region definitions
@@ -190,6 +209,12 @@ model::model() {
 void model::fwd() {
 	modelFwd(x, y);
 }
+void model::modelWise(function<void(model*)> func) {
+	func(this);
+}
+sPtr<model> model::clone() {
+	return new model(*this);
+}
 modelBpg::modelBpg() {
 	x = new cType(0);
 	y = new cType(0);
@@ -199,8 +224,8 @@ modelBpg::modelBpg() {
 void modelBpg::bwd() {
 	modelBwd(yGrad, xGrad);
 }
-void model::modelWise(function<void(model*)> func) {
-	func(this);
+sPtr<model> modelBpg::clone() {
+	return new modelBpg(*this);
 }
 #pragma endregion
 #pragma region bias
@@ -210,6 +235,9 @@ bias::bias() {
 }
 void bias::fwd() {
 	biasFwd(x, y, *prm);
+}
+sPtr<model> bias::clone() {
+	return new bias(*this);
 }
 biasBpg::biasBpg() {
 	x = new cType(0);
@@ -223,6 +251,9 @@ void biasBpg::fwd() {
 void biasBpg::bwd() {
 	biasBwd(yGrad, xGrad, *prm);
 }
+sPtr<model> biasBpg::clone() {
+	return new biasBpg(*this);
+}
 #pragma endregion
 #pragma region act
 act::act(actFunc* _af) {
@@ -230,8 +261,16 @@ act::act(actFunc* _af) {
 	y = new cType(0);
 	this->af = _af;
 }
+act::act(sPtr<actFunc> _af) {
+	x = new cType(0);
+	y = new cType(0);
+	this->af = _af;
+}
 void act::fwd() {
 	actFwd(x, y, af);
+}
+sPtr<model> act::clone() {
+	return new act(*this);
 }
 actBpg::actBpg(actFunc* _af) {
 	x = new cType(0);
@@ -240,11 +279,19 @@ actBpg::actBpg(actFunc* _af) {
 	yGrad = new cType(0);
 	this->af = _af;
 }
+actBpg::actBpg(sPtr<actFunc> _af) {
+	x = new cType(0);
+	y = new cType(0);
+	this->af = _af;
+}
 void actBpg::fwd() {
 	actFwd(x, y, af);
 }
 void actBpg::bwd() {
 	actBwd(yGrad, y, xGrad, af);
+}
+sPtr<model> actBpg::clone() {
+	return new actBpg(*this);
 }
 #pragma endregion
 #pragma region weight
@@ -254,6 +301,9 @@ weight::weight() {
 }
 void weight::fwd() {
 	weightFwd(x, y, *prm);
+}
+sPtr<model> weight::clone() {
+	return new weight(*this);
 }
 weightBpg::weightBpg() {
 	x = new cType(0);
@@ -266,6 +316,9 @@ void weightBpg::fwd() {
 }
 void weightBpg::bwd() {
 	weightBwd(yGrad, xGrad, x, *prm);
+}
+sPtr<model> weightBpg::clone() {
+	return new weightBpg(*this);
 }
 #pragma endregion
 #pragma region wSet
@@ -283,6 +336,9 @@ void wSet::fwd() {
 void wSet::modelWise(function<void(model*)> func) {
 	func(this);
 	wSetModelWise(func, this);
+}
+sPtr<model> wSet::clone() {
+	return new wSet(*this);
 }
 wSetBpg::wSetBpg(int a) {
 	x = new cType(0);
@@ -305,6 +361,9 @@ void wSetBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	wSetModelWise(func, this);
 }
+sPtr<model> wSetBpg::clone() {
+	return new wSetBpg(*this);
+}
 #pragma endregion
 #pragma region wJunc
 wJunc::wJunc(int a, int b) {
@@ -324,6 +383,9 @@ void wJunc::fwd() {
 void wJunc::modelWise(function<void(model*)> func) {
 	func(this);
 	wJuncModelWise(func, this);
+}
+sPtr<model> wJunc::clone() {
+	return new wJunc(*this);
 }
 wJuncBpg::wJuncBpg(int a, int b) {
 	x = new cType({});
@@ -350,6 +412,9 @@ void wJuncBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	wJuncModelWise(func, this);
 }
+sPtr<model> wJuncBpg::clone() {
+	return new wJuncBpg(*this);
+}
 #pragma endregion
 #pragma region seq
 seq::seq() {
@@ -362,6 +427,9 @@ void seq::fwd() {
 void seq::modelWise(function<void(model*)> func) {
 	func(this);
 	seqModelWise(func, this);
+}
+sPtr<model> seq::clone() {
+	return new seq(*this);
 }
 seqBpg::seqBpg() {
 	x = new cType(0);
@@ -379,11 +447,48 @@ void seqBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	seqModelWise(func, this);
 }
+sPtr<model> seqBpg::clone() {
+	return new seqBpg(*this);
+}
 #pragma endregion
 #pragma region layer
 layer::layer() {
-	x = new cType(0);
-	y = new cType(0);
+
+	x = new cType({});
+	y = new cType({});
+
+}
+layer::layer(int a, model* modelTemplate) {
+
+	x = new cType({});
+	y = new cType({});
+
+	for (int i = 0; i < a; i++) {
+
+		// initialize the x, y cTypes as vectors to insure that all members of the cType are initialized
+		x->vVector.push_back(new cType({}));
+		y->vVector.push_back(new cType({}));
+
+		push_back(modelTemplate->clone());
+
+	}
+
+}
+layer::layer(int a, sPtr<model> modelTemplate) {
+
+	x = new cType({});
+	y = new cType({});
+
+	for (int i = 0; i < a; i++) {
+
+		// initialize the x, y cTypes as vectors to insure that all members of the cType are initialized
+		x->vVector.push_back(new cType({}));
+		y->vVector.push_back(new cType({}));
+		
+		push_back(modelTemplate->clone());
+
+	}
+
 }
 void layer::fwd() {
 	layerFwd(x, y, this);
@@ -392,11 +497,57 @@ void layer::modelWise(function<void(model*)> func) {
 	func(this);
 	layerModelWise(func, this);
 }
+sPtr<model> layer::clone() {
+	return new layer(*this);
+}
 layerBpg::layerBpg() {
-	x = new cType(0);
-	y = new cType(0);
-	xGrad = new cType(0);
-	yGrad = new cType(0);
+
+	// initialized the x, y, xGrad, yGrad cTypes as vectors to insure that all members of the cType are initialized
+	x = new cType({});
+	y = new cType({});
+	xGrad = new cType({});
+	yGrad = new cType({});
+
+}
+layerBpg::layerBpg(int a, model* modelTemplate) {
+
+	x = new cType({});
+	y = new cType({});
+	xGrad = new cType({});
+	yGrad = new cType({});
+
+	for (int i = 0; i < a; i++) {
+
+		// initialize the x, y, xGrad, yGrad cTypes as vectors to insure that all members of the cType are initialized
+		x->vVector.push_back(new cType({}));
+		y->vVector.push_back(new cType({}));
+		xGrad->vVector.push_back(new cType({}));
+		yGrad->vVector.push_back(new cType({}));
+
+		push_back(modelTemplate->clone());
+
+	}
+
+}
+layerBpg::layerBpg(int a, sPtr<model> modelTemplate) {
+
+	x = new cType({});
+	y = new cType({});
+	xGrad = new cType({});
+	yGrad = new cType({});
+
+	for (int i = 0; i < a; i++) {
+
+		// initialize the x, y, xGrad, yGrad cTypes as vectors to insure that all members of the cType are initialized
+		x->vVector.push_back(new cType({}));
+		y->vVector.push_back(new cType({}));
+		xGrad->vVector.push_back(new cType({}));
+		yGrad->vVector.push_back(new cType({}));
+
+		push_back(modelTemplate->clone());
+
+	}
+
 }
 void layerBpg::fwd() {
 	layerFwd(x, y, this);
@@ -408,7 +559,9 @@ void layerBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	layerModelWise(func, this);
 }
+sPtr<model> layerBpg::clone() {
+	return new layerBpg(*this);
+}
 #pragma endregion
-
 
 #pragma endregion
