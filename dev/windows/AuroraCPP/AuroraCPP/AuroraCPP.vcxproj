@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="general.h" />
     <ClInclude Include="superHeader.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="maths.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="optimization.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="general.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="maths.cpp" />
     <ClCompile Include="modeling.cpp" />
@@ -115,8 +117,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <Optimization>Full</Optimization>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
