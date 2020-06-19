@@ -4,6 +4,12 @@
 #include <any>
 
 class cType;
+class actFunc;
+class actFuncSm;
+class actFuncTh;
+class actFuncLR;
+
+// default carry type for all models
 class cType {
 public:
 	cType();
@@ -25,3 +31,33 @@ void mult1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 
 void div0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void div1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
+
+// default activation function, just returns input
+class actFunc {
+public:
+	virtual double eval(double x);
+	virtual double deriv(double y);
+};
+
+// softmax activation function, return sigmoid of input
+class actFuncSm : actFunc {
+public:
+	virtual double eval(double x);
+	virtual double deriv(double y);
+};
+
+// tanh activation function, return hyperbolic tangent of input
+class actFuncTh {
+public:
+	virtual double eval(double x);
+	virtual double deriv(double y);
+};
+
+// leaky relu activation function, returns leaky relu of input
+class actFuncLR {
+public:
+	actFuncLR(double m);
+	virtual double eval(double x);
+	virtual double deriv(double y);
+	double m;
+};

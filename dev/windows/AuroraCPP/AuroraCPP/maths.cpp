@@ -25,7 +25,6 @@ cType::cType(initializer_list<cType> a) {
 	}
 }
 
-
 void add0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	output->vDouble = a->vDouble + b->vDouble;
 }
@@ -100,4 +99,45 @@ void div1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 		outVec->at(i)->vDouble = aVec->at(i)->vDouble / bVec->at(i)->vDouble;
 	}
 
+}
+
+double actFunc::eval(double x) {
+	return x;
+}
+double actFunc::deriv(double y) {
+	return 1;
+}
+
+double actFuncSm::eval(double x) {
+	return 1 / (1 + exp(-x));
+}
+double actFuncSm::deriv(double y) {
+	return y * (1 - y);
+}
+
+double actFuncTh::eval(double x) {
+	return tanh(x);
+}
+double actFuncTh::deriv(double y) {
+	return 1 / (pow(cosh(y), 2));
+}
+
+actFuncLR::actFuncLR(double m) {
+	this->m = m;
+}
+double actFuncLR::eval(double x) {
+	if (x > 0) {
+		return x;
+	}
+	else {
+		return m * x;
+	}
+}
+double actFuncLR::deriv(double y) {
+	if (y > 0) {
+		return 1;
+	}
+	else {
+		return m;
+	}
 }
