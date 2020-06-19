@@ -7,3 +7,20 @@ public:
 	double state;
 	double learnRate;
 };
+
+class paramSgd : public param {
+public:
+	double gradient;
+};
+
+class paramMom : public paramSgd {
+public:
+	double momentum;
+};
+
+class paramMut : public param {
+public:
+	double rcv;
+	double momentum;
+	double prevState;
+};
