@@ -46,7 +46,7 @@ void add1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	vector<sPtr<cType>>* outVec = &output->vVector;
 	
 	// throw exception if vectors are of inequal sizes
-	assert(aVec->size() == bVec->size());
+	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
 
 	for (int i = 0; i < aVec->size(); i++) {
 		outVec->at(i)->vDouble = aVec->at(i)->vDouble + bVec->at(i)->vDouble;
@@ -65,7 +65,7 @@ void sub1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	vector<sPtr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
-	assert(aVec->size() == bVec->size());
+	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
 
 	for (int i = 0; i < aVec->size(); i++) {
 		outVec->at(i)->vDouble = aVec->at(i)->vDouble - bVec->at(i)->vDouble;
@@ -84,7 +84,7 @@ void mult1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	vector<sPtr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
-	assert(aVec->size() == bVec->size());
+	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
 
 	for (int i = 0; i < aVec->size(); i++) {
 		outVec->at(i)->vDouble = aVec->at(i)->vDouble * bVec->at(i)->vDouble;
@@ -103,12 +103,63 @@ void div1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	vector<sPtr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
-	assert(aVec->size() == bVec->size());
+	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
 
 	for (int i = 0; i < aVec->size(); i++) {
 		outVec->at(i)->vDouble = aVec->at(i)->vDouble / bVec->at(i)->vDouble;
 	}
 
+}
+
+void abs0D(sPtr<cType> a, sPtr<cType> output) {
+	output->vDouble = abs(a->vDouble);
+}
+void abs1D(sPtr<cType> a, sPtr<cType> output) {
+
+	// pull in reference to save compute
+	vector<sPtr<cType>>* aVec = &a->vVector;
+	vector<sPtr<cType>>* outVec = &output->vVector;
+
+	for (int i = 0; i < aVec->size(); i++) {
+		outVec->at(i)->vDouble = abs(aVec->at(i)->vDouble);
+	}
+}
+
+sPtr<cType> abs0D(sPtr<cType> a) {
+	sPtr<cType> result = new cType(0);
+	abs0D(a, result);
+	return result;
+}
+sPtr<cType> abs1D(sPtr<cType> a) {
+	// pull in reference to save compute
+	vector<sPtr<cType>>* aVec = &a->vVector;
+
+	sPtr<cType> result = new cType({});
+	for (int i = 0; i < aVec->size(); i++) {
+		result->vVector.push_back(new cType());
+	}
+	abs1D(a, result);
+	return result;
+}
+
+void sum1D(sPtr<cType> a, sPtr<cType> output) {
+
+	// pull in reference to save compute
+	vector<sPtr<cType>>* aVec = &a->vVector;
+
+	double result = 0;
+
+	for (int i = 0; i < aVec->size(); i++) {
+		result += aVec->at(i)->vDouble;
+	}
+
+	output->vDouble = result;
+
+}
+sPtr<cType> sum1D(sPtr<cType> a) {
+	sPtr<cType> result = new cType();
+	sum1D(a, result);
+	return result;
 }
 
 double actFunc::eval(double x) {

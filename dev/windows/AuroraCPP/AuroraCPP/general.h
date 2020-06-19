@@ -7,9 +7,6 @@ public:
 	sPtr() {
 
 	}
-	sPtr(T val) {
-		shared_ptr<T>::reset(new T(val));
-	}
 	sPtr(T* _ptr) {
 		shared_ptr<T>::reset(_ptr);
 	}

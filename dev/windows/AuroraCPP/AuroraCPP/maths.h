@@ -35,6 +35,15 @@ void mult1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void div0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void div1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 
+void abs0D(sPtr<cType> a, sPtr<cType> output);
+void abs1D(sPtr<cType> a, sPtr<cType> output);
+
+sPtr<cType> abs0D(sPtr<cType> a);
+sPtr<cType> abs1D(sPtr<cType> a);
+
+void sum1D(sPtr<cType> a, sPtr<cType> output);
+sPtr<cType> sum1D(sPtr<cType> a);
+
 // default activation function, just returns input
 class actFunc {
 public:
@@ -43,21 +52,21 @@ public:
 };
 
 // softmax activation function, return sigmoid of input
-class actFuncSm : actFunc {
+class actFuncSm : public actFunc {
 public:
 	virtual double eval(double x);
 	virtual double deriv(double y);
 };
 
 // tanh activation function, return hyperbolic tangent of input
-class actFuncTh {
+class actFuncTh : public actFunc {
 public:
 	virtual double eval(double x);
 	virtual double deriv(double y);
 };
 
 // leaky relu activation function, returns leaky relu of input
-class actFuncLR {
+class actFuncLR : public actFunc {
 public:
 	actFuncLR(double m);
 	virtual double eval(double x);
