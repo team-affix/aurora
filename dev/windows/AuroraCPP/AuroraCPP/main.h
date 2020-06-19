@@ -3,5 +3,4 @@
 #include "maths.h"
 #include "modeling.h"
 #include "optimization.h"
-#include "sessions.h"
 using namespace std;

@@ -24,14 +24,12 @@
     <ClInclude Include="maths.h" />
     <ClInclude Include="modeling.h" />
     <ClInclude Include="optimization.h" />
-    <ClInclude Include="sessions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="maths.cpp" />
     <ClCompile Include="modeling.cpp" />
     <ClCompile Include="optimization.cpp" />
-    <ClCompile Include="sessions.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
