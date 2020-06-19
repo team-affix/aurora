@@ -14,3 +14,5 @@ public:
 		shared_ptr<T>::reset(_ptr);
 	}
 };
+
+void rep(function<void()> func, int iterations);

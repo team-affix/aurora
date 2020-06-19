@@ -25,6 +25,16 @@ cType::cType(initializer_list<cType> a) {
 	}
 }
 
+void clear0D(sPtr<cType> a) {
+	a->vDouble = 0;
+}
+void clear1D(sPtr<cType> a) {
+	vector<sPtr<cType>>* vVec = &a->vVector;
+	for (int i = 0; i < vVec->size(); i++) {
+		clear0D(vVec->at(i));
+	}
+}
+
 void add0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	output->vDouble = a->vDouble + b->vDouble;
 }
