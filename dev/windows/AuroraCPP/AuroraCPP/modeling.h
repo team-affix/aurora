@@ -120,36 +120,46 @@ public:
 
 class wSet : public model, public vector<sPtr<model>> {
 public:
-	wSet(int a);
+	wSet();
+	wSet(int _a);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
 	virtual sPtr<model> clone();
+	int a;
 };
 
 class wSetBpg : public modelBpg, public vector<sPtr<model>> {
 public:
-	wSetBpg(int a);
+	wSetBpg();
+	wSetBpg(int _a);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
 	virtual sPtr<model> clone();
+	int a;
 };
 
 class wJunc : public model, public vector<sPtr<model>> {
 public:
-	wJunc(int a, int b);
+	wJunc();
+	wJunc(int _a, int _b);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
 	virtual sPtr<model> clone();
+	int a;
+	int b;
 };
 
 class wJuncBpg : public modelBpg, public vector<sPtr<model>> {
 public:
-	wJuncBpg(int a, int b);
+	wJuncBpg();
+	wJuncBpg(int _a, int _b);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
 	virtual sPtr<model> clone();
+	int a;
+	int b;
 };
 
 class seq : public model, public vector<sPtr<model>> {

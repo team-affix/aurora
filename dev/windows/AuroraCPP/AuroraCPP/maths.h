@@ -35,6 +35,15 @@ void mult1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void div0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void div1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 
+void abs0D(sPtr<cType> a, sPtr<cType> output);
+void abs1D(sPtr<cType> a, sPtr<cType> output);
+
+sPtr<cType> abs0D(sPtr<cType> a);
+sPtr<cType> abs1D(sPtr<cType> a);
+
+void sum1D(sPtr<cType> a, sPtr<cType> output);
+sPtr<cType> sum1D(sPtr<cType> a);
+
 // default activation function, just returns input
 class actFunc {
 public:
