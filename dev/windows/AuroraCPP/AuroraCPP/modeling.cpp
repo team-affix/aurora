@@ -270,6 +270,9 @@ sPtr<model> biasBpg::clone() {
 }
 #pragma endregion
 #pragma region act
+act::act() {
+
+}
 act::act(actFunc* _af) {
 	x = new cType(0);
 	y = new cType(0);
@@ -284,8 +287,12 @@ void act::fwd() {
 	actFwd(x, y, af);
 }
 sPtr<model> act::clone() {
-	act* result = new act(af);
+	act* result = new act();
+	result->af = af;
 	return result;
+}
+actBpg::actBpg() {
+
 }
 actBpg::actBpg(actFunc* _af) {
 	x = new cType(0);
@@ -306,7 +313,8 @@ void actBpg::bwd() {
 	actBwd(yGrad, y, xGrad, af);
 }
 sPtr<model> actBpg::clone() {
-	actBpg* result = new actBpg(af);
+	actBpg* result = new actBpg();
+	result->af = af;
 	return result;
 }
 #pragma endregion
