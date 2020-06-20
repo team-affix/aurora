@@ -84,6 +84,7 @@ public:
 
 class act : public model {
 public:
+	act();
 	act(actFunc* _af);
 	act(sPtr<actFunc> _af);
 	virtual void fwd();
@@ -93,6 +94,7 @@ public:
 
 class actBpg : public modelBpg {
 public:
+	actBpg();
 	actBpg(actFunc* _af);
 	actBpg(sPtr<actFunc> _af);
 	virtual void fwd();
