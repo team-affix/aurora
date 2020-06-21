@@ -4,6 +4,80 @@
 #pragma region functions
 
 #pragma region external
+seq tnn(vector<int> npl, vector<model*> layerNeuronTemplates) {
+	seq result = seq();
+	for (int i = 0; i < npl.size() - 1; i++) {
+		result.push_back(new layer(npl.at(i), layerNeuronTemplates.at(i)));
+		result.push_back(new wJunc(npl.at(i), npl.at(i + 1)));
+	}
+	result.push_back(new layer(npl.back(), layerNeuronTemplates.back()));
+	return result;
+}
+seqBpg tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates) {
+	seqBpg result = seqBpg();
+	for (int i = 0; i < npl.size() - 1; i++) {
+		result.push_back(new layerBpg(npl.at(i), layerNeuronTemplates.at(i)));
+		result.push_back(new wJuncBpg(npl.at(i), npl.at(i + 1)));
+	}
+	result.push_back(new layerBpg(npl.back(), layerNeuronTemplates.back()));
+	return result;
+}
+
+seq neuronSm() {
+
+	// construct tanh neuron
+	seq nsm = seq();
+	nsm.push_back(new bias());
+	nsm.push_back(new act(new actFuncSm()));
+	return nsm;
+
+}
+seq neuronTh() {
+
+	// construct tanh neuron
+	seq nth = seq();
+	nth.push_back(new bias());
+	nth.push_back(new act(new actFuncTh()));
+	return nth;
+
+}
+seq neuronLR(double m) {
+
+	// construct tanh neuron
+	seq nlr = seq();
+	nlr.push_back(new bias());
+	nlr.push_back(new act(new actFuncLR(m)));
+	return nlr;
+
+}
+seqBpg neuronSmBpg() {
+
+	// construct tanh neuron
+	seqBpg nsm = seqBpg();
+	nsm.push_back(new biasBpg());
+	nsm.push_back(new actBpg(new actFuncSm()));
+	return nsm;
+
+}
+seqBpg neuronThBpg() {
+
+	// construct tanh neuron
+	seqBpg nth = seqBpg();
+	nth.push_back(new biasBpg());
+	nth.push_back(new actBpg(new actFuncTh()));
+	return nth;
+
+}
+seqBpg neuronLRBpg(double m) {
+
+	// construct tanh neuron
+	seqBpg nlr = seqBpg();
+	nlr.push_back(new biasBpg());
+	nlr.push_back(new actBpg(new actFuncLR(m)));
+	return nlr;
+
+}
+
 void initParam(model* m, vector<sPtr<sPtr<param>>>* paramVecOutput) {
 	if (bias* b = dynamic_cast<bias*>(m)) {
 		b->prm = new sPtr<param>();

@@ -2,19 +2,13 @@
 #include "main.h"
 #include "general.h"
 
-
 int main() {
 
 	seqBpg nlr = seqBpg();
 	nlr.push_back(new biasBpg());
 	nlr.push_back(new actBpg(new actFuncLR(0.05)));
 
-	seqBpg s = seqBpg();
-	s.push_back(new layerBpg(2, &nlr));
-	s.push_back(new wJuncBpg(2, 5));
-	s.push_back(new layerBpg(5, &nlr));
-	s.push_back(new wJuncBpg(5, 1));
-	s.push_back(new layerBpg(1, &nlr));
+	seqBpg s = tnnBpg({ 2, 5, 1 }, { &nlr, &nlr, &nlr });
 
 	vector <sPtr<sPtr<param>>> paramPtrVec = vector <sPtr<sPtr<param>>>();
 	s.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
