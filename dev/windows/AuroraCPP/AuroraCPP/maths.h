@@ -20,6 +20,8 @@ public:
 	vector<sPtr<cType>> vVector;
 };
 
+void op1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output, function<double(double, double)> func);
+
 void clear0D(sPtr<cType> a);
 void clear1D(sPtr<cType> a);
 

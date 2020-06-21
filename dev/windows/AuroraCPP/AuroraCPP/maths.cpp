@@ -25,6 +25,22 @@ cType::cType(initializer_list<cType> a) {
 	}
 }
 
+void op1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output, function<double(double, double)> func) {
+
+	// pull in reference to save compute
+	vector<sPtr<cType>>* aVec = &a->vVector;
+	vector<sPtr<cType>>* bVec = &b->vVector;
+	vector<sPtr<cType>>* outVec = &output->vVector;
+
+	// throw exception if vectors are of inequal sizes
+	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
+
+	for (int i = 0; i < aVec->size(); i++) {
+		outVec->at(i)->vDouble = func(aVec->at(i)->vDouble, bVec->at(i)->vDouble);
+	}
+
+}
+
 void clear0D(sPtr<cType> a) {
 	a->vDouble = 0;
 }

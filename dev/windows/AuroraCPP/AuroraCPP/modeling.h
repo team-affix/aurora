@@ -20,31 +20,17 @@ class seqBpg;
 class layer;
 class layerBpg;
 
+seq tnn(vector<int> npl, vector<model*> layerNeuronTemplates);
+seqBpg tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates);
+
+seq neuronSm();
+seq neuronTh();
+seq neuronLR(double m);
+seqBpg neuronSmBpg();
+seqBpg neuronThBpg();
+seqBpg neuronLRBpg(double m);
+
 void initParam(model* m, vector<sPtr<sPtr<param>>>* paramVecOutput);
-
-void modelFwd(sPtr<cType> x, sPtr<cType> y);
-void modelBwd(sPtr<cType> yGrad, sPtr<cType> xGrad);
-
-void biasFwd(sPtr<cType> x, sPtr<cType> y, sPtr<param> prm);
-void biasBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, sPtr<param> prm);
-
-void actFwd(sPtr<cType> x, sPtr<cType> y, sPtr<actFunc> af);
-void actBwd(sPtr<cType> yGrad, sPtr<cType> y, sPtr<cType> xGrad, sPtr<actFunc> af);
-
-void weightFwd(sPtr<cType> x, sPtr<cType> y, sPtr<param> prm);
-void weightBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, sPtr<cType> x, sPtr<param> prm);
-
-void wSetFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models);
-void wSetBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models);
-
-void wJuncFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models);
-void wJuncBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models);
-
-void seqFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models);
-void seqBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models);
-
-void layerFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models);
-void layerBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models);
 
 class model {
 public:
