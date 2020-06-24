@@ -127,7 +127,11 @@ void trainRctBpg() {
 		{ 0 },
 	};
 
-	r.yGrad = new cType({ { 0 }, { 0 }, { 0 }, { 0 } });
+	r.yGrad = new cType({ 
+		{ 0 }, 
+		{ 0 }, 
+		{ 0 }, 
+		{ 0 } });
 	for (int epoch = 0; epoch < 100000; epoch++) {
 
 		r.x = inputs;
