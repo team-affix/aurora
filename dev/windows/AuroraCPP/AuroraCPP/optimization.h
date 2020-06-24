@@ -16,6 +16,7 @@ public:
 class paramMom : public paramSgd {
 public:
 	double momentum;
+	double beta;
 };
 
 class paramMut : public param {
