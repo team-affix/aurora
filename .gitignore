@@ -14,3 +14,5 @@ dev/windows/AuroraCPP/.vs/AuroraCPP/v16/Browse.VC.db-wal
 dev/windows/AuroraCPP/AuroraCPP/x64/Debug/AuroraCPP.log
 *.ipch
 *.tlog
+dev/windows/AuroraCPP/x64/Debug/AuroraCPP.ilk
+dev/windows/AuroraCPP/x64/Debug/AuroraCPP.pdb
