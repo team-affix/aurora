@@ -4,25 +4,24 @@
 #pragma region functions
 
 #pragma region external
-seq tnn(vector<int> npl, vector<model*> layerNeuronTemplates) {
-	seq result = seq();
+seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates) {
+	seq* result = new seq();
 	for (int i = 0; i < npl.size() - 1; i++) {
-		result.push_back(new layer(npl.at(i), layerNeuronTemplates.at(i)));
-		result.push_back(new wJunc(npl.at(i), npl.at(i + 1)));
+		result->push_back(new layer(npl.at(i), layerNeuronTemplates.at(i)));
+		result->push_back(new wJunc(npl.at(i), npl.at(i + 1)));
 	}
-	result.push_back(new layer(npl.back(), layerNeuronTemplates.back()));
+	result->push_back(new layer(npl.back(), layerNeuronTemplates.back()));
 	return result;
 }
-seqBpg tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates) {
-	seqBpg result = seqBpg();
+seqBpg* tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates) {
+	seqBpg* result = new seqBpg();
 	for (int i = 0; i < npl.size() - 1; i++) {
-		result.push_back(new layerBpg(npl.at(i), layerNeuronTemplates.at(i)));
-		result.push_back(new wJuncBpg(npl.at(i), npl.at(i + 1)));
+		result->push_back(new layerBpg(npl.at(i), layerNeuronTemplates.at(i)));
+		result->push_back(new wJuncBpg(npl.at(i), npl.at(i + 1)));
 	}
-	result.push_back(new layerBpg(npl.back(), layerNeuronTemplates.back()));
+	result->push_back(new layerBpg(npl.back(), layerNeuronTemplates.back()));
 	return result;
 }
-
 seq neuronSm() {
 
 	// construct tanh neuron
@@ -77,7 +76,6 @@ seqBpg neuronLRBpg(double m) {
 	return nlr;
 
 }
-
 void initParam(model* m, vector<sPtr<sPtr<param>>>* paramVecOutput) {
 	if (bias* b = dynamic_cast<bias*>(m)) {
 		b->prm = new sPtr<param>();
@@ -280,6 +278,19 @@ void layerModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
 	}
 }
 #pragma endregion
+#pragma region rct
+void rctFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
+	layerFwd(x, y, models);
+}
+void rctBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) {
+	layerBwd(yGrad, xGrad, models);
+}
+void rctModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
+	for (int i = 0; i < models->size(); i++) {
+		models->at(i)->modelWise(func);
+	}
+}
+#pragma endregion
 
 #pragma endregion
 
@@ -322,6 +333,8 @@ void bias::fwd() {
 }
 sPtr<model> bias::clone() {
 	bias* result = new bias();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
 	result->prm = prm;
 	return result;
 }
@@ -339,6 +352,10 @@ void biasBpg::bwd() {
 }
 sPtr<model> biasBpg::clone() {
 	biasBpg* result = new biasBpg();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
 	result->prm = prm;
 	return result;
 }
@@ -362,6 +379,8 @@ void act::fwd() {
 }
 sPtr<model> act::clone() {
 	act* result = new act();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
 	result->af = af;
 	return result;
 }
@@ -388,6 +407,10 @@ void actBpg::bwd() {
 }
 sPtr<model> actBpg::clone() {
 	actBpg* result = new actBpg();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
 	result->af = af;
 	return result;
 }
@@ -402,6 +425,8 @@ void weight::fwd() {
 }
 sPtr<model> weight::clone() {
 	weight* result = new weight();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
 	result->prm = prm;
 	return result;
 }
@@ -419,6 +444,10 @@ void weightBpg::bwd() {
 }
 sPtr<model> weightBpg::clone() {
 	weightBpg* result = new weightBpg();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
 	result->prm = prm;
 	return result;
 }
@@ -445,6 +474,8 @@ void wSet::modelWise(function<void(model*)> func) {
 }
 sPtr<model> wSet::clone() {
 	wSet* result = new wSet();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
 	for (int i = 0; i < a; i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -477,6 +508,10 @@ void wSetBpg::modelWise(function<void(model*)> func) {
 }
 sPtr<model> wSetBpg::clone() {
 	wSetBpg* result = new wSetBpg();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
 	for (int i = 0; i < a; i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -513,6 +548,8 @@ void wJunc::modelWise(function<void(model*)> func) {
 }
 sPtr<model> wJunc::clone() {
 	wJunc* result = new wJunc();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
 	for (int i = 0; i < a; i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -555,6 +592,10 @@ void wJuncBpg::modelWise(function<void(model*)> func) {
 }
 sPtr<model> wJuncBpg::clone() {
 	wJuncBpg* result = new wJuncBpg();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
 	for (int i = 0; i < a; i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -575,6 +616,8 @@ void seq::modelWise(function<void(model*)> func) {
 }
 sPtr<model> seq::clone() {
 	seq* result = new seq();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
 	for (int i = 0; i < size(); i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -598,6 +641,10 @@ void seqBpg::modelWise(function<void(model*)> func) {
 }
 sPtr<model> seqBpg::clone() {
 	seqBpg* result = new seqBpg();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
 	for (int i = 0; i < size(); i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -652,6 +699,8 @@ void layer::modelWise(function<void(model*)> func) {
 }
 sPtr<model> layer::clone() {
 	layer* result = new layer();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
 	for (int i = 0; i < size(); i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -718,10 +767,104 @@ void layerBpg::modelWise(function<void(model*)> func) {
 }
 sPtr<model> layerBpg::clone() {
 	layerBpg* result = new layerBpg();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
 	for (int i = 0; i < size(); i++) {
 		result->push_back(at(i)->clone());
 	}
 	return result;
+}
+#pragma endregion
+#pragma region rct
+rct::rct() {
+	prepared = vector<sPtr<model>>();
+}
+rct::rct(model* _modelTemplate) {
+	this->modelTemplate = _modelTemplate;
+	prepared = vector<sPtr<model>>();
+}
+void rct::fwd() {
+	rctFwd(x, y, this);
+}
+void rct::modelWise(function<void(model*)> func) {
+	func(this);
+	rctModelWise(func, this);
+}
+sPtr<model> rct::clone() {
+	rct* result = new rct();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->modelTemplate = modelTemplate;
+	return result;
+}
+void rct::prep(int a) {
+	for (int i = 0; i < a; i++) {
+		prepared.push_back(modelTemplate->clone());
+	}
+}
+void rct::unroll(int a) {
+
+	// insure that the requested unroll size, 'a' will not cause there to be more instantiations of modelTemplate used than there are prepared
+	assert(size() + a <= prepared.size());
+
+	for (int i = 0; i < a; i++) {
+
+		x->vVector.push_back(new cType({}));
+		y->vVector.push_back(new cType({}));
+
+		push_back(prepared.at(size()));
+
+	}
+}
+
+rctBpg::rctBpg() {
+	prepared = vector<sPtr<model>>();
+}
+rctBpg::rctBpg(model* _modelTemplate) {
+	this->modelTemplate = _modelTemplate;
+	prepared = vector<sPtr<model>>();
+}
+void rctBpg::fwd() {
+	rctFwd(x, y, this);
+}
+void rctBpg::bwd() {
+	rctBwd(yGrad, xGrad, this);
+}
+void rctBpg::modelWise(function<void(model*)> func) {
+	func(this);
+	rctModelWise(func, this);
+}
+sPtr<model> rctBpg::clone() {
+	rctBpg* result = new rctBpg();
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
+	result->modelTemplate = modelTemplate;
+	return result;
+}
+void rctBpg::prep(int a) {
+	for (int i = 0; i < a; i++) {
+		prepared.push_back(modelTemplate->clone());
+	}
+}
+void rctBpg::unroll(int a) {
+
+	// insure that the requested unroll size, 'a' will not cause there to be more instantiations of modelTemplate used than there are prepared
+	assert(size() + a <= prepared.size());
+
+	for (int i = 0; i < a; i++) {
+
+		x->vVector.push_back(new cType({}));
+		y->vVector.push_back(new cType({}));
+		xGrad->vVector.push_back(new cType({}));
+		yGrad->vVector.push_back(new cType({}));
+
+		push_back(prepared.at(size()));
+
+	}
 }
 #pragma endregion
 

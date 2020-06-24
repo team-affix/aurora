@@ -88,6 +88,19 @@ void sub1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	}
 
 }
+void sub2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+	// pull in reference to save compute
+	vector<sPtr<cType>>* aVec = &a->vVector;
+	vector<sPtr<cType>>* bVec = &b->vVector;
+	vector<sPtr<cType>>* outVec = &output->vVector;
+
+	// throw exception if vectors are of inequal sizes
+	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
+
+	for (int i = 0; i < aVec->size(); i++) {
+		sub1D(aVec->at(i), bVec->at(i), outVec->at(i));
+	}
+}
 
 void mult0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	output->vDouble = a->vDouble * b->vDouble;
@@ -157,6 +170,17 @@ sPtr<cType> abs1D(sPtr<cType> a) {
 	abs1D(a, result);
 	return result;
 }
+sPtr<cType> abs2D(sPtr<cType> a) {
+	sPtr<cType> result = new cType({});
+
+	// pull in reference to save compute
+	vector<sPtr<cType>>* aVec = &a->vVector;
+
+	for (int i = 0; i < aVec->size(); i++) {
+		result->vVector.push_back(abs1D(aVec->at(i)));
+	}
+	return result;
+}
 
 void sum1D(sPtr<cType> a, sPtr<cType> output) {
 
@@ -176,6 +200,39 @@ sPtr<cType> sum1D(sPtr<cType> a) {
 	sPtr<cType> result = new cType();
 	sum1D(a, result);
 	return result;
+}
+sPtr<cType> sum2D(sPtr<cType> a) {
+	sPtr<cType> result = new cType({});
+
+	// pull in reference to save compute
+	vector<sPtr<cType>>* aVec = &a->vVector;
+
+	for (int i = 0; i < aVec->size(); i++) {
+		result->vVector.push_back(sum1D(aVec->at(i)));
+	}
+	return result;
+}
+
+sPtr<vector<int>> randomDist(int count, int incMin, int excMax, bool replace) {
+
+	vector<int> allPossibilities = vector<int>();
+	for (int i = incMin; i < excMax; i++) {
+		allPossibilities.push_back(i);
+	}
+
+	sPtr<vector<int>> result = new vector<int>();
+	for (int i = 0; i < count; i++) {
+		int choiceIndex = rand() % allPossibilities.size();
+		result->push_back(allPossibilities.at(choiceIndex));
+
+		// remove choice from possible choices if replace is set to false
+		if (!replace) {
+			allPossibilities.erase(allPossibilities.begin() + choiceIndex);
+		}
+	}
+
+	return result;
+
 }
 
 double actFunc::eval(double x) {

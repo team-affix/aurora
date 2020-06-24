@@ -30,6 +30,7 @@ void add1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 
 void sub0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void sub1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
+void sub2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 
 void mult0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void mult1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
@@ -42,9 +43,11 @@ void abs1D(sPtr<cType> a, sPtr<cType> output);
 
 sPtr<cType> abs0D(sPtr<cType> a);
 sPtr<cType> abs1D(sPtr<cType> a);
+sPtr<cType> abs2D(sPtr<cType> a);
 
 void sum1D(sPtr<cType> a, sPtr<cType> output);
 sPtr<cType> sum1D(sPtr<cType> a);
+sPtr<cType> sum2D(sPtr<cType> a);
 
 // default activation function, just returns input
 class actFunc {
