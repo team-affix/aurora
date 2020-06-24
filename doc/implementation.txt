@@ -1,1 +1,45 @@
+The desired implementation code can be seen below.
 
+/////////////////////////////////////////////////////////
+///////////////////Traditional Neural Network///////////////////
+/////////////////////////////////////////////////////////
+
+int main(){
+  seqBpg nlr = neuronLRBpg(0.05);
+  seqBpg s = tnnBpg({2, 5, 1}, { &nlr, &nlr &nlr });
+  
+  uniform_real_distribution<double> urd(-1, 1);
+  default_random_engine re(4);
+  
+  optSgd o = optSgd(&s);
+  o.initParams(urd, re);
+  
+  cType inputs = {
+    {0, 0}
+    {0, 1}
+    {1, 0}
+    {1, 1}
+  }
+  cType desired = {
+    {0}
+    {1}
+    {1}
+    {0}
+  }
+  
+  for(int epoch = 0; epoch < 100000; i++){
+    for(int i = 0; i < inputs.size(); i++){
+      s.x = inputs.at(i);
+      s.fwd();
+      sub1D(&s.y, &desired.at(i), &s.yGrad);
+      s.bwd();
+    }
+    o.update();
+  }
+  
+}
+
+
+/////////////////////////////////////////////////////////
+///////////////////Split Neural Network///////////////////
+/////////////////////////////////////////////////////////
