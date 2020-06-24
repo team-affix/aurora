@@ -35,6 +35,10 @@ int main(){
       s.bwd();
     }
     o.update();
+    
+    if(epoch % 1000 == 0){
+      cout << sum1D(sum2D(abs2D(s.yGrad)))->vDouble << endl;
+    }
   }
   
 }
