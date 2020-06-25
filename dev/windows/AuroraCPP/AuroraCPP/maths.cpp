@@ -435,6 +435,7 @@ sPtr<cType> concat(sPtr<cType> a, sPtr<cType> b) {
 	}
 
 	concat(a, b, result);
+	return result;
 
 }
 

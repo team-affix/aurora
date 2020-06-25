@@ -23,6 +23,9 @@ class layerBpg;
 seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates);
 seqBpg* tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates);
 
+seq* tnn(vector<int> npl, model* neuronTemplate);
+seqBpg* tnnBpg(vector<int> npl, model* neuronTemplate);
+
 seq neuronSm();
 seq neuronTh();
 seq neuronLR(double m);
@@ -280,8 +283,14 @@ public:
 	virtual void modelWise(function<void(model*)> func);
 	virtual sPtr<model> clone();
 
+	virtual void prep(int a);
+	virtual void unroll(int a);
+
 	int units;
 
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<sPtr<model>> prepared;
+	// template model that will be cloned when prep() is called
 	sPtr<model> lstmTSTemplate;
 
 	sPtr<cType> cTIn;
@@ -300,8 +309,14 @@ public:
 	virtual void modelWise(function<void(model*)> func);
 	virtual sPtr<model> clone();
 
+	virtual void prep(int a);
+	virtual void unroll(int a);
+
 	int units;
 
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<sPtr<model>> prepared;
+	// template model that will be cloned when prep() is called
 	sPtr<model> lstmTSTemplate;
 
 	sPtr<cType> cTIn;
