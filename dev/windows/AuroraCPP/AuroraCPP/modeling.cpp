@@ -1033,6 +1033,8 @@ void lstmTS::modelWise(function<void(model*)> func) {
 sPtr<model> lstmTS::clone() {
 
 	lstmTS* result = new lstmTS(units, aGate->clone(), bGate->clone(), cGate->clone(), dGate->clone());
+	result->x = new cType(*x);
+	result->y = new cType(*y);
 	return result;
 
 }
@@ -1066,6 +1068,10 @@ void lstmTSBpg::modelWise(function<void(model*)> func) {
 sPtr<model> lstmTSBpg::clone() {
 
 	lstmTSBpg* result = new lstmTSBpg(units, aGate->clone(), bGate->clone(), cGate->clone(), dGate->clone());
+	result->x = new cType(*x);
+	result->y = new cType(*y);
+	result->xGrad = new cType(*xGrad);
+	result->yGrad = new cType(*yGrad);
 	return result;
 
 }
