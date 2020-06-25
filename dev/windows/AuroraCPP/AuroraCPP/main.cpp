@@ -2,11 +2,13 @@
 #include "main.h"
 #include "general.h"
 
+string exportParams(vector<sPtr<sPtr<param>>>* paramPtrVec);
 void trainTnnBpg();
-void trainRctBpg();
+void trainSyncBpg();
+void trainLstmBpg();
 
 int main() {
-	trainRctBpg();
+	trainLstmBpg();
 	return 0;
 }
 
@@ -89,10 +91,10 @@ void trainTnnBpg() {
 
 }
 
-void trainRctBpg() {
+void trainSyncBpg() {
 
 	seqBpg nlr = neuronLRBpg(0.05);
-	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, { &nlr, &nlr, &nlr });
+	seqBpg* templateNN = tnnBpg({ 2, 2, 1 }, &nlr);
 
 	vector <sPtr<sPtr<param>>> paramPtrVec = vector <sPtr<sPtr<param>>>();
 	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -110,7 +112,7 @@ void trainRctBpg() {
 		params.push_back(p);
 	}
 
-	rctBpg r = rctBpg(templateNN);
+	syncBpg r = syncBpg(templateNN);
 	r.prep(4);
 	r.unroll(4);
 
@@ -127,7 +129,12 @@ void trainRctBpg() {
 		{ 0 },
 	};
 
-	r.yGrad = new cType({ { 0 }, { 0 }, { 0 }, { 0 } });
+	r.yGrad = new cType({ 
+		{ 0 }, 
+		{ 0 }, 
+		{ 0 }, 
+		{ 0 } });
+
 	for (int epoch = 0; epoch < 100000; epoch++) {
 
 		r.x = inputs;
@@ -144,4 +151,91 @@ void trainRctBpg() {
 			cout << sum1D(sum2D(abs2D(r.yGrad)))->vDouble << endl;
 		}
 	}
+
+	cout << endl << exportParams(&paramPtrVec);
+}
+
+void trainLstmBpg() {
+
+	seqBpg nlr = neuronLRBpg(0.05);
+
+	lstmBpg l1 = lstmBpg(2);
+
+	seqBpg* outNN = tnnBpg({ 2, 1 }, { &nlr, &nlr });
+
+	vector <sPtr<sPtr<param>>> paramPtrVec = vector <sPtr<sPtr<param>>>();
+	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	l1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(43);
+
+	vector<paramSgd*> params = vector<paramSgd*>();
+	for (sPtr<sPtr<param>> pptr : paramPtrVec) {
+		paramSgd* p = new paramSgd();
+		p->gradient = 0;
+		p->learnRate = 0.02;
+		p->state = urd(re);
+		*pptr = p;
+		params.push_back(p);
+	}
+
+
+
+	sPtr<cType> inputs = new cType{
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	sPtr<cType> desired = new cType{
+		{ 0 },
+		{ 1 },
+		{ 1 },
+		{ 0 },
+	};
+
+	l1.prep(4);
+	l1.unroll(4);
+	syncBpg r = syncBpg(outNN);
+	r.prep(4);
+	r.unroll(4);
+
+	r.yGrad = new cType({
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ 0 } });
+
+	for (int epoch = 0; epoch < 100000; epoch++) {
+
+		l1.x = inputs;
+		l1.fwd();
+		r.x = l1.y;
+		r.fwd();
+		sub2D(r.y, desired, r.yGrad);
+		r.bwd();
+		l1.yGrad = r.xGrad;
+		l1.bwd();
+
+		for (paramSgd* p : params) {
+			p->state -= p->learnRate * p->gradient;
+			p->gradient = 0;
+		}
+
+		if (epoch % 1000 == 0) {
+			cout << sum1D(sum2D(abs2D(r.yGrad)))->vDouble << endl;
+		}
+	}
+
+	cout << endl << exportParams(&paramPtrVec);
+}
+
+string exportParams(vector<sPtr<sPtr<param>>>* paramPtrVec) {
+	string result = "";
+	for (int i = 0; i < paramPtrVec->size(); i++) {
+		result += to_string((*paramPtrVec->at(i))->state);
+		result += "\n";
+	}
+	return result;
 }

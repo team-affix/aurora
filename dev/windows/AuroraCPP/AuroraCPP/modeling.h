@@ -23,6 +23,9 @@ class layerBpg;
 seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates);
 seqBpg* tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates);
 
+seq* tnn(vector<int> npl, model* neuronTemplate);
+seqBpg* tnnBpg(vector<int> npl, model* neuronTemplate);
+
 seq neuronSm();
 seq neuronTh();
 seq neuronLR(double m);
@@ -188,10 +191,10 @@ public:
 	virtual sPtr<model> clone();
 };
 
-class rct : public model, public vector<sPtr<model>> {
+class sync : public model, public vector<sPtr<model>> {
 public:
-	rct();
-	rct(model* _modelTemplate);
+	sync();
+	sync(model* _modelTemplate);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
 	virtual sPtr<model> clone();
@@ -205,10 +208,10 @@ public:
 	sPtr<model> modelTemplate;
 };
 
-class rctBpg : public modelBpg, public vector<sPtr<model>> {
+class syncBpg : public modelBpg, public vector<sPtr<model>> {
 public:
-	rctBpg();
-	rctBpg(model* _modelTemplate);
+	syncBpg();
+	syncBpg(model* _modelTemplate);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
@@ -221,4 +224,108 @@ public:
 	vector<sPtr<model>> prepared;
 	// template model that will be cloned when prep() is called
 	sPtr<model> modelTemplate;
+};
+
+class lstmTS : public model {
+public:
+	lstmTS();
+	lstmTS(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate);
+	virtual void fwd();
+	virtual void modelWise(function<void(model*)> func);
+	virtual sPtr<model> clone();
+
+	int units;
+
+	sPtr<model> aGate;
+	sPtr<model> bGate;
+	sPtr<model> cGate;
+	sPtr<model> dGate;
+
+	sPtr<cType> cTIn;
+	sPtr<cType> cTOut;
+	sPtr<cType> hTIn;
+	sPtr<cType> hTOut;
+};
+
+class lstmTSBpg : public modelBpg {
+public:
+	lstmTSBpg();
+	lstmTSBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate);
+	virtual void fwd();
+	virtual void bwd();
+	virtual void modelWise(function<void(model*)> func);
+	virtual sPtr<model> clone();
+
+	int units;
+
+	sPtr<model> aGate;
+	sPtr<model> bGate;
+	sPtr<model> cGate;
+	sPtr<model> dGate;
+
+	sPtr<cType> cTIn;
+	sPtr<cType> cTOut;
+	sPtr<cType> hTIn;
+	sPtr<cType> hTOut;
+
+	sPtr<cType> cTInGrad;
+	sPtr<cType> cTOutGrad;
+	sPtr<cType> hTInGrad;
+	sPtr<cType> hTOutGrad;
+};
+
+class lstm : public model, public vector<sPtr<model>> {
+public:
+	lstm();
+	lstm(int _units);
+	lstm(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate);
+	virtual void fwd();
+	virtual void modelWise(function<void(model*)> func);
+	virtual sPtr<model> clone();
+
+	virtual void prep(int a);
+	virtual void unroll(int a);
+
+	int units;
+
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<sPtr<model>> prepared;
+	// template model that will be cloned when prep() is called
+	sPtr<model> lstmTSTemplate;
+
+	sPtr<cType> cTIn;
+	sPtr<cType> cTOut;
+	sPtr<cType> hTIn;
+	sPtr<cType> hTOut;
+};
+
+class lstmBpg : public modelBpg, public vector<sPtr<model>> {
+public:
+	lstmBpg();
+	lstmBpg(int _units);
+	lstmBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate);
+	virtual void fwd();
+	virtual void bwd();
+	virtual void modelWise(function<void(model*)> func);
+	virtual sPtr<model> clone();
+
+	virtual void prep(int a);
+	virtual void unroll(int a);
+
+	int units;
+
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<sPtr<model>> prepared;
+	// template model that will be cloned when prep() is called
+	sPtr<model> lstmTSTemplate;
+
+	sPtr<cType> cTIn;
+	sPtr<cType> cTOut;
+	sPtr<cType> hTIn;
+	sPtr<cType> hTOut;
+
+	sPtr<cType> cTInGrad;
+	sPtr<cType> cTOutGrad;
+	sPtr<cType> hTInGrad;
+	sPtr<cType> hTOutGrad;
 };
