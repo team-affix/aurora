@@ -3,10 +3,10 @@
 #include "general.h"
 
 void trainTnnBpg();
-void trainRctBpg();
+void trainSyncBpg();
 
 int main() {
-	trainRctBpg();
+	trainSyncBpg();
 	return 0;
 }
 
@@ -89,7 +89,7 @@ void trainTnnBpg() {
 
 }
 
-void trainRctBpg() {
+void trainSyncBpg() {
 
 	seqBpg nlr = neuronLRBpg(0.05);
 	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, { &nlr, &nlr, &nlr });
@@ -110,7 +110,7 @@ void trainRctBpg() {
 		params.push_back(p);
 	}
 
-	rctBpg r = rctBpg(templateNN);
+	syncBpg r = syncBpg(templateNN);
 	r.prep(4);
 	r.unroll(4);
 
@@ -132,6 +132,7 @@ void trainRctBpg() {
 		{ 0 }, 
 		{ 0 }, 
 		{ 0 } });
+
 	for (int epoch = 0; epoch < 100000; epoch++) {
 
 		r.x = inputs;
