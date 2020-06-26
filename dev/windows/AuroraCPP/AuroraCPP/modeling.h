@@ -285,6 +285,7 @@ public:
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
+	virtual void clear();
 
 	int units;
 
@@ -311,6 +312,7 @@ public:
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
+	virtual void clear();
 
 	int units;
 
@@ -328,4 +330,10 @@ public:
 	sPtr<cType> cTOutGrad;
 	sPtr<cType> hTInGrad;
 	sPtr<cType> hTOutGrad;
+};
+
+class attTS : public model {
+public:
+	attTS();
+	attTS(int _units);
 };

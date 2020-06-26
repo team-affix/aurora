@@ -1194,6 +1194,11 @@ void lstm::unroll(int a) {
 		y->vVector.push_back(new cType{});
 	}
 }
+void lstm::clear() {
+	vector<sPtr<model>>::clear();
+	x->vVector.clear();
+	y->vVector.clear();
+}
 
 lstmBpg::lstmBpg() {
 
@@ -1343,7 +1348,13 @@ void lstmBpg::unroll(int a) {
 		yGrad->vVector.push_back(new cType{});
 	}
 }
+void lstmBpg::clear() {
+	vector<sPtr<model>>::clear();
+	x->vVector.clear();
+	y->vVector.clear();
+	xGrad->vVector.clear();
+	yGrad->vVector.clear();
+}
 #pragma endregion
-
 
 #pragma endregion
