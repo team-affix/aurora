@@ -87,6 +87,8 @@ void trainTnnBpg() {
 		epoch++;
 	}
 
+	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
 	return;
 
 }
@@ -152,7 +154,7 @@ void trainSyncBpg() {
 		}
 	}
 
-	cout << endl << exportParams(&paramPtrVec);
+	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
 }
 
 void trainLstmBpg() {
@@ -160,7 +162,6 @@ void trainLstmBpg() {
 	seqBpg nlr = neuronLRBpg(0.05);
 
 	lstmBpg l1 = lstmBpg(5);
-
 	seqBpg* inNN = tnnBpg({ 2, 5 }, &nlr);
 	seqBpg* outNN = tnnBpg({ 5, 1 }, &nlr);
 
@@ -223,15 +224,18 @@ void trainLstmBpg() {
 	rOut.unroll(4);
 
 	rOut.yGrad = new cType({
+
 		{ 0 },
 		{ 0 },
 		{ 0 },
-		{ 0 } 
+		{ 0 }
+
 	});
 
 	for (int epoch = 0; epoch < 100000; epoch++) {
 
 		for (int i = 0; i < inputs->vVector.size(); i++) {
+
 			rIn.x = inputs->vVector.at(i);
 			rIn.fwd();
 			l1.x = rIn.y;
@@ -244,19 +248,25 @@ void trainLstmBpg() {
 			l1.bwd();
 			rIn.yGrad = l1.xGrad;
 			rIn.bwd();
+
 		}
 
 		for (paramSgd* p : params) {
+
 			p->state -= p->learnRate * p->gradient;
 			p->gradient = 0;
+
 		}
 
 		if (epoch % 1000 == 0) {
+
 			cout << sum1D(sum2D(abs2D(rOut.yGrad)))->vDouble << endl;
+
 		}
 	}
 
-	cout << endl << exportParams(&paramPtrVec);
+	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
 }
 
 string exportParams(vector<sPtr<sPtr<param>>>* paramPtrVec) {
