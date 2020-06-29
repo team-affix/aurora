@@ -22,6 +22,7 @@ public:
 class paramMut : public param {
 public:
 	double rcv;
-	double momentum;
 	double prevState;
+	double beta;
+	double momentum;
 };

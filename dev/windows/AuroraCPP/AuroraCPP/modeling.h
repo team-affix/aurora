@@ -245,6 +245,9 @@ public:
 	sPtr<cType> cTOut;
 	sPtr<cType> hTIn;
 	sPtr<cType> hTOut;
+private:
+	sPtr<cType> comp_LenUnits;
+	sPtr<cType> comp_Len2Units;
 };
 
 class lstmTSBpg : public modelBpg {
@@ -272,6 +275,9 @@ public:
 	sPtr<cType> cTOutGrad;
 	sPtr<cType> hTInGrad;
 	sPtr<cType> hTOutGrad;
+private:
+	sPtr<cType> comp_LenUnits;
+	sPtr<cType> comp_Len2Units;
 };
 
 class lstm : public model, public vector<sPtr<model>> {
@@ -332,8 +338,43 @@ public:
 	sPtr<cType> hTOutGrad;
 };
 
-class attTS : public model {
+class attLstm : public model, public vector<sPtr<model>> {
 public:
-	attTS();
-	attTS(int _units);
+	attLstm();
+	attLstm(int _unitsIn, int _unitsOut);
+	virtual void fwd();
+	virtual void modelWise(function<void(model*)> func);
+	virtual sPtr<model> clone();
+
+	virtual void prep(int a);
+	virtual void unroll(int a);
+	virtual void clear();
+
+	int unitsIn;
+	int unitsOut;
+
+	sPtr<model> lstm;
+	sPtr<model> syncTemplate;
+	vector<sPtr<model>> prepared;
+};
+
+class attLstmBpg : public modelBpg, public vector<sPtr<model>> {
+public:
+	attLstmBpg();
+	attLstmBpg(int _unitsIn, int _unitsOut);
+	virtual void fwd();
+	virtual void bwd();
+	virtual void modelWise(function<void(model*)> func);
+	virtual sPtr<model> clone();
+
+	virtual void prep(int a);
+	virtual void unroll(int a);
+	virtual void clear();
+
+	int unitsIn;
+	int unitsOut;
+
+	sPtr<model> lstm;
+	sPtr<model> syncTemplate;
+	vector<sPtr<model>> prepared;
 };

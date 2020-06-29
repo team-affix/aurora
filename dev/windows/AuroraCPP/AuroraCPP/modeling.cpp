@@ -311,34 +311,56 @@ void syncModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
 #pragma endregion
 #pragma region lstmTS
 void lstmTSFwd(sPtr<cType> x, sPtr<cType> cTIn, sPtr<cType> hTIn,
-	sPtr<cType> y, sPtr<cType> cTOut, sPtr<cType> hTOut, 
+	sPtr<cType> comp_LenUnits, sPtr<cType> comp_Len2Units,
+	sPtr<cType> y, sPtr<cType> cTOut, sPtr<cType> hTOut,
 	sPtr<model> aGate, sPtr<model> bGate, sPtr<model> cGate, sPtr<model> dGate) {
 	
-	sPtr<cType> input = concat(x, hTIn);
+	// import cTypes used for computation output that are of length: units
+	vector<sPtr<cType>>* compVec_LenUnits = &comp_LenUnits->vVector;
+	sPtr<cType> cT = compVec_LenUnits->at(0);
+	sPtr<cType> bYTimescY = compVec_LenUnits->at(1);
 
-	aGate->x = input;
-	bGate->x = input;
-	cGate->x = input;
-	dGate->x = input;
+	// import cTypes used for computation output that are of length: 2 * units
+	vector<sPtr<cType>>* compVec_Len2Units = &comp_Len2Units->vVector;
+	sPtr<cType> xConcatHTIn = compVec_Len2Units->at(0);
+
+	concat(x, hTIn, xConcatHTIn);
+
+	copy1D(xConcatHTIn, aGate->x);
+	copy1D(xConcatHTIn, bGate->x);
+	copy1D(xConcatHTIn, cGate->x);
+	copy1D(xConcatHTIn, dGate->x);
 
 	aGate->fwd();
 	bGate->fwd();
 	cGate->fwd();
 	dGate->fwd();
 
-	sPtr<cType> cT = mult1D(aGate->y, cTIn);
-	add1D(cT, mult1D(bGate->y, cGate->y), cT);
-	cTOut->vVector = cT->vVector;
-	sPtr<cType> hT = mult1D(cT, dGate->y);
-	hTOut->vVector = hT->vVector;
-	y->vVector = hT->vVector;
+	mult1D(aGate->y, cTIn, cT);
+	mult1D(bGate->y, cGate->y, bYTimescY);
+	add1D(cT, bYTimescY, cTOut);
+	mult1D(cTOut, dGate->y, hTOut);
+	copy1D(hTOut, y);
 
 }
 void lstmTSBwd(int units,
+	sPtr<cType> comp_LenUnits, sPtr<cType> comp_Len2Units,
 	sPtr<cType> cTOut, sPtr<cType> cTIn,
-	sPtr<cType> yGrad, sPtr<cType> cTOutGrad, sPtr<cType> hTOutGrad, 
+	sPtr<cType> yGrad, sPtr<cType> cTOutGrad, sPtr<cType> hTOutGrad,
 	sPtr<cType> xGrad, sPtr<cType> cTInGrad, sPtr<cType> hTInGrad,
 	sPtr<model> aGate, sPtr<model> bGate, sPtr<model> cGate, sPtr<model> dGate) {
+
+	// import cTypes used for computation output that are of length: units
+	vector<sPtr<cType>>* compVec_LenUnits = &comp_LenUnits->vVector;
+	sPtr<cType> hTGrad = compVec_LenUnits->at(0);
+	sPtr<cType> dYTimeshTGrad = compVec_LenUnits->at(1);
+	sPtr<cType> cTGrad = compVec_LenUnits->at(2);
+
+	// import cTypes used for computation output that are of length: 2 * units
+	vector<sPtr<cType>>* compVec_Len2Units = &comp_Len2Units->vVector;
+	sPtr<cType> xGradSum1 = compVec_Len2Units->at(0);
+	sPtr<cType> xGradSum2 = compVec_Len2Units->at(1);
+	sPtr<cType> xGradSum3 = compVec_Len2Units->at(2);
 
 	// cast all gates to the modelBpgs that they are
 	modelBpg* aGateBpg = (modelBpg*)aGate.get();
@@ -347,16 +369,17 @@ void lstmTSBwd(int units,
 	modelBpg* dGateBpg = (modelBpg*)dGate.get();
 
 	// calculate major gradient tracks
-	sPtr<cType> hTGrad = add1D(hTOutGrad, yGrad);
-	sPtr<cType> cTGrad = add1D(cTOutGrad, mult1D(dGateBpg->y, hTGrad));
+	add1D(hTOutGrad, yGrad, hTGrad);
+	mult1D(dGateBpg->y, hTGrad, dYTimeshTGrad);
+	add1D(cTOutGrad, dYTimeshTGrad, cTGrad);
 
 	// calculate each gate's output gradient
-	dGateBpg->yGrad = mult1D(hTGrad, cTOut);
-	cGateBpg->yGrad = mult1D(bGateBpg->y, cTGrad);
-	bGateBpg->yGrad = mult1D(cGateBpg->y, cTGrad);
-	aGateBpg->yGrad = mult1D(cTGrad, cTIn);
+	mult1D(hTGrad, cTOut, dGateBpg->yGrad);
+	mult1D(bGateBpg->y, cTGrad, cGateBpg->yGrad);
+	mult1D(cGateBpg->y, cTGrad, bGateBpg->yGrad);
+	mult1D(cTGrad, cTIn, aGateBpg->yGrad);
 
-	mult1D(aGateBpg->y, cTGrad, cTGrad);
+	mult1D(aGateBpg->y, cTGrad, cTInGrad);
 
 	// carry each gates' gradient backward
 	aGateBpg->bwd();
@@ -364,13 +387,12 @@ void lstmTSBwd(int units,
 	cGateBpg->bwd();
 	dGateBpg->bwd();
 
-	sPtr<cType> inputGrad = add1D(add1D(aGateBpg->xGrad, bGateBpg->xGrad), add1D(cGateBpg->xGrad, dGateBpg->xGrad));
-	vector<sPtr<cType>> xGradVec(inputGrad->vVector.begin(), inputGrad->vVector.begin() + units);
-	vector<sPtr<cType>> hTInGradVec(inputGrad->vVector.begin() + units, inputGrad->vVector.begin() + units * 2);
-	
-	xGrad->vVector = xGradVec;
-	hTInGrad->vVector = hTInGradVec;
-	cTInGrad->vVector = cTGrad->vVector;
+	add1D(aGateBpg->xGrad, bGateBpg->xGrad, xGradSum1);
+	add1D(cGateBpg->xGrad, dGateBpg->xGrad, xGradSum2);
+	add1D(xGradSum1, xGradSum2, xGradSum3);
+
+	copy1D(xGradSum3, xGrad, 0, units, 0);
+	copy1D(xGradSum3, hTInGrad, units, units, 0);
 
 }
 void lstmTSModelWise(function<void(model*)> func, sPtr<model> aGate, sPtr<model> bGate, sPtr<model> cGate, sPtr<model> dGate) {
@@ -983,28 +1005,29 @@ lstmTS::lstmTS(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _
 	this->cGate = _cGate;
 	this->dGate = _dGate;
 
-	this->x = new cType({});
-	this->y = new cType({});
+	this->x = make1D(units);
+	this->y = make1D(units);
 
-	this->cTIn = new cType({});
-	this->cTOut = new cType({});
-	this->hTIn = new cType({});
-	this->hTOut = new cType({});
+	this->aGate->x = make1D(2 * units);
+	this->aGate->y = make1D(units);
+	this->bGate->x = make1D(2 * units);
+	this->bGate->y = make1D(units);
+	this->cGate->x = make1D(2 * units);
+	this->cGate->y = make1D(units);
+	this->dGate->x = make1D(2 * units);
+	this->dGate->y = make1D(units);
 
-	for (int i = 0; i < units; i++) {
+	this->cTIn = make1D(units);
+	this->cTOut = make1D(units);
+	this->hTIn = make1D(units);
+	this->hTOut = make1D(units);
 
-		this->cTIn->vVector.push_back(new cType());
-		this->cTOut->vVector.push_back(new cType());
-		this->hTIn->vVector.push_back(new cType());
-		this->hTOut->vVector.push_back(new cType());
-
-	}
+	comp_LenUnits = make2D(3, units);
+	comp_Len2Units = make2D(1, 2 * units);
 
 }
 void lstmTS::fwd() {
-	lstmTSFwd(x, cTIn, hTIn, 
-		y, cTOut, hTOut, 
-		aGate, bGate, cGate, dGate);
+	lstmTSFwd(x, cTIn, hTIn, comp_LenUnits, comp_Len2Units, y, cTOut, hTOut, aGate, bGate, cGate, dGate);
 }
 void lstmTS::modelWise(function<void(model*)> func) {
 	func(this);
@@ -1013,8 +1036,6 @@ void lstmTS::modelWise(function<void(model*)> func) {
 sPtr<model> lstmTS::clone() {
 
 	lstmTS* result = new lstmTS(units, aGate->clone(), bGate->clone(), cGate->clone(), dGate->clone());
-	result->x = new cType(*x);
-	result->y = new cType(*y);
 	return result;
 
 }
@@ -1038,43 +1059,55 @@ lstmTSBpg::lstmTSBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<mo
 	this->cGate = _cGate;
 	this->dGate = _dGate;
 
-	this->x = new cType({});
-	this->y = new cType({});
-	this->xGrad = new cType({});
-	this->yGrad = new cType({});
+	this->x = make1D(units);
+	this->y = make1D(units);
+	this->xGrad = make1D(units);
+	this->yGrad = make1D(units);
 
-	this->cTIn = new cType({});
-	this->cTOut = new cType({});
-	this->hTIn = new cType({});
-	this->hTOut = new cType({});
-	this->cTInGrad = new cType({});
-	this->cTOutGrad = new cType({});
-	this->hTInGrad = new cType({});
-	this->hTOutGrad = new cType({});
+	// cast all gates to the modelBpgs that they are
+	modelBpg* aGateBpg = (modelBpg*)aGate.get();
+	modelBpg* bGateBpg = (modelBpg*)bGate.get();
+	modelBpg* cGateBpg = (modelBpg*)cGate.get();
+	modelBpg* dGateBpg = (modelBpg*)dGate.get();
 
-	for (int i = 0; i < units; i++) {
+	aGateBpg->x = make1D(2 * units);
+	aGateBpg->y = make1D(units);
+	bGateBpg->x = make1D(2 * units);
+	bGateBpg->y = make1D(units);
+	cGateBpg->x = make1D(2 * units);
+	cGateBpg->y = make1D(units);
+	dGateBpg->x = make1D(2 * units);
+	dGateBpg->y = make1D(units);
+	aGateBpg->yGrad = make1D(units);
+	aGateBpg->xGrad = make1D(2 * units);
+	bGateBpg->yGrad = make1D(units);
+	bGateBpg->xGrad = make1D(2 * units);
+	cGateBpg->yGrad = make1D(units);
+	cGateBpg->xGrad = make1D(2 * units);
+	dGateBpg->yGrad = make1D(units);
+	dGateBpg->xGrad = make1D(2 * units);
 
-		this->cTIn->vVector.push_back(new cType());
-		this->cTOut->vVector.push_back(new cType());
-		this->hTIn->vVector.push_back(new cType());
-		this->hTOut->vVector.push_back(new cType());
+	this->cTIn = make1D(units);
+	this->cTOut = make1D(units);
+	this->hTIn = make1D(units);
+	this->hTOut = make1D(units);
 
-		this->cTInGrad->vVector.push_back(new cType());
-		this->cTOutGrad->vVector.push_back(new cType());
-		this->hTInGrad->vVector.push_back(new cType());
-		this->hTOutGrad->vVector.push_back(new cType());
+	this->cTInGrad = make1D(units);
+	this->cTOutGrad = make1D(units);
+	this->hTInGrad = make1D(units);
+	this->hTOutGrad = make1D(units);
 
-	}
+	this->comp_LenUnits = make2D(3, units);
+	this->comp_Len2Units = make2D(3, 2 * units);
 
 }
 void lstmTSBpg::fwd() {
-	lstmTSFwd(x, cTIn, hTIn,
-		y, cTOut, hTOut,
-		aGate, bGate, cGate, dGate);
+	lstmTSFwd(x, cTIn, hTIn, comp_LenUnits, comp_Len2Units, y, cTOut, hTOut, aGate, bGate, cGate, dGate);
 }
 void lstmTSBpg::bwd() {
-	lstmTSBwd(units, cTOut, cTIn, yGrad,
-		cTOutGrad, hTOutGrad, xGrad, cTInGrad, hTInGrad,
+	lstmTSBwd(units, comp_LenUnits, comp_Len2Units,
+		cTOut, cTIn, yGrad,
+		cTOutGrad, hTOutGrad, xGrad, cTInGrad, hTInGrad, 
 		aGate, bGate, cGate, dGate);
 }
 void lstmTSBpg::modelWise(function<void(model*)> func) {
@@ -1084,10 +1117,6 @@ void lstmTSBpg::modelWise(function<void(model*)> func) {
 sPtr<model> lstmTSBpg::clone() {
 
 	lstmTSBpg* result = new lstmTSBpg(units, aGate->clone(), bGate->clone(), cGate->clone(), dGate->clone());
-	result->x = new cType(*x);
-	result->y = new cType(*y);
-	result->xGrad = new cType(*xGrad);
-	result->yGrad = new cType(*yGrad);
 	return result;
 
 }
@@ -1109,17 +1138,10 @@ lstm::lstm(int _units) {
 	sPtr<model> cGate = tnn({ 2 * units, units }, { &nlr, &nth });
 	sPtr<model> dGate = tnn({ 2 * units, units }, { &nlr, &nsm });
 
-	this->hTIn = new cType({});
-	this->cTIn = new cType({});
-	this->hTOut = new cType({});
-	this->cTOut = new cType({});
-
-	for (int i = 0; i < units; i++) {
-		hTIn->vVector.push_back(new cType());
-		cTIn->vVector.push_back(new cType());
-		hTOut->vVector.push_back(new cType());
-		cTOut->vVector.push_back(new cType());
-	}
+	this->hTIn = make1D(units);
+	this->cTIn = make1D(units);
+	this->hTOut = make1D(units);
+	this->cTOut = make1D(units);
 
 	this->lstmTSTemplate = new lstmTS(units, aGate, bGate, cGate, dGate);
 
@@ -1128,17 +1150,10 @@ lstm::lstm(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGat
 	
 	this->units = _units;
 
-	this->hTIn = new cType({});
-	this->cTIn = new cType({});
-	this->hTOut = new cType({});
-	this->cTOut = new cType({});
-
-	for (int i = 0; i < units; i++) {
-		hTIn->vVector.push_back(new cType());
-		cTIn->vVector.push_back(new cType());
-		hTOut->vVector.push_back(new cType());
-		cTOut->vVector.push_back(new cType());
-	}
+	this->hTIn = make1D(units);
+	this->cTIn = make1D(units);
+	this->hTOut = make1D(units);
+	this->cTOut = make1D(units);
 
 	this->lstmTSTemplate = new lstmTS(units, _aGate, _bGate, _cGate, _dGate);
 
@@ -1154,9 +1169,9 @@ void lstm::fwd() {
 	for (int i = 0; i < size(); i++) {
 
 		lstmTS* l = (lstmTS*)at(i).get();
-		l->x = xVec->at(i);
-		l->cTIn = cT;
-		l->hTIn = hT;
+		l->x->vVector = xVec->at(i)->vVector;
+		l->cTIn->vVector = cT->vVector;
+		l->hTIn->vVector = hT->vVector;
 		l->fwd();
 		yVec->at(i) = l->y;
 		cT = l->cTOut;
@@ -1164,8 +1179,8 @@ void lstm::fwd() {
 
 	}
 
-	*cTOut = *cT;
-	*hTOut = *hT;
+	cTOut->vVector = cT->vVector;
+	hTOut->vVector = hT->vVector;
 
 }
 void lstm::modelWise(function<void(model*)> func) {
@@ -1216,27 +1231,15 @@ lstmBpg::lstmBpg(int _units) {
 	sPtr<model> cGate = tnnBpg({ 2 * units, units }, { &nlr, &nth });
 	sPtr<model> dGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
 
-	this->hTIn = new cType({});
-	this->cTIn = new cType({});
-	this->hTOut = new cType({});
-	this->cTOut = new cType({});
+	this->hTIn = make1D(units);
+	this->cTIn = make1D(units);
+	this->hTOut = make1D(units);
+	this->cTOut = make1D(units);
 
-	this->hTInGrad = new cType({});
-	this->cTInGrad = new cType({});
-	this->hTOutGrad = new cType({});
-	this->cTOutGrad = new cType({});
-
-	for (int i = 0; i < units; i++) {
-		hTIn->vVector.push_back(new cType());
-		cTIn->vVector.push_back(new cType());
-		hTOut->vVector.push_back(new cType());
-		cTOut->vVector.push_back(new cType());
-
-		hTInGrad->vVector.push_back(new cType());
-		cTInGrad->vVector.push_back(new cType());
-		hTOutGrad->vVector.push_back(new cType());
-		cTOutGrad->vVector.push_back(new cType());
-	}
+	this->hTInGrad = make1D(units);
+	this->cTInGrad = make1D(units);
+	this->hTOutGrad = make1D(units);
+	this->cTOutGrad = make1D(units);
 
 	this->lstmTSTemplate = new lstmTSBpg(units, aGate, bGate, cGate, dGate);
 
@@ -1245,27 +1248,15 @@ lstmBpg::lstmBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model>
 
 	this->units = _units;
 
-	this->hTIn = new cType({});
-	this->cTIn = new cType({});
-	this->hTOut = new cType({});
-	this->cTOut = new cType({});
+	this->hTIn = make1D(units);
+	this->cTIn = make1D(units);
+	this->hTOut = make1D(units);
+	this->cTOut = make1D(units);
 
-	this->hTInGrad = new cType({});
-	this->cTInGrad = new cType({});
-	this->hTOutGrad = new cType({});
-	this->cTOutGrad = new cType({});
-
-	for (int i = 0; i < units; i++) {
-		hTIn->vVector.push_back(new cType());
-		cTIn->vVector.push_back(new cType());
-		hTOut->vVector.push_back(new cType());
-		cTOut->vVector.push_back(new cType());
-
-		hTInGrad->vVector.push_back(new cType());
-		cTInGrad->vVector.push_back(new cType());
-		hTOutGrad->vVector.push_back(new cType());
-		cTOutGrad->vVector.push_back(new cType());
-	}
+	this->hTInGrad = make1D(units);
+	this->cTInGrad = make1D(units);
+	this->hTOutGrad = make1D(units);
+	this->cTOutGrad = make1D(units);
 
 	this->lstmTSTemplate = new lstmTSBpg(units, _aGate, _bGate, _cGate, _dGate);
 
@@ -1281,9 +1272,9 @@ void lstmBpg::fwd() {
 	for (int i = 0; i < size(); i++) {
 
 		lstmTSBpg* l = (lstmTSBpg*)at(i).get();
-		l->x = xVec->at(i);
-		l->cTIn = cT;
-		l->hTIn = hT;
+		l->x->vVector = xVec->at(i)->vVector;
+		l->cTIn->vVector = cT->vVector;
+		l->hTIn->vVector = hT->vVector;
 		l->fwd();
 		yVec->at(i) = l->y;
 		cT = l->cTOut;
@@ -1291,8 +1282,8 @@ void lstmBpg::fwd() {
 
 	}
 
-	*cTOut = *cT;
-	*hTOut = *hT;
+	cTOut->vVector = cT->vVector;
+	hTOut->vVector = hT->vVector;
 
 }
 void lstmBpg::bwd() {
@@ -1354,6 +1345,32 @@ void lstmBpg::clear() {
 	y->vVector.clear();
 	xGrad->vVector.clear();
 	yGrad->vVector.clear();
+}
+#pragma endregion
+#pragma region att
+attLstm::attLstm() {
+
+}
+attLstm::attLstm(int _unitsIn, int _unitsOut) {
+
+}
+void attLstm::fwd() {
+
+}
+void attLstm::modelWise(function<void(model*)> func) {
+
+}
+sPtr<model> attLstm::clone() {
+	return new model();
+}
+void attLstm::prep(int a) {
+
+}
+void attLstm::unroll(int a) {
+
+}
+void attLstm::clear() {
+
 }
 #pragma endregion
 

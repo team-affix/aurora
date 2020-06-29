@@ -20,9 +20,21 @@ public:
 	vector<sPtr<cType>> vVector;
 };
 
+sPtr<cType> make1D(int a);
+sPtr<cType> make2D(int a, int b);
+sPtr<cType> make3D(int a, int b, int c);
+sPtr<cType> make4D(int a, int b, int c, int d);
+sPtr<cType> make5D(int a, int b, int c, int d, int e);
+
 void clear0D(sPtr<cType> a);
 void clear1D(sPtr<cType> a);
 void clear2D(sPtr<cType> a);
+
+void copy0D(sPtr<cType> a, sPtr<cType> output);
+void copy1D(sPtr<cType> a, sPtr<cType> output);
+void copy1D(sPtr<cType> a, sPtr<cType> output, int sourceStartIndex, int count, int destStartIndex);
+void copy2D(sPtr<cType> a, sPtr<cType> output);
+void copy2D(sPtr<cType> a, sPtr<cType> output, int sourceStartIndex, int count, int destStartIndex);
 
 void add0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
 void add1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
