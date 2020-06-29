@@ -19,3 +19,4 @@ dev/windows/AuroraCPP/x64/Debug/AuroraCPP.pdb
 dev/windows/AuroraCPP/AuroraCPP/x64/Debug/vc142.pdb
 *.idb
 dev/windows/AuroraCPP/AuroraCPP/x64/Debug/main.obj
+dev/windows/AuroraCPP/AuroraCPP/x64/Debug/modeling.obj
