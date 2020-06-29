@@ -96,7 +96,7 @@ void trainTnnBpg() {
 void trainSyncBpg() {
 
 	seqBpg nlr = neuronLRBpg(0.05);
-	seqBpg* templateNN = tnnBpg({ 2, 2, 1 }, &nlr);
+	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, &nlr);
 
 	vector <sPtr<sPtr<param>>> paramPtrVec = vector <sPtr<sPtr<param>>>();
 	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -187,30 +187,30 @@ void trainLstmBpg() {
 
 	sPtr<cType> inputs = new cType{ 
 		{
-		{0, 0},
-		{0, 1},
-		{1, 0},
-		{1, 1},
+			{0, 0},
+			{0, 1},
+			{1, 0},
+			{1, 1},
 		},
 		{
-		{0, 0},
-		{1, 1},
-		{1, 0},
-		{1, 1}
+			{0, 0},
+			{1, 1},
+			{1, 0},
+			{1, 1}
 		}
 	};
 	sPtr<cType> desired = new cType{
 		{
-		{ 0 },
-		{ 1 },
-		{ 1 },
-		{ 0 },
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 0 },
 		},
 		{
-		{ 0 },
-		{ 1 },
-		{ 1 },
-		{ 1 },
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 1 },
 		}
 	};
 
@@ -223,14 +223,7 @@ void trainLstmBpg() {
 	rOut.prep(4);
 	rOut.unroll(4);
 
-	rOut.yGrad = new cType({
-
-		{ 0 },
-		{ 0 },
-		{ 0 },
-		{ 0 }
-
-	});
+	rOut.yGrad = make2D(4, 1);
 
 	for (int epoch = 0; epoch < 100000; epoch++) {
 
