@@ -1215,16 +1215,18 @@ void lstm::fwd() {
 	ptr<cType> cT = cTIn;
 	ptr<cType> hT = hTIn;
 
-	for (int i = 0; i < size(); i++) {
+	for (int i = index; i < size(); i++) {
 
-		lstmTS* l = (lstmTS*)at(i).get();
-		l->x->vVector = xVec->at(i)->vVector;
+		lstmTSBpg* l = (lstmTSBpg*)at(index).get();
+		l->x->vVector = xVec->at(index)->vVector;
 		l->cTIn->vVector = cT->vVector;
 		l->hTIn->vVector = hT->vVector;
 		l->fwd();
-		yVec->at(i) = l->y;
+		yVec->at(index) = l->y;
 		cT = l->cTOut;
 		hT = l->hTOut;
+
+		index++;
 
 	}
 
@@ -1262,6 +1264,7 @@ void lstm::clear() {
 	vector<ptr<model>>::clear();
 	x->vVector.clear();
 	y->vVector.clear();
+	index = 0;
 }
 
 lstmBpg::lstmBpg() {
@@ -1318,16 +1321,18 @@ void lstmBpg::fwd() {
 	ptr<cType> cT = cTIn;
 	ptr<cType> hT = hTIn;
 
-	for (int i = 0; i < size(); i++) {
+	for (int i = index; i < size(); i++) {
 
-		lstmTSBpg* l = (lstmTSBpg*)at(i).get();
-		l->x->vVector = xVec->at(i)->vVector;
+		lstmTSBpg* l = (lstmTSBpg*)at(index).get();
+		l->x->vVector = xVec->at(index)->vVector;
 		l->cTIn->vVector = cT->vVector;
 		l->hTIn->vVector = hT->vVector;
 		l->fwd();
-		yVec->at(i) = l->y;
+		yVec->at(index) = l->y;
 		cT = l->cTOut;
 		hT = l->hTOut;
+
+		index++;
 
 	}
 
@@ -1343,14 +1348,16 @@ void lstmBpg::bwd() {
 	ptr<cType> cTGrad = cTOutGrad;
 	ptr<cType> hTGrad = hTOutGrad;
 
-	for (int i = size() - 1; i >= 0; i--) {
+	for (int i = index - 1; i >= 0; i--) {
 
-		lstmTSBpg* l = (lstmTSBpg*)at(i).get();
-		l->yGrad = yGradVec->at(i);
+		index--;
+
+		lstmTSBpg* l = (lstmTSBpg*)at(index).get();
+		l->yGrad = yGradVec->at(index);
 		l->cTOutGrad = cTGrad;
 		l->hTOutGrad = hTGrad;
 		l->bwd();
-		xGradVec->at(i) = l->xGrad;
+		xGradVec->at(index) = l->xGrad;
 		cTGrad = l->cTInGrad;
 		hTGrad = l->hTInGrad;
 
@@ -1394,6 +1401,7 @@ void lstmBpg::clear() {
 	y->vVector.clear();
 	xGrad->vVector.clear();
 	yGrad->vVector.clear();
+	index = 0;
 }
 #pragma endregion
 #pragma region muTS
@@ -1540,16 +1548,18 @@ void mu::fwd() {
 	ptr<cType> cT = cTIn;
 	ptr<cType> hT = hTIn;
 
-	for (int i = 0; i < size(); i++) {
+	for (int i = index; i < size(); i++) {
 
-		muTS* m = (muTS*)at(i).get();
-		m->x->vVector = xVec->at(i)->vVector;
+		muTS* m = (muTS*)at(index).get();
+		m->x->vVector = xVec->at(index)->vVector;
 		m->cTIn->vVector = cT->vVector;
 		m->hTIn->vVector = hT->vVector;
 		m->fwd();
-		yVec->at(i) = m->y;
+		yVec->at(index) = m->y;
 		cT = m->cTOut;
 		hT = m->hTOut;
+
+		index++;
 
 	}
 
@@ -1585,7 +1595,9 @@ void mu::clear() {
 	vector<ptr<model>>::clear();
 	x->vVector.clear();
 	y->vVector.clear();
+	index = 0;
 }
+
 muBpg::muBpg() {
 
 }
@@ -1638,16 +1650,18 @@ void muBpg::fwd() {
 	ptr<cType> cT = cTIn;
 	ptr<cType> hT = hTIn;
 
-	for (int i = 0; i < size(); i++) {
+	for (int i = index; i < size(); i++) {
 
-		muTSBpg* m = (muTSBpg*)at(i).get();
-		m->x->vVector = xVec->at(i)->vVector;
+		muTSBpg* m = (muTSBpg*)at(index).get();
+		m->x->vVector = xVec->at(index)->vVector;
 		m->cTIn->vVector = cT->vVector;
 		m->hTIn->vVector = hT->vVector;
 		m->fwd();
-		yVec->at(i) = m->y;
+		yVec->at(index) = m->y;
 		cT = m->cTOut;
 		hT = m->hTOut;
+
+		index++;
 
 	}
 
@@ -1663,14 +1677,16 @@ void muBpg::bwd() {
 	ptr<cType> cTGrad = cTOutGrad;
 	ptr<cType> hTGrad = hTOutGrad;
 
-	for (int i = size() - 1; i >= 0; i--) {
+	for (int i = index - 1; i >= 0; i--) {
 
-		muTSBpg* m = (muTSBpg*)at(i).get();
-		m->yGrad = yGradVec->at(i);
+		index--;
+
+		muTSBpg* m = (muTSBpg*)at(index).get();
+		m->yGrad = yGradVec->at(index);
 		m->cTOutGrad = cTGrad;
 		m->hTOutGrad = hTGrad;
 		m->bwd();
-		xGradVec->at(i) = m->xGrad;
+		xGradVec->at(index) = m->xGrad;
 		cTGrad = m->cTInGrad;
 		hTGrad = m->hTInGrad;
 
@@ -1710,6 +1726,7 @@ void muBpg::clear() {
 	vector<ptr<model>>::clear();
 	x->vVector.clear();
 	y->vVector.clear();
+	index = 0;
 }
 #pragma endregion
 

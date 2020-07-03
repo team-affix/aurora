@@ -304,6 +304,7 @@ public:
 	virtual void clear();
 
 	int units;
+	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -331,6 +332,7 @@ public:
 	virtual void clear();
 
 	int units;
+	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -415,6 +417,7 @@ public:
 	int xUnits;
 	int cTUnits;
 	int hTUnits;
+	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -444,6 +447,7 @@ public:
 	int xUnits;
 	int cTUnits;
 	int hTUnits;
+	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;

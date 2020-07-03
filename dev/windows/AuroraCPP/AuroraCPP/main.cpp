@@ -280,7 +280,7 @@ void trainMuBpg() {
 	for (ptr<ptr<param>> pptr : paramPtrVec) {
 		paramSgd* p = new paramSgd();
 		p->gradient = 0;
-		p->learnRate = 0.02;
+		p->learnRate = 0.002;
 		p->state = urd(re);
 		*pptr = p;
 		params.push_back(p);
@@ -323,8 +323,8 @@ void trainMuBpg() {
 			{ 1 },
 			{ 1 },
 			{ 1 },
-			{ 1 },
-			{ 1 },
+			{ 0.754 },
+			{ 0 },
 			{ 1 },
 		}
 	};
