@@ -211,6 +211,9 @@ public:
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
+	virtual void clear();
+
+	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -229,6 +232,9 @@ public:
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
+	virtual void clear();
+
+	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;

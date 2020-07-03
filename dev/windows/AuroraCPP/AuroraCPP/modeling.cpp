@@ -297,11 +297,37 @@ void layerModelWise(function<void(model*)> func, vector<ptr<model>>* models) {
 }
 #pragma endregion
 #pragma region sync
-void syncFwd(ptr<cType> x, ptr<cType> y, vector<ptr<model>>* models) {
-	layerFwd(x, y, models);
+void syncFwd(ptr<cType> x, ptr<cType> y, vector<ptr<model>>* models, int* index) {
+
+	vector<ptr<cType>>* xVec = &x->vVector;
+	vector<ptr<cType>>* yVec = &y->vVector;
+	for (int i = *index; i < models->size(); i++) {
+
+		model* m = models->at(i).get();
+		m->x = xVec->at(i);
+		m->fwd();
+		yVec->at(i) = m->y;
+
+		(*index)++;
+
+	}
+
 }
-void syncBwd(ptr<cType> yGrad, ptr<cType> xGrad, vector<ptr<model>>* models) {
-	layerBwd(yGrad, xGrad, models);
+void syncBwd(ptr<cType> yGrad, ptr<cType> xGrad, vector<ptr<model>>* models, int* index) {
+
+	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
+	vector<ptr<cType>>* yGradVec = &yGrad->vVector;
+	for (int i = *index - 1; i >= 0; i--) {
+
+		(*index)--;
+
+		modelBpg* m = (modelBpg*)models->at(i).get();
+		m->yGrad = yGradVec->at(i);
+		m->bwd();
+		xGradVec->at(i) = m->xGrad;
+		
+	}
+
 }
 void syncModelWise(function<void(model*)> func, vector<ptr<model>>* models) {
 	for (int i = 0; i < models->size(); i++) {
@@ -953,7 +979,7 @@ sync::sync(model* _modelTemplate) {
 	prepared = vector<ptr<model>>();
 }
 void sync::fwd() {
-	syncFwd(x, y, this);
+	syncFwd(x, y, this, &index);
 }
 void sync::modelWise(function<void(model*)> func) {
 	func(this);
@@ -985,6 +1011,12 @@ void sync::unroll(int a) {
 
 	}
 }
+void sync::clear() {
+	vector<ptr<model>>::clear();
+	x->vVector.clear();
+	y->vVector.clear();
+	index = 0;
+}
 
 syncBpg::syncBpg() {
 	prepared = vector<ptr<model>>();
@@ -994,10 +1026,10 @@ syncBpg::syncBpg(model* _modelTemplate) {
 	prepared = vector<ptr<model>>();
 }
 void syncBpg::fwd() {
-	syncFwd(x, y, this);
+	syncFwd(x, y, this, &index);
 }
 void syncBpg::bwd() {
-	syncBwd(yGrad, xGrad, this);
+	syncBwd(yGrad, xGrad, this, &index);
 }
 void syncBpg::modelWise(function<void(model*)> func) {
 	func(this);
@@ -1032,6 +1064,14 @@ void syncBpg::unroll(int a) {
 		push_back(prepared.at(size()));
 
 	}
+}
+void syncBpg::clear() {
+	vector<ptr<model>>::clear();
+	x->vVector.clear();
+	y->vVector.clear();
+	xGrad->vVector.clear();
+	yGrad->vVector.clear();
+	index = 0;
 }
 #pragma endregion
 #pragma region lstmTS
