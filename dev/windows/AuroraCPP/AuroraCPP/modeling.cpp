@@ -94,65 +94,65 @@ seqBpg neuronLRBpg(double m) {
 	return nlr;
 
 }
-void initParam(model* m, vector<sPtr<sPtr<param>>>* paramVecOutput) {
+void initParam(model* m, vector<ptr<ptr<param>>>* paramVecOutput) {
 	if (bias* b = dynamic_cast<bias*>(m)) {
-		b->prm = new sPtr<param>();
+		b->prm = new ptr<param>();
 		paramVecOutput->push_back(b->prm);
 	}
 	else if (biasBpg* b = dynamic_cast<biasBpg*>(m)) {
-		b->prm = new sPtr<param>();
+		b->prm = new ptr<param>();
 		paramVecOutput->push_back(b->prm);
 	}
 	else if (weight* w = dynamic_cast<weight*>(m)) {
-		w->prm = new sPtr<param>();
+		w->prm = new ptr<param>();
 		paramVecOutput->push_back(w->prm);
 	}
 	else if (weightBpg* w = dynamic_cast<weightBpg*>(m)) {
-		w->prm = new sPtr<param>();
+		w->prm = new ptr<param>();
 		paramVecOutput->push_back(w->prm);
 	}
 }
 #pragma endregion
 #pragma region model
-void modelFwd(sPtr<cType> x, sPtr<cType> y) {
+void modelFwd(ptr<cType> x, ptr<cType> y) {
 	*y = *x;
 }
-void modelBwd(sPtr<cType> yGrad, sPtr<cType> xGrad) {
+void modelBwd(ptr<cType> yGrad, ptr<cType> xGrad) {
 	*xGrad = *yGrad;
 }
 #pragma endregion
 #pragma region bias
-void biasFwd(sPtr<cType> x, sPtr<cType> y, sPtr<param> prm) {
+void biasFwd(ptr<cType> x, ptr<cType> y, ptr<param> prm) {
 	y->vDouble = x->vDouble + prm->state;
 }
-void biasBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, sPtr<param> prm) {
+void biasBwd(ptr<cType> yGrad, ptr<cType> xGrad, ptr<param> prm) {
 	paramSgd* p = (paramSgd*)prm.get();
 	p->gradient += yGrad->vDouble;
 	xGrad->vDouble = yGrad->vDouble;
 }
 #pragma endregion
 #pragma region act
-void actFwd(sPtr<cType> x, sPtr<cType> y, sPtr<actFunc> af) {
+void actFwd(ptr<cType> x, ptr<cType> y, ptr<actFunc> af) {
 	y->vDouble = af->eval(x->vDouble);
 }
-void actBwd(sPtr<cType> yGrad, sPtr<cType> y, sPtr<cType> xGrad, sPtr<actFunc> af) {
+void actBwd(ptr<cType> yGrad, ptr<cType> y, ptr<cType> xGrad, ptr<actFunc> af) {
 	xGrad->vDouble = yGrad->vDouble * af->deriv(y->vDouble);
 }
 #pragma endregion
 #pragma region weight
-void weightFwd(sPtr<cType> x, sPtr<cType> y, sPtr<param> prm) {
+void weightFwd(ptr<cType> x, ptr<cType> y, ptr<param> prm) {
 	y->vDouble = x->vDouble * prm->state;
 }
-void weightBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, sPtr<cType> x, sPtr<param> prm) {
+void weightBwd(ptr<cType> yGrad, ptr<cType> xGrad, ptr<cType> x, ptr<param> prm) {
 	paramSgd* p = (paramSgd*)prm.get();
 	p->gradient += yGrad->vDouble * x->vDouble;
 	xGrad->vDouble = yGrad->vDouble * prm->state;
 }
 #pragma endregion
 #pragma region wSet
-void wSetFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
+void wSetFwd(ptr<cType> x, ptr<cType> y, vector<ptr<model>>* models) {
 
-	vector<sPtr<cType>>* yVec = &y->vVector;
+	vector<ptr<cType>>* yVec = &y->vVector;
 	for (int i = 0; i < models->size(); i++) {
 
 		model* m = models->at(i).get();
@@ -163,12 +163,12 @@ void wSetFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
 	}
 
 }
-void wSetBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) {
+void wSetBwd(ptr<cType> yGrad, ptr<cType> xGrad, vector<ptr<model>>* models) {
 
 	// reset xGrad of weightSet to avoid overaccumulation
 	xGrad->vDouble = 0;
 
-	vector<sPtr<cType>>* yGradVec = &yGrad->vVector;
+	vector<ptr<cType>>* yGradVec = &yGrad->vVector;
 	for (int i = 0; i < models->size(); i++) {
 
 		modelBpg* m = (modelBpg*)models->at(i).get();
@@ -179,18 +179,18 @@ void wSetBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) 
 	}
 
 }
-void wSetModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
+void wSetModelWise(function<void(model*)> func, vector<ptr<model>>* models) {
 	for (int i = 0; i < models->size(); i++) {
 		models->at(i)->modelWise(func);
 	}
 }
 #pragma endregion
 #pragma region wJunc
-void wJuncFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
+void wJuncFwd(ptr<cType> x, ptr<cType> y, vector<ptr<model>>* models) {
 
 	// reset all values in vector to zero, to ensure that no overaccumulation occurs
 	clear1D(y);
-	vector<sPtr<cType>>* xVec = &x->vVector;
+	vector<ptr<cType>>* xVec = &x->vVector;
 	for (int i = 0; i < models->size(); i++) {
 
 		model* m = models->at(i).get();
@@ -203,9 +203,9 @@ void wJuncFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
 	}
 
 }
-void wJuncBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) {
+void wJuncBwd(ptr<cType> yGrad, ptr<cType> xGrad, vector<ptr<model>>* models) {
 
-	vector<sPtr<cType>>* xGradVec = &xGrad->vVector;
+	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
 	for (int i = 0; i < models->size(); i++) {
 
 		modelBpg* m = (modelBpg*)models->at(i).get();
@@ -216,16 +216,16 @@ void wJuncBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models)
 	}
 
 }
-void wJuncModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
+void wJuncModelWise(function<void(model*)> func, vector<ptr<model>>* models) {
 	for (int i = 0; i < models->size(); i++) {
 		models->at(i)->modelWise(func);
 	}
 }
 #pragma endregion
 #pragma region seq
-void seqFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
+void seqFwd(ptr<cType> x, ptr<cType> y, vector<ptr<model>>* models) {
 
-	sPtr<cType> currentInput = x;
+	ptr<cType> currentInput = x;
 	for (int i = 0; i < models->size(); i++) {
 
 		model* m = models->at(i).get();
@@ -237,9 +237,9 @@ void seqFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
 	*y = *currentInput;
 
 }
-void seqBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) {
+void seqBwd(ptr<cType> yGrad, ptr<cType> xGrad, vector<ptr<model>>* models) {
 
-	sPtr<cType> currentGradient = yGrad;
+	ptr<cType> currentGradient = yGrad;
 	for (int i = models->size() - 1; i >= 0; i--) {
 
 		modelBpg* m = (modelBpg*)models->at(i).get();
@@ -251,7 +251,7 @@ void seqBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) {
 	*xGrad = *currentGradient;
 
 }
-void seqModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
+void seqModelWise(function<void(model*)> func, vector<ptr<model>>* models) {
 
 	for (int i = 0; i < models->size(); i++) {
 
@@ -262,10 +262,10 @@ void seqModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
 }
 #pragma endregion
 #pragma region layer
-void layerFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
+void layerFwd(ptr<cType> x, ptr<cType> y, vector<ptr<model>>* models) {
 
-	vector<sPtr<cType>>* xVec = &x->vVector;
-	vector<sPtr<cType>>* yVec = &y->vVector;
+	vector<ptr<cType>>* xVec = &x->vVector;
+	vector<ptr<cType>>* yVec = &y->vVector;
 	for (int i = 0; i < models->size(); i++) {
 
 		model* m = models->at(i).get();
@@ -276,10 +276,10 @@ void layerFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
 	}
 
 }
-void layerBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) {
+void layerBwd(ptr<cType> yGrad, ptr<cType> xGrad, vector<ptr<model>>* models) {
 
-	vector<sPtr<cType>>* xGradVec = &xGrad->vVector;
-	vector<sPtr<cType>>* yGradVec = &yGrad->vVector;
+	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
+	vector<ptr<cType>>* yGradVec = &yGrad->vVector;
 	for (int i = 0; i < models->size(); i++) {
 
 		modelBpg* m = (modelBpg*)models->at(i).get();
@@ -290,39 +290,39 @@ void layerBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models)
 	}
 
 }
-void layerModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
+void layerModelWise(function<void(model*)> func, vector<ptr<model>>* models) {
 	for (int i = 0; i < models->size(); i++) {
 		models->at(i)->modelWise(func);
 	}
 }
 #pragma endregion
 #pragma region sync
-void syncFwd(sPtr<cType> x, sPtr<cType> y, vector<sPtr<model>>* models) {
+void syncFwd(ptr<cType> x, ptr<cType> y, vector<ptr<model>>* models) {
 	layerFwd(x, y, models);
 }
-void syncBwd(sPtr<cType> yGrad, sPtr<cType> xGrad, vector<sPtr<model>>* models) {
+void syncBwd(ptr<cType> yGrad, ptr<cType> xGrad, vector<ptr<model>>* models) {
 	layerBwd(yGrad, xGrad, models);
 }
-void syncModelWise(function<void(model*)> func, vector<sPtr<model>>* models) {
+void syncModelWise(function<void(model*)> func, vector<ptr<model>>* models) {
 	for (int i = 0; i < models->size(); i++) {
 		models->at(i)->modelWise(func);
 	}
 }
 #pragma endregion
 #pragma region lstmTS
-void lstmTSFwd(sPtr<cType> x, sPtr<cType> cTIn, sPtr<cType> hTIn,
-	sPtr<cType> comp_LenUnits, sPtr<cType> comp_Len2Units,
-	sPtr<cType> y, sPtr<cType> cTOut, sPtr<cType> hTOut,
-	sPtr<model> aGate, sPtr<model> bGate, sPtr<model> cGate, sPtr<model> dGate) {
+void lstmTSFwd(ptr<cType> x, ptr<cType> cTIn, ptr<cType> hTIn,
+	ptr<cType> comp_LenUnits, ptr<cType> comp_Len2Units,
+	ptr<cType> y, ptr<cType> cTOut, ptr<cType> hTOut,
+	ptr<model> aGate, ptr<model> bGate, ptr<model> cGate, ptr<model> dGate) {
 	
 	// import cTypes used for computation output that are of length: units
-	vector<sPtr<cType>>* compVec_LenUnits = &comp_LenUnits->vVector;
-	sPtr<cType> cT = compVec_LenUnits->at(0);
-	sPtr<cType> bYTimescY = compVec_LenUnits->at(1);
+	vector<ptr<cType>>* compVec_LenUnits = &comp_LenUnits->vVector;
+	ptr<cType> cT = compVec_LenUnits->at(0);
+	ptr<cType> bYTimescY = compVec_LenUnits->at(1);
 
 	// import cTypes used for computation output that are of length: 2 * units
-	vector<sPtr<cType>>* compVec_Len2Units = &comp_Len2Units->vVector;
-	sPtr<cType> xConcatHTIn = compVec_Len2Units->at(0);
+	vector<ptr<cType>>* compVec_Len2Units = &comp_Len2Units->vVector;
+	ptr<cType> xConcatHTIn = compVec_Len2Units->at(0);
 
 	concat(x, hTIn, xConcatHTIn);
 
@@ -344,23 +344,23 @@ void lstmTSFwd(sPtr<cType> x, sPtr<cType> cTIn, sPtr<cType> hTIn,
 
 }
 void lstmTSBwd(int units,
-	sPtr<cType> comp_LenUnits, sPtr<cType> comp_Len2Units,
-	sPtr<cType> cTOut, sPtr<cType> cTIn,
-	sPtr<cType> yGrad, sPtr<cType> cTOutGrad, sPtr<cType> hTOutGrad,
-	sPtr<cType> xGrad, sPtr<cType> cTInGrad, sPtr<cType> hTInGrad,
-	sPtr<model> aGate, sPtr<model> bGate, sPtr<model> cGate, sPtr<model> dGate) {
+	ptr<cType> comp_LenUnits, ptr<cType> comp_Len2Units,
+	ptr<cType> cTOut, ptr<cType> cTIn,
+	ptr<cType> yGrad, ptr<cType> cTOutGrad, ptr<cType> hTOutGrad,
+	ptr<cType> xGrad, ptr<cType> cTInGrad, ptr<cType> hTInGrad,
+	ptr<model> aGate, ptr<model> bGate, ptr<model> cGate, ptr<model> dGate) {
 
 	// import cTypes used for computation output that are of length: units
-	vector<sPtr<cType>>* compVec_LenUnits = &comp_LenUnits->vVector;
-	sPtr<cType> hTGrad = compVec_LenUnits->at(0);
-	sPtr<cType> dYTimeshTGrad = compVec_LenUnits->at(1);
-	sPtr<cType> cTGrad = compVec_LenUnits->at(2);
+	vector<ptr<cType>>* compVec_LenUnits = &comp_LenUnits->vVector;
+	ptr<cType> hTGrad = compVec_LenUnits->at(0);
+	ptr<cType> dYTimeshTGrad = compVec_LenUnits->at(1);
+	ptr<cType> cTGrad = compVec_LenUnits->at(2);
 
 	// import cTypes used for computation output that are of length: 2 * units
-	vector<sPtr<cType>>* compVec_Len2Units = &comp_Len2Units->vVector;
-	sPtr<cType> xGradSum1 = compVec_Len2Units->at(0);
-	sPtr<cType> xGradSum2 = compVec_Len2Units->at(1);
-	sPtr<cType> xGradSum3 = compVec_Len2Units->at(2);
+	vector<ptr<cType>>* compVec_Len2Units = &comp_Len2Units->vVector;
+	ptr<cType> xGradSum1 = compVec_Len2Units->at(0);
+	ptr<cType> xGradSum2 = compVec_Len2Units->at(1);
+	ptr<cType> xGradSum3 = compVec_Len2Units->at(2);
 
 	// cast all gates to the modelBpgs that they are
 	modelBpg* aGateBpg = (modelBpg*)aGate.get();
@@ -395,7 +395,7 @@ void lstmTSBwd(int units,
 	copy1D(xGradSum3, hTInGrad, units, units, 0);
 
 }
-void lstmTSModelWise(function<void(model*)> func, sPtr<model> aGate, sPtr<model> bGate, sPtr<model> cGate, sPtr<model> dGate) {
+void lstmTSModelWise(function<void(model*)> func, ptr<model> aGate, ptr<model> bGate, ptr<model> cGate, ptr<model> dGate) {
 	aGate->modelWise(func);
 	bGate->modelWise(func);
 	cGate->modelWise(func);
@@ -403,9 +403,58 @@ void lstmTSModelWise(function<void(model*)> func, sPtr<model> aGate, sPtr<model>
 }
 #pragma endregion
 #pragma region lstm
-void lstmModelWise(function<void(model*)> func, sPtr<model> lstmTSTemplate) {
+void lstmModelWise(function<void(model*)> func, ptr<model> lstmTSTemplate) {
 
 	lstmTSTemplate->modelWise(func);
+
+}
+#pragma endregion
+#pragma region muTS
+void muTSFwd(int xUnits, int cTUnits, int hTUnits, ptr<cType> comp_LenCTUnits, ptr<cType> x, ptr<cType> y, ptr<cType> cTIn, ptr<cType> cTOut, ptr<cType> hTIn, ptr<cType> hTOut, ptr<model> gate) {
+
+	// import compuation cTypes
+	vector<ptr<cType>>* comp_LenCTUnitsVec = &comp_LenCTUnits->vVector;
+	ptr<cType> cTAddOperand = comp_LenCTUnitsVec->at(0);
+
+	concat({ x, cTIn, hTIn }, gate->x);
+	gate->fwd();
+	copy1D(gate->y, cTAddOperand, 0, cTUnits, 0);
+	add1D(cTIn, cTAddOperand, cTOut);
+	copy1D(gate->y, hTOut, cTUnits, hTUnits, 0);
+	copy1D(hTOut, y);
+
+}
+void muTSBwd(int xUnits, int cTUnits, int hTUnits, ptr<cType> comp_LenCTUnits, ptr<cType> comp_LenHTUnits, ptr<cType> xGrad, ptr<cType> yGrad, ptr<cType> cTInGrad, ptr<cType> cTOutGrad, ptr<cType> hTInGrad, ptr<cType> hTOutGrad, ptr<model> gate) {
+
+	// import compuation cTypes
+	vector<ptr<cType>>* comp_LenCTUnitsVec = &comp_LenCTUnits->vVector;
+	ptr<cType> cTCopyOperand = comp_LenCTUnitsVec->at(0);
+
+	vector<ptr<cType>>* comp_LenHTUnitsVec = &comp_LenHTUnits->vVector;
+	ptr<cType> hTAddOperand = comp_LenHTUnitsVec->at(0);
+
+	modelBpg* gateBpg = (modelBpg*)gate.get();
+
+	add1D(yGrad, hTOutGrad, hTAddOperand);
+	copy1D(cTOutGrad, gateBpg->yGrad, 0, cTUnits, 0);
+	copy1D(hTAddOperand, gateBpg->yGrad, 0, hTUnits, cTUnits);
+	gateBpg->bwd();
+	copy1D(gateBpg->xGrad, cTCopyOperand, xUnits, cTUnits, 0);
+	add1D(cTCopyOperand, cTOutGrad, cTInGrad);
+	copy1D(gateBpg->xGrad, xGrad, 0, xUnits, 0);
+	copy1D(gateBpg->xGrad, hTInGrad, xUnits + cTUnits, hTUnits, 0);
+
+}
+void muTSModelWise(function<void(model*)> func, ptr<model> gate) {
+
+	gate->modelWise(func);
+
+}
+#pragma endregion
+#pragma region mu
+void muModelWise(function<void(model*)> func, ptr<model> muTSTemplate) {
+
+	muTSTemplate->modelWise(func);
 
 }
 #pragma endregion
@@ -425,7 +474,7 @@ void model::fwd() {
 void model::modelWise(function<void(model*)> func) {
 	func(this);
 }
-sPtr<model> model::clone() {
+ptr<model> model::clone() {
 	return new model();
 }
 modelBpg::modelBpg() {
@@ -437,7 +486,7 @@ modelBpg::modelBpg() {
 void modelBpg::bwd() {
 	modelBwd(yGrad, xGrad);
 }
-sPtr<model> modelBpg::clone() {
+ptr<model> modelBpg::clone() {
 	return new modelBpg(*this);
 }
 #pragma endregion
@@ -449,7 +498,7 @@ bias::bias() {
 void bias::fwd() {
 	biasFwd(x, y, *prm);
 }
-sPtr<model> bias::clone() {
+ptr<model> bias::clone() {
 	bias* result = new bias();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -468,7 +517,7 @@ void biasBpg::fwd() {
 void biasBpg::bwd() {
 	biasBwd(yGrad, xGrad, *prm);
 }
-sPtr<model> biasBpg::clone() {
+ptr<model> biasBpg::clone() {
 	biasBpg* result = new biasBpg();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -487,7 +536,7 @@ act::act(actFunc* _af) {
 	y = new cType(0);
 	this->af = _af;
 }
-act::act(sPtr<actFunc> _af) {
+act::act(ptr<actFunc> _af) {
 	x = new cType(0);
 	y = new cType(0);
 	this->af = _af;
@@ -495,7 +544,7 @@ act::act(sPtr<actFunc> _af) {
 void act::fwd() {
 	actFwd(x, y, af);
 }
-sPtr<model> act::clone() {
+ptr<model> act::clone() {
 	act* result = new act();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -512,7 +561,7 @@ actBpg::actBpg(actFunc* _af) {
 	yGrad = new cType(0);
 	this->af = _af;
 }
-actBpg::actBpg(sPtr<actFunc> _af) {
+actBpg::actBpg(ptr<actFunc> _af) {
 	x = new cType(0);
 	y = new cType(0);
 	this->af = _af;
@@ -523,7 +572,7 @@ void actBpg::fwd() {
 void actBpg::bwd() {
 	actBwd(yGrad, y, xGrad, af);
 }
-sPtr<model> actBpg::clone() {
+ptr<model> actBpg::clone() {
 	actBpg* result = new actBpg();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -541,7 +590,7 @@ weight::weight() {
 void weight::fwd() {
 	weightFwd(x, y, *prm);
 }
-sPtr<model> weight::clone() {
+ptr<model> weight::clone() {
 	weight* result = new weight();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -560,7 +609,7 @@ void weightBpg::fwd() {
 void weightBpg::bwd() {
 	weightBwd(yGrad, xGrad, x, *prm);
 }
-sPtr<model> weightBpg::clone() {
+ptr<model> weightBpg::clone() {
 	weightBpg* result = new weightBpg();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -590,7 +639,7 @@ void wSet::modelWise(function<void(model*)> func) {
 	func(this);
 	wSetModelWise(func, this);
 }
-sPtr<model> wSet::clone() {
+ptr<model> wSet::clone() {
 	wSet* result = new wSet();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -624,7 +673,7 @@ void wSetBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	wSetModelWise(func, this);
 }
-sPtr<model> wSetBpg::clone() {
+ptr<model> wSetBpg::clone() {
 	wSetBpg* result = new wSetBpg();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -664,7 +713,7 @@ void wJunc::modelWise(function<void(model*)> func) {
 	func(this);
 	wJuncModelWise(func, this);
 }
-sPtr<model> wJunc::clone() {
+ptr<model> wJunc::clone() {
 	wJunc* result = new wJunc();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -708,7 +757,7 @@ void wJuncBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	wJuncModelWise(func, this);
 }
-sPtr<model> wJuncBpg::clone() {
+ptr<model> wJuncBpg::clone() {
 	wJuncBpg* result = new wJuncBpg();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -732,7 +781,7 @@ void seq::modelWise(function<void(model*)> func) {
 	func(this);
 	seqModelWise(func, this);
 }
-sPtr<model> seq::clone() {
+ptr<model> seq::clone() {
 	seq* result = new seq();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -757,7 +806,7 @@ void seqBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	seqModelWise(func, this);
 }
-sPtr<model> seqBpg::clone() {
+ptr<model> seqBpg::clone() {
 	seqBpg* result = new seqBpg();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -792,7 +841,7 @@ layer::layer(int a, model* modelTemplate) {
 	}
 
 }
-layer::layer(int a, sPtr<model> modelTemplate) {
+layer::layer(int a, ptr<model> modelTemplate) {
 
 	x = new cType({});
 	y = new cType({});
@@ -815,7 +864,7 @@ void layer::modelWise(function<void(model*)> func) {
 	func(this);
 	layerModelWise(func, this);
 }
-sPtr<model> layer::clone() {
+ptr<model> layer::clone() {
 	layer* result = new layer();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -853,7 +902,7 @@ layerBpg::layerBpg(int a, model* modelTemplate) {
 	}
 
 }
-layerBpg::layerBpg(int a, sPtr<model> modelTemplate) {
+layerBpg::layerBpg(int a, ptr<model> modelTemplate) {
 
 	x = new cType({});
 	y = new cType({});
@@ -883,7 +932,7 @@ void layerBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	layerModelWise(func, this);
 }
-sPtr<model> layerBpg::clone() {
+ptr<model> layerBpg::clone() {
 	layerBpg* result = new layerBpg();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -897,11 +946,11 @@ sPtr<model> layerBpg::clone() {
 #pragma endregion
 #pragma region sync
 sync::sync() {
-	prepared = vector<sPtr<model>>();
+	prepared = vector<ptr<model>>();
 }
 sync::sync(model* _modelTemplate) {
 	this->modelTemplate = _modelTemplate;
-	prepared = vector<sPtr<model>>();
+	prepared = vector<ptr<model>>();
 }
 void sync::fwd() {
 	syncFwd(x, y, this);
@@ -910,7 +959,7 @@ void sync::modelWise(function<void(model*)> func) {
 	func(this);
 	syncModelWise(func, this);
 }
-sPtr<model> sync::clone() {
+ptr<model> sync::clone() {
 	sync* result = new sync();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -938,11 +987,11 @@ void sync::unroll(int a) {
 }
 
 syncBpg::syncBpg() {
-	prepared = vector<sPtr<model>>();
+	prepared = vector<ptr<model>>();
 }
 syncBpg::syncBpg(model* _modelTemplate) {
 	this->modelTemplate = _modelTemplate;
-	prepared = vector<sPtr<model>>();
+	prepared = vector<ptr<model>>();
 }
 void syncBpg::fwd() {
 	syncFwd(x, y, this);
@@ -954,7 +1003,7 @@ void syncBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	syncModelWise(func, this);
 }
-sPtr<model> syncBpg::clone() {
+ptr<model> syncBpg::clone() {
 	syncBpg* result = new syncBpg();
 	result->x = new cType(*x);
 	result->y = new cType(*y);
@@ -997,7 +1046,7 @@ lstmTS::lstmTS() {
 	this->hTOut = new cType({});
 
 }
-lstmTS::lstmTS(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate) {
+lstmTS::lstmTS(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate) {
 
 	this->units = _units;
 	this->aGate = _aGate;
@@ -1033,7 +1082,7 @@ void lstmTS::modelWise(function<void(model*)> func) {
 	func(this);
 	lstmTSModelWise(func, aGate, bGate, cGate, dGate);
 }
-sPtr<model> lstmTS::clone() {
+ptr<model> lstmTS::clone() {
 
 	lstmTS* result = new lstmTS(units, aGate->clone(), bGate->clone(), cGate->clone(), dGate->clone());
 	return result;
@@ -1051,7 +1100,7 @@ lstmTSBpg::lstmTSBpg() {
 	this->hTOut = new cType({});
 
 }
-lstmTSBpg::lstmTSBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate) {
+lstmTSBpg::lstmTSBpg(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate) {
 
 	this->units = _units;
 	this->aGate = _aGate;
@@ -1114,7 +1163,7 @@ void lstmTSBpg::modelWise(function<void(model*)> func) {
 	func(this);
 	lstmTSModelWise(func, aGate, bGate, cGate, dGate);
 }
-sPtr<model> lstmTSBpg::clone() {
+ptr<model> lstmTSBpg::clone() {
 
 	lstmTSBpg* result = new lstmTSBpg(units, aGate->clone(), bGate->clone(), cGate->clone(), dGate->clone());
 	return result;
@@ -1133,10 +1182,10 @@ lstm::lstm(int _units) {
 	seq nth = neuronTh();
 	seq nsm = neuronSm();
 
-	sPtr<model> aGate = tnn({ 2 * units, units }, { &nlr, &nsm });
-	sPtr<model> bGate = tnn({ 2 * units, units }, { &nlr, &nsm });
-	sPtr<model> cGate = tnn({ 2 * units, units }, { &nlr, &nth });
-	sPtr<model> dGate = tnn({ 2 * units, units }, { &nlr, &nsm });
+	ptr<model> aGate = tnn({ 2 * units, units }, { &nlr, &nsm });
+	ptr<model> bGate = tnn({ 2 * units, units }, { &nlr, &nsm });
+	ptr<model> cGate = tnn({ 2 * units, units }, { &nlr, &nth });
+	ptr<model> dGate = tnn({ 2 * units, units }, { &nlr, &nsm });
 
 	this->hTIn = make1D(units);
 	this->cTIn = make1D(units);
@@ -1146,7 +1195,7 @@ lstm::lstm(int _units) {
 	this->lstmTSTemplate = new lstmTS(units, aGate, bGate, cGate, dGate);
 
 }
-lstm::lstm(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate) {
+lstm::lstm(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate) {
 	
 	this->units = _units;
 
@@ -1160,11 +1209,11 @@ lstm::lstm(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGat
 }
 void lstm::fwd() {
 
-	vector<sPtr<cType>>* xVec = &x->vVector;
-	vector<sPtr<cType>>* yVec = &y->vVector;
+	vector<ptr<cType>>* xVec = &x->vVector;
+	vector<ptr<cType>>* yVec = &y->vVector;
 
-	sPtr<cType> cT = cTIn;
-	sPtr<cType> hT = hTIn;
+	ptr<cType> cT = cTIn;
+	ptr<cType> hT = hTIn;
 
 	for (int i = 0; i < size(); i++) {
 
@@ -1189,7 +1238,7 @@ void lstm::modelWise(function<void(model*)> func) {
 	lstmModelWise(func, lstmTSTemplate);
 
 }
-sPtr<model> lstm::clone() {
+ptr<model> lstm::clone() {
 
 	lstm* result = new lstm();
 	result->units = units;
@@ -1210,7 +1259,7 @@ void lstm::unroll(int a) {
 	}
 }
 void lstm::clear() {
-	vector<sPtr<model>>::clear();
+	vector<ptr<model>>::clear();
 	x->vVector.clear();
 	y->vVector.clear();
 }
@@ -1226,10 +1275,10 @@ lstmBpg::lstmBpg(int _units) {
 	seqBpg nth = neuronThBpg();
 	seqBpg nsm = neuronSmBpg();
 
-	sPtr<model> aGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
-	sPtr<model> bGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
-	sPtr<model> cGate = tnnBpg({ 2 * units, units }, { &nlr, &nth });
-	sPtr<model> dGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
+	ptr<model> aGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
+	ptr<model> bGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
+	ptr<model> cGate = tnnBpg({ 2 * units, units }, { &nlr, &nth });
+	ptr<model> dGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
 
 	this->hTIn = make1D(units);
 	this->cTIn = make1D(units);
@@ -1244,7 +1293,7 @@ lstmBpg::lstmBpg(int _units) {
 	this->lstmTSTemplate = new lstmTSBpg(units, aGate, bGate, cGate, dGate);
 
 }
-lstmBpg::lstmBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate) {
+lstmBpg::lstmBpg(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate) {
 
 	this->units = _units;
 
@@ -1263,11 +1312,11 @@ lstmBpg::lstmBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model>
 }
 void lstmBpg::fwd() {
 
-	vector<sPtr<cType>>* xVec = &x->vVector;
-	vector<sPtr<cType>>* yVec = &y->vVector;
+	vector<ptr<cType>>* xVec = &x->vVector;
+	vector<ptr<cType>>* yVec = &y->vVector;
 
-	sPtr<cType> cT = cTIn;
-	sPtr<cType> hT = hTIn;
+	ptr<cType> cT = cTIn;
+	ptr<cType> hT = hTIn;
 
 	for (int i = 0; i < size(); i++) {
 
@@ -1288,11 +1337,11 @@ void lstmBpg::fwd() {
 }
 void lstmBpg::bwd() {
 
-	vector<sPtr<cType>>* yGradVec = &yGrad->vVector;
-	vector<sPtr<cType>>* xGradVec = &xGrad->vVector;
+	vector<ptr<cType>>* yGradVec = &yGrad->vVector;
+	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
 
-	sPtr<cType> cTGrad = cTOutGrad;
-	sPtr<cType> hTGrad = hTOutGrad;
+	ptr<cType> cTGrad = cTOutGrad;
+	ptr<cType> hTGrad = hTOutGrad;
 
 	for (int i = size() - 1; i >= 0; i--) {
 
@@ -1317,7 +1366,7 @@ void lstmBpg::modelWise(function<void(model*)> func) {
 	lstmModelWise(func, lstmTSTemplate);
 
 }
-sPtr<model> lstmBpg::clone() {
+ptr<model> lstmBpg::clone() {
 
 	lstmBpg* result = new lstmBpg();
 	result->units = units;
@@ -1340,37 +1389,327 @@ void lstmBpg::unroll(int a) {
 	}
 }
 void lstmBpg::clear() {
-	vector<sPtr<model>>::clear();
+	vector<ptr<model>>::clear();
 	x->vVector.clear();
 	y->vVector.clear();
 	xGrad->vVector.clear();
 	yGrad->vVector.clear();
 }
 #pragma endregion
-#pragma region att
-attLstm::attLstm() {
+#pragma region muTS
+muTS::muTS() {
 
 }
-attLstm::attLstm(int _unitsIn, int _unitsOut) {
+muTS::muTS(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate) {
+	
+	this->xUnits = _xUnits;
+	this->cTUnits = _cTUnits;
+	this->hTUnits = _hTUnits;
+	this->gate = _gate;
+
+	this->x = make1D(xUnits);
+	this->y = make1D(hTUnits);
+
+	this->gate->x = make1D(xUnits + cTUnits + hTUnits);
+	this->gate->y = make1D(cTUnits + hTUnits);
+
+	this->cTIn = make1D(cTUnits);
+	this->cTOut = make1D(cTUnits);
+	this->hTIn = make1D(hTUnits);
+	this->hTOut = make1D(hTUnits);
+
+	this->comp_LenCTUnits = make2D(1, cTUnits);
 
 }
-void attLstm::fwd() {
+void muTS::fwd() {
+
+	muTSFwd(xUnits, cTUnits, hTUnits, comp_LenCTUnits, x, y, cTIn, cTOut, hTIn, hTOut, gate);
 
 }
-void attLstm::modelWise(function<void(model*)> func) {
+void muTS::modelWise(function<void(model*)> func) {
+
+	func(this);
+	muTSModelWise(func, gate);
 
 }
-sPtr<model> attLstm::clone() {
-	return new model();
-}
-void attLstm::prep(int a) {
+ptr<model> muTS::clone() {
+
+	muTS* result = new muTS(xUnits, cTUnits, hTUnits, gate->clone());
+	return result;
 
 }
-void attLstm::unroll(int a) {
+muTSBpg::muTSBpg() {
 
 }
-void attLstm::clear() {
+muTSBpg::muTSBpg(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate) {
 
+	this->xUnits = _xUnits;
+	this->cTUnits = _cTUnits;
+	this->hTUnits = _hTUnits;
+	this->gate = _gate;
+
+	this->x = make1D(xUnits);
+	this->y = make1D(hTUnits);
+	this->xGrad = make1D(xUnits);
+	this->yGrad = make1D(hTUnits);
+
+	modelBpg* gateBpg = (modelBpg*)gate.get();
+
+	gateBpg->x = make1D(xUnits + cTUnits + hTUnits);
+	gateBpg->y = make1D(cTUnits + hTUnits);
+	gateBpg->xGrad = make1D(xUnits + cTUnits + hTUnits);
+	gateBpg->yGrad = make1D(cTUnits + hTUnits);
+
+	this->cTIn = make1D(cTUnits);
+	this->cTOut = make1D(cTUnits);
+	this->hTIn = make1D(hTUnits);
+	this->hTOut = make1D(hTUnits);
+
+	this->cTInGrad = make1D(cTUnits);
+	this->cTOutGrad = make1D(cTUnits);
+	this->hTInGrad = make1D(hTUnits);
+	this->hTOutGrad = make1D(hTUnits);
+
+	this->comp_LenCTUnits = make2D(1, cTUnits);
+	this->comp_LenHTUnits = make2D(1, hTUnits);
+
+}
+void muTSBpg::fwd() {
+
+	muTSFwd(xUnits, cTUnits, hTUnits, comp_LenCTUnits, x, y, cTIn, cTOut, hTIn, hTOut, gate);
+
+}
+void muTSBpg::bwd() {
+
+	muTSBwd(xUnits, cTUnits, hTUnits, comp_LenCTUnits, comp_LenHTUnits, xGrad, yGrad, cTInGrad, cTOutGrad, hTInGrad, hTOutGrad, gate);
+
+}
+void muTSBpg::modelWise(function<void(model*)> func) {
+
+	func(this);
+	muTSModelWise(func, gate);
+
+}
+ptr<model> muTSBpg::clone() {
+
+	muTSBpg* result = new muTSBpg(xUnits, cTUnits, hTUnits, gate->clone());
+	return result;
+
+}
+#pragma endregion
+#pragma region mu
+mu::mu() {
+
+}
+mu::mu(int _xUnits, int _cTUnits, int _hTUnits) {
+
+	this->xUnits = _xUnits;
+	this->cTUnits = _cTUnits;
+	this->hTUnits = _hTUnits;
+
+	this->cTIn = make1D(cTUnits);
+	this->cTOut = make1D(cTUnits);
+	this->hTIn = make1D(hTUnits);
+	this->hTOut = make1D(hTUnits);
+
+	seq nlr = neuronLR(0.05);
+
+	ptr<model> gateTemplate = tnn({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, &nlr);
+	muTSTemplate = new muTS(xUnits, cTUnits, hTUnits, gateTemplate);
+
+}
+mu::mu(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate) {
+
+	this->xUnits = _xUnits;
+	this->cTUnits = _cTUnits;
+	this->hTUnits = _hTUnits;
+
+	this->cTIn = make1D(cTUnits);
+	this->cTOut = make1D(cTUnits);
+	this->hTIn = make1D(hTUnits);
+	this->hTOut = make1D(hTUnits);
+
+	muTSTemplate = new muTSBpg(xUnits, cTUnits, hTUnits, _gate);
+
+}
+void mu::fwd() {
+
+	vector<ptr<cType>>* xVec = &x->vVector;
+	vector<ptr<cType>>* yVec = &y->vVector;
+
+	ptr<cType> cT = cTIn;
+	ptr<cType> hT = hTIn;
+
+	for (int i = 0; i < size(); i++) {
+
+		muTS* m = (muTS*)at(i).get();
+		m->x->vVector = xVec->at(i)->vVector;
+		m->cTIn->vVector = cT->vVector;
+		m->hTIn->vVector = hT->vVector;
+		m->fwd();
+		yVec->at(i) = m->y;
+		cT = m->cTOut;
+		hT = m->hTOut;
+
+	}
+
+	cTOut->vVector = cT->vVector;
+	hTOut->vVector = hT->vVector;
+
+}
+void mu::modelWise(function<void(model*)> func) {
+
+	func(this);
+	muModelWise(func, muTSTemplate);
+
+}
+ptr<model> mu::clone() {
+
+	mu* result = new mu(xUnits, cTUnits, hTUnits, muTSTemplate->clone());
+	return result;
+
+}
+void mu::prep(int a) {
+	for (int i = 0; i < a; i++) {
+		prepared.push_back(muTSTemplate->clone());
+	}
+}
+void mu::unroll(int a) {
+	for (int i = 0; i < a; i++) {
+		push_back(prepared.at(size()));
+		x->vVector.push_back(new cType{});
+		y->vVector.push_back(new cType{});
+	}
+}
+void mu::clear() {
+	vector<ptr<model>>::clear();
+	x->vVector.clear();
+	y->vVector.clear();
+}
+muBpg::muBpg() {
+
+}
+muBpg::muBpg(int _xUnits, int _cTUnits, int _hTUnits) {
+
+	this->xUnits = _xUnits;
+	this->cTUnits = _cTUnits;
+	this->hTUnits = _hTUnits;
+
+	this->cTIn = make1D(cTUnits);
+	this->cTOut = make1D(cTUnits);
+	this->hTIn = make1D(hTUnits);
+	this->hTOut = make1D(hTUnits);
+
+	this->cTInGrad = make1D(cTUnits);
+	this->cTOutGrad = make1D(cTUnits);
+	this->hTInGrad = make1D(hTUnits);
+	this->hTOutGrad = make1D(hTUnits);
+
+	seqBpg nlr = neuronLRBpg(0.05);
+
+	ptr<model> gateTemplate = tnnBpg({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, &nlr);
+	muTSTemplate = new muTSBpg(xUnits, cTUnits, hTUnits, gateTemplate);
+
+}
+muBpg::muBpg(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate) {
+
+	this->xUnits = _xUnits;
+	this->cTUnits = _cTUnits;
+	this->hTUnits = _hTUnits;
+
+	this->cTIn = make1D(cTUnits);
+	this->cTOut = make1D(cTUnits);
+	this->hTIn = make1D(hTUnits);
+	this->hTOut = make1D(hTUnits);
+
+	this->cTInGrad = make1D(cTUnits);
+	this->cTOutGrad = make1D(cTUnits);
+	this->hTInGrad = make1D(hTUnits);
+	this->hTOutGrad = make1D(hTUnits);
+
+	muTSTemplate = new muTSBpg(xUnits, cTUnits, hTUnits, _gate);
+
+}
+void muBpg::fwd() {
+
+	vector<ptr<cType>>* xVec = &x->vVector;
+	vector<ptr<cType>>* yVec = &y->vVector;
+
+	ptr<cType> cT = cTIn;
+	ptr<cType> hT = hTIn;
+
+	for (int i = 0; i < size(); i++) {
+
+		muTSBpg* m = (muTSBpg*)at(i).get();
+		m->x->vVector = xVec->at(i)->vVector;
+		m->cTIn->vVector = cT->vVector;
+		m->hTIn->vVector = hT->vVector;
+		m->fwd();
+		yVec->at(i) = m->y;
+		cT = m->cTOut;
+		hT = m->hTOut;
+
+	}
+
+	cTOut->vVector = cT->vVector;
+	hTOut->vVector = hT->vVector;
+
+}
+void muBpg::bwd() {
+
+	vector<ptr<cType>>* yGradVec = &yGrad->vVector;
+	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
+
+	ptr<cType> cTGrad = cTOutGrad;
+	ptr<cType> hTGrad = hTOutGrad;
+
+	for (int i = size() - 1; i >= 0; i--) {
+
+		muTSBpg* m = (muTSBpg*)at(i).get();
+		m->yGrad = yGradVec->at(i);
+		m->cTOutGrad = cTGrad;
+		m->hTOutGrad = hTGrad;
+		m->bwd();
+		xGradVec->at(i) = m->xGrad;
+		cTGrad = m->cTInGrad;
+		hTGrad = m->hTInGrad;
+
+	}
+
+	cTInGrad = cTGrad;
+	hTInGrad = hTGrad;
+
+}
+void muBpg::modelWise(function<void(model*)> func) {
+
+	func(this);
+	muModelWise(func, muTSTemplate);
+
+}
+ptr<model> muBpg::clone() {
+
+	muBpg* result = new muBpg(xUnits, cTUnits, hTUnits, muTSTemplate->clone());
+	return result;
+
+}
+void muBpg::prep(int a) {
+	for (int i = 0; i < a; i++) {
+		prepared.push_back(muTSTemplate->clone());
+	}
+}
+void muBpg::unroll(int a) {
+	for (int i = 0; i < a; i++) {
+		push_back(prepared.at(size()));
+		x->vVector.push_back(new cType{});
+		y->vVector.push_back(new cType{});
+		xGrad->vVector.push_back(new cType{});
+		yGrad->vVector.push_back(new cType{});
+	}
+}
+void muBpg::clear() {
+	vector<ptr<model>>::clear();
+	x->vVector.clear();
+	y->vVector.clear();
 }
 #pragma endregion
 
