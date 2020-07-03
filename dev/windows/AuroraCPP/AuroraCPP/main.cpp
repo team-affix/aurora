@@ -268,7 +268,7 @@ void trainMuBpg() {
 	seqBpg nlr = neuronLRBpg(0.05);
 	seqBpg nth = neuronThBpg();
 
-	muBpg m1 = muBpg(2, 10, 1, tnnBpg({ 13, 12, 11 }, {&nlr, &nlr, &nth}));
+	muBpg m1 = muBpg(2, 15, 1, tnnBpg({ 18, 12, 16 }, {&nlr, &nlr, &nth}));
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	m1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -280,7 +280,7 @@ void trainMuBpg() {
 	for (ptr<ptr<param>> pptr : paramPtrVec) {
 		paramSgd* p = new paramSgd();
 		p->gradient = 0;
-		p->learnRate = 0.02;
+		p->learnRate = 0.002;
 		p->state = urd(re);
 		*pptr = p;
 		params.push_back(p);
@@ -322,9 +322,9 @@ void trainMuBpg() {
 			{ 0 },
 			{ 1 },
 			{ 1 },
-			{ 1 },
-			{ 1 },
-			{ 1 },
+			{ 0.25 },
+			{ 0.754 },
+			{ -1 },
 			{ 1 },
 		}
 	};
