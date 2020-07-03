@@ -2,13 +2,14 @@
 #include "main.h"
 #include "general.h"
 
-string exportParams(vector<sPtr<sPtr<param>>>* paramPtrVec);
+string exportParams(vector<ptr<ptr<param>>>* paramPtrVec);
 void trainTnnBpg();
 void trainSyncBpg();
 void trainLstmBpg();
+void trainMuBpg();
 
 int main() {
-	trainLstmBpg();
+	trainMuBpg();
 	return 0;
 }
 
@@ -20,9 +21,9 @@ void trainTnnBpg() {
 
 	seqBpg nlr = neuronLRBpg(0.05);
 
-	sPtr<seqBpg> s = tnnBpg({ 2, 5, 1 }, { &nlr, &nlr, &nlr });
+	ptr<seqBpg> s = tnnBpg({ 2, 5, 1 }, { &nlr, &nlr, &nlr });
 
-	vector <sPtr<sPtr<param>>> paramPtrVec = vector <sPtr<sPtr<param>>>();
+	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	s->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 
 	// set up random engine for initializing param states
@@ -30,7 +31,7 @@ void trainTnnBpg() {
 	default_random_engine re(26);
 
 	vector <paramSgd*> paramVec = vector <paramSgd*>();
-	for (sPtr<sPtr<param>> s : paramPtrVec) {
+	for (ptr<ptr<param>> s : paramPtrVec) {
 
 		// initialize type of parameter used
 		paramSgd* ps = new paramSgd();
@@ -46,13 +47,13 @@ void trainTnnBpg() {
 		paramVec.push_back(ps);
 
 	}
-	sPtr<cType> inputs = new cType{
+	ptr<cType> inputs = new cType{
 		{0, 0},
 		{0, 1},
 		{1, 0},
 		{1, 1}
 	};
-	sPtr<cType> desired = new cType{
+	ptr<cType> desired = new cType{
 		{ 0 },
 		{ 1 },
 		{ 1 },
@@ -64,7 +65,7 @@ void trainTnnBpg() {
 	int epoch = 0;
 	while (true) {
 
-		sPtr<cType> signals = new cType({ new cType(0) });
+		ptr<cType> signals = new cType({ new cType(0) });
 
 		for (int i = 0; i < inputs->vVector.size(); i++) {
 			int tsIndex = ui(re);
@@ -81,7 +82,7 @@ void trainTnnBpg() {
 		}
 
 		if (epoch % 1000 == 0) {
-			sPtr<cType> sumSignals = sum1D(signals);
+			ptr<cType> sumSignals = sum1D(signals);
 			cout << sumSignals->vDouble << endl;
 		}
 		epoch++;
@@ -98,14 +99,14 @@ void trainSyncBpg() {
 	seqBpg nlr = neuronLRBpg(0.05);
 	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, &nlr);
 
-	vector <sPtr<sPtr<param>>> paramPtrVec = vector <sPtr<sPtr<param>>>();
+	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(43);
 
 	vector<paramSgd*> params = vector<paramSgd*>();
-	for (sPtr<sPtr<param>> pptr : paramPtrVec) {
+	for (ptr<ptr<param>> pptr : paramPtrVec) {
 		paramSgd* p = new paramSgd();
 		p->gradient = 0;
 		p->learnRate = 0.02;
@@ -118,13 +119,13 @@ void trainSyncBpg() {
 	r.prep(4);
 	r.unroll(4);
 
-	sPtr<cType> inputs = new cType{
+	ptr<cType> inputs = new cType{
 		{0, 0},
 		{0, 1},
 		{1, 0},
 		{1, 1},
 	};
-	sPtr<cType> desired = new cType{
+	ptr<cType> desired = new cType{
 		{ 0 },
 		{ 1 },
 		{ 1 },
@@ -137,7 +138,7 @@ void trainSyncBpg() {
 		{ 0 }, 
 		{ 0 } });
 
-	for (int epoch = 0; epoch < 100000; epoch++) {
+	for (int epoch = 0; epoch < 1000000; epoch++) {
 
 		r.x = inputs;
 		r.fwd();
@@ -165,7 +166,7 @@ void trainLstmBpg() {
 	seqBpg* inNN = tnnBpg({ 2, 5 }, &nlr);
 	seqBpg* outNN = tnnBpg({ 5, 1 }, &nlr);
 
-	vector <sPtr<sPtr<param>>> paramPtrVec = vector <sPtr<sPtr<param>>>();
+	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 	l1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -174,7 +175,7 @@ void trainLstmBpg() {
 	default_random_engine re(43);
 
 	vector<paramSgd*> params = vector<paramSgd*>();
-	for (sPtr<sPtr<param>> pptr : paramPtrVec) {
+	for (ptr<ptr<param>> pptr : paramPtrVec) {
 		paramSgd* p = new paramSgd();
 		p->gradient = 0;
 		p->learnRate = 0.02;
@@ -185,7 +186,7 @@ void trainLstmBpg() {
 
 
 
-	sPtr<cType> inputs = new cType{ 
+	ptr<cType> inputs = new cType{ 
 		{
 			{0, 0},
 			{0, 1},
@@ -199,7 +200,7 @@ void trainLstmBpg() {
 			{1, 1}
 		}
 	};
-	sPtr<cType> desired = new cType{
+	ptr<cType> desired = new cType{
 		{
 			{ 0 },
 			{ 1 },
@@ -262,7 +263,107 @@ void trainLstmBpg() {
 
 }
 
-string exportParams(vector<sPtr<sPtr<param>>>* paramPtrVec) {
+void trainMuBpg() {
+
+	seqBpg nlr = neuronLRBpg(0.05);
+	seqBpg nth = neuronThBpg();
+
+	muBpg m1 = muBpg(2, 10, 1, tnnBpg({ 13, 12, 11 }, {&nlr, &nlr, &nth}));
+
+	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
+	m1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(43);
+
+	vector<paramSgd*> params = vector<paramSgd*>();
+	for (ptr<ptr<param>> pptr : paramPtrVec) {
+		paramSgd* p = new paramSgd();
+		p->gradient = 0;
+		p->learnRate = 0.02;
+		p->state = urd(re);
+		*pptr = p;
+		params.push_back(p);
+	}
+
+
+
+	ptr<cType> inputs = new cType{
+		{
+			{0, 0},
+			{0, 1},
+			{1, 0},
+			{1, 1},
+			{3.2, 1},
+			{1, 1.7},
+			{1, 1},
+		},
+		{
+			{0, 0},
+			{1, 1},
+			{1, 0},
+			{1, 1},
+			{3.2, 1},
+			{1, 1.7},
+			{1, 1},
+		}
+	};
+	ptr<cType> desired = new cType{
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+		},
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 1 },
+			{ 1 },
+			{ 1 },
+			{ 1 },
+		}
+	};
+
+	m1.prep(7);
+	m1.unroll(7);
+
+	m1.yGrad = make2D(7, 1);
+
+	for (int epoch = 0; epoch < 100000; epoch++) {
+
+		for (int i = 0; i < inputs->vVector.size(); i++) {
+
+			m1.x = inputs->vVector.at(i);
+ 			m1.fwd();
+			sub2D(m1.y, desired->vVector.at(i), m1.yGrad);
+			m1.bwd();
+
+		}
+
+		for (paramSgd* p : params) {
+
+			p->state -= p->learnRate * p->gradient;
+			p->gradient = 0;
+
+		}
+
+		if (epoch % 1000 == 0) {
+
+			cout << sum1D(sum2D(abs2D(m1.yGrad)))->vDouble << endl;
+
+		}
+	}
+
+	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
+}
+
+string exportParams(vector<ptr<ptr<param>>>* paramPtrVec) {
 	string result = "";
 	for (int i = 0; i < paramPtrVec->size(); i++) {
 		result += to_string((*paramPtrVec->at(i))->state);

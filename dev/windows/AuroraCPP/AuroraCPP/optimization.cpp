@@ -3,11 +3,11 @@
 
 #pragma region opt
 /*
-void opt::initModel(model* m, vector<sPtr<sPtr<param>>>* paramPtrVec, uniform_real_distribution<double> u, default_random_engine re) {
+void opt::initModel(model* m, vector<ptr<ptr<param>>>* paramPtrVec, uniform_real_distribution<double> u, default_random_engine re) {
 
 	for (int i = 0; i < paramPtrVec->size(); i++) {
 
-		sPtr<sPtr<param>> Ptr = paramPtrVec->at(i);
+		ptr<ptr<param>> Ptr = paramPtrVec->at(i);
 
 		// initialize type of parameter used
 		param* p = new param();

@@ -19,6 +19,16 @@ class seq;
 class seqBpg;
 class layer;
 class layerBpg;
+class sync;
+class syncBpg;
+class lstmTS;
+class lstmTSBpg;
+class lstm;
+class lstmBpg;
+class muTS;
+class muTSBpg;
+class mu;
+class muBpg;
 
 seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates);
 seqBpg* tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates);
@@ -33,33 +43,33 @@ seqBpg neuronSmBpg();
 seqBpg neuronThBpg();
 seqBpg neuronLRBpg(double m);
 
-void initParam(model* m, vector<sPtr<sPtr<param>>>* paramVecOutput);
+void initParam(model* m, vector<ptr<ptr<param>>>* paramVecOutput);
 
 class model {
 public:
 	model();
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
-	sPtr<cType> x;
-	sPtr<cType> y;
+	virtual ptr<model> clone();
+	ptr<cType> x;
+	ptr<cType> y;
 };
 
 class modelBpg : public model {
 public:
 	modelBpg();
 	virtual void bwd();
-	virtual sPtr<model> clone();
-	sPtr<cType> xGrad;
-	sPtr<cType> yGrad;
+	virtual ptr<model> clone();
+	ptr<cType> xGrad;
+	ptr<cType> yGrad;
 };
 
 class bias : public model {
 public:
 	bias();
 	virtual void fwd();
-	virtual sPtr<model> clone();
-	sPtr<sPtr<param>> prm;
+	virtual ptr<model> clone();
+	ptr<ptr<param>> prm;
 };
 
 class biasBpg : public modelBpg {
@@ -67,37 +77,37 @@ public:
 	biasBpg();
 	virtual void fwd();
 	virtual void bwd();
-	virtual sPtr<model> clone();
-	sPtr<sPtr<param>> prm;
+	virtual ptr<model> clone();
+	ptr<ptr<param>> prm;
 };
 
 class act : public model {
 public:
 	act();
 	act(actFunc* _af);
-	act(sPtr<actFunc> _af);
+	act(ptr<actFunc> _af);
 	virtual void fwd();
-	virtual sPtr<model> clone();
-	sPtr<actFunc> af;
+	virtual ptr<model> clone();
+	ptr<actFunc> af;
 };
 
 class actBpg : public modelBpg {
 public:
 	actBpg();
 	actBpg(actFunc* _af);
-	actBpg(sPtr<actFunc> _af);
+	actBpg(ptr<actFunc> _af);
 	virtual void fwd();
 	virtual void bwd();
-	virtual sPtr<model> clone();
-	sPtr<actFunc> af;
+	virtual ptr<model> clone();
+	ptr<actFunc> af;
 };
 
 class weight : public model {
 public:
 	weight();
 	virtual void fwd();
-	virtual sPtr<model> clone();
-	sPtr<sPtr<param>> prm;
+	virtual ptr<model> clone();
+	ptr<ptr<param>> prm;
 };
 
 class weightBpg : public modelBpg {
@@ -105,189 +115,189 @@ public:
 	weightBpg();
 	virtual void fwd();
 	virtual void bwd();
-	virtual sPtr<model> clone();
-	sPtr<sPtr<param>> prm;
+	virtual ptr<model> clone();
+	ptr<ptr<param>> prm;
 };
 
-class wSet : public model, public vector<sPtr<model>> {
+class wSet : public model, public vector<ptr<model>> {
 public:
 	wSet();
 	wSet(int _a);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 	int a;
 };
 
-class wSetBpg : public modelBpg, public vector<sPtr<model>> {
+class wSetBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	wSetBpg();
 	wSetBpg(int _a);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 	int a;
 };
 
-class wJunc : public model, public vector<sPtr<model>> {
+class wJunc : public model, public vector<ptr<model>> {
 public:
 	wJunc();
 	wJunc(int _a, int _b);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 	int a;
 	int b;
 };
 
-class wJuncBpg : public modelBpg, public vector<sPtr<model>> {
+class wJuncBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	wJuncBpg();
 	wJuncBpg(int _a, int _b);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 	int a;
 	int b;
 };
 
-class seq : public model, public vector<sPtr<model>> {
+class seq : public model, public vector<ptr<model>> {
 public:
 	seq();
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 };
 
-class seqBpg : public modelBpg, public vector<sPtr<model>> {
+class seqBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	seqBpg();
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 };
 
-class layer : public model, public vector<sPtr<model>> {
+class layer : public model, public vector<ptr<model>> {
 public:
 	layer();
 	layer(int a, model* modelTemplate);
-	layer(int a, sPtr<model> modelTemplate);
+	layer(int a, ptr<model> modelTemplate);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 };
 
-class layerBpg : public modelBpg, public vector<sPtr<model>> {
+class layerBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	layerBpg();
 	layerBpg(int a, model* modelTemplate);
-	layerBpg(int a, sPtr<model> modelTemplate);
+	layerBpg(int a, ptr<model> modelTemplate);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 };
 
-class sync : public model, public vector<sPtr<model>> {
+class sync : public model, public vector<ptr<model>> {
 public:
 	sync();
 	sync(model* _modelTemplate);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
-	vector<sPtr<model>> prepared;
+	vector<ptr<model>> prepared;
 	// template model that will be cloned when prep() is called
-	sPtr<model> modelTemplate;
+	ptr<model> modelTemplate;
 };
 
-class syncBpg : public modelBpg, public vector<sPtr<model>> {
+class syncBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	syncBpg();
 	syncBpg(model* _modelTemplate);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
-	vector<sPtr<model>> prepared;
+	vector<ptr<model>> prepared;
 	// template model that will be cloned when prep() is called
-	sPtr<model> modelTemplate;
+	ptr<model> modelTemplate;
 };
 
 class lstmTS : public model {
 public:
 	lstmTS();
-	lstmTS(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate);
+	lstmTS(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 
 	int units;
 
-	sPtr<model> aGate;
-	sPtr<model> bGate;
-	sPtr<model> cGate;
-	sPtr<model> dGate;
+	ptr<model> aGate;
+	ptr<model> bGate;
+	ptr<model> cGate;
+	ptr<model> dGate;
 
-	sPtr<cType> cTIn;
-	sPtr<cType> cTOut;
-	sPtr<cType> hTIn;
-	sPtr<cType> hTOut;
+	ptr<cType> cTIn;
+	ptr<cType> cTOut;
+	ptr<cType> hTIn;
+	ptr<cType> hTOut;
 private:
-	sPtr<cType> comp_LenUnits;
-	sPtr<cType> comp_Len2Units;
+	ptr<cType> comp_LenUnits;
+	ptr<cType> comp_Len2Units;
 };
 
 class lstmTSBpg : public modelBpg {
 public:
 	lstmTSBpg();
-	lstmTSBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate);
+	lstmTSBpg(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 
 	int units;
 
-	sPtr<model> aGate;
-	sPtr<model> bGate;
-	sPtr<model> cGate;
-	sPtr<model> dGate;
+	ptr<model> aGate;
+	ptr<model> bGate;
+	ptr<model> cGate;
+	ptr<model> dGate;
 
-	sPtr<cType> cTIn;
-	sPtr<cType> cTOut;
-	sPtr<cType> hTIn;
-	sPtr<cType> hTOut;
+	ptr<cType> cTIn;
+	ptr<cType> cTOut;
+	ptr<cType> hTIn;
+	ptr<cType> hTOut;
 
-	sPtr<cType> cTInGrad;
-	sPtr<cType> cTOutGrad;
-	sPtr<cType> hTInGrad;
-	sPtr<cType> hTOutGrad;
+	ptr<cType> cTInGrad;
+	ptr<cType> cTOutGrad;
+	ptr<cType> hTInGrad;
+	ptr<cType> hTOutGrad;
 private:
-	sPtr<cType> comp_LenUnits;
-	sPtr<cType> comp_Len2Units;
+	ptr<cType> comp_LenUnits;
+	ptr<cType> comp_Len2Units;
 };
 
-class lstm : public model, public vector<sPtr<model>> {
+class lstm : public model, public vector<ptr<model>> {
 public:
 	lstm();
 	lstm(int _units);
-	lstm(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate);
+	lstm(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
@@ -296,25 +306,25 @@ public:
 	int units;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
-	vector<sPtr<model>> prepared;
+	vector<ptr<model>> prepared;
 	// template model that will be cloned when prep() is called
-	sPtr<model> lstmTSTemplate;
+	ptr<model> lstmTSTemplate;
 
-	sPtr<cType> cTIn;
-	sPtr<cType> cTOut;
-	sPtr<cType> hTIn;
-	sPtr<cType> hTOut;
+	ptr<cType> cTIn;
+	ptr<cType> cTOut;
+	ptr<cType> hTIn;
+	ptr<cType> hTOut;
 };
 
-class lstmBpg : public modelBpg, public vector<sPtr<model>> {
+class lstmBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	lstmBpg();
 	lstmBpg(int _units);
-	lstmBpg(int _units, sPtr<model> _aGate, sPtr<model> _bGate, sPtr<model> _cGate, sPtr<model> _dGate);
+	lstmBpg(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
@@ -323,58 +333,130 @@ public:
 	int units;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
-	vector<sPtr<model>> prepared;
+	vector<ptr<model>> prepared;
 	// template model that will be cloned when prep() is called
-	sPtr<model> lstmTSTemplate;
+	ptr<model> lstmTSTemplate;
 
-	sPtr<cType> cTIn;
-	sPtr<cType> cTOut;
-	sPtr<cType> hTIn;
-	sPtr<cType> hTOut;
+	ptr<cType> cTIn;
+	ptr<cType> cTOut;
+	ptr<cType> hTIn;
+	ptr<cType> hTOut;
 
-	sPtr<cType> cTInGrad;
-	sPtr<cType> cTOutGrad;
-	sPtr<cType> hTInGrad;
-	sPtr<cType> hTOutGrad;
+	ptr<cType> cTInGrad;
+	ptr<cType> cTOutGrad;
+	ptr<cType> hTInGrad;
+	ptr<cType> hTOutGrad;
 };
 
-class attLstm : public model, public vector<sPtr<model>> {
+class muTS : public model {
 public:
-	attLstm();
-	attLstm(int _unitsIn, int _unitsOut);
+	muTS();
+	muTS(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate);
 	virtual void fwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
 
-	virtual void prep(int a);
-	virtual void unroll(int a);
-	virtual void clear();
+	int xUnits;
+	int cTUnits;
+	int hTUnits;
 
-	int unitsIn;
-	int unitsOut;
+	ptr<model> gate;
 
-	sPtr<model> lstm;
-	sPtr<model> syncTemplate;
-	vector<sPtr<model>> prepared;
+	ptr<cType> cTIn;
+	ptr<cType> cTOut;
+	ptr<cType> hTIn;
+	ptr<cType> hTOut;
+private:
+	ptr<cType> comp_LenCTUnits;
 };
 
-class attLstmBpg : public modelBpg, public vector<sPtr<model>> {
+class muTSBpg : public modelBpg {
 public:
-	attLstmBpg();
-	attLstmBpg(int _unitsIn, int _unitsOut);
+	muTSBpg();
+	muTSBpg(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate);
 	virtual void fwd();
 	virtual void bwd();
 	virtual void modelWise(function<void(model*)> func);
-	virtual sPtr<model> clone();
+	virtual ptr<model> clone();
+
+	int xUnits;
+	int cTUnits;
+	int hTUnits;
+
+	ptr<model> gate;
+
+	ptr<cType> cTIn;
+	ptr<cType> cTOut;
+	ptr<cType> hTIn;
+	ptr<cType> hTOut;
+
+	ptr<cType> cTInGrad;
+	ptr<cType> cTOutGrad;
+	ptr<cType> hTInGrad;
+	ptr<cType> hTOutGrad;
+private:
+	ptr<cType> comp_LenCTUnits;
+	ptr<cType> comp_LenHTUnits;
+};
+
+class mu : public model, public vector<ptr<model>> {
+public:
+	mu();
+	mu(int _xUnits, int _cTUnits, int _hTUnits);
+	mu(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate);
+	virtual void fwd();
+	virtual void modelWise(function<void(model*)> func);
+	virtual ptr<model> clone();
 
 	virtual void prep(int a);
 	virtual void unroll(int a);
 	virtual void clear();
 
-	int unitsIn;
-	int unitsOut;
+	int xUnits;
+	int cTUnits;
+	int hTUnits;
 
-	sPtr<model> lstm;
-	sPtr<model> syncTemplate;
-	vector<sPtr<model>> prepared;
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<ptr<model>> prepared;
+	// template model that will be cloned when prep() is called
+	ptr<model> muTSTemplate;
+
+	ptr<cType> cTIn;
+	ptr<cType> cTOut;
+	ptr<cType> hTIn;
+	ptr<cType> hTOut;
+};
+
+class muBpg : public modelBpg, public vector<ptr<model>> {
+public:
+	muBpg();
+	muBpg(int _xUnits, int _cTUnits, int _hTUnits);
+	muBpg(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> gate);
+	virtual void fwd();
+	virtual void bwd();
+	virtual void modelWise(function<void(model*)> func);
+	virtual ptr<model> clone();
+
+	virtual void prep(int a);
+	virtual void unroll(int a);
+	virtual void clear();
+
+	int xUnits;
+	int cTUnits;
+	int hTUnits;
+
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<ptr<model>> prepared;
+	// template model that will be cloned when prep() is called
+	ptr<model> muTSTemplate;
+
+	ptr<cType> cTIn;
+	ptr<cType> cTOut;
+	ptr<cType> hTIn;
+	ptr<cType> hTOut;
+
+	ptr<cType> cTInGrad;
+	ptr<cType> cTOutGrad;
+	ptr<cType> hTInGrad;
+	ptr<cType> hTOutGrad;
 };

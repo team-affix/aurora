@@ -8,7 +8,7 @@ cType::cType() {
 cType::cType(double a) {
 	vDouble = a;
 }
-cType::cType(vector<sPtr<cType>> a) {
+cType::cType(vector<ptr<cType>> a) {
 	// initializes vDouble
 	vDouble = 0;
 	vVector = a;
@@ -19,41 +19,41 @@ cType::cType(initializer_list<cType> a) {
 
 	vector<cType> vA = vector<cType>();
 	copy(a.begin(), a.end(), back_inserter(vA));
-	vVector = vector<sPtr<cType>>();
+	vVector = vector<ptr<cType>>();
 	for (cType c : vA) {
 		vVector.push_back(new cType(c));
 	}
 }
 
-sPtr<cType> make1D(int a) {
+ptr<cType> make1D(int a) {
 	cType* result = new cType({});
 	for (int i = 0; i < a; i++) {
 		result->vVector.push_back(new cType(0));
 	}
 	return result;
 }
-sPtr<cType> make2D(int a, int b) {
+ptr<cType> make2D(int a, int b) {
 	cType* result = new cType({});
 	for (int i = 0; i < a; i++) {
 		result->vVector.push_back(make1D(b));
 	}
 	return result;
 }
-sPtr<cType> make3D(int a, int b, int c) {
+ptr<cType> make3D(int a, int b, int c) {
 	cType* result = new cType({});
 	for (int i = 0; i < a; i++) {
 		result->vVector.push_back(make2D(b, c));
 	}
 	return result;
 }
-sPtr<cType> make4D(int a, int b, int c, int d) {
+ptr<cType> make4D(int a, int b, int c, int d) {
 	cType* result = new cType({});
 	for (int i = 0; i < a; i++) {
 		result->vVector.push_back(make3D(b, c, d));
 	}
 	return result;
 }
-sPtr<cType> make5D(int a, int b, int c, int d, int e) {
+ptr<cType> make5D(int a, int b, int c, int d, int e) {
 	cType* result = new cType({});
 	for (int i = 0; i < a; i++) {
 		result->vVector.push_back(make4D(b, c, d, e));
@@ -61,32 +61,32 @@ sPtr<cType> make5D(int a, int b, int c, int d, int e) {
 	return result;
 }
 
-void clear0D(sPtr<cType> a) {
+void clear0D(ptr<cType> a) {
 
 	a->vDouble = 0;
 
 }
-void clear1D(sPtr<cType> a) {
-	vector<sPtr<cType>>* vVec = &a->vVector;
+void clear1D(ptr<cType> a) {
+	vector<ptr<cType>>* vVec = &a->vVector;
 	for (int i = 0; i < vVec->size(); i++) {
 		clear0D(vVec->at(i));
 	}
 }
-void clear2D(sPtr<cType> a) {
-	vector<sPtr<cType>>* vVec = &a->vVector;
+void clear2D(ptr<cType> a) {
+	vector<ptr<cType>>* vVec = &a->vVector;
 	for (int i = 0; i < vVec->size(); i++) {
 		clear1D(vVec->at(i));
 	}
 }
 
-void copy0D(sPtr<cType> a, sPtr<cType> output) {
+void copy0D(ptr<cType> a, ptr<cType> output) {
 	output->vDouble = a->vDouble;
 }
-void copy1D(sPtr<cType> a, sPtr<cType> output) {
+void copy1D(ptr<cType> a, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == outVec->size());
@@ -96,11 +96,11 @@ void copy1D(sPtr<cType> a, sPtr<cType> output) {
 	}
 
 }
-void copy1D(sPtr<cType> a, sPtr<cType> output, int sourceStartIndex, int count, int destStartIndex) {
+void copy1D(ptr<cType> a, ptr<cType> output, int sourceStartIndex, int count, int destStartIndex) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() >= sourceStartIndex + count || outVec->size() >= destStartIndex + count);
@@ -112,11 +112,11 @@ void copy1D(sPtr<cType> a, sPtr<cType> output, int sourceStartIndex, int count, 
 	}
 
 }
-void copy2D(sPtr<cType> a, sPtr<cType> output) {
+void copy2D(ptr<cType> a, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == outVec->size());
@@ -126,11 +126,11 @@ void copy2D(sPtr<cType> a, sPtr<cType> output) {
 	}
 
 }
-void copy2D(sPtr<cType> a, sPtr<cType> output, int sourceStartIndex, int count, int destStartIndex) {
+void copy2D(ptr<cType> a, ptr<cType> output, int sourceStartIndex, int count, int destStartIndex) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == outVec->size());
@@ -143,15 +143,15 @@ void copy2D(sPtr<cType> a, sPtr<cType> output, int sourceStartIndex, int count, 
 
 }
 
-void add0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void add0D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 	output->vDouble = a->vDouble + b->vDouble;
 }
-void add1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void add1D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 	
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
@@ -161,12 +161,12 @@ void add1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	}
 
 }
-void add2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void add2D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
@@ -177,19 +177,19 @@ void add2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 
 }
 
-sPtr<cType> add0D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> add0D(ptr<cType> a, ptr<cType> b) {
 
-	sPtr<cType> result = new cType();
+	ptr<cType> result = new cType();
 
 	add0D(a, b, result);
 	
 	return result;
 }
-sPtr<cType> add1D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> add1D(ptr<cType> a, ptr<cType> b) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	sPtr<cType> result = new cType({});
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(add0D(aVec->at(i), bVec->at(i)));
@@ -197,11 +197,11 @@ sPtr<cType> add1D(sPtr<cType> a, sPtr<cType> b) {
 
 	return result;
 }
-sPtr<cType> add2D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> add2D(ptr<cType> a, ptr<cType> b) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	sPtr<cType> result = new cType({});
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(add1D(aVec->at(i), bVec->at(i)));
@@ -210,15 +210,15 @@ sPtr<cType> add2D(sPtr<cType> a, sPtr<cType> b) {
 	return result;
 }
 
-void sub0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void sub0D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 	output->vDouble = a->vDouble - b->vDouble;
 }
-void sub1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void sub1D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
@@ -228,11 +228,11 @@ void sub1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	}
 
 }
-void sub2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void sub2D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
@@ -242,19 +242,19 @@ void sub2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	}
 }
 
-sPtr<cType> sub0D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> sub0D(ptr<cType> a, ptr<cType> b) {
 
-	sPtr<cType> result = new cType();
+	ptr<cType> result = new cType();
 
 	sub0D(a, b, result);
 
 	return result;
 }
-sPtr<cType> sub1D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> sub1D(ptr<cType> a, ptr<cType> b) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	sPtr<cType> result = new cType({});
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(sub0D(aVec->at(i), bVec->at(i)));
@@ -262,11 +262,11 @@ sPtr<cType> sub1D(sPtr<cType> a, sPtr<cType> b) {
 
 	return result;
 }
-sPtr<cType> sub2D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> sub2D(ptr<cType> a, ptr<cType> b) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	sPtr<cType> result = new cType({});
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(sub1D(aVec->at(i), bVec->at(i)));
@@ -275,15 +275,15 @@ sPtr<cType> sub2D(sPtr<cType> a, sPtr<cType> b) {
 	return result;
 }
 
-void mult0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void mult0D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 	output->vDouble = a->vDouble * b->vDouble;
 }
-void mult1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void mult1D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
@@ -293,12 +293,12 @@ void mult1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	}
 
 }
-void mult2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void mult2D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
@@ -309,19 +309,19 @@ void mult2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 
 }
 
-sPtr<cType> mult0D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> mult0D(ptr<cType> a, ptr<cType> b) {
 
-	sPtr<cType> result = new cType();
+	ptr<cType> result = new cType();
 
 	mult0D(a, b, result);
 
 	return result;
 }
-sPtr<cType> mult1D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> mult1D(ptr<cType> a, ptr<cType> b) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	sPtr<cType> result = new cType({});
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(mult0D(aVec->at(i), bVec->at(i)));
@@ -329,11 +329,11 @@ sPtr<cType> mult1D(sPtr<cType> a, sPtr<cType> b) {
 
 	return result;
 }
-sPtr<cType> mult2D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> mult2D(ptr<cType> a, ptr<cType> b) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	sPtr<cType> result = new cType({});
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(mult1D(aVec->at(i), bVec->at(i)));
@@ -342,15 +342,15 @@ sPtr<cType> mult2D(sPtr<cType> a, sPtr<cType> b) {
 	return result;
 }
 
-void div0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void div0D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 	output->vDouble = a->vDouble / b->vDouble;
 }
-void div1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void div1D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
@@ -360,12 +360,12 @@ void div1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 	}
 
 }
-void div2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void div2D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	// throw exception if vectors are of inequal sizes
 	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
@@ -376,19 +376,19 @@ void div2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 
 }
 
-sPtr<cType> div0D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> div0D(ptr<cType> a, ptr<cType> b) {
 
-	sPtr<cType> result = new cType();
+	ptr<cType> result = new cType();
 
 	div0D(a, b, result);
 
 	return result;
 }
-sPtr<cType> div1D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> div1D(ptr<cType> a, ptr<cType> b) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	sPtr<cType> result = new cType({});
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(div0D(aVec->at(i), bVec->at(i)));
@@ -396,11 +396,11 @@ sPtr<cType> div1D(sPtr<cType> a, sPtr<cType> b) {
 
 	return result;
 }
-sPtr<cType> div2D(sPtr<cType> a, sPtr<cType> b) {
+ptr<cType> div2D(ptr<cType> a, ptr<cType> b) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	sPtr<cType> result = new cType({});
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(div1D(aVec->at(i), bVec->at(i)));
@@ -409,51 +409,51 @@ sPtr<cType> div2D(sPtr<cType> a, sPtr<cType> b) {
 	return result;
 }
 
-void abs0D(sPtr<cType> a, sPtr<cType> output) {
+void abs0D(ptr<cType> a, ptr<cType> output) {
 	output->vDouble = abs(a->vDouble);
 }
-void abs1D(sPtr<cType> a, sPtr<cType> output) {
+void abs1D(ptr<cType> a, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	for (int i = 0; i < aVec->size(); i++) {
 		abs0D(aVec->at(i), outVec->at(i));
 	}
 }
-void abs2D(sPtr<cType> a, sPtr<cType> output) {
+void abs2D(ptr<cType> a, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	for (int i = 0; i < aVec->size(); i++) {
 		abs1D(aVec->at(i), outVec->at(i));
 	}
 }
 
-sPtr<cType> abs0D(sPtr<cType> a) {
-	sPtr<cType> result = new cType(0);
+ptr<cType> abs0D(ptr<cType> a) {
+	ptr<cType> result = new cType(0);
 	abs0D(a, result);
 	return result;
 }
-sPtr<cType> abs1D(sPtr<cType> a) {
+ptr<cType> abs1D(ptr<cType> a) {
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
 
-	sPtr<cType> result = new cType({});
+	ptr<cType> result = new cType({});
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(new cType());
 	}
 	abs1D(a, result);
 	return result;
 }
-sPtr<cType> abs2D(sPtr<cType> a) {
-	sPtr<cType> result = new cType({});
+ptr<cType> abs2D(ptr<cType> a) {
+	ptr<cType> result = new cType({});
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(abs1D(aVec->at(i)));
@@ -461,10 +461,10 @@ sPtr<cType> abs2D(sPtr<cType> a) {
 	return result;
 }
 
-void sum1D(sPtr<cType> a, sPtr<cType> output) {
+void sum1D(ptr<cType> a, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
 
 	double result = 0;
 
@@ -475,27 +475,27 @@ void sum1D(sPtr<cType> a, sPtr<cType> output) {
 	output->vDouble = result;
 
 }
-void sum2D(sPtr<cType> a, sPtr<cType> output) {
+void sum2D(ptr<cType> a, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* outVec = &a->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &a->vVector;
 
 	for (int i = 0; i < aVec->size(); i++) {
 		sum1D(aVec->at(i), outVec->at(i));
 	}
 
 }
-sPtr<cType> sum1D(sPtr<cType> a) {
-	sPtr<cType> result = new cType();
+ptr<cType> sum1D(ptr<cType> a) {
+	ptr<cType> result = new cType();
 	sum1D(a, result);
 	return result;
 }
-sPtr<cType> sum2D(sPtr<cType> a) {
-	sPtr<cType> result = new cType({});
+ptr<cType> sum2D(ptr<cType> a) {
+	ptr<cType> result = new cType({});
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(sum1D(aVec->at(i)));
@@ -503,12 +503,12 @@ sPtr<cType> sum2D(sPtr<cType> a) {
 	return result;
 }
 
-void concat(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
+void concat(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 
 	// pull in reference to save compute
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
-	vector<sPtr<cType>>* outVec = &output->vVector;
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
 
 	int index = 0;
 	for (int i = 0; i < aVec->size(); i++) {
@@ -520,12 +520,29 @@ void concat(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output) {
 		index++;
 	}
 }
-sPtr<cType> concat(sPtr<cType> a, sPtr<cType> b) {
+void concat(vector<ptr<cType>> vec, ptr<cType> output) {
 
-	vector<sPtr<cType>>* aVec = &a->vVector;
-	vector<sPtr<cType>>* bVec = &b->vVector;
+	// pull in reference to save compute
+	vector<ptr<cType>>* outVec = &output->vVector;
 
-	sPtr<cType> result = new cType({});
+	int index = 0;
+	for (int i = 0; i < vec.size(); i++) {
+
+		vector<ptr<cType>>* cTypeVec = &vec.at(i)->vVector;
+		for (int j = 0; j < cTypeVec->size(); j++) {
+			outVec->at(index) = cTypeVec->at(j);
+			index++;
+		}
+
+	}
+
+}
+ptr<cType> concat(ptr<cType> a, ptr<cType> b) {
+
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+
+	ptr<cType> result = new cType({});
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(new cType());
@@ -539,14 +556,14 @@ sPtr<cType> concat(sPtr<cType> a, sPtr<cType> b) {
 
 }
 
-sPtr<vector<int>> randomDist(int count, int incMin, int excMax, bool replace) {
+ptr<vector<int>> randomDist(int count, int incMin, int excMax, bool replace) {
 
 	vector<int> allPossibilities = vector<int>();
 	for (int i = incMin; i < excMax; i++) {
 		allPossibilities.push_back(i);
 	}
 
-	sPtr<vector<int>> result = new vector<int>();
+	ptr<vector<int>> result = new vector<int>();
 	for (int i = 0; i < count; i++) {
 		int choiceIndex = rand() % allPossibilities.size();
 		result->push_back(allPossibilities.at(choiceIndex));

@@ -14,75 +14,76 @@ class cType {
 public:
 	cType();
 	cType(double a);
-	cType(vector<sPtr<cType>> a);
+	cType(vector<ptr<cType>> a);
 	cType(initializer_list<cType> a);
 	double vDouble;
-	vector<sPtr<cType>> vVector;
+	vector<ptr<cType>> vVector;
 };
 
-sPtr<cType> make1D(int a);
-sPtr<cType> make2D(int a, int b);
-sPtr<cType> make3D(int a, int b, int c);
-sPtr<cType> make4D(int a, int b, int c, int d);
-sPtr<cType> make5D(int a, int b, int c, int d, int e);
+ptr<cType> make1D(int a);
+ptr<cType> make2D(int a, int b);
+ptr<cType> make3D(int a, int b, int c);
+ptr<cType> make4D(int a, int b, int c, int d);
+ptr<cType> make5D(int a, int b, int c, int d, int e);
 
-void clear0D(sPtr<cType> a);
-void clear1D(sPtr<cType> a);
-void clear2D(sPtr<cType> a);
+void clear0D(ptr<cType> a);
+void clear1D(ptr<cType> a);
+void clear2D(ptr<cType> a);
 
-void copy0D(sPtr<cType> a, sPtr<cType> output);
-void copy1D(sPtr<cType> a, sPtr<cType> output);
-void copy1D(sPtr<cType> a, sPtr<cType> output, int sourceStartIndex, int count, int destStartIndex);
-void copy2D(sPtr<cType> a, sPtr<cType> output);
-void copy2D(sPtr<cType> a, sPtr<cType> output, int sourceStartIndex, int count, int destStartIndex);
+void copy0D(ptr<cType> a, ptr<cType> output);
+void copy1D(ptr<cType> a, ptr<cType> output);
+void copy1D(ptr<cType> a, ptr<cType> output, int sourceStartIndex, int count, int destStartIndex);
+void copy2D(ptr<cType> a, ptr<cType> output);
+void copy2D(ptr<cType> a, ptr<cType> output, int sourceStartIndex, int count, int destStartIndex);
 
-void add0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-void add1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-void add2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
+void add0D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void add1D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void add2D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 
-sPtr<cType> add0D(sPtr<cType> a, sPtr<cType> b);
-sPtr<cType> add1D(sPtr<cType> a, sPtr<cType> b);
-sPtr<cType> add2D(sPtr<cType> a, sPtr<cType> b);
+ptr<cType> add0D(ptr<cType> a, ptr<cType> b);
+ptr<cType> add1D(ptr<cType> a, ptr<cType> b);
+ptr<cType> add2D(ptr<cType> a, ptr<cType> b);
 
-void sub0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-void sub1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-void sub2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
+void sub0D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void sub1D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void sub2D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 
-sPtr<cType> sub0D(sPtr<cType> a, sPtr<cType> b);
-sPtr<cType> sub1D(sPtr<cType> a, sPtr<cType> b);
-sPtr<cType> sub2D(sPtr<cType> a, sPtr<cType> b);
+ptr<cType> sub0D(ptr<cType> a, ptr<cType> b);
+ptr<cType> sub1D(ptr<cType> a, ptr<cType> b);
+ptr<cType> sub2D(ptr<cType> a, ptr<cType> b);
 
-void mult0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-void mult1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-void mult2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
+void mult0D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void mult1D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void mult2D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 
-sPtr<cType> mult0D(sPtr<cType> a, sPtr<cType> b);
-sPtr<cType> mult1D(sPtr<cType> a, sPtr<cType> b);
-sPtr<cType> mult2D(sPtr<cType> a, sPtr<cType> b);
+ptr<cType> mult0D(ptr<cType> a, ptr<cType> b);
+ptr<cType> mult1D(ptr<cType> a, ptr<cType> b);
+ptr<cType> mult2D(ptr<cType> a, ptr<cType> b);
 
-void div0D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-void div1D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-void div2D(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
+void div0D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void div1D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void div2D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 
-sPtr<cType> div0D(sPtr<cType> a, sPtr<cType> b);
-sPtr<cType> div1D(sPtr<cType> a, sPtr<cType> b);
-sPtr<cType> div2D(sPtr<cType> a, sPtr<cType> b);
+ptr<cType> div0D(ptr<cType> a, ptr<cType> b);
+ptr<cType> div1D(ptr<cType> a, ptr<cType> b);
+ptr<cType> div2D(ptr<cType> a, ptr<cType> b);
 
-void abs0D(sPtr<cType> a, sPtr<cType> output);
-void abs1D(sPtr<cType> a, sPtr<cType> output);
-void abs2D(sPtr<cType> a, sPtr<cType> output);
+void abs0D(ptr<cType> a, ptr<cType> output);
+void abs1D(ptr<cType> a, ptr<cType> output);
+void abs2D(ptr<cType> a, ptr<cType> output);
 
-sPtr<cType> abs0D(sPtr<cType> a);
-sPtr<cType> abs1D(sPtr<cType> a);
-sPtr<cType> abs2D(sPtr<cType> a);
+ptr<cType> abs0D(ptr<cType> a);
+ptr<cType> abs1D(ptr<cType> a);
+ptr<cType> abs2D(ptr<cType> a);
 
-void sum1D(sPtr<cType> a, sPtr<cType> output);
-void sum2D(sPtr<cType> a, sPtr<cType> output);
-sPtr<cType> sum1D(sPtr<cType> a);
-sPtr<cType> sum2D(sPtr<cType> a);
+void sum1D(ptr<cType> a, ptr<cType> output);
+void sum2D(ptr<cType> a, ptr<cType> output);
+ptr<cType> sum1D(ptr<cType> a);
+ptr<cType> sum2D(ptr<cType> a);
 
-void concat(sPtr<cType> a, sPtr<cType> b, sPtr<cType> output);
-sPtr<cType> concat(sPtr<cType> a, sPtr<cType> b);
+void concat(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void concat(vector<ptr<cType>> vec, ptr<cType> output);
+ptr<cType> concat(ptr<cType> a, ptr<cType> b);
 
 // default activation function, just returns input
 class actFunc {

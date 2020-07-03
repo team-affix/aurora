@@ -2,12 +2,12 @@
 #include "superHeader.h"
 
 template<class T>
-class sPtr : public shared_ptr<T> {
+class ptr : public shared_ptr<T> {
 public:
-	sPtr() {
+	ptr() {
 
 	}
-	sPtr(T* _ptr) {
+	ptr(T* _ptr) {
 		shared_ptr<T>::reset(_ptr);
 	}
 };
