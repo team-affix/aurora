@@ -1560,9 +1560,9 @@ mu::mu(int _xUnits, int _cTUnits, int _hTUnits) {
 	this->hTIn = make1D(hTUnits);
 	this->hTOut = make1D(hTUnits);
 
-	seq nlr = neuronLR(0.05);
+	seqBpg nth = neuronThBpg();
 
-	ptr<model> gateTemplate = tnn({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, &nlr);
+	ptr<model> gateTemplate = tnn({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, &nth);
 	muTSTemplate = new muTS(xUnits, cTUnits, hTUnits, gateTemplate);
 
 }
@@ -1657,9 +1657,9 @@ muBpg::muBpg(int _xUnits, int _cTUnits, int _hTUnits) {
 	this->hTInGrad = make1D(hTUnits);
 	this->hTOutGrad = make1D(hTUnits);
 
-	seqBpg nlr = neuronLRBpg(0.05);
+	seqBpg nth = neuronThBpg();
 
-	ptr<model> gateTemplate = tnnBpg({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, &nlr);
+	ptr<model> gateTemplate = tnnBpg({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, &nth);
 	muTSTemplate = new muTSBpg(xUnits, cTUnits, hTUnits, gateTemplate);
 
 }
