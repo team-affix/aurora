@@ -2,6 +2,7 @@
 #include "main.h"
 #include "general.h"
 
+
 string exportParams(vector<ptr<ptr<param>>>* paramPtrVec);
 void trainTnnBpg();
 void trainSyncBpg();
@@ -270,7 +271,6 @@ void trainMuBpg() {
 
 	int xUnits = 2;
 	int cTUnits = 7;
-	int connectUnits = 10;
 	int hTUnits = 1;
 
 	muBpg m1 = muBpg(xUnits, cTUnits, hTUnits);
@@ -278,7 +278,7 @@ void trainMuBpg() {
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	m1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 
-	uniform_real_distribution<double> urd(-.01, .01);
+	uniform_real_distribution<double> urd(-0.1, 0.1);
 	default_random_engine re(43);
 
 	vector<paramMom*> params = vector<paramMom*>();
