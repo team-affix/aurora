@@ -269,7 +269,8 @@ void trainMuBpg() {
 	seqBpg nth = neuronThBpg();
 
 	int xUnits = 2;
-	int cTUnits = 5;
+	int cTUnits = 7;
+	int connectUnits = 10;
 	int hTUnits = 1;
 
 	muBpg m1 = muBpg(xUnits, cTUnits, hTUnits);
@@ -277,15 +278,17 @@ void trainMuBpg() {
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	m1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 
-	uniform_real_distribution<double> urd(-1, 1);
+	uniform_real_distribution<double> urd(-.01, .01);
 	default_random_engine re(43);
 
-	vector<paramSgd*> params = vector<paramSgd*>();
+	vector<paramMom*> params = vector<paramMom*>();
 	for (ptr<ptr<param>> pptr : paramPtrVec) {
-		paramSgd* p = new paramSgd();
+		paramMom* p = new paramMom();
 		p->gradient = 0;
-		p->learnRate = 0.0002;
+		p->learnRate = 0.02;
 		p->state = urd(re);
+		p->beta = 0.9;
+		p->momentum = 0;
 		*pptr = p;
 		params.push_back(p);
 	}
@@ -349,9 +352,10 @@ void trainMuBpg() {
 
 		}
 
-		for (paramSgd* p : params) {
+		for (paramMom* p : params) {
 
-			p->state -= p->learnRate * p->gradient;
+			p->momentum = (p->beta * p->momentum) + (1 - p->beta) * p->gradient;
+			p->state -= p->learnRate * p->momentum;
 			p->gradient = 0;
 
 		}
