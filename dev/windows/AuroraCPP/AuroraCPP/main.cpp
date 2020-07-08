@@ -266,9 +266,6 @@ void trainLstmBpg() {
 
 void trainMuBpg() {
 
-	seqBpg nlr = neuronLRBpg(0.05);
-	seqBpg nth = neuronThBpg();
-
 	int xUnits = 2;
 	int cTUnits = 7;
 	int hTUnits = 1;

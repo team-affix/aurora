@@ -484,6 +484,60 @@ void muModelWise(function<void(model*)> func, ptr<model> muTSTemplate) {
 
 }
 #pragma endregion
+#pragma region attTS
+void attTSFwd(ptr<cType> x, ptr<cType> y, ptr<cType> hTIn, ptr<cType> comp_LenXUnits, int xUnits, int hTUnits, vector<ptr<model>>* unrolled) {
+
+	vector<ptr<cType>>* comp_LenXUnitsVec = &comp_LenXUnits->vVector;
+	ptr<cType> x_yproduct = comp_LenXUnitsVec->at(0);
+
+	// pull in references to input matrices to save compute
+	vector<ptr<cType>>* xVec = &x->vVector;
+
+	clear1D(y);
+
+	for (int i = 0; i < unrolled->size(); i++) {
+
+		model* m = (model*)unrolled->at(i).get();
+
+		// set input to the model
+		concat(xVec->at(i), hTIn, m->x);
+		m->fwd();
+		mult1D(m->y, xVec->at(i), x_yproduct);
+		add1D(y, x_yproduct, y);
+
+	}
+
+}
+void attTSBwd(ptr<cType> x, ptr<cType> yGrad, ptr<cType> xGrad, ptr<cType> hTInGrad, ptr<cType> comp_LenXUnits, int xUnits, int hTUnits, vector<ptr<model>>* unrolled) {
+
+	vector<ptr<cType>>* comp_LenXUnitsVec = &comp_LenXUnits->vVector;
+	ptr<cType> xGrad_copyResult = comp_LenXUnitsVec->at(0);
+	ptr<cType> y_yGradproduct = comp_LenXUnitsVec->at(1);
+
+	// pull in references to input matrices to save compute
+	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
+	vector<ptr<cType>>* xVec = &x->vVector;
+
+	for (int i = 0; i < unrolled->size(); i++) {
+
+		modelBpg* m = (modelBpg*)unrolled->at(i).get();
+
+		mult1D(yGrad, xVec->at(i), m->yGrad);
+		m->bwd();
+		copy1D(m->xGrad, xGrad_copyResult, 0, xUnits, 0);
+		copy1D(m->xGrad, hTInGrad, xUnits, hTUnits, 0);
+		mult1D(yGrad, m->y, y_yGradproduct);
+		add1D(y_yGradproduct, xGrad_copyResult, xGradVec->at(i));
+
+	}
+
+}
+void attTSModelWise(function<void(model*)> func, ptr<model> seqTemplate) {
+
+	seqTemplate->modelWise(func);
+	
+}
+#pragma endregion
 
 #pragma endregion
 
@@ -1767,6 +1821,190 @@ void muBpg::clear() {
 	x->vVector.clear();
 	y->vVector.clear();
 	index = 0;
+}
+#pragma endregion
+#pragma region attTS
+attTS::attTS() {
+
+}
+attTS::attTS(int _xUnits, int _hTUnits) {
+
+	// Make the xUnits and hTUnits publicly accessable
+	this->xUnits = _xUnits;
+	this->hTUnits = _hTUnits;
+
+	// Initialize y, and hT vectors
+	this->hTIn = make1D(hTUnits);
+	this->y = make1D(xUnits);
+
+	// Instantiate neurons that will be used in attention template TNN
+	seq nlr = neuronLR(0.05);
+	seq nsm = neuronSm();
+
+	// Initialize the attention timestep template model to be a tnn
+	seqTemplate = tnn({ xUnits + hTUnits, xUnits }, { &nlr, &nsm });
+
+	// Initialize the template's x and y vectors
+	seqTemplate->x = make1D(xUnits + hTUnits);
+	seqTemplate->y = make1D(xUnits);
+
+	// Initialize the computation result cType
+	comp_LenXUnits = make2D(1, xUnits);
+
+}
+attTS::attTS(int _xUnits, int _hTUnits, ptr<model> _seqTemplate) {
+
+	// Make the xUnits and hTUnits publicly accessable
+	this->xUnits = _xUnits;
+	this->hTUnits = _hTUnits;
+	this->seqTemplate = _seqTemplate;
+
+	// Initialize x, y, and hT vectors
+	this->hTIn = make1D(hTUnits);
+	this->y = make1D(xUnits);
+
+	// Initialize the template's x and y vectors
+	seqTemplate->x = make1D(xUnits + hTUnits);
+	seqTemplate->y = make1D(xUnits);
+
+	// Initialize the computation result cType
+	comp_LenXUnits = make2D(1, xUnits);
+
+}
+void attTS::fwd() {
+
+	attTSFwd(x, y, hTIn, comp_LenXUnits, xUnits, hTUnits, this);
+
+}
+void attTS::modelWise(function<void(model*)> func) {
+	
+	func(this);
+	attTSModelWise(func, seqTemplate);
+
+}
+ptr<model> attTS::clone() {
+
+	attTS* result = new attTS(xUnits, hTUnits, seqTemplate);
+	return result;
+
+}
+void attTS::prep(int a) {
+
+	for (int i = 0; i < a; i++) {
+		prepared.push_back(seqTemplate->clone());
+	}
+
+}
+void attTS::unroll(int a) {
+	
+	for (int i = 0; i < a; i++) {
+		push_back(prepared.at(size()));
+		x->vVector.push_back(new cType{});
+	}
+
+}
+void attTS::clear() {
+
+	vector<ptr<model>>::clear();
+	x->vVector.clear();
+	index = 0;
+
+}
+
+attTSBpg::attTSBpg() {
+
+}
+attTSBpg::attTSBpg(int _xUnits, int _hTUnits) {
+
+	// Make the xUnits and hTUnits publicly accessable
+	this->xUnits = _xUnits;
+	this->hTUnits = _hTUnits;
+
+	// Initialize x, y, and hT vectors
+	this->hTIn = make1D(hTUnits);
+	this->hTInGrad = make1D(hTUnits);
+	this->y = make1D(xUnits);
+	this->yGrad = make1D(xUnits);
+
+	// Instantiate neurons that will be used in attention template TNN
+	seqBpg nlr = neuronLRBpg(0.05);
+	seqBpg nsm = neuronSmBpg();
+
+	// Initialize the attention timestep template model to be a tnn
+	seqTemplate = tnnBpg({ xUnits + hTUnits, xUnits }, { &nlr, &nsm });
+
+	// Initialize the template's x and y vectors
+	seqTemplate->x = make1D(xUnits + hTUnits);
+	seqTemplate->y = make1D(xUnits);
+
+	// Initialize the computation result cType
+	comp_LenXUnits = make2D(2, xUnits);
+
+}
+attTSBpg::attTSBpg(int _xUnits, int _hTUnits, ptr<model> _seqTemplate) {
+
+	// Make the xUnits and hTUnits publicly accessable
+	this->xUnits = _xUnits;
+	this->hTUnits = _hTUnits;
+	this->seqTemplate = _seqTemplate;
+
+	// Initialize x, y, and hT vectors
+	this->hTIn = make1D(hTUnits);
+	this->hTInGrad = make1D(hTUnits);
+	this->y = make1D(xUnits);
+	this->yGrad = make1D(xUnits);
+
+	// Initialize the template's x and y vectors
+	seqTemplate->x = make1D(xUnits + hTUnits);
+	seqTemplate->y = make1D(xUnits);
+
+	// Initialize the computation result cType
+	comp_LenXUnits = make2D(2, xUnits);
+
+}
+void attTSBpg::fwd() {
+
+	attTSFwd(x, y, hTIn, comp_LenXUnits, xUnits, hTUnits, this);
+
+}
+void attTSBpg::bwd() {
+
+	attTSBwd(x, yGrad, xGrad, hTInGrad, comp_LenXUnits, xUnits, hTUnits, this);
+
+}
+void attTSBpg::modelWise(function<void(model*)> func) {
+
+	func(this);
+	attTSModelWise(func, seqTemplate);
+
+}
+ptr<model> attTSBpg::clone() {
+
+	attTSBpg* result = new attTSBpg(xUnits, hTUnits, seqTemplate);
+	return result;
+
+}
+void attTSBpg::prep(int a) {
+
+	for (int i = 0; i < a; i++) {
+		prepared.push_back(seqTemplate->clone());
+	}
+
+}
+void attTSBpg::unroll(int a) {
+
+	for (int i = 0; i < a; i++) {
+		push_back(prepared.at(size()));
+		x->vVector.push_back(new cType{});
+	}
+
+}
+void attTSBpg::clear() {
+
+	vector<ptr<model>>::clear();
+	x->vVector.clear();
+	index = 0;
+
 }
 #pragma endregion
 
