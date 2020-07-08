@@ -3,6 +3,35 @@
 #include "optimization.h"
 #include "maths.h"
 
+#pragma region Defs
+
+#define MODELFIELDS \
+virtual void fwd(); \
+virtual ptr<model> clone();
+
+#define MODELBPGFIELDS MODELFIELDS \
+virtual void bwd();
+
+#define SEQFIELDS MODELFIELDS \
+virtual void modelWise(function<void(model*)> func);
+
+#define SEQBPGFIELDS MODELBPGFIELDS \
+virtual void modelWise(function<void(model*)> func);
+
+#define RECFIELDS SEQFIELDS \
+virtual void prep(int a);\
+virtual void unroll(int a);\
+virtual void clear(); \
+int index;
+
+#define RECBPGFIELDS SEQBPGFIELDS \
+virtual void prep(int a);\
+virtual void unroll(int a);\
+virtual void clear(); \
+int index;
+
+#pragma endregion
+
 class model;
 class modelBpg;
 class bias;
@@ -66,154 +95,117 @@ public:
 
 class bias : public model {
 public:
+	MODELFIELDS
 	bias();
-	virtual void fwd();
-	virtual ptr<model> clone();
 	ptr<ptr<param>> prm;
 };
 
 class biasBpg : public modelBpg {
 public:
+	MODELBPGFIELDS
 	biasBpg();
-	virtual void fwd();
-	virtual void bwd();
-	virtual ptr<model> clone();
 	ptr<ptr<param>> prm;
 };
 
 class act : public model {
 public:
+	MODELFIELDS
 	act();
 	act(actFunc* _af);
 	act(ptr<actFunc> _af);
-	virtual void fwd();
-	virtual ptr<model> clone();
 	ptr<actFunc> af;
 };
 
 class actBpg : public modelBpg {
 public:
+	MODELBPGFIELDS
 	actBpg();
 	actBpg(actFunc* _af);
 	actBpg(ptr<actFunc> _af);
-	virtual void fwd();
-	virtual void bwd();
-	virtual ptr<model> clone();
 	ptr<actFunc> af;
 };
 
 class weight : public model {
 public:
+	MODELFIELDS
 	weight();
-	virtual void fwd();
-	virtual ptr<model> clone();
 	ptr<ptr<param>> prm;
 };
 
 class weightBpg : public modelBpg {
 public:
+	MODELBPGFIELDS
 	weightBpg();
-	virtual void fwd();
-	virtual void bwd();
-	virtual ptr<model> clone();
 	ptr<ptr<param>> prm;
 };
 
 class wSet : public model, public vector<ptr<model>> {
 public:
+	SEQFIELDS
 	wSet();
 	wSet(int _a);
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 	int a;
 };
 
 class wSetBpg : public modelBpg, public vector<ptr<model>> {
 public:
+	SEQBPGFIELDS
 	wSetBpg();
 	wSetBpg(int _a);
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 	int a;
 };
 
 class wJunc : public model, public vector<ptr<model>> {
 public:
+	SEQFIELDS
 	wJunc();
 	wJunc(int _a, int _b);
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 	int a;
 	int b;
 };
 
 class wJuncBpg : public modelBpg, public vector<ptr<model>> {
 public:
+	SEQBPGFIELDS
 	wJuncBpg();
 	wJuncBpg(int _a, int _b);
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 	int a;
 	int b;
 };
 
 class seq : public model, public vector<ptr<model>> {
 public:
+	SEQFIELDS
 	seq();
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 };
 
 class seqBpg : public modelBpg, public vector<ptr<model>> {
 public:
+	SEQBPGFIELDS
 	seqBpg();
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 };
 
 class layer : public model, public vector<ptr<model>> {
 public:
+	SEQFIELDS
 	layer();
 	layer(int a, model* modelTemplate);
 	layer(int a, ptr<model> modelTemplate);
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 };
 
 class layerBpg : public modelBpg, public vector<ptr<model>> {
 public:
+	SEQBPGFIELDS
 	layerBpg();
 	layerBpg(int a, model* modelTemplate);
 	layerBpg(int a, ptr<model> modelTemplate);
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 };
 
 class sync : public model, public vector<ptr<model>> {
 public:
+	RECFIELDS
 	sync();
 	sync(model* _modelTemplate);
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
-
-	virtual void prep(int a);
-	virtual void unroll(int a);
-	virtual void clear();
-
-	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -223,18 +215,9 @@ public:
 
 class syncBpg : public modelBpg, public vector<ptr<model>> {
 public:
+	RECBPGFIELDS
 	syncBpg();
 	syncBpg(model* _modelTemplate);
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
-
-	virtual void prep(int a);
-	virtual void unroll(int a);
-	virtual void clear();
-
-	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -244,11 +227,9 @@ public:
 
 class lstmTS : public model {
 public:
+	SEQFIELDS
 	lstmTS();
 	lstmTS(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 
 	int units;
 
@@ -268,12 +249,9 @@ private:
 
 class lstmTSBpg : public modelBpg {
 public:
+	SEQBPGFIELDS
 	lstmTSBpg();
 	lstmTSBpg(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 
 	int units;
 
@@ -298,20 +276,12 @@ private:
 
 class lstm : public model, public vector<ptr<model>> {
 public:
+	RECFIELDS
 	lstm();
 	lstm(int _units);
 	lstm(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
-
-	virtual void prep(int a);
-	virtual void unroll(int a);
-	virtual void clear();
 
 	int units;
-	int index;
-
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
 	// template model that will be cloned when prep() is called
@@ -325,21 +295,12 @@ public:
 
 class lstmBpg : public modelBpg, public vector<ptr<model>> {
 public:
+	RECBPGFIELDS
 	lstmBpg();
 	lstmBpg(int _units);
 	lstmBpg(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
-
-	virtual void prep(int a);
-	virtual void unroll(int a);
-	virtual void clear();
 
 	int units;
-	int index;
-
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
 	// template model that will be cloned when prep() is called
@@ -358,11 +319,9 @@ public:
 
 class muTS : public model {
 public:
+	SEQFIELDS
 	muTS();
 	muTS(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate);
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 
 	int xUnits;
 	int cTUnits;
@@ -380,12 +339,9 @@ private:
 
 class muTSBpg : public modelBpg {
 public:
+	SEQBPGFIELDS
 	muTSBpg();
 	muTSBpg(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate);
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
 
 	int xUnits;
 	int cTUnits;
@@ -409,21 +365,14 @@ private:
 
 class mu : public model, public vector<ptr<model>> {
 public:
+	RECFIELDS
 	mu();
 	mu(int _xUnits, int _cTUnits, int _hTUnits);
 	mu(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate);
-	virtual void fwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
-
-	virtual void prep(int a);
-	virtual void unroll(int a);
-	virtual void clear();
 
 	int xUnits;
 	int cTUnits;
 	int hTUnits;
-	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -438,22 +387,14 @@ public:
 
 class muBpg : public modelBpg, public vector<ptr<model>> {
 public:
+	RECBPGFIELDS
 	muBpg();
 	muBpg(int _xUnits, int _cTUnits, int _hTUnits);
 	muBpg(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> gate);
-	virtual void fwd();
-	virtual void bwd();
-	virtual void modelWise(function<void(model*)> func);
-	virtual ptr<model> clone();
-
-	virtual void prep(int a);
-	virtual void unroll(int a);
-	virtual void clear();
 
 	int xUnits;
 	int cTUnits;
 	int hTUnits;
-	int index;
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -469,4 +410,46 @@ public:
 	ptr<cType> cTOutGrad;
 	ptr<cType> hTInGrad;
 	ptr<cType> hTOutGrad;
+};
+
+class attTS : public model, public vector<ptr<model>> {
+public:
+	RECFIELDS
+	attTS();
+	attTS(int _xUnits, int _hTUnits);
+	attTS(int _xUnits, int _hTUnits, ptr<model> _seqTemplate);
+
+	int xUnits;
+	int hTUnits;
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<ptr<model>> prepared;
+	// template model that will be cloned when prep() is called
+	ptr<model> seqTemplate;
+
+	ptr<cType> hTIn;
+
+private:
+	ptr<cType> comp_LenXUnits;
+};
+
+class attTSBpg : public modelBpg, public vector<ptr<model>> {
+public:
+	RECBPGFIELDS
+	attTSBpg();
+	attTSBpg(int _xUnits, int _hTUnits);
+	attTSBpg(int _xUnits, int _hTUnits, ptr<model> _seqTemplate);
+
+	int xUnits;
+	int hTUnits;
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<ptr<model>> prepared;
+	// template model that will be cloned when prep() is called
+	ptr<model> seqTemplate;
+
+	ptr<cType> hTIn;
+
+	ptr<cType> hTInGrad;
+
+private:
+	ptr<cType> comp_LenXUnits;
 };
