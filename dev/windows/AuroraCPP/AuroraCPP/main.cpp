@@ -8,9 +8,10 @@ void trainTnnBpg();
 void trainSyncBpg();
 void trainLstmBpg();
 void trainMuBpg();
+void trainAttBpg();
 
 int main() {
-	trainMuBpg();
+	trainLstmBpg();
 	return 0;
 }
 
@@ -343,7 +344,7 @@ void trainMuBpg() {
 		for (int i = 0; i < inputs->vVector.size(); i++) {
 
 			m1.x = inputs->vVector.at(i);
- 			m1.fwd();
+			m1.fwd();
 			sub2D(m1.y, desired->vVector.at(i), m1.yGrad);
 			m1.bwd();
 
@@ -365,6 +366,100 @@ void trainMuBpg() {
 	}
 
 	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
+}
+
+void trainAttBpg() {
+
+	attBpg a1 = attBpg(2, 5);
+	muBpg m1 = muBpg(5, 7, 1);
+
+	vector<ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
+	a1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	m1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+
+	uniform_real_distribution<double> urd(-0.1, 0.1);
+	default_random_engine re(43);
+
+	vector<paramMom*> params = vector<paramMom*>();
+	for (ptr<ptr<param>> pptr : paramPtrVec) {
+		paramMom* p = new paramMom();
+		p->gradient = 0;
+		p->learnRate = 0.02;
+		p->state = urd(re);
+		p->beta = 0.9;
+		p->momentum = 0;
+		*pptr = p;
+		params.push_back(p);
+	}
+
+	ptr<cType> inputs = new cType{
+		{
+			{0, 0},
+			{0, 1},
+			{1, 0},
+			{1, 1},
+			{3.2, 1},
+			{1, 1.7},
+			{1, 1},
+		},
+		{
+			{0, 0},
+			{1, 1},
+			{1, 0},
+			{1, 1},
+			{3.2, 1},
+			{1, 1.7},
+			{1, 1},
+		}
+	};
+	ptr<cType> desired = new cType{
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+		},
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 0.25 },
+			{ 0.754 },
+			{ -1 },
+			{ 1 },
+		}
+	};
+
+	a1.prep(7);
+	m1.prep(7);
+
+	a1.unroll(7);
+
+	m1.yGrad = make2D(7, 1);
+
+	for (int epoch = 0; epoch < 100000; epoch++) {
+
+		for (int i = 0; i < inputs->vVector.size(); i++) {
+
+			ptr<cType> tsInputs = inputs->vVector.at(i);
+			a1.x = tsInputs;
+			for (int j = 0; j < tsInputs->vVector.size(); j++) {
+
+				attTSBpg* a = (attTSBpg*)a1.at(j).get();
+				a->hTIn = m1.hTOut;
+				a1.fwd();
+				m1.unroll(1);
+				
+
+			}
+
+		}
+
+	}
 
 }
 

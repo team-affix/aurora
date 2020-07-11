@@ -19,12 +19,15 @@ virtual void modelWise(function<void(model*)> func);
 virtual void modelWise(function<void(model*)> func);
 
 #define RECFIELDS SEQFIELDS \
+virtual void incFwd(int a);\
 virtual void prep(int a);\
 virtual void unroll(int a);\
 virtual void clear(); \
 int index;
 
 #define RECBPGFIELDS SEQBPGFIELDS \
+virtual void incFwd(int a);\
+virtual void incBwd(int a);\
 virtual void prep(int a);\
 virtual void unroll(int a);\
 virtual void clear(); \
@@ -58,6 +61,8 @@ class muTS;
 class muTSBpg;
 class mu;
 class muBpg;
+class attTS;
+class attTSBpg;
 
 seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates);
 seqBpg* tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates);
@@ -83,7 +88,6 @@ public:
 	ptr<cType> x;
 	ptr<cType> y;
 };
-
 class modelBpg : public model {
 public:
 	modelBpg();
@@ -92,21 +96,18 @@ public:
 	ptr<cType> xGrad;
 	ptr<cType> yGrad;
 };
-
 class bias : public model {
 public:
 	MODELFIELDS
 	bias();
 	ptr<ptr<param>> prm;
 };
-
 class biasBpg : public modelBpg {
 public:
 	MODELBPGFIELDS
 	biasBpg();
 	ptr<ptr<param>> prm;
 };
-
 class act : public model {
 public:
 	MODELFIELDS
@@ -115,7 +116,6 @@ public:
 	act(ptr<actFunc> _af);
 	ptr<actFunc> af;
 };
-
 class actBpg : public modelBpg {
 public:
 	MODELBPGFIELDS
@@ -124,21 +124,18 @@ public:
 	actBpg(ptr<actFunc> _af);
 	ptr<actFunc> af;
 };
-
 class weight : public model {
 public:
 	MODELFIELDS
 	weight();
 	ptr<ptr<param>> prm;
 };
-
 class weightBpg : public modelBpg {
 public:
 	MODELBPGFIELDS
 	weightBpg();
 	ptr<ptr<param>> prm;
 };
-
 class wSet : public model, public vector<ptr<model>> {
 public:
 	SEQFIELDS
@@ -146,7 +143,6 @@ public:
 	wSet(int _a);
 	int a;
 };
-
 class wSetBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	SEQBPGFIELDS
@@ -154,7 +150,6 @@ public:
 	wSetBpg(int _a);
 	int a;
 };
-
 class wJunc : public model, public vector<ptr<model>> {
 public:
 	SEQFIELDS
@@ -163,7 +158,6 @@ public:
 	int a;
 	int b;
 };
-
 class wJuncBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	SEQBPGFIELDS
@@ -172,19 +166,16 @@ public:
 	int a;
 	int b;
 };
-
 class seq : public model, public vector<ptr<model>> {
 public:
 	SEQFIELDS
 	seq();
 };
-
 class seqBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	SEQBPGFIELDS
 	seqBpg();
 };
-
 class layer : public model, public vector<ptr<model>> {
 public:
 	SEQFIELDS
@@ -192,7 +183,6 @@ public:
 	layer(int a, model* modelTemplate);
 	layer(int a, ptr<model> modelTemplate);
 };
-
 class layerBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	SEQBPGFIELDS
@@ -200,7 +190,6 @@ public:
 	layerBpg(int a, model* modelTemplate);
 	layerBpg(int a, ptr<model> modelTemplate);
 };
-
 class sync : public model, public vector<ptr<model>> {
 public:
 	RECFIELDS
@@ -212,7 +201,6 @@ public:
 	// template model that will be cloned when prep() is called
 	ptr<model> modelTemplate;
 };
-
 class syncBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	RECBPGFIELDS
@@ -224,7 +212,6 @@ public:
 	// template model that will be cloned when prep() is called
 	ptr<model> modelTemplate;
 };
-
 class lstmTS : public model {
 public:
 	SEQFIELDS
@@ -246,7 +233,6 @@ private:
 	ptr<cType> comp_LenUnits;
 	ptr<cType> comp_Len2Units;
 };
-
 class lstmTSBpg : public modelBpg {
 public:
 	SEQBPGFIELDS
@@ -273,7 +259,6 @@ private:
 	ptr<cType> comp_LenUnits;
 	ptr<cType> comp_Len2Units;
 };
-
 class lstm : public model, public vector<ptr<model>> {
 public:
 	RECFIELDS
@@ -292,7 +277,6 @@ public:
 	ptr<cType> hTIn;
 	ptr<cType> hTOut;
 };
-
 class lstmBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	RECBPGFIELDS
@@ -316,7 +300,6 @@ public:
 	ptr<cType> hTInGrad;
 	ptr<cType> hTOutGrad;
 };
-
 class muTS : public model {
 public:
 	SEQFIELDS
@@ -336,7 +319,6 @@ public:
 private:
 	ptr<cType> comp_LenCTUnits;
 };
-
 class muTSBpg : public modelBpg {
 public:
 	SEQBPGFIELDS
@@ -362,7 +344,6 @@ private:
 	ptr<cType> comp_LenCTUnits;
 	ptr<cType> comp_LenHTUnits;
 };
-
 class mu : public model, public vector<ptr<model>> {
 public:
 	RECFIELDS
@@ -384,7 +365,6 @@ public:
 	ptr<cType> hTIn;
 	ptr<cType> hTOut;
 };
-
 class muBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	RECBPGFIELDS
@@ -411,7 +391,6 @@ public:
 	ptr<cType> hTInGrad;
 	ptr<cType> hTOutGrad;
 };
-
 class attTS : public model, public vector<ptr<model>> {
 public:
 	RECFIELDS
@@ -425,13 +404,12 @@ public:
 	vector<ptr<model>> prepared;
 	// template model that will be cloned when prep() is called
 	ptr<model> seqTemplate;
-
+	// the input hidden state is a vector, because it intakes one vector representing the decoder lstm's previous hTOut
 	ptr<cType> hTIn;
 
 private:
 	ptr<cType> comp_LenXUnits;
 };
-
 class attTSBpg : public modelBpg, public vector<ptr<model>> {
 public:
 	RECBPGFIELDS
@@ -443,13 +421,47 @@ public:
 	int hTUnits;
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
-	// template model that will be cloned when prep() is called
+	// the template model is a sequential (using the attTSBpg(int, int) constructor, this will be a traditional neural network)
 	ptr<model> seqTemplate;
-
+	// the input hidden state is a vector, because it intakes one vector representing the decoder lstm's previous hTOut
 	ptr<cType> hTIn;
-
 	ptr<cType> hTInGrad;
 
 private:
 	ptr<cType> comp_LenXUnits;
+	ptr<cType> comp_LenHTUnits;
+};
+class att : public model, public vector<ptr<model>> {
+public:
+	RECFIELDS
+	att();
+	att(int _xUnits, int _hTUnits);
+	att(int _xUnits, int _hTUnits, ptr<model> _attTSTemplate);
+
+	int xUnits;
+	int hTUnits;
+
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<ptr<model>> prepared;
+	// the template model is an attTS (attention timestep)
+	ptr<model> attTSTemplate;
+	// the input hidden state is a matrix, because it intakes one vector representing the decoder lstm's hidden state at every timestep
+	ptr<cType> hTIn;
+};
+class attBpg : public modelBpg, public vector<ptr<model>> {
+public:
+	RECBPGFIELDS
+	attBpg();
+	attBpg(int _xUnits, int _hTUnits);
+	attBpg(int _xUnits, int _hTUnits, ptr<model> _attTSTemplate);
+
+	int xUnits;
+	int hTUnits;
+	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
+	vector<ptr<model>> prepared;
+	// the template model is an attTS (attention timestep)
+	ptr<model> attTSTemplate;
+	// the input hidden state is a matrix, because it intakes one vector representing the decoder lstm's hidden state at every timestep
+	ptr<cType> hTIn;
+	ptr<cType> hTInGrad;
 };
