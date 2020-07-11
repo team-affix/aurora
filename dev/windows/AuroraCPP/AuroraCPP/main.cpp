@@ -11,19 +11,14 @@ void trainMuBpg();
 void trainAttBpg();
 
 int main() {
-	trainLstmBpg();
+	trainMuBpg();
 	return 0;
 }
 
 void trainTnnBpg() {
 
-	//seqBpg nlr = seqBpg();
-	//nlr.push_back(new biasBpg());
-	//nlr.push_back(new actBpg(new actFuncLR(0.05)));
-
-	seqBpg nlr = neuronLRBpg(0.05);
-
-	ptr<seqBpg> s = tnnBpg({ 2, 5, 1 }, { &nlr, &nlr, &nlr });
+	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<seqBpg> s = tnnBpg({ 2, 5, 1 }, { nlr, nlr, nlr });
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	s->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -98,8 +93,8 @@ void trainTnnBpg() {
 
 void trainSyncBpg() {
 
-	seqBpg nlr = neuronLRBpg(0.05);
-	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, &nlr);
+	ptr<model> nlr = neuronLRBpg(0.05);
+	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, nlr);
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -162,11 +157,11 @@ void trainSyncBpg() {
 
 void trainLstmBpg() {
 
-	seqBpg nlr = neuronLRBpg(0.05);
+	ptr<model> nlr = neuronLRBpg(0.05);
 
 	lstmBpg l1 = lstmBpg(5);
-	seqBpg* inNN = tnnBpg({ 2, 5 }, &nlr);
-	seqBpg* outNN = tnnBpg({ 5, 1 }, &nlr);
+	seqBpg* inNN = tnnBpg({ 2, 5 }, nlr);
+	seqBpg* outNN = tnnBpg({ 5, 1 }, nlr);
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });

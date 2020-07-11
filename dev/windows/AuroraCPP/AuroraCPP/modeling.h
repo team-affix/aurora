@@ -64,18 +64,18 @@ class muBpg;
 class attTS;
 class attTSBpg;
 
-seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates);
-seqBpg* tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates);
+seq* tnn(vector<int> npl, vector<ptr<model>> layerNeuronTemplates);
+seqBpg* tnnBpg(vector<int> npl, vector<ptr<model>> layerNeuronTemplates);
 
-seq* tnn(vector<int> npl, model* neuronTemplate);
-seqBpg* tnnBpg(vector<int> npl, model* neuronTemplate);
+seq* tnn(vector<int> npl, ptr<model> neuronTemplate);
+seqBpg* tnnBpg(vector<int> npl, ptr<model> neuronTemplate);
 
-seq neuronSm();
-seq neuronTh();
-seq neuronLR(double m);
-seqBpg neuronSmBpg();
-seqBpg neuronThBpg();
-seqBpg neuronLRBpg(double m);
+seq* neuronSm();
+seq* neuronTh();
+seq* neuronLR(double m);
+seqBpg* neuronSmBpg();
+seqBpg* neuronThBpg();
+seqBpg* neuronLRBpg(double m);
 
 void initParam(model* m, vector<ptr<ptr<param>>>* paramVecOutput);
 
