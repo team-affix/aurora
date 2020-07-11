@@ -581,22 +581,22 @@ ptr<vector<int>> randomDist(int count, int incMin, int excMax, bool replace) {
 double actFunc::eval(double x) {
 	return x;
 }
-double actFunc::deriv(double y) {
+double actFunc::deriv(double* x, double* y) {
 	return 1;
 }
 
 double actFuncSm::eval(double x) {
 	return 1 / (1 + exp(-x));
 }
-double actFuncSm::deriv(double y) {
-	return y * (1 - y);
+double actFuncSm::deriv(double* x, double* y) {
+	return *y * (1 - *y);
 }
 
 double actFuncTh::eval(double x) {
 	return tanh(x);
 }
-double actFuncTh::deriv(double y) {
-	return 1 / (pow(cosh(y), 2));
+double actFuncTh::deriv(double* x, double* y) {
+	return 1 / (pow(cosh(*x), 2));
 }
 
 actFuncLR::actFuncLR(double m) {
@@ -610,8 +610,8 @@ double actFuncLR::eval(double x) {
 		return m * x;
 	}
 }
-double actFuncLR::deriv(double y) {
-	if (y > 0) {
+double actFuncLR::deriv(double* x, double* y) {
+	if (*y > 0) {
 		return 1;
 	}
 	else {

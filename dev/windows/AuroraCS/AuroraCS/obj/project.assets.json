@@ -180,19 +180,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\jakeh\\.nuget\\packages\\": {}
+    "C:\\Users\\jake\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.2.2",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jakeh\\source\\repos\\AuroraCS\\AuroraCS\\AuroraCS.csproj",
+      "projectUniqueName": "D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCS\\AuroraCS\\AuroraCS.csproj",
       "projectName": "AuroraCS",
-      "projectPath": "C:\\Users\\jakeh\\source\\repos\\AuroraCS\\AuroraCS\\AuroraCS.csproj",
-      "packagesPath": "C:\\Users\\jakeh\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jakeh\\source\\repos\\AuroraCS\\AuroraCS\\obj\\",
+      "projectPath": "D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCS\\AuroraCS\\AuroraCS.csproj",
+      "packagesPath": "C:\\Users\\jake\\.nuget\\packages\\",
+      "outputPath": "D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCS\\AuroraCS\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\jakeh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\jake\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -200,7 +200,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\jakeh\\Documents\\MEGAsync\\source\\nuget\\NuGet": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -234,7 +233,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.300\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.301\\RuntimeIdentifierGraph.json"
       }
     }
   }

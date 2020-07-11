@@ -89,21 +89,21 @@ ptr<cType> concat(ptr<cType> a, ptr<cType> b);
 class actFunc {
 public:
 	virtual double eval(double x);
-	virtual double deriv(double y);
+	virtual double deriv(double* x, double* y);
 };
 
 // softmax activation function, return sigmoid of input
 class actFuncSm : public actFunc {
 public:
 	virtual double eval(double x);
-	virtual double deriv(double y);
+	virtual double deriv(double* x, double* y);
 };
 
 // tanh activation function, return hyperbolic tangent of input
 class actFuncTh : public actFunc {
 public:
 	virtual double eval(double x);
-	virtual double deriv(double y);
+	virtual double deriv(double* x, double* y);
 };
 
 // leaky relu activation function, returns leaky relu of input
@@ -111,6 +111,6 @@ class actFuncLR : public actFunc {
 public:
 	actFuncLR(double m);
 	virtual double eval(double x);
-	virtual double deriv(double y);
+	virtual double deriv(double* x, double* y);
 	double m;
 };
