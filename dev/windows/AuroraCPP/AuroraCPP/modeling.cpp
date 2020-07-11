@@ -3,6 +3,8 @@
 
 #pragma region functions
 
+// functions outside of classes, so they are usable between those of similar types.
+
 #pragma region external
 seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates) {
 	seq* result = new seq();
@@ -577,6 +579,8 @@ void attModelWise(function<void(model*)> func, ptr<model> attTSTemplate) {
 #pragma endregion
 
 #pragma region definitions
+
+// class function definitions
 
 #pragma region model
 model::model() {
@@ -1754,6 +1758,7 @@ void mu::incFwd(int a) {
 	ptr<cType> cT;
 	ptr<cType> hT;
 
+	// if the current carry index is 0, it means that none of the timesteps have been carried forward yet
 	if (index == 0) {
 		cT = cTIn;
 		hT = hTIn;
@@ -1876,6 +1881,7 @@ void muBpg::incFwd(int a) {
 	ptr<cType> cT;
 	ptr<cType> hT;
 
+	// if the current carry index is 0, it means that none of the timesteps have been carried forward yet
 	if (index == 0) {
 		cT = cTIn;
 		hT = hTIn;
@@ -1918,6 +1924,7 @@ void muBpg::incBwd(int a) {
 	ptr<cType> cTGrad;
 	ptr<cType> hTGrad;
 
+	// if the current carry index is size(), it means that all of the timesteps have been carried forward.
 	if (index == size()) {
 		cTGrad = cTOutGrad;
 		hTGrad = hTOutGrad;
