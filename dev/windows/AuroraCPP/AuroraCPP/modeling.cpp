@@ -6,7 +6,7 @@
 // functions outside of classes, so they are usable between those of similar types.
 
 #pragma region external
-seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates) {
+seq* tnn(vector<int> npl, vector<ptr<model>> layerNeuronTemplates) {
 	seq* result = new seq();
 	for (int i = 0; i < npl.size() - 1; i++) {
 		result->push_back(new layer(npl.at(i), layerNeuronTemplates.at(i)));
@@ -15,7 +15,7 @@ seq* tnn(vector<int> npl, vector<model*> layerNeuronTemplates) {
 	result->push_back(new layer(npl.back(), layerNeuronTemplates.back()));
 	return result;
 }
-seqBpg* tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates) {
+seqBpg* tnnBpg(vector<int> npl, vector<ptr<model>> layerNeuronTemplates) {
 	seqBpg* result = new seqBpg();
 	for (int i = 0; i < npl.size() - 1; i++) {
 		result->push_back(new layerBpg(npl.at(i), layerNeuronTemplates.at(i)));
@@ -24,7 +24,7 @@ seqBpg* tnnBpg(vector<int> npl, vector<model*> layerNeuronTemplates) {
 	result->push_back(new layerBpg(npl.back(), layerNeuronTemplates.back()));
 	return result;
 }
-seq* tnn(vector<int> npl, model* neuronTemplate) {
+seq* tnn(vector<int> npl, ptr<model> neuronTemplate) {
 	seq* result = new seq();
 	for (int i = 0; i < npl.size() - 1; i++) {
 		result->push_back(new layer(npl.at(i), neuronTemplate));
@@ -33,7 +33,7 @@ seq* tnn(vector<int> npl, model* neuronTemplate) {
 	result->push_back(new layer(npl.back(), neuronTemplate));
 	return result;
 }
-seqBpg* tnnBpg(vector<int> npl, model* neuronTemplate) {
+seqBpg* tnnBpg(vector<int> npl, ptr<model> neuronTemplate) {
 	seqBpg* result = new seqBpg();
 	for (int i = 0; i < npl.size() - 1; i++) {
 		result->push_back(new layerBpg(npl.at(i), neuronTemplate));
@@ -42,57 +42,57 @@ seqBpg* tnnBpg(vector<int> npl, model* neuronTemplate) {
 	result->push_back(new layerBpg(npl.back(), neuronTemplate));
 	return result;
 }
-seq neuronSm() {
+seq* neuronSm() {
 
 	// construct tanh neuron
-	seq nsm = seq();
-	nsm.push_back(new bias());
-	nsm.push_back(new act(new actFuncSm()));
+	seq* nsm = new seq();
+	nsm->push_back(new bias());
+	nsm->push_back(new act(new actFuncSm()));
 	return nsm;
 
 }
-seq neuronTh() {
+seq* neuronTh() {
 
 	// construct tanh neuron
-	seq nth = seq();
-	nth.push_back(new bias());
-	nth.push_back(new act(new actFuncTh()));
+	seq* nth = new seq();
+	nth->push_back(new bias());
+	nth->push_back(new act(new actFuncTh()));
 	return nth;
 
 }
-seq neuronLR(double m) {
+seq* neuronLR(double m) {
 
 	// construct tanh neuron
-	seq nlr = seq();
-	nlr.push_back(new bias());
-	nlr.push_back(new act(new actFuncLR(m)));
+	seq* nlr = new seq();
+	nlr->push_back(new bias());
+	nlr->push_back(new act(new actFuncLR(m)));
 	return nlr;
 
 }
-seqBpg neuronSmBpg() {
+seqBpg* neuronSmBpg() {
 
 	// construct tanh neuron
-	seqBpg nsm = seqBpg();
-	nsm.push_back(new biasBpg());
-	nsm.push_back(new actBpg(new actFuncSm()));
+	seqBpg* nsm = new seqBpg();
+	nsm->push_back(new biasBpg());
+	nsm->push_back(new actBpg(new actFuncSm()));
 	return nsm;
 
 }
-seqBpg neuronThBpg() {
+seqBpg* neuronThBpg() {
 
 	// construct tanh neuron
-	seqBpg nth = seqBpg();
-	nth.push_back(new biasBpg());
-	nth.push_back(new actBpg(new actFuncTh()));
+	seqBpg* nth = new seqBpg();
+	nth->push_back(new biasBpg());
+	nth->push_back(new actBpg(new actFuncTh()));
 	return nth;
 
 }
-seqBpg neuronLRBpg(double m) {
+seqBpg* neuronLRBpg(double m) {
 
 	// construct tanh neuron
-	seqBpg nlr = seqBpg();
-	nlr.push_back(new biasBpg());
-	nlr.push_back(new actBpg(new actFuncLR(m)));
+	seqBpg* nlr = new seqBpg();
+	nlr->push_back(new biasBpg());
+	nlr->push_back(new actBpg(new actFuncLR(m)));
 	return nlr;
 
 }
@@ -1326,14 +1326,14 @@ lstm::lstm(int _units) {
 
 	this->units = _units;
 
-	seq nlr = neuronLR(0.05);
-	seq nth = neuronTh();
-	seq nsm = neuronSm();
+	ptr<model> nlr = neuronLR(0.05);
+	ptr<model> nth = neuronTh();
+	ptr<model> nsm = neuronSm();
 
-	ptr<model> aGate = tnn({ 2 * units, units }, { &nlr, &nsm });
-	ptr<model> bGate = tnn({ 2 * units, units }, { &nlr, &nsm });
-	ptr<model> cGate = tnn({ 2 * units, units }, { &nlr, &nth });
-	ptr<model> dGate = tnn({ 2 * units, units }, { &nlr, &nsm });
+	ptr<model> aGate = tnn({ 2 * units, units }, { nlr, nsm });
+	ptr<model> bGate = tnn({ 2 * units, units }, { nlr, nsm });
+	ptr<model> cGate = tnn({ 2 * units, units }, { nlr, nth });
+	ptr<model> dGate = tnn({ 2 * units, units }, { nlr, nsm });
 
 	this->hTIn = make1D(units);
 	this->cTIn = make1D(units);
@@ -1441,14 +1441,14 @@ lstmBpg::lstmBpg(int _units) {
 
 	this->units = _units;
 
-	seqBpg nlr = neuronLRBpg(0.05);
-	seqBpg nth = neuronThBpg();
-	seqBpg nsm = neuronSmBpg();
+	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nth = neuronThBpg();
+	ptr<model> nsm = neuronSmBpg();
 
-	ptr<model> aGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
-	ptr<model> bGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
-	ptr<model> cGate = tnnBpg({ 2 * units, units }, { &nlr, &nth });
-	ptr<model> dGate = tnnBpg({ 2 * units, units }, { &nlr, &nsm });
+	ptr<model> aGate = tnnBpg({ 2 * units, units }, { nlr, nsm });
+	ptr<model> bGate = tnnBpg({ 2 * units, units }, { nlr, nsm });
+	ptr<model> cGate = tnnBpg({ 2 * units, units }, { nlr, nth });
+	ptr<model> dGate = tnnBpg({ 2 * units, units }, { nlr, nsm });
 
 	this->hTIn = make1D(units);
 	this->cTIn = make1D(units);
@@ -1724,10 +1724,10 @@ mu::mu(int _xUnits, int _cTUnits, int _hTUnits) {
 	this->hTIn = make1D(hTUnits);
 	this->hTOut = make1D(hTUnits);
 
-	seq nlr = neuronLR(0.05);
-	seqBpg nth = neuronThBpg();
+	ptr<model> nlr = neuronLR(0.05);
+	ptr<model> nth = neuronTh();
 
-	ptr<model> gateTemplate = tnn({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, { &nlr, &nth });
+	ptr<model> gateTemplate = tnn({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, { nlr, nth });
 	muTSTemplate = new muTS(xUnits, cTUnits, hTUnits, gateTemplate);
 
 }
@@ -1842,10 +1842,10 @@ muBpg::muBpg(int _xUnits, int _cTUnits, int _hTUnits) {
 	this->hTInGrad = make1D(hTUnits);
 	this->hTOutGrad = make1D(hTUnits);
 
-	seqBpg nlr = neuronLRBpg(0.05);
-	seqBpg nth = neuronThBpg();
+	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nth = neuronThBpg();
 
-	ptr<model> gateTemplate = tnnBpg({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, { &nlr, &nth });
+	ptr<model> gateTemplate = tnnBpg({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, { nlr, nth });
 	muTSTemplate = new muTSBpg(xUnits, cTUnits, hTUnits, gateTemplate);
 
 }
@@ -2012,11 +2012,11 @@ attTS::attTS(int _xUnits, int _hTUnits) {
 	this->prepared = vector<ptr<model>>();
 
 	// Instantiate neurons that will be used in attention template TNN
-	seq nlr = neuronLR(0.05);
-	seq nsm = neuronSm();
+	ptr<model> nlr = neuronLR(0.05);
+	ptr<model> nsm = neuronSm();
 
 	// Initialize the attention timestep template model to be a tnn
-	seqTemplate = tnn({ xUnits + hTUnits, xUnits }, { &nlr, &nsm });
+	seqTemplate = tnn({ xUnits + hTUnits, xUnits }, { nlr, nsm });
 
 	// Initialize the template's x and y vectors
 	seqTemplate->x = make1D(xUnits + hTUnits);
@@ -2112,11 +2112,11 @@ attTSBpg::attTSBpg(int _xUnits, int _hTUnits) {
 	this->prepared = vector<ptr<model>>();
 
 	// Instantiate neurons that will be used in attention template TNN
-	seqBpg nlr = neuronLRBpg(0.05);
-	seqBpg nsm = neuronSmBpg();
+	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nsm = neuronSmBpg();
 
 	// Initialize the attention timestep template model to be a tnn
-	seqTemplate = tnnBpg({ xUnits + hTUnits, xUnits }, { &nlr, &nsm });
+	seqTemplate = tnnBpg({ xUnits + hTUnits, xUnits }, { nlr, nsm });
 
 	// Initialize the template's x and y vectors
 	seqTemplate->x = make1D(xUnits + hTUnits);
