@@ -6,7 +6,7 @@
 #pragma region Defs
 
 #define MODELFIELDS \
-virtual void fwd(); \
+virtual void fwd();\
 virtual ptr<model> clone();
 
 #define MODELBPGFIELDS MODELFIELDS \
@@ -32,6 +32,17 @@ virtual void prep(int a);\
 virtual void unroll(int a);\
 virtual void clear(); \
 int index;
+
+#define ATTFIELDS \
+RECFIELDS \
+virtual void prep(int a, int b);\
+virtual void unroll(int a, int b);
+
+#define ATTBPGFIELDS \
+RECBPGFIELDS \
+virtual void prep(int a, int b);\
+virtual void unroll(int a, int b);
+
 
 #pragma endregion
 
@@ -195,6 +206,7 @@ public:
 	RECFIELDS
 	sync();
 	sync(model* _modelTemplate);
+	sync(ptr<model> _modelTemplate);
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -206,6 +218,7 @@ public:
 	RECBPGFIELDS
 	syncBpg();
 	syncBpg(model* _modelTemplate);
+	syncBpg(ptr<model> _modelTemplate);
 
 	// models that have been instantiated in RAM, and therefore are ready to be unrolled when ready to use
 	vector<ptr<model>> prepared;
@@ -433,7 +446,7 @@ private:
 };
 class att : public model, public vector<ptr<model>> {
 public:
-	RECFIELDS
+	ATTFIELDS
 	att();
 	att(int _xUnits, int _hTUnits);
 	att(int _xUnits, int _hTUnits, ptr<model> _attTSTemplate);
@@ -450,7 +463,7 @@ public:
 };
 class attBpg : public modelBpg, public vector<ptr<model>> {
 public:
-	RECBPGFIELDS
+	ATTBPGFIELDS
 	attBpg();
 	attBpg(int _xUnits, int _hTUnits);
 	attBpg(int _xUnits, int _hTUnits, ptr<model> _attTSTemplate);
