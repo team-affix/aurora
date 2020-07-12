@@ -11,7 +11,7 @@ void trainMuBpg();
 void trainAttBpg();
 
 int main() {
-	trainMuBpg();
+	trainAttBpg();
 	return 0;
 }
 
@@ -160,8 +160,8 @@ void trainLstmBpg() {
 	ptr<model> nlr = neuronLRBpg(0.05);
 
 	lstmBpg l1 = lstmBpg(5);
-	seqBpg* inNN = tnnBpg({ 2, 5 }, nlr);
-	seqBpg* outNN = tnnBpg({ 5, 1 }, nlr);
+	ptr<model> inNN = tnnBpg({ 2, 5 }, nlr);
+	ptr<model> outNN = tnnBpg({ 5, 1 }, nlr);
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -366,8 +366,8 @@ void trainMuBpg() {
 
 void trainAttBpg() {
 
-	attBpg a1 = attBpg(2, 5);
-	muBpg m1 = muBpg(5, 7, 1);
+	attBpg a1 = attBpg(2, 1);
+	muBpg m1 = muBpg(2, 8, 1);
 
 	vector<ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	a1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -382,7 +382,7 @@ void trainAttBpg() {
 		p->gradient = 0;
 		p->learnRate = 0.02;
 		p->state = urd(re);
-		p->beta = 0.9;
+		p->beta = 0.0;
 		p->momentum = 0;
 		*pptr = p;
 		params.push_back(p);
@@ -429,10 +429,12 @@ void trainAttBpg() {
 		}
 	};
 
-	a1.prep(7);
+	a1.prep(7, 7);
 	m1.prep(7);
 
-	a1.unroll(7);
+	a1.unroll(7, 7);
+	m1.unroll(7);
+	m1.x = make2D(7, 2);
 
 	m1.yGrad = make2D(7, 1);
 
@@ -442,15 +444,37 @@ void trainAttBpg() {
 
 			ptr<cType> tsInputs = inputs->vVector.at(i);
 			a1.x = tsInputs;
-			for (int j = 0; j < tsInputs->vVector.size(); j++) {
+			for (int j = 0; j < m1.size(); j++) {
 
 				attTSBpg* a = (attTSBpg*)a1.at(j).get();
-				a->hTIn = m1.hTOut;
-				a1.fwd();
-				m1.unroll(1);
-				
+				a1.hTIn->vVector.at(j) = m1.hTOut;
+				a1.incFwd(1);
+				m1.x->vVector[m1.index] = a->y;
+				m1.incFwd(1);
 
 			}
+			sub2D(m1.y, desired->vVector.at(i), m1.yGrad);
+			for (int j = m1.size() - 1; j >= 0; j--) {
+
+				attTSBpg* a = (attTSBpg*)a1.at(j).get();
+				m1.incBwd(1);
+				a1.yGrad->vVector.at(j) = m1.xGrad->vVector.at(j);
+				a1.incBwd(1);
+				add1D(m1.hTInGrad, a1.hTInGrad->vVector.at(j), m1.hTInGrad);
+
+			}
+
+		}
+
+		for (paramMom* p : params) {
+			p->momentum = p->beta * p->momentum + (1 - p->beta) * p->gradient;
+			p->state -= p->learnRate * p->momentum;
+			p->gradient = 0;
+		}
+
+		if (epoch % 1000 == 0) {
+
+			cout << sum1D(sum2D(abs2D(m1.yGrad)))->vDouble << endl;
 
 		}
 

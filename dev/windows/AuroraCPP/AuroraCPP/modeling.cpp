@@ -511,6 +511,7 @@ void attTSIncFwd(ptr<cType> x, ptr<cType> y, ptr<cType> hTIn, ptr<cType> comp_Le
 	clear1D(y);
 
 	for (int j = 0; j < a; j++) {
+
 		int i = *index;
 		model* m = (model*)unrolled->at(i).get();
 		// set input to the model
@@ -518,6 +519,9 @@ void attTSIncFwd(ptr<cType> x, ptr<cType> y, ptr<cType> hTIn, ptr<cType> comp_Le
 		m->fwd();
 		mult1D(m->y, xVec->at(i), x_yproduct);
 		add1D(y, x_yproduct, y);
+
+		(*index)++;
+
 	}
 
 }
@@ -554,7 +558,7 @@ void attTSIncBwd(ptr<cType> x, ptr<cType> yGrad, ptr<cType> xGrad, ptr<cType> hT
 }
 void attTSFwd(ptr<cType> x, ptr<cType> y, ptr<cType> hTIn, ptr<cType> comp_LenXUnits, int xUnits, int hTUnits, vector<ptr<model>>* unrolled, int* index) {
 
-	attTSIncFwd(x, y, hTIn, comp_LenXUnits, xUnits, hTUnits, unrolled, index, unrolled->size());
+	attTSIncFwd(x, y, hTIn, comp_LenXUnits, xUnits, hTUnits, unrolled, index, unrolled->size() - *index);
 
 }
 void attTSBwd(ptr<cType> x, ptr<cType> yGrad, ptr<cType> xGrad, ptr<cType> hTInGrad, ptr<cType> comp_LenXUnits, ptr<cType> comp_LenHTUnits, int xUnits, int hTUnits, vector<ptr<model>>* unrolled, int* index) {
@@ -1071,6 +1075,10 @@ sync::sync(model* _modelTemplate) {
 	this->modelTemplate = _modelTemplate;
 	prepared = vector<ptr<model>>();
 }
+sync::sync(ptr<model> _modelTemplate) {
+	this->modelTemplate = _modelTemplate;
+	prepared = vector<ptr<model>>();
+}
 void sync::fwd() {
 	syncFwd(x, y, this, &index);
 }
@@ -1120,6 +1128,10 @@ syncBpg::syncBpg() {
 	prepared = vector<ptr<model>>();
 }
 syncBpg::syncBpg(model* _modelTemplate) {
+	this->modelTemplate = _modelTemplate;
+	prepared = vector<ptr<model>>();
+}
+syncBpg::syncBpg(ptr<model> _modelTemplate) {
 	this->modelTemplate = _modelTemplate;
 	prepared = vector<ptr<model>>();
 }
@@ -1650,6 +1662,7 @@ ptr<model> muTS::clone() {
 	return result;
 
 }
+
 muTSBpg::muTSBpg() {
 
 }
@@ -1907,8 +1920,8 @@ void muBpg::incFwd(int a) {
 	}
 
 
-	cTOut->vVector = cT->vVector;
-	hTOut->vVector = hT->vVector;
+	cTOut = cT;
+	hTOut = hT;
 
 }
 void muBpg::bwd() {
@@ -1949,8 +1962,8 @@ void muBpg::incBwd(int a) {
 
 	}
 
-	cTInGrad->vVector = cTGrad->vVector;
-	hTInGrad->vVector = hTGrad->vVector;
+	cTInGrad = cTGrad;
+	hTInGrad = hTGrad;
 
 }
 void muBpg::modelWise(function<void(model*)> func) {
@@ -2016,11 +2029,10 @@ attTS::attTS(int _xUnits, int _hTUnits) {
 	ptr<model> nsm = neuronSm();
 
 	// Initialize the attention timestep template model to be a tnn
-	seqTemplate = tnn({ xUnits + hTUnits, xUnits }, { nlr, nsm });
-
-	// Initialize the template's x and y vectors
-	seqTemplate->x = make1D(xUnits + hTUnits);
-	seqTemplate->y = make1D(xUnits);
+	seq* seqTemp = tnn({ xUnits + hTUnits, xUnits }, { nlr, nsm });
+	seqTemp->x = make1D(xUnits + hTUnits);
+	seqTemp->y = make1D(xUnits);
+	this->seqTemplate = seqTemp;
 
 	// Initialize the computation result cType
 	comp_LenXUnits = make2D(1, xUnits);
@@ -2031,7 +2043,6 @@ attTS::attTS(int _xUnits, int _hTUnits, ptr<model> _seqTemplate) {
 	// Make the xUnits and hTUnits publicly accessable
 	this->xUnits = _xUnits;
 	this->hTUnits = _hTUnits;
-	this->seqTemplate = _seqTemplate;
 
 	// Initialize x, y, and hT vectors
 	this->hTIn = make1D(hTUnits);
@@ -2040,9 +2051,11 @@ attTS::attTS(int _xUnits, int _hTUnits, ptr<model> _seqTemplate) {
 	// Initialize the prepared vector
 	this->prepared = vector<ptr<model>>();
 
-	// Initialize the template's x and y vectors
-	seqTemplate->x = make1D(xUnits + hTUnits);
-	seqTemplate->y = make1D(xUnits);
+	// Initialize the attention timestep template model to be a tnn
+	seq* seqTemp = (seq*)_seqTemplate.get();
+	seqTemp->x = make1D(xUnits + hTUnits);
+	seqTemp->y = make1D(xUnits);
+	this->seqTemplate = seqTemp;
 
 	// Initialize the computation result cType
 	comp_LenXUnits = make2D(1, xUnits);
@@ -2081,7 +2094,7 @@ void attTS::unroll(int a) {
 	
 	for (int i = 0; i < a; i++) {
 		push_back(prepared.at(size()));
-		x->vVector.push_back(new cType{});
+		x->vVector.push_back(make1D(xUnits));
 	}
 
 }
@@ -2116,7 +2129,12 @@ attTSBpg::attTSBpg(int _xUnits, int _hTUnits) {
 	ptr<model> nsm = neuronSmBpg();
 
 	// Initialize the attention timestep template model to be a tnn
-	seqTemplate = tnnBpg({ xUnits + hTUnits, xUnits }, { nlr, nsm });
+	seqBpg* seqTemp = tnnBpg({ xUnits + hTUnits, xUnits }, { nlr, nsm });
+	seqTemp->x = make1D(xUnits + hTUnits);
+	seqTemp->y = make1D(xUnits);
+	seqTemp->xGrad = make1D(xUnits + hTUnits);
+	seqTemp->yGrad = make1D(xUnits);
+	this->seqTemplate = seqTemp;
 
 	// Initialize the template's x and y vectors
 	seqTemplate->x = make1D(xUnits + hTUnits);
@@ -2132,7 +2150,6 @@ attTSBpg::attTSBpg(int _xUnits, int _hTUnits, ptr<model> _seqTemplate) {
 	// Make the xUnits and hTUnits publicly accessable
 	this->xUnits = _xUnits;
 	this->hTUnits = _hTUnits;
-	this->seqTemplate = _seqTemplate;
 
 	// Initialize x, y, and hT vectors
 	this->hTIn = make1D(hTUnits);
@@ -2143,9 +2160,13 @@ attTSBpg::attTSBpg(int _xUnits, int _hTUnits, ptr<model> _seqTemplate) {
 	// Initialize the prepared vector
 	this->prepared = vector<ptr<model>>();
 
-	// Initialize the template's x and y vectors
-	seqTemplate->x = make1D(xUnits + hTUnits);
-	seqTemplate->y = make1D(xUnits);
+	// Initialize the attention timestep template model to be a tnn
+	seqBpg* seqTemp = (seqBpg*)_seqTemplate.get();
+	seqTemp->x = make1D(xUnits + hTUnits);
+	seqTemp->y = make1D(xUnits);
+	seqTemp->xGrad = make1D(xUnits + hTUnits);
+	seqTemp->yGrad = make1D(xUnits);
+	this->seqTemplate = seqTemp;
 
 	// Initialize the computation result cType
 	comp_LenXUnits = make2D(2, xUnits);
@@ -2195,8 +2216,8 @@ void attTSBpg::unroll(int a) {
 
 	for (int i = 0; i < a; i++) {
 		push_back(prepared.at(size()));
-		x->vVector.push_back(new cType{});
-		xGrad->vVector.push_back(new cType{});
+		x->vVector.push_back(make1D(xUnits));
+		xGrad->vVector.push_back(make1D(xUnits));
 	}
 
 }
@@ -2218,11 +2239,15 @@ att::att(int _xUnits, int _hTUnits) {
 	this->xUnits = _xUnits;
 	this->hTUnits = _hTUnits;
 
+	this->x = new cType{};
+	this->hTIn = new cType{};
+
 	// Initialize the prepared vector
 	this->prepared = vector<ptr<model>>();
 
 	// Initialize template model
 	this->attTSTemplate = new attTS(xUnits, hTUnits);
+	attTSTemplate->y = make1D(xUnits);
 
 }
 att::att(int _xUnits, int _hTUnits, ptr<model> _attTSTemplate) {
@@ -2231,11 +2256,15 @@ att::att(int _xUnits, int _hTUnits, ptr<model> _attTSTemplate) {
 	this->xUnits = _xUnits;
 	this->hTUnits = _hTUnits;
 
+	this->x = new cType{};
+	this->hTIn = new cType{};
+
 	// Initialize the prepared vector
 	this->prepared = vector<ptr<model>>();
 
 	// Initialize template model
 	this->attTSTemplate = _attTSTemplate;
+	attTSTemplate->y = make1D(xUnits);
 
 }
 void att::fwd() {
@@ -2282,11 +2311,38 @@ void att::prep(int a) {
 	}
 
 }
+void att::prep(int a, int b) {
+
+	for (int i = 0; i < a; i++) {
+		ptr<model> m = attTSTemplate->clone();
+		attTS* att = (attTS*)m.get();
+		att->prep(b);
+		prepared.push_back(m);
+	}
+
+}
 void att::unroll(int a) {
 
 	for (int i = 0; i < a; i++) {
 
 		push_back(prepared.at(size()));
+		x->vVector.push_back(make1D(xUnits));
+		y->vVector.push_back(new cType{});
+		hTIn->vVector.push_back(new cType{});
+		// x's vVector is not pushed back to because it is completely populated by the user before any timestep is carried forward
+
+	}
+
+}
+void att::unroll(int a, int b) {
+
+	for (int i = 0; i < a; i++) {
+
+		ptr<model> m = prepared.at(size());
+		attTS* att = (attTS*)m.get();
+		att->unroll(b);
+		push_back(m);
+		x->vVector.push_back(make1D(xUnits));
 		y->vVector.push_back(new cType{});
 		hTIn->vVector.push_back(new cType{});
 		// x's vVector is not pushed back to because it is completely populated by the user before any timestep is carried forward
@@ -2297,10 +2353,9 @@ void att::unroll(int a) {
 void att::clear() {
 
 	vector<ptr<model>>::clear();
+	x->vVector.clear();
 	y->vVector.clear();
 	hTIn->vVector.clear();
-	// x's vVector is cleared even though it should never be pushed back to at training time
-	x->vVector.clear();
 
 }
 
@@ -2313,11 +2368,20 @@ attBpg::attBpg(int _xUnits, int _hTUnits) {
 	this->xUnits = _xUnits;
 	this->hTUnits = _hTUnits;
 
+	this->x = new cType{};
+	this->hTIn = new cType{};
+
+	this->xGrad = new cType{};
+	this->hTInGrad = new cType{};
+
 	// Initialize the prepared vector
 	this->prepared = vector<ptr<model>>();
 
 	// Initialize template model
-	this->attTSTemplate = new attTSBpg(xUnits, hTUnits);
+	attTSBpg* attTSTemplateBpg = new attTSBpg(xUnits, hTUnits);
+	attTSTemplateBpg->y = make1D(xUnits);
+	attTSTemplateBpg->yGrad = make1D(xUnits);
+	this->attTSTemplate = attTSTemplateBpg;
 
 }
 attBpg::attBpg(int _xUnits, int _hTUnits, ptr<model> _attTSTemplate) {
@@ -2326,11 +2390,20 @@ attBpg::attBpg(int _xUnits, int _hTUnits, ptr<model> _attTSTemplate) {
 	this->xUnits = _xUnits;
 	this->hTUnits = _hTUnits;
 
+	this->x = new cType{};
+	this->hTIn = new cType{};
+
+	this->xGrad = new cType{};
+	this->hTInGrad = new cType{};
+
 	// Initialize the prepared vector
 	this->prepared = vector<ptr<model>>();
 
 	// Initialize template model
-	this->attTSTemplate = _attTSTemplate;
+	attTSBpg* attTSTemplateBpg = (attTSBpg*)_attTSTemplate.get();
+	attTSTemplateBpg->y = make1D(xUnits);
+	attTSTemplateBpg->yGrad = make1D(xUnits);
+	this->attTSTemplate = attTSTemplateBpg;
 
 }
 void attBpg::fwd() {
@@ -2389,7 +2462,7 @@ void attBpg::incBwd(int _a) {
 		attTSBpg* a = (attTSBpg*)at(index).get();
 		a->yGrad = yGradVec->at(index);
 		a->bwd();
-		xGradVec->at(index) = a->xGrad;
+		add2D(xGrad, a->xGrad, xGrad);
 		hTInGradMat->at(index) = a->hTInGrad;
 
 	}
@@ -2414,11 +2487,42 @@ void attBpg::prep(int a) {
 	}
 
 }
+void attBpg::prep(int a, int b) {
+
+	for (int i = 0; i < a; i++) {
+		ptr<model> m = attTSTemplate->clone();
+		attTSBpg* att = (attTSBpg*)m.get();
+		att->prep(b);
+		prepared.push_back(m);
+	}
+
+}
 void attBpg::unroll(int a) {
 
 	for (int i = 0; i < a; i++) {
 
 		push_back(prepared.at(size()));
+		x->vVector.push_back(make1D(xUnits));
+		xGrad->vVector.push_back(make1D(xUnits));
+		y->vVector.push_back(new cType{});
+		yGrad->vVector.push_back(new cType{});
+		hTIn->vVector.push_back(new cType{});
+		hTInGrad->vVector.push_back(new cType{});
+
+	}
+
+}
+void attBpg::unroll(int a, int b) {
+
+	for (int i = 0; i < a; i++) {
+
+		int s = size();
+		ptr<model> m = prepared.at(size());
+		attTSBpg* att = (attTSBpg*)m.get();
+		att->unroll(b);
+		push_back(m);
+		x->vVector.push_back(make1D(xUnits));
+		xGrad->vVector.push_back(make1D(xUnits));
 		y->vVector.push_back(new cType{});
 		yGrad->vVector.push_back(new cType{});
 		hTIn->vVector.push_back(new cType{});
@@ -2431,13 +2535,12 @@ void attBpg::unroll(int a) {
 void attBpg::clear() {
 
 	vector<ptr<model>>::clear();
+	x->vVector.clear();
+	xGrad->vVector.clear();
 	y->vVector.clear();
 	yGrad->vVector.clear();
 	hTIn->vVector.clear();
 	hTInGrad->vVector.clear();
-	// x's vVector is cleared even though it should never be pushed back to at training time
-	x->vVector.clear();
-	xGrad->vVector.clear();
 
 }
 #pragma endregion
