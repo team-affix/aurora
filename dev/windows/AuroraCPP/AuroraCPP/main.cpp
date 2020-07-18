@@ -12,26 +12,15 @@ string exportParams(vector<ptr<ptr<param>>>* paramPtrVec);
 void trainTnnBpg();
 void trainTnnMut();
 void trainSyncBpg();
+void trainSyncMut();
 void trainLstmBpg();
+void trainLstmMut();
 void trainMuBpg();
 void trainAttBpg();
 void trainDigitRecognizer();
 
-ptr<cType> somewhatNormalDistribution(double verStretch, double horStretch, double upShift, double min, double max, double inc)
-{
-	ptr<cType> result = new cType();
-	for (double x = min; x <= max; x += inc) {
-		double dvals = verStretch * (horStretch * (1 - pow(tanh(x), 2))) + upShift;
-		int vals = (int)dvals;
-		for (int i = 0; i < vals; i++) {
-			result->vVector.push_back(new cType(x));
-		}
-	}
-	return result;
-}
-
 int main() {
-	trainTnnMut();
+	trainLstmMut();
 	return 0;
 }
 
@@ -262,6 +251,88 @@ void trainSyncBpg() {
 	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
 }
 
+void trainSyncMut() {
+	ptr<model> nlr = neuronLR(0.05);
+	seq* templateNN = tnn({ 2, 5, 1 }, nlr);
+
+	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
+	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(43);
+
+	vector<param*> params = vector<param*>();
+	for (ptr<ptr<param>> pptr : paramPtrVec) {
+		param* p = new param();
+		p->learnRate = 1;
+		p->state = urd(re);
+		*pptr = p;
+		params.push_back(p);
+	}
+
+	sync s = sync(templateNN);
+	s.prep(4);
+	s.unroll(4);
+
+	ptr<cType> inputs = new cType{
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	ptr<cType> desired = new cType{
+		{ 0 },
+		{ 1 },
+		{ 1 },
+		{ 0 },
+	};
+
+	int genSize = 40;
+	genePool g(urd, re, &params, genSize, 0.001);
+	g.initParent();
+	g.initChildren();
+	g.populateParent();
+
+	ptr<cType> childBestCost = new cType(999999999);
+	ptr<cType> childCost0D = new cType();
+	ptr<cType> childCost1D = make1D(1);
+	ptr<cType> childCost2D = make2D(4, 1);
+	int bestChildIndex;
+
+	for (int epoch = 0; true; epoch++) {
+
+		childBestCost->vDouble = 999999999;
+		bestChildIndex = 0;
+
+		g.birthGeneration();
+
+		for (int childIndex = 0; childIndex < genSize; childIndex++) {
+
+			g.populateParams(childIndex);
+
+			s.x = inputs;
+			s.index = 0;
+			s.fwd();
+			sub2D(s.y, desired, childCost2D);
+			abs2D(childCost2D, childCost2D);
+			sum2D(childCost2D, childCost1D);
+			sum1D(childCost1D, childCost0D);
+
+			if (childCost0D->vDouble < childBestCost->vDouble) {
+				childBestCost->vDouble = childCost0D->vDouble;
+				bestChildIndex = childIndex;
+			}
+		}
+
+		g.makeParent(bestChildIndex);
+
+		if (epoch % 10 == 0) {
+			cout << childBestCost->vDouble << endl;
+		}
+
+	}
+}
+
 void trainLstmBpg() {
 
 	ptr<model> nlr = neuronLRBpg(0.05);
@@ -287,8 +358,6 @@ void trainLstmBpg() {
 		*pptr = p;
 		params.push_back(p);
 	}
-
-
 
 	ptr<cType> inputs = new cType{ 
 		{
@@ -364,6 +433,123 @@ void trainLstmBpg() {
 	}
 
 	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
+}
+
+void trainLstmMut() {
+
+	ptr<model> nlr = neuronLRBpg(0.05);
+
+	lstmBpg l1 = lstmBpg(5);
+	ptr<model> inNN = tnnBpg({ 2, 5 }, nlr);
+	ptr<model> outNN = tnnBpg({ 5, 1 }, nlr);
+
+	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
+	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	l1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(43);
+
+	vector<param*> params = vector<param*>();
+	for (ptr<ptr<param>> pptr : paramPtrVec) {
+		param* p = new param();
+		p->learnRate = 1;
+		p->state = urd(re);
+		*pptr = p;
+		params.push_back(p);
+	}
+
+	ptr<cType> inputs = new cType{
+		{
+			{0, 0},
+			{0, 1},
+			{1, 0},
+			{1, 1},
+		},
+		{
+			{0, 0},
+			{1, 1},
+			{1, 0},
+			{1, 1}
+		}
+	};
+	ptr<cType> desired = new cType{
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 0 },
+		},
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 1 },
+		}
+	};
+
+	l1.prep(4);
+	l1.unroll(4);
+	syncBpg rIn = syncBpg(inNN);
+	rIn.prep(4);
+	rIn.unroll(4);
+	syncBpg rOut = syncBpg(outNN);
+	rOut.prep(4);
+	rOut.unroll(4);
+
+	int genSize = 60;
+	genePool g(urd, re, &params, genSize, 0.001);
+	g.initParent();
+	g.initChildren();
+	g.populateParent();
+
+	ptr<cType> childTSCost2D = make2D(4, 1);
+	ptr<cType> childCost2D = make2D(4, 1);
+	ptr<cType> childCost1D = make1D(1);
+	ptr<cType> childCost0D = new cType();
+	ptr<cType> childBestCost = new cType();
+	int bestChildIndex;
+
+	for (int epoch = 0; true; epoch++) {
+
+		g.birthGeneration();
+		childBestCost->vDouble = 9999999;
+		bestChildIndex = 0;
+
+		for (int childIndex = 0; childIndex < genSize; childIndex++) {
+			clear2D(childCost2D);
+			for (int tsIndex = 0; tsIndex < inputs->vVector.size(); tsIndex++) {
+				g.populateParams(childIndex);
+				rIn.index = l1.index = rOut.index = 0;
+				rIn.x = inputs->vVector.at(tsIndex);
+				rIn.fwd();
+				l1.x = rIn.y;
+				l1.fwd();
+				rOut.x = l1.y;
+				rOut.fwd();
+				sub2D(rOut.y, desired->vVector.at(tsIndex), childTSCost2D);
+				abs2D(childTSCost2D, childTSCost2D);
+				add2D(childCost2D, childTSCost2D, childCost2D);
+			}
+			sum2D(childCost2D, childCost1D);
+			sum1D(childCost1D, childCost0D);
+
+			if (childCost0D->vDouble < childBestCost->vDouble) {
+				childBestCost->vDouble = childCost0D->vDouble;
+				bestChildIndex = childIndex;
+			}
+
+		}
+		g.makeParent(bestChildIndex);
+
+		if (epoch % 10 == 0) {
+			cout << childBestCost->vDouble << endl;
+		}
+
+	}
+
 
 }
 
