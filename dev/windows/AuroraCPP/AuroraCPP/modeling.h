@@ -90,6 +90,10 @@ seqBpg* neuronLRBpg(double m);
 
 void initParam(model* m, vector<ptr<ptr<param>>>* paramVecOutput);
 
+//void attToLSTMFwd(att* a, lstm* l);
+//void attToLSTMFwd(attBpg* a, lstmBpg* l);
+//void attToLSTMBwd(attBpg* a, lstmBpg* l);
+
 class model {
 public:
 	model();

@@ -600,6 +600,7 @@ void model::modelWise(function<void(model*)> func) {
 ptr<model> model::clone() {
 	return new model();
 }
+
 modelBpg::modelBpg() {
 	x = new cType(0);
 	y = new cType(0);
@@ -628,6 +629,7 @@ ptr<model> bias::clone() {
 	result->prm = prm;
 	return result;
 }
+
 biasBpg::biasBpg() {
 	x = new cType(0);
 	y = new cType(0);
@@ -913,6 +915,7 @@ ptr<model> seq::clone() {
 	}
 	return result;
 }
+
 seqBpg::seqBpg() {
 	x = new cType(0);
 	y = new cType(0);
