@@ -1,17 +1,37 @@
 #pragma once
 #include "main.h"
 #include "general.h"
+#include <fstream>
+#include <filesystem>
+#include <FreeImage.h>
 
+using namespace std;
+using namespace filesystem;
 
 string exportParams(vector<ptr<ptr<param>>>* paramPtrVec);
 void trainTnnBpg();
+void trainTnnMut();
 void trainSyncBpg();
 void trainLstmBpg();
 void trainMuBpg();
 void trainAttBpg();
+void trainDigitRecognizer();
+
+ptr<cType> somewhatNormalDistribution(double verStretch, double horStretch, double upShift, double min, double max, double inc)
+{
+	ptr<cType> result = new cType();
+	for (double x = min; x <= max; x += inc) {
+		double dvals = verStretch * (horStretch * (1 - pow(tanh(x), 2))) + upShift;
+		int vals = (int)dvals;
+		for (int i = 0; i < vals; i++) {
+			result->vVector.push_back(new cType(x));
+		}
+	}
+	return result;
+}
 
 int main() {
-	trainAttBpg();
+	trainTnnMut();
 	return 0;
 }
 
@@ -86,6 +106,121 @@ void trainTnnBpg() {
 	}
 
 	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
+	return;
+
+}
+
+void trainTnnMut() {
+
+	ptr<model> nlr = neuronLR(0.05);
+	ptr<seq> s = tnn({ 2, 5, 1 }, { nlr, nlr, nlr });
+
+	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
+	s->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+
+	// set up random engine for initializing param states
+	uniform_real_distribution<double> u(-1, 1);
+	default_random_engine re(26);
+
+	vector <param*> paramVec = vector <param*>();
+	for (ptr<ptr<param>> s : paramPtrVec) {
+		// initialize type of parameter used
+		param* ps = new param();
+		// initialize parameter state
+		ps->state = u(re);
+		ps->learnRate = 0.002;
+		// cause the model's parameter ptr to point to the dynamically allocated paramSgd
+		*s = ps;
+		paramVec.push_back(ps);
+	}
+	ptr<cType> inputs = new cType{
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1}
+	};
+	ptr<cType> desired = new cType{
+		{ 0 },
+		{ 1 },
+		{ 1 },
+		{ 0 }
+	};
+
+	int genSize = 40;
+	int mutProb = 10;
+
+	ptr<cType> parentParamStates = make1D(paramVec.size());
+	ptr<cType> childParamStates = make2D(genSize, paramVec.size());
+
+	// set parent parameter values
+	for (int paramIndex = 0; paramIndex < paramVec.size(); paramIndex++) {
+		ptr<cType> parentParamState = parentParamStates->vVector.at(paramIndex);
+		parentParamState->vDouble = paramVec.at(paramIndex)->state;
+	}
+
+	function<void(int)> populateParams = [&paramVec, &childParamStates](int childIndex) {
+		for (int paramIndex = 0; paramIndex < paramVec.size(); paramIndex++) {
+			ptr<cType> childParamState = childParamStates->vVector.at(childIndex)->vVector.at(paramIndex);
+			paramVec.at(paramIndex)->state = childParamState->vDouble;
+		}
+	};
+
+	ptr<cType> parentCost = make1D(1);
+	ptr<cType> childCost = make1D(1);
+	ptr<cType> childTSCost = make1D(1);
+	ptr<cType> bestChildCost = make1D(1);  bestChildCost->vVector.at(0)->vDouble = 99999999;
+	int bestChildIndex;
+
+	for (int epoch = 0; true; epoch++) {
+
+		// mutate children parameter values
+		for (int childIndex = 0; childIndex < genSize; childIndex++) {
+			for (int paramIndex = 0; paramIndex < paramVec.size(); paramIndex++) {
+				ptr<cType> parentParamState = parentParamStates->vVector.at(paramIndex);
+				ptr<cType> childParamState = childParamStates->vVector.at(childIndex)->vVector.at(paramIndex);
+				if (rand() % 10000 <= mutProb) {
+					childParamState->vDouble = parentParamState->vDouble - u(re);
+				}
+				else {
+					childParamState->vDouble = parentParamState->vDouble;
+				}
+			}
+		}
+
+		bestChildIndex = 0;
+		bestChildCost->vVector.at(0)->vDouble = 99999999;
+
+		for (int childIndex = 0; childIndex < genSize; childIndex++) {
+
+			clear1D(childCost);
+			populateParams(childIndex);
+			for (int tsIndex = 0; tsIndex < inputs->vVector.size(); tsIndex++) {
+				ptr<cType> x = inputs->vVector.at(tsIndex);
+				ptr<cType> des = desired->vVector.at(tsIndex);
+				s->x = x;
+				s->fwd();
+				sub1D(s->y, des, childTSCost);
+				abs1D(childTSCost, childTSCost);
+				add1D(childCost, childTSCost, childCost);
+			}
+
+			if (childCost->vVector.at(0)->vDouble < bestChildCost->vVector.at(0)->vDouble) {
+				bestChildIndex = childIndex;
+				copy1D(childCost, bestChildCost);
+			}
+
+		}
+
+		copy1D(bestChildCost, parentCost);
+		copy1D(childParamStates->vVector.at(bestChildIndex), parentParamStates);
+		
+		if (epoch % 10 == 0) {
+			cout << bestChildCost->vVector.at(0)->vDouble << endl;
+		}
+
+	}
+
 
 	return;
 
@@ -367,7 +502,7 @@ void trainMuBpg() {
 void trainAttBpg() {
 
 	attBpg a1 = attBpg(2, 1);
-	muBpg m1 = muBpg(2, 8, 1);
+	muBpg m1 = muBpg(2, 12, 1);
 
 	vector<ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	a1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -438,7 +573,7 @@ void trainAttBpg() {
 
 	m1.yGrad = make2D(7, 1);
 
-	for (int epoch = 0; epoch < 100000; epoch++) {
+	for (int epoch = 0; epoch < 20000; epoch++) {
 
 		for (int i = 0; i < inputs->vVector.size(); i++) {
 
@@ -479,6 +614,49 @@ void trainAttBpg() {
 		}
 
 	}
+
+
+	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
+
+}
+
+void trainDigitRecognizer() {
+
+	vector<string> paths = { 
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\0", 
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\1",
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\2",
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\3",
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\4",
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\5",
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\6",
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\7",
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\8",
+	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\9" };
+
+	ptr<cType> inputs = new cType();
+	for (int i = 0; i < paths.size(); i++) {
+
+		directory_iterator d(paths.at(i));
+		ptr<cType> trainingSets = new cType();
+		
+		ifstream ifs;
+
+		for (const auto& entry : d) {
+			
+			path p = entry.path();
+			ifstream file(p);
+			char data[10000];
+			file.read(data, 10000);
+		}
+	}
+
+
+	ofstream myfile;
+	myfile.open("example.txt");
+	myfile << "Writing this to a file.\n";
+	myfile.close();
 
 }
 
