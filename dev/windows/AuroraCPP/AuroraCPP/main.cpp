@@ -129,8 +129,8 @@ void trainTnnMut() {
 		param* ps = new param();
 		// initialize parameter state
 		ps->state = u(re);
-		ps->learnRate = 0.002;
-		// cause the model's parameter ptr to point to the dynamically allocated paramSgd
+		ps->learnRate = 1;
+		// cause the model's parameter ptr to point to the dynamically allocated param
 		*s = ps;
 		paramVec.push_back(ps);
 	}
@@ -148,25 +148,12 @@ void trainTnnMut() {
 	};
 
 	int genSize = 40;
-	int mutProb = 10;
 
-	ptr<cType> parentParamStates = make1D(paramVec.size());
-	ptr<cType> childParamStates = make2D(genSize, paramVec.size());
-
-	// set parent parameter values
-	for (int paramIndex = 0; paramIndex < paramVec.size(); paramIndex++) {
-		ptr<cType> parentParamState = parentParamStates->vVector.at(paramIndex);
-		parentParamState->vDouble = paramVec.at(paramIndex)->state;
-	}
-
-	function<void(int)> populateParams = [&paramVec, &childParamStates](int childIndex) {
-		for (int paramIndex = 0; paramIndex < paramVec.size(); paramIndex++) {
-			ptr<cType> childParamState = childParamStates->vVector.at(childIndex)->vVector.at(paramIndex);
-			paramVec.at(paramIndex)->state = childParamState->vDouble;
-		}
-	};
-
-	ptr<cType> parentCost = make1D(1);
+	genePool g(u, re, &paramVec, genSize, 0.005);
+	g.initParent();
+	g.initChildren();
+	g.populateParent();
+	
 	ptr<cType> childCost = make1D(1);
 	ptr<cType> childTSCost = make1D(1);
 	ptr<cType> bestChildCost = make1D(1);  bestChildCost->vVector.at(0)->vDouble = 99999999;
@@ -174,27 +161,14 @@ void trainTnnMut() {
 
 	for (int epoch = 0; true; epoch++) {
 
-		// mutate children parameter values
-		for (int childIndex = 0; childIndex < genSize; childIndex++) {
-			for (int paramIndex = 0; paramIndex < paramVec.size(); paramIndex++) {
-				ptr<cType> parentParamState = parentParamStates->vVector.at(paramIndex);
-				ptr<cType> childParamState = childParamStates->vVector.at(childIndex)->vVector.at(paramIndex);
-				if (rand() % 10000 <= mutProb) {
-					childParamState->vDouble = parentParamState->vDouble - u(re);
-				}
-				else {
-					childParamState->vDouble = parentParamState->vDouble;
-				}
-			}
-		}
+		g.birthGeneration();
 
 		bestChildIndex = 0;
 		bestChildCost->vVector.at(0)->vDouble = 99999999;
 
 		for (int childIndex = 0; childIndex < genSize; childIndex++) {
-
 			clear1D(childCost);
-			populateParams(childIndex);
+			g.populateParams(childIndex);
 			for (int tsIndex = 0; tsIndex < inputs->vVector.size(); tsIndex++) {
 				ptr<cType> x = inputs->vVector.at(tsIndex);
 				ptr<cType> des = desired->vVector.at(tsIndex);
@@ -209,14 +183,12 @@ void trainTnnMut() {
 				bestChildIndex = childIndex;
 				copy1D(childCost, bestChildCost);
 			}
-
 		}
+		g.makeParent(bestChildIndex);
 
-		copy1D(bestChildCost, parentCost);
-		copy1D(childParamStates->vVector.at(bestChildIndex), parentParamStates);
-		
 		if (epoch % 10 == 0) {
-			cout << bestChildCost->vVector.at(0)->vDouble << endl;
+			double bcc = bestChildCost->vVector.at(0)->vDouble;
+			cout << bcc << endl;
 		}
 
 	}
