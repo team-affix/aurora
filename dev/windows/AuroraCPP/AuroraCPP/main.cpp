@@ -289,7 +289,7 @@ void trainSyncMut() {
 	};
 
 	int genSize = 40;
-	genePool g(urd, re, &params, genSize, 0.001);
+	genePool g(urd, re, &params, genSize, 0.002);
 	g.initParent();
 	g.initChildren();
 	g.populateParent();
@@ -451,12 +451,12 @@ void trainLstmMut() {
 	l1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(43);
+	default_random_engine re(44);
 
 	vector<param*> params = vector<param*>();
 	for (ptr<ptr<param>> pptr : paramPtrVec) {
 		param* p = new param();
-		p->learnRate = 1;
+		p->learnRate = 10;
 		p->state = urd(re);
 		*pptr = p;
 		params.push_back(p);
