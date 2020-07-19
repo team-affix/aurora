@@ -16,6 +16,7 @@ void trainSyncMut();
 void trainLstmBpg();
 void trainLstmMut();
 void trainMuBpg();
+void trainMuMut();
 void trainAttBpg();
 void trainDigitRecognizer();
 
@@ -500,7 +501,7 @@ void trainLstmMut() {
 	rOut.unroll(4);
 
 	int genSize = 60;
-	genePool g(urd, re, &params, genSize, 0.001);
+	genePool g(urd, re, &params, genSize, 0.01);
 	g.initParent();
 	g.initChildren();
 	g.populateParent();
@@ -654,6 +655,127 @@ void trainMuBpg() {
 	}
 
 	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
+}
+
+void trainMuMut() {
+
+	mu m = mu(2, 7, 5);
+	mu m2 = mu(5, 7, 1);
+
+	vector<ptr<ptr<param>>> paramPtrs = vector<ptr<ptr<param>>>();
+	m.modelWise([&paramPtrs](model* m) {initParam(m, &paramPtrs); });
+	m2.modelWise([&paramPtrs](model* m) {initParam(m, &paramPtrs); });
+	
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(43);
+
+
+	vector<param*> params = vector<param*>();
+	for (int paramIndex = 0; paramIndex < paramPtrs.size(); paramIndex++) {
+		param* p = new param();
+		p->learnRate = 1;
+		p->state = urd(re);
+		params.push_back(p);
+		*paramPtrs.at(paramIndex) = p;
+	}
+
+
+	ptr<cType> inputs = new cType{
+		{
+			{0, 0},
+			{0, 1},
+			{1, 0},
+			{1, 1},
+			{3.2, 1},
+			{1, 1.7},
+			{1, 1},
+		},
+		{
+			{0, 0},
+			{1, 1},
+			{1, 0},
+			{1, 1},
+			{3.2, 1},
+			{1, 1.7},
+			{1, 1},
+		}
+	};
+	ptr<cType> desired = new cType{
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+		},
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 0.25 },
+			{ 0.754 },
+			{ -1 },
+			{ 1 },
+		}
+	};
+
+	m.prep(7);
+	m.unroll(7);
+	m2.prep(7);
+	m2.unroll(7);
+
+	int genSize = 40;
+	genePool g(urd, re, &params, genSize, 0.005);
+	g.initParent();
+	g.initChildren();
+	g.populateParent();
+
+	int bestChildIndex = 0;
+	ptr<cType> bestChildCost = new cType(99999999);
+
+	ptr<cType> childTSCost2D = make2D(7, 1);
+	ptr<cType> childCost2D = make2D(7, 1);
+	ptr<cType> childCost1D = make1D(1);
+	ptr<cType> childCost0D = new cType();
+
+	for (int epoch = 0; true; epoch++) {
+
+		g.birthGeneration();
+		bestChildCost->vDouble = 999999999;
+
+		for (int childIndex = 0; childIndex < genSize; childIndex++) {
+			clear2D(childCost2D);
+			g.populateParams(childIndex);
+			for (int tsIndex = 0; tsIndex < inputs->vVector.size(); tsIndex++) {
+				m.index = 0;
+				m2.index = 0;
+				m.x = inputs->vVector.at(tsIndex);
+				m.fwd();
+				m2.x = m.y;
+				m2.fwd();
+				sub2D(m2.y, desired->vVector.at(tsIndex), childTSCost2D);
+				abs2D(childTSCost2D, childTSCost2D);
+				add2D(childCost2D, childTSCost2D, childCost2D);
+			}
+			sum2D(childCost2D, childCost1D);
+			sum1D(childCost1D, childCost0D);
+
+			if (childCost0D->vDouble < bestChildCost->vDouble) {
+				bestChildIndex = childIndex;
+				bestChildCost->vDouble = childCost0D->vDouble;
+			}
+		}
+
+		g.makeParent(bestChildIndex);
+
+		if (epoch % 10 == 0) {
+			cout << bestChildCost->vDouble << endl;
+		}
+
+	}
 
 }
 
