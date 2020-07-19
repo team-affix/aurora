@@ -451,7 +451,7 @@ void trainLstmMut() {
 	l1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(44);
+	default_random_engine re(45);
 
 	vector<param*> params = vector<param*>();
 	for (ptr<ptr<param>> pptr : paramPtrVec) {
