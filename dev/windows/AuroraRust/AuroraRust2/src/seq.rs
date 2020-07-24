@@ -3,8 +3,8 @@ use crate::model::*;
 use crate::math::*;
 
 pub struct Seq {
-    pub x: Carry,
-    pub y: Carry,
+    pub x: Box<Carry>,
+    pub y: Box<Carry>,
     pub models: Vec<Box<dyn Model>>
 }
 
@@ -12,11 +12,21 @@ impl Model for Seq {
     fn fwd(&mut self, input: Carry) -> Carry {
         runSeq(self, input)
     }
+    fn getX(&mut self) -> Carry {
+        self.x.
+    }
+    fn getY(&mut self) -> Carry {
+        self.y
+    }
 }
 
 impl Seq {
     pub fn new(forModels: Vec<Box<dyn Model>>) -> Seq {
-        Seq { x: Carry::new(0.0), y: Carry::new(0.0), models: forModels }
+        Seq {
+            x: Carry::new(0.0),
+            y: Carry::new(0.0),
+            models: forModels
+        }
     }
     
     pub fn fwd(&mut self, input: Carry) -> Carry {
@@ -25,11 +35,12 @@ impl Seq {
 }
 
 fn runSeq(personal: &mut Seq, input: Carry) -> Carry {
-    personal.x = input.clone();    
-    let mut output = input;
-    for xModels in &mut personal.models {
-        output = xModels.fwd(output);
+    for i in 1..personal.models.len() {
+        personal.models[i].fwd (
+            personal.models[i-1].getY()
+        );
     }
-    personal.y = output.clone();
-    output
+    personal.x = input;
+    personal.y = personal.models[personal.models.len()-1].getY();
+    personal.models[personal.models.len()-1].getY()
 }
