@@ -21,13 +21,13 @@ void trainAttBpg();
 void trainDigitRecognizer();
 
 int main() {
-	trainLstmMut();
+	trainTnnMut();
 	return 0;
 }
 
 void trainTnnBpg() {
 
-	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nlr = neuronLRBpg(0.3);
 	ptr<seqBpg> s = tnnBpg({ 2, 5, 1 }, { nlr, nlr, nlr });
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
@@ -72,7 +72,7 @@ void trainTnnBpg() {
 	int epoch = 0;
 	while (true) {
 
-		ptr<cType> signals = new cType({ new cType(0) });
+		ptr<cType> signals = make1D(1);
 
 		for (int i = 0; i < inputs->vVector.size(); i++) {
 			int tsIndex = ui(re);
@@ -103,7 +103,7 @@ void trainTnnBpg() {
 
 void trainTnnMut() {
 
-	ptr<model> nlr = neuronLR(0.05);
+	ptr<model> nlr = neuronLR(0.3);
 	ptr<seq> s = tnn({ 2, 5, 1 }, { nlr, nlr, nlr });
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
@@ -111,7 +111,7 @@ void trainTnnMut() {
 
 	// set up random engine for initializing param states
 	uniform_real_distribution<double> u(-1, 1);
-	default_random_engine re(26);
+	default_random_engine re(43);
 
 	vector <param*> paramVec = vector <param*>();
 	for (ptr<ptr<param>> s : paramPtrVec) {
@@ -176,7 +176,7 @@ void trainTnnMut() {
 		}
 		g.makeParent(bestChildIndex);
 
-		if (epoch % 10 == 0) {
+		if (epoch % 1000 == 0) {
 			double bcc = bestChildCost->vVector.at(0)->vDouble;
 			cout << bcc << endl;
 		}
@@ -190,7 +190,7 @@ void trainTnnMut() {
 
 void trainSyncBpg() {
 
-	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nlr = neuronLRBpg(0.3);
 	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, nlr);
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
@@ -253,7 +253,7 @@ void trainSyncBpg() {
 }
 
 void trainSyncMut() {
-	ptr<model> nlr = neuronLR(0.05);
+	ptr<model> nlr = neuronLR(0.3);
 	seq* templateNN = tnn({ 2, 5, 1 }, nlr);
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
@@ -336,11 +336,11 @@ void trainSyncMut() {
 
 void trainLstmBpg() {
 
-	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nlr = neuronLRBpg(0.3);
 
-	lstmBpg l1 = lstmBpg(5);
-	ptr<model> inNN = tnnBpg({ 2, 5 }, nlr);
-	ptr<model> outNN = tnnBpg({ 5, 1 }, nlr);
+	lstmBpg l1 = lstmBpg(7);
+	ptr<model> inNN = tnnBpg({ 2, 7 }, nlr);
+	ptr<model> outNN = tnnBpg({ 7, 1 }, nlr);
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -348,14 +348,16 @@ void trainLstmBpg() {
 	l1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(43);
+	default_random_engine re(46);
 
-	vector<paramSgd*> params = vector<paramSgd*>();
+	vector<paramMom*> params = vector<paramMom*>();
 	for (ptr<ptr<param>> pptr : paramPtrVec) {
-		paramSgd* p = new paramSgd();
+		paramMom* p = new paramMom();
 		p->gradient = 0;
 		p->learnRate = 0.02;
 		p->state = urd(re);
+		p->momentum = 0;
+		p->beta = 0.9;
 		*pptr = p;
 		params.push_back(p);
 	}
@@ -400,7 +402,12 @@ void trainLstmBpg() {
 
 	rOut.yGrad = make2D(4, 1);
 
+	ptr<cType> signals = make2D(4, 1);
+	ptr<cType> absYGrad = make2D(4, 1);
+
 	for (int epoch = 0; epoch < 100000; epoch++) {
+
+		clear2D(signals);
 
 		for (int i = 0; i < inputs->vVector.size(); i++) {
 
@@ -417,18 +424,21 @@ void trainLstmBpg() {
 			rIn.yGrad = l1.xGrad;
 			rIn.bwd();
 
+			abs2D(rOut.yGrad, absYGrad);
+			add2D(signals, absYGrad, signals);
 		}
 
-		for (paramSgd* p : params) {
+		for (paramMom* p : params) {
 
-			p->state -= p->learnRate * p->gradient;
+			p->momentum = p->beta * p->momentum + (1 - p->beta) * p->gradient;
+			p->state -= p->learnRate * p->momentum;
 			p->gradient = 0;
 
 		}
 
 		if (epoch % 1000 == 0) {
 
-			cout << sum1D(sum2D(abs2D(rOut.yGrad)))->vDouble << endl;
+			cout << sum1D(sum2D(abs2D(signals)))->vDouble << endl;
 
 		}
 	}
@@ -439,7 +449,7 @@ void trainLstmBpg() {
 
 void trainLstmMut() {
 
-	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nlr = neuronLRBpg(0.3);
 
 	lstmBpg l1 = lstmBpg(5);
 	ptr<model> inNN = tnnBpg({ 2, 5 }, nlr);
@@ -556,17 +566,13 @@ void trainLstmMut() {
 
 void trainMuBpg() {
 
-	int xUnits = 2;
-	int cTUnits = 7;
-	int hTUnits = 1;
-
-	muBpg m1 = muBpg(xUnits, cTUnits, hTUnits);
+	muBpg m1 = muBpg(2, 7, 1);
 
 	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	m1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-0.1, 0.1);
-	default_random_engine re(43);
+	default_random_engine re(44);
 
 	vector<paramMom*> params = vector<paramMom*>();
 	for (ptr<ptr<param>> pptr : paramPtrVec) {
@@ -579,8 +585,6 @@ void trainMuBpg() {
 		*pptr = p;
 		params.push_back(p);
 	}
-
-
 
 	ptr<cType> inputs = new cType{
 		{
@@ -628,7 +632,12 @@ void trainMuBpg() {
 
 	m1.yGrad = make2D(7, 1);
 
+	ptr<cType> signals = make2D(7, 1);
+	ptr<cType> absYGrad = make2D(7, 1);
+
 	for (int epoch = 0; epoch < 10000000; epoch++) {
+
+		clear2D(signals);
 
 		for (int i = 0; i < inputs->vVector.size(); i++) {
 
@@ -636,6 +645,9 @@ void trainMuBpg() {
 			m1.fwd();
 			sub2D(m1.y, desired->vVector.at(i), m1.yGrad);
 			m1.bwd();
+
+			abs2D(m1.yGrad, absYGrad);
+			add2D(signals, absYGrad, signals);
 
 		}
 
@@ -649,7 +661,7 @@ void trainMuBpg() {
 
 		if (epoch % 1000 == 0) {
 
-			cout << sum1D(sum2D(abs2D(m1.yGrad)))->vDouble << endl;
+			cout << sum1D(sum2D(abs2D(signals)))->vDouble << endl;
 
 		}
 	}
@@ -782,7 +794,7 @@ void trainMuMut() {
 void trainAttBpg() {
 
 	attBpg a1 = attBpg(2, 1);
-	muBpg m1 = muBpg(2, 12, 1);
+	muBpg m1 = muBpg(2, 10, 1);
 
 	vector<ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
 	a1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
@@ -894,7 +906,6 @@ void trainAttBpg() {
 		}
 
 	}
-
 
 	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
 
