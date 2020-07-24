@@ -25,6 +25,12 @@ impl Model for WeightJunction {
         self.y = output.clone();
         output
     }
+    fn getX(&mut self) -> Carry {
+        self.x
+    }
+    fn getY(&mut self) -> Carry {
+        self.y
+    }
 }
 
 impl WeightJunction {

@@ -18,21 +18,8 @@ impl act::Act for LeakyReLu {
         if input < 0.0 {
             output = input * 0.05;
         }
-        println!("{:?}", output);
         output
     } 
-}
-
-pub struct TNN {
-    net: Box<dyn model::Model>
-}
-impl TNN {
-    pub fn new(forNet: Box<dyn model::Model>) -> TNN {
-        TNN { net: forNet }
-    }
-    pub fn fwd(&mut self, input: math::Carry) -> math::Carry {
-        self.net.fwd(input)
-    }
 }
 
 fn main() {
