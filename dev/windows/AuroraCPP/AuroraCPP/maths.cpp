@@ -479,10 +479,10 @@ void sum2D(ptr<cType> a, ptr<cType> output) {
 
 	// pull in reference to save compute
 	vector<ptr<cType>>* aVec = &a->vVector;
-	vector<ptr<cType>>* outVec = &a->vVector;
 
+	clear1D(output);
 	for (int i = 0; i < aVec->size(); i++) {
-		sum1D(aVec->at(i), outVec->at(i));
+		add1D(output, aVec->at(i), output);
 	}
 
 }

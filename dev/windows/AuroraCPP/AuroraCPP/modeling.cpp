@@ -600,6 +600,7 @@ void model::modelWise(function<void(model*)> func) {
 ptr<model> model::clone() {
 	return new model();
 }
+
 modelBpg::modelBpg() {
 	x = new cType(0);
 	y = new cType(0);
@@ -628,6 +629,7 @@ ptr<model> bias::clone() {
 	result->prm = prm;
 	return result;
 }
+
 biasBpg::biasBpg() {
 	x = new cType(0);
 	y = new cType(0);
@@ -913,6 +915,7 @@ ptr<model> seq::clone() {
 	}
 	return result;
 }
+
 seqBpg::seqBpg() {
 	x = new cType(0);
 	y = new cType(0);
@@ -1338,7 +1341,7 @@ lstm::lstm(int _units) {
 
 	this->units = _units;
 
-	ptr<model> nlr = neuronLR(0.05);
+	ptr<model> nlr = neuronLR(0.3);
 	ptr<model> nth = neuronTh();
 	ptr<model> nsm = neuronSm();
 
@@ -1453,7 +1456,7 @@ lstmBpg::lstmBpg(int _units) {
 
 	this->units = _units;
 
-	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nlr = neuronLRBpg(0.3);
 	ptr<model> nth = neuronThBpg();
 	ptr<model> nsm = neuronSmBpg();
 
@@ -1737,10 +1740,9 @@ mu::mu(int _xUnits, int _cTUnits, int _hTUnits) {
 	this->hTIn = make1D(hTUnits);
 	this->hTOut = make1D(hTUnits);
 
-	ptr<model> nlr = neuronLR(0.05);
-	ptr<model> nth = neuronTh();
+	ptr<model> nlr = neuronLR(0.3);
 
-	ptr<model> gateTemplate = tnn({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, { nlr, nth });
+	ptr<model> gateTemplate = tnn({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, { nlr, nlr });
 	muTSTemplate = new muTS(xUnits, cTUnits, hTUnits, gateTemplate);
 
 }
@@ -1855,10 +1857,9 @@ muBpg::muBpg(int _xUnits, int _cTUnits, int _hTUnits) {
 	this->hTInGrad = make1D(hTUnits);
 	this->hTOutGrad = make1D(hTUnits);
 
-	ptr<model> nlr = neuronLRBpg(0.05);
-	ptr<model> nth = neuronThBpg();
+	ptr<model> nlr = neuronLRBpg(0.3);
 
-	ptr<model> gateTemplate = tnnBpg({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, { nlr, nth });
+	ptr<model> gateTemplate = tnnBpg({ xUnits + cTUnits + hTUnits, cTUnits + hTUnits }, { nlr, nlr });
 	muTSTemplate = new muTSBpg(xUnits, cTUnits, hTUnits, gateTemplate);
 
 }
@@ -2025,7 +2026,7 @@ attTS::attTS(int _xUnits, int _hTUnits) {
 	this->prepared = vector<ptr<model>>();
 
 	// Instantiate neurons that will be used in attention template TNN
-	ptr<model> nlr = neuronLR(0.05);
+	ptr<model> nlr = neuronLR(0.3);
 	ptr<model> nsm = neuronSm();
 
 	// Initialize the attention timestep template model to be a tnn
@@ -2125,7 +2126,7 @@ attTSBpg::attTSBpg(int _xUnits, int _hTUnits) {
 	this->prepared = vector<ptr<model>>();
 
 	// Instantiate neurons that will be used in attention template TNN
-	ptr<model> nlr = neuronLRBpg(0.05);
+	ptr<model> nlr = neuronLRBpg(0.3);
 	ptr<model> nsm = neuronSmBpg();
 
 	// Initialize the attention timestep template model to be a tnn
