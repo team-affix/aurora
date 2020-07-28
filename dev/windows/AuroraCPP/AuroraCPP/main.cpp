@@ -3,7 +3,6 @@
 #include "general.h"
 #include <fstream>
 #include <filesystem>
-#include <FreeImage.h>
 
 using namespace std;
 using namespace filesystem;
@@ -18,10 +17,11 @@ void trainLstmMut();
 void trainMuBpg();
 void trainMuMut();
 void trainAttBpg();
+void trainAccelerator();
 void trainDigitRecognizer();
 
 int main() {
-	trainTnnMut();
+	trainMuMut();
 	return 0;
 }
 
@@ -680,7 +680,7 @@ void trainMuMut() {
 	m2.modelWise([&paramPtrs](model* m) {initParam(m, &paramPtrs); });
 	
 	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(43);
+	default_random_engine re(46);
 
 
 	vector<param*> params = vector<param*>();
@@ -740,7 +740,7 @@ void trainMuMut() {
 	m2.unroll(7);
 
 	int genSize = 40;
-	genePool g(urd, re, &params, genSize, 0.005);
+	genePool g(urd, re, &params, genSize, 0.002);
 	g.initParent();
 	g.initChildren();
 	g.populateParent();
@@ -908,6 +908,218 @@ void trainAttBpg() {
 	}
 
 	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+
+
+}
+
+void trainAccelerator() {
+
+	ptr<model> nlr = neuronLRBpg(0.3);
+
+	// initialize the training subject models
+	lstmBpg subLstm(7);
+	syncBpg subSyncIn(tnnBpg({ 2, 7 }, nlr));
+	syncBpg subSyncOut(tnnBpg({ 7, 1 }, nlr));
+
+	// initialize the accelerator models
+	muTS* accMuTS = new muTS(1, 10, 1, tnn({1 + 1, 10 + 1}, nlr));
+	sync accSync(accMuTS);
+
+	vector<ptr<ptr<param>>> subParamPtrVec = vector<ptr<ptr<param>>>();
+	subLstm.modelWise([&subParamPtrVec](model* m) { initParam(m, &subParamPtrVec); });
+	subSyncIn.modelWise([&subParamPtrVec](model* m) { initParam(m, &subParamPtrVec); });
+	subSyncOut.modelWise([&subParamPtrVec](model* m) { initParam(m, &subParamPtrVec); });
+
+	vector<ptr<ptr<param>>> accParamPtrVec = vector<ptr<ptr<param>>>();
+	accSync.modelWise([&accParamPtrVec](model* m) { initParam(m, &accParamPtrVec); });
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(46);
+
+	vector<paramMom*> subParamVec = vector<paramMom*>();
+	for (ptr<ptr<param>> pptr : subParamPtrVec) {
+
+		paramMom* param = new paramMom();
+		param->beta = 0.9;
+		param->learnRate = 0.02;
+		param->state = urd(re);
+		*pptr = param;
+		subParamVec.push_back(param);
+
+	}
+
+	vector<param*> accParamVec = vector<param*>();
+	for (ptr<ptr<param>> pptr : accParamPtrVec) {
+
+		param* p = new param();
+		p->learnRate = 0.02;
+		p->state = urd(re);
+		*pptr = p;
+		accParamVec.push_back(p);
+
+	}
+
+	ptr<cType> inputs = new cType{
+		{
+			{0, 0},
+			{0, 1},
+			{1, 0},
+			{1, 1},
+		},
+		{
+			{0, 0},
+			{1, 1},
+			{1, 0},
+			{1, 1}
+		}
+	};
+	ptr<cType> desired = new cType{
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 0 },
+		},
+		{
+			{ 0 },
+			{ 1 },
+			{ 1 },
+			{ 1 },
+		}
+	};
+
+	subLstm.prep(4);
+	subLstm.unroll(4);
+	subSyncIn.prep(4);
+	subSyncIn.unroll(4);
+	subSyncOut.prep(4);
+	subSyncOut.unroll(4);
+	
+	function<paramMom(paramMom*)> saveParam = [](paramMom* p) { return *p; };
+	function<void(paramMom&, paramMom*&)> rollBackParam = [](paramMom& saved, paramMom*& changed) { *changed = saved; };
+
+	// Save values of the parameters at epoch == 0
+	vector<paramMom> InitialValues = getVals(&subParamVec, saveParam);
+
+	accSync.prep(subParamVec.size());
+	accSync.unroll(subParamVec.size());
+
+	int accGenSize = 40;
+	double accMutProb = 0.2;
+	genePool accGp = genePool(urd, re, &accParamVec, accGenSize, accMutProb);
+	accGp.initParent();
+	accGp.initChildren();
+	accGp.populateParent();
+	
+	subSyncOut.yGrad = make2D(4, 1);
+	ptr<cType> subTSCost2D = make2D(4, 1);
+	ptr<cType> subCost2D = make2D(4, 1);
+
+	double childCost;
+	double bestChildCost;
+	int bestChildIndex;
+
+	// train accelerator
+	for (int epoch = 0; epoch < 100; epoch++) {
+
+		childCost = 0;
+		bestChildCost = 9999999;
+		bestChildIndex = 0;
+
+
+		accGp.birthGeneration();
+
+		for (int childIndex = 0; childIndex < accGenSize; childIndex++) {
+
+			accGp.populateParams(childIndex);
+
+			// Roll back the values of the parameters to equal those at epoch == 0
+			setVals(&InitialValues, &subParamVec, rollBackParam);
+
+			// clear all subMuTSs' cTIns and hTIns
+			elemWise<ptr<model>>(&accSync, [](ptr<model> p) {
+				muTS* m = (muTS*)p.get();
+				clear1D(m->hTIn);
+				clear1D(m->cTIn);
+			});
+
+			// train subject
+			for (int subEpoch = 0; subEpoch < 10000; subEpoch++) {
+
+				// clear the cost for the epoch
+				clear2D(subCost2D);
+
+				for (int tsIndex = 0; tsIndex < inputs->vVector.size(); tsIndex++) {
+
+					// carry forward state
+					subSyncIn.x = inputs->vVector.at(tsIndex);
+					subSyncIn.fwd();
+					subLstm.x = subSyncIn.y;
+					subLstm.fwd();
+					subSyncOut.x = subLstm.y;
+					subSyncOut.fwd();
+
+					// calculate output gradient of subSyncOut
+					sub2D(subSyncOut.y, desired->vVector.at(tsIndex), subSyncOut.yGrad);
+
+					// carry backward gradient
+					subSyncOut.bwd();
+					subLstm.yGrad = subSyncOut.xGrad;
+					subLstm.bwd();
+					subSyncIn.yGrad = subLstm.xGrad;
+					subSyncIn.bwd();
+
+					// add output gradient to total epoch cost
+					abs2D(subSyncOut.yGrad, subTSCost2D);
+					add2D(subCost2D, subTSCost2D, subCost2D);
+
+				}
+
+				for (paramMom* p : subParamVec) {
+					p->momentum = p->beta * p->momentum + (1 - p->beta) * p->gradient;
+					p->state -= p->learnRate * p->momentum;
+					p->gradient = 0;
+				}
+
+				if (subEpoch % 1000 == 0) {
+					childCost = sum1D(sum2D(subCost2D))->vDouble;
+					cout << childCost << endl;
+					if (isnan(childCost)) {
+						childCost = 9999999;
+					}
+
+					// modify the learn rates of all subParameters
+					for (int muIndex = 0; muIndex < accSync.size(); muIndex++) {
+
+						int learnRateModifyIndex = subEpoch / 1000;
+
+						muTS* m = (muTS*)accSync.at(muIndex).get();
+						m->x = new cType{ subParamVec.at(muIndex)->learnRate/*, (double)muIndex*/ };
+						m->fwd();
+						copy1D(m->cTOut, m->cTIn);
+						copy1D(m->hTOut, m->hTIn);
+						subParamVec.at(muIndex)->learnRate += 0.1 * tanh(m->y->vVector.at(0)->vDouble);
+					}
+
+				}
+
+			}
+
+			if (childCost < bestChildCost) {
+				bestChildCost = childCost;
+				bestChildIndex = childIndex;
+			}
+
+			cout << "----------------------" << endl << "END SUBJECT TRAINING" << endl << "ACCELERATOR CHILD EPOCH: " << childIndex << endl << "----------------------" << endl;
+
+		}
+
+		accGp.makeParent(bestChildIndex);
+
+	}
+
+	
+
 
 
 }

@@ -344,10 +344,8 @@ void syncBwd(ptr<cType> yGrad, ptr<cType> xGrad, vector<ptr<model>>* models, int
 	syncIncBwd(yGrad, xGrad, models, index, *index);
 
 }
-void syncModelWise(function<void(model*)> func, vector<ptr<model>>* models) {
-	for (int i = 0; i < models->size(); i++) {
-		models->at(i)->modelWise(func);
-	}
+void syncModelWise(function<void(model*)> func, ptr<model> modelTemplate) {
+	modelTemplate->modelWise(func);
 }
 #pragma endregion
 #pragma region lstmTS
@@ -1092,7 +1090,7 @@ void sync::incFwd(int a) {
 }
 void sync::modelWise(function<void(model*)> func) {
 	func(this);
-	syncModelWise(func, this);
+	syncModelWise(func, modelTemplate);
 }
 ptr<model> sync::clone() {
 	sync* result = new sync();
@@ -1156,7 +1154,7 @@ void syncBpg::incBwd(int a) {
 }
 void syncBpg::modelWise(function<void(model*)> func) {
 	func(this);
-	syncModelWise(func, this);
+	syncModelWise(func, modelTemplate);
 }
 ptr<model> syncBpg::clone() {
 	syncBpg* result = new syncBpg();
@@ -1380,16 +1378,16 @@ void lstm::incFwd(int a) {
 	vector<ptr<cType>>* xVec = &x->vVector;
 	vector<ptr<cType>>* yVec = &y->vVector;
 
-	ptr<cType> cT;
-	ptr<cType> hT;
+	ptr<cType> cT = make1D(units);
+	ptr<cType> hT = make1D(units);
 
 	if (index == 0) {
-		cT = cTIn;
-		hT = hTIn;
+		copy1D(cTIn, cT);
+		copy1D(hTIn, hT);
 	}
 	else {
-		cT = cTOut;
-		hT = hTOut;
+		copy1D(cTOut, cT);
+		copy1D(hTOut, hT);
 	}
 
 	for (int j = 0; j < a; j++) {
@@ -1407,9 +1405,10 @@ void lstm::incFwd(int a) {
 
 	}
 
-
-	cTOut->vVector = cT->vVector;
-	hTOut->vVector = hT->vVector;
+	copy1D(cT, cTOut);
+	copy1D(hT, hTOut);
+	/*cTOut->vVector = cT->vVector;
+	hTOut->vVector = hT->vVector;*/
 
 }
 void lstm::modelWise(function<void(model*)> func) {
@@ -1505,16 +1504,16 @@ void lstmBpg::incFwd(int a) {
 	vector<ptr<cType>>* xVec = &x->vVector;
 	vector<ptr<cType>>* yVec = &y->vVector;
 
-	ptr<cType> cT;
-	ptr<cType> hT;
+	ptr<cType> cT = make1D(units);
+	ptr<cType> hT = make1D(units);
 
 	if (index == 0) {
-		cT = cTIn;
-		hT = hTIn;
+		copy1D(cTIn, cT);
+		copy1D(hTIn, hT);
 	}
 	else {
-		cT = cTOut;
-		hT = hTOut;
+		copy1D(cTOut, cT);
+		copy1D(hTOut, hT);
 	}
 
 	for (int j = 0; j < a; j++) {
@@ -1532,9 +1531,10 @@ void lstmBpg::incFwd(int a) {
 
 	}
 
-
-	cTOut->vVector = cT->vVector;
-	hTOut->vVector = hT->vVector;
+	copy1D(cT, cTOut);
+	copy1D(hT, hTOut);
+	/*cTOut->vVector = cT->vVector;
+	hTOut->vVector = hT->vVector;*/
 
 }
 void lstmBpg::bwd() {
@@ -1547,16 +1547,16 @@ void lstmBpg::incBwd(int a) {
 	vector<ptr<cType>>* yGradVec = &yGrad->vVector;
 	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
 
-	ptr<cType> cTGrad;
-	ptr<cType> hTGrad;
+	ptr<cType> cTGrad = make1D(units);
+	ptr<cType> hTGrad = make1D(units);
 
 	if (index == size()) {
-		cTGrad = cTOutGrad;
-		hTGrad = hTOutGrad;
+		copy1D(cTOutGrad, cTGrad);
+		copy1D(hTOutGrad, hTGrad);
 	}
 	else {
-		cTGrad = cTInGrad;
-		hTGrad = hTInGrad;
+		copy1D(cTInGrad, cTGrad);
+		copy1D(hTInGrad, hTGrad);
 	}
 
 	for (int j = 0; j < a; j++) {
@@ -1573,9 +1573,9 @@ void lstmBpg::incBwd(int a) {
 		hTGrad = l->hTInGrad;
 
 	}
-
-	cTInGrad->vVector = cTGrad->vVector;
-	hTInGrad->vVector = hTGrad->vVector;
+	
+	copy1D(cTGrad, cTInGrad);
+	copy1D(hTGrad, hTInGrad);
 
 }
 void lstmBpg::modelWise(function<void(model*)> func) {
@@ -1757,7 +1757,7 @@ mu::mu(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate) {
 	this->hTIn = make1D(hTUnits);
 	this->hTOut = make1D(hTUnits);
 
-	muTSTemplate = new muTSBpg(xUnits, cTUnits, hTUnits, _gate);
+	muTSTemplate = new muTS(xUnits, cTUnits, hTUnits, _gate);
 
 }
 void mu::fwd() {
@@ -1770,17 +1770,17 @@ void mu::incFwd(int a) {
 	vector<ptr<cType>>* xVec = &x->vVector;
 	vector<ptr<cType>>* yVec = &y->vVector;
 
-	ptr<cType> cT;
-	ptr<cType> hT;
+	ptr<cType> cT = make1D(cTUnits);
+	ptr<cType> hT = make1D(hTUnits);
 
 	// if the current carry index is 0, it means that none of the timesteps have been carried forward yet
 	if (index == 0) {
-		cT = cTIn;
-		hT = hTIn;
+		copy1D(cTIn, cT);
+		copy1D(hTIn, hT);
 	}
 	else {
-		cT = cTOut;
-		hT = hTOut;
+		copy1D(cTOut, cT);
+		copy1D(hTOut, hT);
 	}
 
 	for (int j = 0; j < a; j++) {
@@ -1799,8 +1799,8 @@ void mu::incFwd(int a) {
 	}
 
 
-	cTOut->vVector = cT->vVector;
-	hTOut->vVector = hT->vVector;
+	copy1D(cT, cTOut);
+	copy1D(hT, hTOut);
 
 }
 void mu::modelWise(function<void(model*)> func) {
@@ -1811,7 +1811,8 @@ void mu::modelWise(function<void(model*)> func) {
 }
 ptr<model> mu::clone() {
 
-	mu* result = new mu(xUnits, cTUnits, hTUnits, muTSTemplate->clone());
+	muTS* castedTemplate = (muTS*)muTSTemplate.get();
+	mu* result = new mu(xUnits, cTUnits, hTUnits, castedTemplate->gate->clone());
 	return result;
 
 }
@@ -1892,23 +1893,23 @@ void muBpg::incFwd(int a) {
 	vector<ptr<cType>>* xVec = &x->vVector;
 	vector<ptr<cType>>* yVec = &y->vVector;
 
-	ptr<cType> cT;
-	ptr<cType> hT;
+	ptr<cType> cT = make1D(cTUnits);
+	ptr<cType> hT = make1D(hTUnits);
 
 	// if the current carry index is 0, it means that none of the timesteps have been carried forward yet
 	if (index == 0) {
-		cT = cTIn;
-		hT = hTIn;
+		copy1D(cTIn, cT);
+		copy1D(hTIn, hT);
 	}
 	else {
-		cT = cTOut;
-		hT = hTOut;
+		copy1D(cTOut, cT);
+		copy1D(hTOut, hT);
 	}
 
 	for (int j = 0; j < a; j++) {
 
 		muTSBpg* m = (muTSBpg*)at(index).get();
-		m->x->vVector = xVec->at(index)->vVector;
+		m->x = xVec->at(index);
 		m->cTIn = cT;
 		m->hTIn = hT;
 		m->fwd();
@@ -1921,8 +1922,8 @@ void muBpg::incFwd(int a) {
 	}
 
 
-	cTOut = cT;
-	hTOut = hT;
+	copy1D(cT, cTOut);
+	copy1D(hT, hTOut);
 
 }
 void muBpg::bwd() {
@@ -1935,17 +1936,17 @@ void muBpg::incBwd(int a) {
 	vector<ptr<cType>>* yGradVec = &yGrad->vVector;
 	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
 
-	ptr<cType> cTGrad;
-	ptr<cType> hTGrad;
+	ptr<cType> cTGrad = make1D(cTUnits);
+	ptr<cType> hTGrad = make1D(hTUnits);
 
 	// if the current carry index is size(), it means that all of the timesteps have been carried forward.
 	if (index == size()) {
-		cTGrad = cTOutGrad;
-		hTGrad = hTOutGrad;
+		copy1D(cTOutGrad, cTGrad);
+		copy1D(hTOutGrad, hTGrad);
 	}
 	else {
-		cTGrad = cTInGrad;
-		hTGrad = hTInGrad;
+		copy1D(cTInGrad, cTGrad);
+		copy1D(hTInGrad, hTGrad);
 	}
 
 	for (int j = 0; j < a; j++) {
@@ -1963,8 +1964,8 @@ void muBpg::incBwd(int a) {
 
 	}
 
-	cTInGrad = cTGrad;
-	hTInGrad = hTGrad;
+	copy1D(cTGrad, cTInGrad);
+	copy1D(hTGrad, hTInGrad);
 
 }
 void muBpg::modelWise(function<void(model*)> func) {
@@ -1975,7 +1976,8 @@ void muBpg::modelWise(function<void(model*)> func) {
 }
 ptr<model> muBpg::clone() {
 
-	muBpg* result = new muBpg(xUnits, cTUnits, hTUnits, muTSTemplate->clone());
+	muTSBpg* castedTemplate = (muTSBpg*)muTSTemplate.get();
+	muBpg* result = new muBpg(xUnits, cTUnits, hTUnits, castedTemplate->gate->clone());
 	return result;
 
 }
