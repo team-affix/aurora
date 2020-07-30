@@ -1356,6 +1356,32 @@ lstm::lstm(int _units) {
 	this->lstmTSTemplate = new lstmTS(units, aGate, bGate, cGate, dGate);
 
 }
+//lstm::lstm(int _units, vector<int> _gateHiddenLayers) {
+//
+//	this->units = _units;
+//
+//	ptr<model> nlr = neuronLR(0.3);
+//	ptr<model> nth = neuronTh();
+//	ptr<model> nsm = neuronSm();
+//
+//	vector<int> gateDims = concat(concat({ 2 * units }, _gateHiddenLayers), { units });
+//
+//	ptr<model> aGate = tnn(gateDims, { nlr, nsm });
+//	ptr<model> bGate = tnn(gateDims, { nlr, nsm });
+//	ptr<model> cGate = tnn(gateDims, { nlr, nth });
+//	ptr<model> dGate = tnn(gateDims, { nlr, nsm });
+//
+//	this->hTIn = make1D(units);
+//	this->cTIn = make1D(units);
+//	this->hTOut = make1D(units);
+//	this->cTOut = make1D(units);
+//
+//	this->lstmTSTemplate = new lstmTS(units, aGate, bGate, cGate, dGate);
+//
+//}
+//lstm::lstm(int _units, vector<int> _aGateHiddenLayers, vector<int> _bGateHiddenLayers, vector<int> _cGateHiddenLayers, vector<int> _dGateHiddenLayers) {
+//
+//}
 lstm::lstm(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate) {
 	
 	this->units = _units;
