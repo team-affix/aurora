@@ -81,6 +81,9 @@ seqBpg* tnnBpg(vector<int> npl, vector<ptr<model>> layerNeuronTemplates);
 seq* tnn(vector<int> npl, ptr<model> neuronTemplate);
 seqBpg* tnnBpg(vector<int> npl, ptr<model> neuronTemplate);
 
+seq* stackedLstm(int count, int units);
+seqBpg* stackedLstmBpg(int count, int units);
+
 seq* neuronSm();
 seq* neuronTh();
 seq* neuronLR(double m);
@@ -281,6 +284,8 @@ public:
 	RECFIELDS
 	lstm();
 	lstm(int _units);
+	//lstm(int _units, vector<int> _gateHiddenLayers);
+	//lstm(int _units, vector<int> _aGateHiddenLayers, vector<int> _bGateHiddenLayers, vector<int> _cGateHiddenLayers, vector<int> _dGateHiddenLayers);
 	lstm(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
 
 	int units;
@@ -299,6 +304,8 @@ public:
 	RECBPGFIELDS
 	lstmBpg();
 	lstmBpg(int _units);
+	//lstmBpg(int _units, vector<int> gateHiddenLayers);
+	//lstmBpg(int _units, vector<int> _aGateHiddenLayers, vector<int> _bGateHiddenLayers, vector<int> _cGateHiddenLayers, vector<int> _dGateHiddenLayers);
 	lstmBpg(int _units, ptr<model> _aGate, ptr<model> _bGate, ptr<model> _cGate, ptr<model> _dGate);
 
 	int units;
@@ -366,6 +373,7 @@ public:
 	RECFIELDS
 	mu();
 	mu(int _xUnits, int _cTUnits, int _hTUnits);
+	//mu(int _xUnits, int _cTUnits, int _hTUnits, vector<int> _gateHiddenLayers);
 	mu(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate);
 
 	int xUnits;
@@ -387,6 +395,7 @@ public:
 	RECBPGFIELDS
 	muBpg();
 	muBpg(int _xUnits, int _cTUnits, int _hTUnits);
+	//muBpg(int _xUnits, int _cTUnits, int _hTUnits, vector<int> gateHiddenLayers);
 	muBpg(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> gate);
 
 	int xUnits;

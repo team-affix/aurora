@@ -33,6 +33,9 @@
     <ClInclude Include="general.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="processing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="maths.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="general.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="processing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

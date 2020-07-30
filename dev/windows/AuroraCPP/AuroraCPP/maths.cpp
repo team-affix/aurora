@@ -79,6 +79,22 @@ void clear2D(ptr<cType> a) {
 	}
 }
 
+void copy(ptr<cType> a, ptr<cType> output, int sourceStartIndex, int count, int destStartIndex) {
+
+	// pull in reference to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
+
+	// throw exception if vectors are of inequal sizes
+	assert(aVec->size() >= sourceStartIndex + count || outVec->size() >= destStartIndex + count);
+
+	for (int i = 0; i < count; i++) {
+		int sourceIndex = sourceStartIndex + i;
+		int destIndex = destStartIndex + i;
+		outVec->at(destIndex) = aVec->at(sourceIndex);
+	}
+
+}
 void copy0D(ptr<cType> a, ptr<cType> output) {
 	output->vDouble = a->vDouble;
 }
@@ -552,6 +568,44 @@ ptr<cType> concat(ptr<cType> a, ptr<cType> b) {
 	}
 
 	concat(a, b, result);
+	return result;
+
+}
+
+void unroll(ptr<cType> a, ptr<cType> output) {
+
+	// import reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
+
+	int destStartIndex = 0;
+	for (int i = 0; i < aVec->size(); i++) {
+		
+		int aVecItemSize = aVec->at(i)->vVector.size();
+		copy(aVec->at(i), output, 0, aVecItemSize, destStartIndex);
+		destStartIndex += aVecItemSize;
+
+	}
+
+}
+ptr<cType> unroll(ptr<cType> a) {
+
+	ptr<cType> result = new cType();
+
+	// import reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* resultVec = &result->vVector;
+
+	int destStartIndex = 0;
+	for (int i = 0; i < aVec->size(); i++) {
+
+		int aVecItemSize = aVec->at(i)->vVector.size();
+		resultVec->resize(result->vVector.size() + aVecItemSize);
+		copy(aVec->at(i), result, 0, aVecItemSize, destStartIndex);
+		destStartIndex += aVecItemSize;
+
+	}
+
 	return result;
 
 }

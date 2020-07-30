@@ -30,6 +30,7 @@ void clear0D(ptr<cType> a);
 void clear1D(ptr<cType> a);
 void clear2D(ptr<cType> a);
 
+void copy(ptr<cType> a, ptr<cType> output, int sourceStartIndex, int count, int destStartIndex);
 void copy0D(ptr<cType> a, ptr<cType> output);
 void copy1D(ptr<cType> a, ptr<cType> output);
 void copy1D(ptr<cType> a, ptr<cType> output, int sourceStartIndex, int count, int destStartIndex);
@@ -84,6 +85,9 @@ ptr<cType> sum2D(ptr<cType> a);
 void concat(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 void concat(vector<ptr<cType>> vec, ptr<cType> output);
 ptr<cType> concat(ptr<cType> a, ptr<cType> b);
+
+void unroll(ptr<cType> a, ptr<cType> output);
+ptr<cType> unroll(ptr<cType> a);
 
 // default activation function, just returns input
 class actFunc {

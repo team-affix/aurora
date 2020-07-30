@@ -21,7 +21,7 @@ void trainAccelerator();
 void trainDigitRecognizer();
 
 int main() {
-	trainMuMut();
+	trainLstmBpg();
 	return 0;
 }
 
@@ -511,7 +511,7 @@ void trainLstmMut() {
 	rOut.unroll(4);
 
 	int genSize = 60;
-	genePool g(urd, re, &params, genSize, 0.01);
+	genePool g(urd, re, &params, genSize, 0.005);
 	g.initParent();
 	g.initChildren();
 	g.populateParent();
@@ -680,7 +680,7 @@ void trainMuMut() {
 	m2.modelWise([&paramPtrs](model* m) {initParam(m, &paramPtrs); });
 	
 	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(46);
+	default_random_engine re(49);
 
 
 	vector<param*> params = vector<param*>();
@@ -740,7 +740,7 @@ void trainMuMut() {
 	m2.unroll(7);
 
 	int genSize = 40;
-	genePool g(urd, re, &params, genSize, 0.002);
+	genePool g(urd, re, &params, genSize, 0.003333);
 	g.initParent();
 	g.initChildren();
 	g.populateParent();
@@ -1014,6 +1014,7 @@ void trainAccelerator() {
 	subSyncOut.yGrad = make2D(4, 1);
 	ptr<cType> subTSCost2D = make2D(4, 1);
 	ptr<cType> subCost2D = make2D(4, 1);
+	ptr<cType> subEpochCost2D = make2D(4, 1);
 
 	double childCost;
 	double bestChildCost;
@@ -1043,11 +1044,14 @@ void trainAccelerator() {
 				clear1D(m->cTIn);
 			});
 
+			// clear the accumulated cost for the subModel over all epochs
+			clear2D(subCost2D);
+
 			// train subject
 			for (int subEpoch = 0; subEpoch < 10000; subEpoch++) {
 
 				// clear the cost for the epoch
-				clear2D(subCost2D);
+				clear2D(subEpochCost2D);
 
 				for (int tsIndex = 0; tsIndex < inputs->vVector.size(); tsIndex++) {
 
@@ -1071,9 +1075,11 @@ void trainAccelerator() {
 
 					// add output gradient to total epoch cost
 					abs2D(subSyncOut.yGrad, subTSCost2D);
-					add2D(subCost2D, subTSCost2D, subCost2D);
+					add2D(subEpochCost2D, subTSCost2D, subEpochCost2D);
 
 				}
+
+				add2D(subCost2D, subEpochCost2D, subCost2D);
 
 				for (paramMom* p : subParamVec) {
 					p->momentum = p->beta * p->momentum + (1 - p->beta) * p->gradient;
@@ -1081,9 +1087,10 @@ void trainAccelerator() {
 					p->gradient = 0;
 				}
 
-				if (subEpoch % 1000 == 0) {
+				if (subEpoch % 100 == 0) {
+					double childEpochCost = sum1D(sum2D(subEpochCost2D))->vDouble;
 					childCost = sum1D(sum2D(subCost2D))->vDouble;
-					cout << childCost << endl;
+					cout << childEpochCost << " / " << childCost << endl;
 					if (isnan(childCost)) {
 						childCost = 9999999;
 					}
@@ -1091,14 +1098,14 @@ void trainAccelerator() {
 					// modify the learn rates of all subParameters
 					for (int muIndex = 0; muIndex < accSync.size(); muIndex++) {
 
-						int learnRateModifyIndex = subEpoch / 1000;
+						int learnRateModifyIndex = subEpoch / 100;
 
 						muTS* m = (muTS*)accSync.at(muIndex).get();
 						m->x = new cType{ subParamVec.at(muIndex)->learnRate/*, (double)muIndex*/ };
 						m->fwd();
 						copy1D(m->cTOut, m->cTIn);
 						copy1D(m->hTOut, m->hTIn);
-						subParamVec.at(muIndex)->learnRate += 0.1 * tanh(m->y->vVector.at(0)->vDouble);
+						subParamVec.at(muIndex)->learnRate += 0.002 * tanh(m->y->vVector.at(0)->vDouble);
 					}
 
 				}

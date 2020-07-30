@@ -40,3 +40,15 @@ void elemWise(vector<T>* a, function<void(T)> func) {
 		func(a->at(i));
 	}
 }
+
+template<class T>
+vector<T> concat(vector<T>* a, vector<T>* b) {
+	vector<T> result = vector<T>();
+	for (int i = 0; i < a->size(); i++) {
+		result.push_back(a->at(i));
+	}
+	for (int i = 0; i < b->size(); i++) {
+		result.push_back(b->at(i));
+	}
+	return result;
+}

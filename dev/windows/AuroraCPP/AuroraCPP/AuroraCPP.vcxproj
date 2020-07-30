@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="general.h" />
+    <ClInclude Include="processing.h" />
     <ClInclude Include="superHeader.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="maths.h" />
@@ -32,6 +33,7 @@
     <ClCompile Include="maths.cpp" />
     <ClCompile Include="modeling.cpp" />
     <ClCompile Include="optimization.cpp" />
+    <ClCompile Include="processing.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
