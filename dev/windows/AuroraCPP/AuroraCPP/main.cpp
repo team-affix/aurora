@@ -32,15 +32,15 @@ void trainDigitRecognizer();
 
 int main() {
 
-	trainTnnMut();
+	trainTnnBpg();
 	return 0;
 
 }
 
 void trainTnnBpg() {
 
-	ptr<model> nlr = neuronLRBpg(0.3);
-	ptr<seqBpg> s = tnnBpg({ 2, 5, 1 }, { nlr, nlr, nlr });
+	ptr<model> nlr = neuronLR(0.3);
+	ptr<seq> s = tnn({ 2, 5, 1 }, { nlr, nlr, nlr });
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
 	s->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
@@ -202,8 +202,8 @@ void trainTnnMut() {
 
 void trainSyncBpg() {
 
-	ptr<model> nlr = neuronLRBpg(0.3);
-	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, nlr);
+	ptr<model> nlr = neuronLR(0.3);
+	seq* templateNN = tnn({ 2, 5, 1 }, nlr);
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
 	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
@@ -221,7 +221,7 @@ void trainSyncBpg() {
 		params.push_back(p);
 	}
 
-	syncBpg r = syncBpg(templateNN);
+	sync r = sync(templateNN);
 	r.prep(4);
 	r.unroll(4);
 
@@ -348,11 +348,11 @@ void trainSyncMut() {
 
 void trainLstmBpg() {
 
-	ptr<model> nlr = neuronLRBpg(0.3);
+	ptr<model> nlr = neuronLR(0.3);
 
-	lstmBpg l1 = lstmBpg(7);
-	ptr<model> inNN = tnnBpg({ 2, 7 }, nlr);
-	ptr<model> outNN = tnnBpg({ 7, 1 }, nlr);
+	lstm l1 = lstm(7);
+	ptr<model> inNN = tnn({ 2, 7 }, nlr);
+	ptr<model> outNN = tnn({ 7, 1 }, nlr);
 
 	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
 	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
@@ -405,10 +405,10 @@ void trainLstmBpg() {
 
 	l1.prep(4);
 	l1.unroll(4);
-	syncBpg rIn = syncBpg(inNN);
+	sync rIn = sync(inNN);
 	rIn.prep(4);
 	rIn.unroll(4);
-	syncBpg rOut = syncBpg(outNN);
+	sync rOut = sync(outNN);
 	rOut.prep(4);
 	rOut.unroll(4);
 
@@ -461,11 +461,11 @@ void trainLstmBpg() {
 
 void trainLstmMut() {
 
-	ptr<model> nlr = neuronLRBpg(0.3);
+	ptr<model> nlr = neuronLR(0.3);
 
-	lstmBpg l1 = lstmBpg(5);
-	ptr<model> inNN = tnnBpg({ 2, 5 }, nlr);
-	ptr<model> outNN = tnnBpg({ 5, 1 }, nlr);
+	lstm l1 = lstm(5);
+	ptr<model> inNN = tnn({ 2, 5 }, nlr);
+	ptr<model> outNN = tnn({ 5, 1 }, nlr);
 
 	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
 	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
@@ -515,10 +515,10 @@ void trainLstmMut() {
 
 	l1.prep(4);
 	l1.unroll(4);
-	syncBpg rIn = syncBpg(inNN);
+	sync rIn = sync(inNN);
 	rIn.prep(4);
 	rIn.unroll(4);
-	syncBpg rOut = syncBpg(outNN);
+	sync rOut = sync(outNN);
 	rOut.prep(4);
 	rOut.unroll(4);
 
@@ -578,7 +578,7 @@ void trainLstmMut() {
 
 void trainMuBpg() {
 
-	muBpg m1 = muBpg(2, 7, 1);
+	mu m1 = mu(2, 7, 1);
 
 	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
 	m1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
@@ -805,8 +805,8 @@ void trainMuMut() {
 
 void trainAttBpg() {
 
-	attBpg a1 = attBpg(2, 1);
-	muBpg m1 = muBpg(2, 10, 1);
+	att a1 = att(2, 1);
+	mu m1 = mu(2, 10, 1);
 
 	vector<ptr<param>*> paramPtrVec = vector <ptr<param>*>();
 	a1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
@@ -885,7 +885,7 @@ void trainAttBpg() {
 			a1.x = tsInputs;
 			for (int j = 0; j < m1.size(); j++) {
 
-				attTSBpg* a = (attTSBpg*)a1.at(j).get();
+				attTS* a = (attTS*)a1.at(j).get();
 				a1.hTIn->vVector.at(j) = m1.hTOut;
 				a1.incFwd(1);
 				m1.x->vVector[m1.index] = a->y;
@@ -895,7 +895,7 @@ void trainAttBpg() {
 			sub2D(m1.y, desired->vVector.at(i), m1.yGrad);
 			for (int j = m1.size() - 1; j >= 0; j--) {
 
-				attTSBpg* a = (attTSBpg*)a1.at(j).get();
+				attTS* a = (attTS*)a1.at(j).get();
 				m1.incBwd(1);
 				a1.yGrad->vVector.at(j) = m1.xGrad->vVector.at(j);
 				a1.incBwd(1);
@@ -926,12 +926,12 @@ void trainAttBpg() {
 
 void trainAccelerator() {
 
-	ptr<model> nlr = neuronLRBpg(0.3);
+	ptr<model> nlr = neuronLR(0.3);
 
 	// initialize the training subject models
-	lstmBpg subLstm(7);
-	syncBpg subSyncIn(tnnBpg({ 2, 7 }, nlr));
-	syncBpg subSyncOut(tnnBpg({ 7, 1 }, nlr));
+	lstm subLstm(7);
+	sync subSyncIn(tnn({ 2, 7 }, nlr));
+	sync subSyncOut(tnn({ 7, 1 }, nlr));
 
 	// initialize the accelerator models
 	muTS* accMuTS = new muTS(1, 10, 1, tnn({1 + 1, 10 + 1}, nlr));
@@ -1241,9 +1241,9 @@ void trainDigitRecognizer() {
 		norm1D(inputs->vVector.at(i), inputs->vVector.at(i));
 	}
 
-	ptr<model> nlr = neuronLRBpg(0.3);
-	ptr<model> nth = neuronThBpg();
-	seqBpg* t = tnnBpg({ (int)inputs->vVector.at(0)->vVector.size(), 24, 16, 1 }, { nth, nth, nth, nlr });
+	ptr<model> nlr = neuronLR(0.3);
+	ptr<model> nth = neuronTh();
+	seq* t = tnn({ (int)inputs->vVector.at(0)->vVector.size(), 24, 16, 1 }, { nth, nth, nth, nlr });
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
 	t->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
@@ -1263,7 +1263,7 @@ void trainDigitRecognizer() {
 		params.push_back(p);
 	}
 
-	syncBpg s = syncBpg(t);
+	sync s = sync(t);
 
 	s.prep(inputs->vVector.size());
 	s.unroll(inputs->vVector.size());
