@@ -89,6 +89,24 @@ ptr<cType> concat(ptr<cType> a, ptr<cType> b);
 void unroll(ptr<cType> a, ptr<cType> output);
 ptr<cType> unroll(ptr<cType> a);
 
+void get2D(ptr<cType> a, ptr<cType> output, int x, int y, int width, int height);
+ptr<cType> get2D(ptr<cType> a, int x, int y, int width, int height);
+
+void info1D(ptr<cType> a, int& size);
+void info2D(ptr<cType> a, int& width, int& height, bool& is2D);
+
+ptr<cType> max1D(ptr<cType> a);
+ptr<cType> max2D(ptr<cType> a);
+ptr<cType> max3D(ptr<cType> a);
+
+ptr<cType> min1D(ptr<cType> a);
+ptr<cType> min2D(ptr<cType> a);
+ptr<cType> min3D(ptr<cType> a);
+
+ptr<cType> mean1D(ptr<cType> a);
+
+void norm1D(ptr<cType> a, ptr<cType> output);
+
 // default activation function, just returns input
 class actFunc {
 public:

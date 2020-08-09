@@ -610,6 +610,248 @@ ptr<cType> unroll(ptr<cType> a) {
 
 }
 
+void get2D(ptr<cType> a, ptr<cType> output, int x, int y, int width, int height) {
+
+	// import reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
+
+	for (int i = 0; i < width; i++) {
+
+		int sourceIndex = x + i;
+		int destIndex = i;
+		copy1D(aVec->at(sourceIndex), outVec->at(destIndex), 0, height, 0);
+
+	}
+
+}
+ptr<cType> get2D(ptr<cType> a, int x, int y, int width, int height) {
+
+	ptr<cType> result = make2D(width, height);
+	get2D(a, result, x, y, width, height);
+	return result;
+
+}
+
+void info1D(ptr<cType> a, int& size) {
+
+	vector<ptr<cType>>* aVec = &a->vVector;
+	size = aVec->size();
+}
+void info2D(ptr<cType> a, int& width, int& height, bool& is2D) {
+
+	// pull in reference to vector, to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+
+	is2D = true;
+	height = -1;
+
+	for (int i = 0; i < aVec->size(); i++) {
+
+		vector<ptr<cType>>* itemVec = &aVec->at(i)->vVector;
+
+		if (height == -1) {
+
+			height = itemVec->size();
+
+		}
+		else if (height != itemVec->size()) {
+
+			is2D = false;
+			break;
+
+		}
+
+	}
+
+	width = aVec->size();
+	if (!is2D) {
+		height = -1;
+	}
+
+}
+
+ptr<cType> max1D(ptr<cType> a) {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+
+	// make sure the vector has elements
+	assert(aVec->size() > 0);
+
+	double max = aVec->at(0)->vDouble;
+	for (int i = 1; i < aVec->size(); i++) {
+
+		double val = aVec->at(i)->vDouble;
+
+		if (val > max) {
+			max = val;
+		}
+
+	}
+
+	return new cType(max);
+
+}
+ptr<cType> max2D(ptr<cType> a) {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+
+	// make sure the vector has elements
+	assert(aVec->size() > 0);
+
+	double max = max1D(aVec->at(0))->vDouble;
+	for (int i = 1; i < aVec->size(); i++) {
+
+		double val = max1D(aVec->at(i))->vDouble;
+
+		if (val > max) {
+			max = val;
+		}
+
+	}
+
+	return new cType(max);
+
+}
+ptr<cType> max3D(ptr<cType> a) {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+
+	// make sure the vector has elements
+	assert(aVec->size() > 0);
+
+	double max = max2D(aVec->at(0))->vDouble;
+	for (int i = 1; i < aVec->size(); i++) {
+
+		double val = max2D(aVec->at(i))->vDouble;
+
+		if (val > max) {
+			max = val;
+		}
+
+	}
+
+	return new cType(max);
+
+}
+
+ptr<cType> min1D(ptr<cType> a) {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+
+	// make sure the vector has elements
+	assert(aVec->size() > 0);
+
+	double min = aVec->at(0)->vDouble;
+	for (int i = 1; i < aVec->size(); i++) {
+
+		double val = aVec->at(i)->vDouble;
+
+		if (val < min) {
+			min = val;
+		}
+
+	}
+
+	return new cType(min);
+
+}
+ptr<cType> min2D(ptr<cType> a) {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+
+	// make sure the vector has elements
+	assert(aVec->size() > 0);
+
+	double min = min1D(aVec->at(0))->vDouble;
+	for (int i = 1; i < aVec->size(); i++) {
+
+		double val = min1D(aVec->at(i))->vDouble;
+
+		if (val < min) {
+			min = val;
+		}
+
+	}
+
+	return new cType(min);
+
+}
+ptr<cType> min3D(ptr<cType> a) {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+
+	// make sure the vector has elements
+	assert(aVec->size() > 0);
+
+	double min = min2D(aVec->at(0))->vDouble;
+	for (int i = 1; i < aVec->size(); i++) {
+
+		double val = min2D(aVec->at(i))->vDouble;
+
+		if (val < min) {
+			min = val;
+		}
+
+	}
+
+	return new cType(min);
+
+}
+
+ptr<cType> mean1D(ptr<cType> a) {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+
+	// make sure the vector has elements
+	assert(aVec->size() > 0);
+
+	double sum = 0;
+
+	for (int i = 0; i < aVec->size(); i++) {
+
+		sum += aVec->at(i)->vDouble;
+
+	}
+
+	double mean = sum / (double)aVec->size();
+
+	return new cType(mean);
+
+}
+
+void norm1D(ptr<cType> a, ptr<cType> output) {
+	
+	ptr<cType> mean = mean1D(a);
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
+
+	// make sure the vector has elements
+	assert(aVec->size() == outVec->size());
+
+	// calculate the standard deviation
+	double devSum = 0;
+	for (int i = 0; i < aVec->size(); i++) {
+		devSum += abs(aVec->at(i)->vDouble - mean->vDouble);
+	}
+	double devAvg = devSum / (double)aVec->size();
+	
+	// output the normalized 1D cType
+	for (int i = 0; i < aVec->size(); i++) {
+		outVec->at(i)->vDouble = (aVec->at(i)->vDouble - mean->vDouble) / devAvg;
+	}
+
+}
+
 ptr<vector<int>> randomDist(int count, int incMin, int excMax, bool replace) {
 
 	vector<int> allPossibilities = vector<int>();
