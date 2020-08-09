@@ -1,13 +1,23 @@
 #pragma once
 #include "main.h"
 #include "general.h"
-#include <fstream>
-#include <filesystem>
 
 using namespace std;
 using namespace filesystem;
+using namespace cv;
 
-string exportParams(vector<ptr<ptr<param>>>* paramPtrVec);
+uint allocated_memory;
+
+void* operator new(size_t size) {
+	allocated_memory += size;
+	return malloc(size);
+}
+void operator delete(void* block, size_t size) {
+	allocated_memory -= size;
+	free(block);
+}
+
+string exportParams(vector<ptr<param>*>& paramPtrVec);
 void trainTnnBpg();
 void trainTnnMut();
 void trainSyncBpg();
@@ -21,8 +31,10 @@ void trainAccelerator();
 void trainDigitRecognizer();
 
 int main() {
-	trainLstmBpg();
+
+	trainTnnMut();
 	return 0;
+
 }
 
 void trainTnnBpg() {
@@ -30,15 +42,15 @@ void trainTnnBpg() {
 	ptr<model> nlr = neuronLRBpg(0.3);
 	ptr<seqBpg> s = tnnBpg({ 2, 5, 1 }, { nlr, nlr, nlr });
 
-	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
-	s->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
+	s->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
 	// set up random engine for initializing param states
 	uniform_real_distribution<double> u(-1, 1);
 	default_random_engine re(26);
 
 	vector <paramSgd*> paramVec = vector <paramSgd*>();
-	for (ptr<ptr<param>> s : paramPtrVec) {
+	for (ptr<param>* s : paramPtrVec) {
 
 		// initialize type of parameter used
 		paramSgd* ps = new paramSgd();
@@ -49,7 +61,7 @@ void trainTnnBpg() {
 		ps->gradient = 0;
 
 		// cause the model's parameter ptr to point to the dynamically allocated paramSgd
-		*s = ps;
+		s->reset(ps);
 
 		paramVec.push_back(ps);
 
@@ -95,7 +107,7 @@ void trainTnnBpg() {
 		epoch++;
 	}
 
-	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+	cout << endl << "---------------------- Params:" << endl << exportParams(paramPtrVec);
 
 	return;
 
@@ -106,22 +118,22 @@ void trainTnnMut() {
 	ptr<model> nlr = neuronLR(0.3);
 	ptr<seq> s = tnn({ 2, 5, 1 }, { nlr, nlr, nlr });
 
-	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
-	s->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
+	s->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
 	// set up random engine for initializing param states
 	uniform_real_distribution<double> u(-1, 1);
 	default_random_engine re(43);
 
 	vector <param*> paramVec = vector <param*>();
-	for (ptr<ptr<param>> s : paramPtrVec) {
+	for (ptr<param>* s : paramPtrVec) {
 		// initialize type of parameter used
 		param* ps = new param();
 		// initialize parameter state
 		ps->state = u(re);
 		ps->learnRate = 1;
 		// cause the model's parameter ptr to point to the dynamically allocated param
-		*s = ps;
+		s->reset(ps);
 		paramVec.push_back(ps);
 	}
 	ptr<cType> inputs = new cType{
@@ -193,19 +205,19 @@ void trainSyncBpg() {
 	ptr<model> nlr = neuronLRBpg(0.3);
 	seqBpg* templateNN = tnnBpg({ 2, 5, 1 }, nlr);
 
-	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
-	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
+	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(43);
 
 	vector<paramSgd*> params = vector<paramSgd*>();
-	for (ptr<ptr<param>> pptr : paramPtrVec) {
+	for (ptr<param>* pptr : paramPtrVec) {
 		paramSgd* p = new paramSgd();
 		p->gradient = 0;
 		p->learnRate = 0.02;
 		p->state = urd(re);
-		*pptr = p;
+		pptr->reset(p);
 		params.push_back(p);
 	}
 
@@ -249,25 +261,25 @@ void trainSyncBpg() {
 		}
 	}
 
-	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+	cout << endl << "---------------------- Params:" << endl << exportParams(paramPtrVec);
 }
 
 void trainSyncMut() {
 	ptr<model> nlr = neuronLR(0.3);
 	seq* templateNN = tnn({ 2, 5, 1 }, nlr);
 
-	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
-	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
+	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(43);
 
 	vector<param*> params = vector<param*>();
-	for (ptr<ptr<param>> pptr : paramPtrVec) {
+	for (ptr<param>* pptr : paramPtrVec) {
 		param* p = new param();
 		p->learnRate = 1;
 		p->state = urd(re);
-		*pptr = p;
+		pptr->reset(p);
 		params.push_back(p);
 	}
 
@@ -342,23 +354,23 @@ void trainLstmBpg() {
 	ptr<model> inNN = tnnBpg({ 2, 7 }, nlr);
 	ptr<model> outNN = tnnBpg({ 7, 1 }, nlr);
 
-	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
-	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
-	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
-	l1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
+	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	l1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(46);
 
 	vector<paramMom*> params = vector<paramMom*>();
-	for (ptr<ptr<param>> pptr : paramPtrVec) {
+	for (ptr<param>* pptr : paramPtrVec) {
 		paramMom* p = new paramMom();
 		p->gradient = 0;
 		p->learnRate = 0.02;
 		p->state = urd(re);
 		p->momentum = 0;
 		p->beta = 0.9;
-		*pptr = p;
+		pptr->reset(p);
 		params.push_back(p);
 	}
 
@@ -443,7 +455,7 @@ void trainLstmBpg() {
 		}
 	}
 
-	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+	cout << endl << "---------------------- Params:" << endl << exportParams(paramPtrVec);
 
 }
 
@@ -455,20 +467,20 @@ void trainLstmMut() {
 	ptr<model> inNN = tnnBpg({ 2, 5 }, nlr);
 	ptr<model> outNN = tnnBpg({ 5, 1 }, nlr);
 
-	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
-	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
-	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
-	l1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
+	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	l1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(45);
 
 	vector<param*> params = vector<param*>();
-	for (ptr<ptr<param>> pptr : paramPtrVec) {
+	for (ptr<param>* pptr : paramPtrVec) {
 		param* p = new param();
 		p->learnRate = 10;
 		p->state = urd(re);
-		*pptr = p;
+		pptr->reset(p);
 		params.push_back(p);
 	}
 
@@ -568,21 +580,21 @@ void trainMuBpg() {
 
 	muBpg m1 = muBpg(2, 7, 1);
 
-	vector <ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
-	m1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
+	m1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-0.1, 0.1);
 	default_random_engine re(44);
 
 	vector<paramMom*> params = vector<paramMom*>();
-	for (ptr<ptr<param>> pptr : paramPtrVec) {
+	for (ptr<param>* pptr : paramPtrVec) {
 		paramMom* p = new paramMom();
 		p->gradient = 0;
 		p->learnRate = 0.02;
 		p->state = urd(re);
 		p->beta = 0.9;
 		p->momentum = 0;
-		*pptr = p;
+		pptr->reset(p);
 		params.push_back(p);
 	}
 
@@ -666,20 +678,20 @@ void trainMuBpg() {
 		}
 	}
 
-	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+	cout << endl << "---------------------- Params:" << endl << exportParams(paramPtrVec);
 
 }
 
 void trainMuMut() {
 
-	mu m = mu(2, 7, 5);
-	mu m2 = mu(5, 7, 1);
+	mu m = mu(2, 10, 10);
+	mu m2 = mu(10, 10, 1);
 
-	vector<ptr<ptr<param>>> paramPtrs = vector<ptr<ptr<param>>>();
-	m.modelWise([&paramPtrs](model* m) {initParam(m, &paramPtrs); });
-	m2.modelWise([&paramPtrs](model* m) {initParam(m, &paramPtrs); });
+	vector<ptr<param>*> paramPtrs = vector<ptr<param>*>();
+	m.modelWise([&paramPtrs](model* m) {initParam(m, paramPtrs); });
+	m2.modelWise([&paramPtrs](model* m) {initParam(m, paramPtrs); });
 	
-	uniform_real_distribution<double> urd(-1, 1);
+	uniform_real_distribution<double> urd(-0.1, 0.1);
 	default_random_engine re(49);
 
 
@@ -689,7 +701,7 @@ void trainMuMut() {
 		p->learnRate = 1;
 		p->state = urd(re);
 		params.push_back(p);
-		*paramPtrs.at(paramIndex) = p;
+		paramPtrs.at(paramIndex)->reset(p);
 	}
 
 
@@ -740,7 +752,7 @@ void trainMuMut() {
 	m2.unroll(7);
 
 	int genSize = 40;
-	genePool g(urd, re, &params, genSize, 0.003333);
+	genePool g(urd, re, &params, genSize, 0.005);
 	g.initParent();
 	g.initChildren();
 	g.populateParent();
@@ -796,22 +808,22 @@ void trainAttBpg() {
 	attBpg a1 = attBpg(2, 1);
 	muBpg m1 = muBpg(2, 10, 1);
 
-	vector<ptr<ptr<param>>> paramPtrVec = vector <ptr<ptr<param>>>();
-	a1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
-	m1.modelWise([&paramPtrVec](model* m) { initParam(m, &paramPtrVec); });
+	vector<ptr<param>*> paramPtrVec = vector <ptr<param>*>();
+	a1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	m1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-0.1, 0.1);
 	default_random_engine re(43);
 
 	vector<paramMom*> params = vector<paramMom*>();
-	for (ptr<ptr<param>> pptr : paramPtrVec) {
+	for (ptr<param>* pptr : paramPtrVec) {
 		paramMom* p = new paramMom();
 		p->gradient = 0;
 		p->learnRate = 0.02;
 		p->state = urd(re);
 		p->beta = 0.0;
 		p->momentum = 0;
-		*pptr = p;
+		pptr->reset(p);
 		params.push_back(p);
 	}
 
@@ -907,7 +919,7 @@ void trainAttBpg() {
 
 	}
 
-	cout << endl << "---------------------- Params:" << endl << exportParams(&paramPtrVec);
+	cout << endl << "---------------------- Params:" << endl << exportParams(paramPtrVec);
 
 
 }
@@ -925,36 +937,36 @@ void trainAccelerator() {
 	muTS* accMuTS = new muTS(1, 10, 1, tnn({1 + 1, 10 + 1}, nlr));
 	sync accSync(accMuTS);
 
-	vector<ptr<ptr<param>>> subParamPtrVec = vector<ptr<ptr<param>>>();
-	subLstm.modelWise([&subParamPtrVec](model* m) { initParam(m, &subParamPtrVec); });
-	subSyncIn.modelWise([&subParamPtrVec](model* m) { initParam(m, &subParamPtrVec); });
-	subSyncOut.modelWise([&subParamPtrVec](model* m) { initParam(m, &subParamPtrVec); });
+	vector<ptr<param>*> subParamPtrVec = vector<ptr<param>*>();
+	subLstm.modelWise([&subParamPtrVec](model* m) { initParam(m, subParamPtrVec); });
+	subSyncIn.modelWise([&subParamPtrVec](model* m) { initParam(m, subParamPtrVec); });
+	subSyncOut.modelWise([&subParamPtrVec](model* m) { initParam(m, subParamPtrVec); });
 
-	vector<ptr<ptr<param>>> accParamPtrVec = vector<ptr<ptr<param>>>();
-	accSync.modelWise([&accParamPtrVec](model* m) { initParam(m, &accParamPtrVec); });
+	vector<ptr<param>*> accParamPtrVec = vector<ptr<param>*>();
+	accSync.modelWise([&accParamPtrVec](model* m) { initParam(m, accParamPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(46);
 
 	vector<paramMom*> subParamVec = vector<paramMom*>();
-	for (ptr<ptr<param>> pptr : subParamPtrVec) {
+	for (ptr<param>* pptr : subParamPtrVec) {
 
 		paramMom* param = new paramMom();
 		param->beta = 0.9;
 		param->learnRate = 0.02;
 		param->state = urd(re);
-		*pptr = param;
+		pptr->reset(param);
 		subParamVec.push_back(param);
 
 	}
 
 	vector<param*> accParamVec = vector<param*>();
-	for (ptr<ptr<param>> pptr : accParamPtrVec) {
+	for (ptr<param>* pptr : accParamPtrVec) {
 
 		param* p = new param();
 		p->learnRate = 0.02;
 		p->state = urd(re);
-		*pptr = p;
+		pptr->reset(p);
 		accParamVec.push_back(p);
 
 	}
@@ -1101,7 +1113,7 @@ void trainAccelerator() {
 						int learnRateModifyIndex = subEpoch / 100;
 
 						muTS* m = (muTS*)accSync.at(muIndex).get();
-						m->x = new cType{ subParamVec.at(muIndex)->learnRate/*, (double)muIndex*/ };
+						m->x = new cType{ subParamVec.at(muIndex)->learnRate };
 						m->fwd();
 						copy1D(m->cTOut, m->cTIn);
 						copy1D(m->hTOut, m->hTIn);
@@ -1131,49 +1143,160 @@ void trainAccelerator() {
 
 }
 
-void trainDigitRecognizer() {
+#pragma region "Digit Recognition"
 
-	vector<string> paths = { 
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\0", 
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\1",
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\2",
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\3",
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\4",
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\5",
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\6",
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\7",
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\8",
-	"D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCPP\\AuroraCPP\\Debug\\0004_CH4M\\9" };
+ptr<cType> toCType(Mat a) {
 
-	ptr<cType> inputs = new cType();
-	for (int i = 0; i < paths.size(); i++) {
+	ptr<cType> result = make2D(a.rows, a.cols);
 
-		directory_iterator d(paths.at(i));
-		ptr<cType> trainingSets = new cType();
-		
-		ifstream ifs;
+	vector<ptr<cType>>* resultVec = &result->vVector;
 
-		for (const auto& entry : d) {
-			
-			path p = entry.path();
-			ifstream file(p);
-			char data[10000];
-			file.read(data, 10000);
+	for (int y = 0; y < a.rows; y++) {
+		vector<ptr<cType>>* resultRow = &resultVec->at(y)->vVector;
+		for (int x = 0; x < a.cols; x++) {
+
+			 // blue, green, red
+			Vec3b pxl = a.at<Vec3b>(y, x);
+			resultRow->at(x)->vDouble = pxl.val[1];
+
 		}
 	}
 
-
-	ofstream myfile;
-	myfile.open("example.txt");
-	myfile << "Writing this to a file.\n";
-	myfile.close();
+	return result;
 
 }
 
-string exportParams(vector<ptr<ptr<param>>>* paramPtrVec) {
+void compressWithKernal(ptr<cType> inputs, int i) {
+
+	for (int j = 0; j < inputs->vVector.at(i)->vVector.size(); j++) {
+		ptr<cType> img = inputs->vVector.at(i)->vVector.at(j);
+		vector<ptr<cType>> strided = strideKernal(img, 8, 8, 6, 6);
+
+		inputs->vVector.at(i)->vVector.at(j) = make1D(strided.size());
+		img = inputs->vVector.at(i)->vVector.at(j);
+
+		for (int k = 0; k < strided.size(); k++) {
+			ptr<cType> mean = mean1D(unroll(strided.at(k)));
+			img->vVector.at(k) = mean;
+		}
+	}
+	
+}
+
+void trainDigitRecognizer() {
+
+	vector<string> paths = { 
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\0", 
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\1",
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\2",
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\3",
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\4",
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\5",
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\6",
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\7",
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\8",
+	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\9" };
+
+	ptr<cType> inputs_separated_by_type = make1D(10);
+
+	directory_iterator end_itr;
+	for (int i = 0; i < paths.size(); i++) {
+		for (directory_iterator itr(paths.at(i)); itr != end_itr; ++itr) {
+
+			string dir = itr->path().generic_string();
+			Mat mat = imread(itr->path().generic_string());
+			ptr<cType> c = toCType(mat);
+			inputs_separated_by_type->vVector.at(i)->vVector.push_back(c);
+			mat.release();
+
+		}
+	}
+
+	vector<thread> kernalThreads = vector<thread>();
+	for (int i = 0; i < inputs_separated_by_type->vVector.size(); i++) {
+#if 0
+		kernalThreads.push_back(thread(compressWithKernal, inputs_separated_by_type, i));
+#else
+		compressWithKernal(inputs_separated_by_type, i);
+#endif
+	}
+
+	for (int i = 0; i < kernalThreads.size(); i++) {
+		kernalThreads.at(i).join();
+	}
+
+	ptr<cType> inputs = new cType();
+	ptr<cType> desired = new cType();
+
+	// desegregate inputs
+	for (int i = 0; i < inputs_separated_by_type->vVector.size(); i++) {
+		for (int j = 0; j < inputs_separated_by_type->vVector.at(i)->vVector.size(); j++) {
+			inputs->vVector.push_back(inputs_separated_by_type->vVector.at(i)->vVector.at(j));
+			desired->vVector.push_back(new cType{ (double)i });
+		}
+	}
+
+	// normalize inputs
+	for (int i = 0; i < inputs->vVector.size(); i++) {
+		norm1D(inputs->vVector.at(i), inputs->vVector.at(i));
+	}
+
+	ptr<model> nlr = neuronLRBpg(0.3);
+	ptr<model> nth = neuronThBpg();
+	seqBpg* t = tnnBpg({ (int)inputs->vVector.at(0)->vVector.size(), 24, 16, 1 }, { nth, nth, nth, nlr });
+
+	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
+	t->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(46);
+
+	vector<paramMom*> params = vector<paramMom*>();
+	for (ptr<param>* pptr : paramPtrVec) {
+		paramMom* p = new paramMom();
+		p->gradient = 0;
+		p->learnRate = 0.00002;
+		p->state = urd(re);
+		p->beta = 0;
+		p->momentum = 0;
+		pptr->reset(p);
+		params.push_back(p);
+	}
+
+	syncBpg s = syncBpg(t);
+
+	s.prep(inputs->vVector.size());
+	s.unroll(inputs->vVector.size());
+
+	s.yGrad = make2D(desired->vVector.size(), 1);
+
+	for (int epoch = 0; epoch < 100000; epoch++) {
+		s.x = inputs;
+		s.fwd();
+		sub2D(s.y, desired, s.yGrad);
+		s.bwd();
+
+		for (paramMom* p : params) {
+			p->momentum = p->beta * p->momentum + (1 - p->beta) * p->gradient;
+			p->state -= p->learnRate * p->momentum;
+			p->gradient = 0;
+		}
+
+		if (epoch % 5 == 0) {
+			cout << sum1D(sum2D(abs2D(s.yGrad)))->vDouble << endl;
+		}
+	}
+
+}
+
+#pragma endregion
+
+
+
+string exportParams(vector<ptr<param>*>& paramPtrVec) {
 	string result = "";
-	for (int i = 0; i < paramPtrVec->size(); i++) {
-		result += to_string((*paramPtrVec->at(i))->state);
+	for (int i = 0; i < paramPtrVec.size(); i++) {
+		result += to_string((*paramPtrVec.at(i))->state);
 		result += "\n";
 	}
 	return result;

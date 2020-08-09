@@ -96,22 +96,22 @@ seqBpg* neuronLRBpg(double m) {
 	return nlr;
 
 }
-void initParam(model* m, vector<ptr<ptr<param>>>* paramVecOutput) {
+void initParam(model* m, vector<ptr<param>*>& paramVecOutput) {
 	if (bias* b = dynamic_cast<bias*>(m)) {
-		b->prm = new ptr<param>();
-		paramVecOutput->push_back(b->prm);
+		b->prm = ptr<param>();
+		paramVecOutput.push_back(&b->prm);
 	}
 	else if (biasBpg* b = dynamic_cast<biasBpg*>(m)) {
-		b->prm = new ptr<param>();
-		paramVecOutput->push_back(b->prm);
+		b->prm = ptr<param>();
+		paramVecOutput.push_back(&b->prm);
 	}
 	else if (weight* w = dynamic_cast<weight*>(m)) {
-		w->prm = new ptr<param>();
-		paramVecOutput->push_back(w->prm);
+		w->prm = ptr<param>();
+		paramVecOutput.push_back(&w->prm);
 	}
 	else if (weightBpg* w = dynamic_cast<weightBpg*>(m)) {
-		w->prm = new ptr<param>();
-		paramVecOutput->push_back(w->prm);
+		w->prm = ptr<param>();
+		paramVecOutput.push_back(&w->prm);
 	}
 }
 #pragma endregion
@@ -618,7 +618,7 @@ bias::bias() {
 	y = new cType(0);
 }
 void bias::fwd() {
-	biasFwd(x, y, *prm);
+	biasFwd(x, y, prm);
 }
 ptr<model> bias::clone() {
 	bias* result = new bias();
@@ -635,10 +635,10 @@ biasBpg::biasBpg() {
 	yGrad = new cType(0);
 }
 void biasBpg::fwd() {
-	biasFwd(x, y, *prm);
+	biasFwd(x, y, prm);
 }
 void biasBpg::bwd() {
-	biasBwd(yGrad, xGrad, *prm);
+	biasBwd(yGrad, xGrad, prm);
 }
 ptr<model> biasBpg::clone() {
 	biasBpg* result = new biasBpg();
@@ -711,7 +711,7 @@ weight::weight() {
 	y = new cType(0);
 }
 void weight::fwd() {
-	weightFwd(x, y, *prm);
+	weightFwd(x, y, prm);
 }
 ptr<model> weight::clone() {
 	weight* result = new weight();
@@ -727,10 +727,10 @@ weightBpg::weightBpg() {
 	yGrad = new cType(0);
 }
 void weightBpg::fwd() {
-	weightFwd(x, y, *prm);
+	weightFwd(x, y, prm);
 }
 void weightBpg::bwd() {
-	weightBwd(yGrad, xGrad, x, *prm);
+	weightBwd(yGrad, xGrad, x, prm);
 }
 ptr<model> weightBpg::clone() {
 	weightBpg* result = new weightBpg();

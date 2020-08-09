@@ -81,8 +81,8 @@ seqBpg* tnnBpg(vector<int> npl, vector<ptr<model>> layerNeuronTemplates);
 seq* tnn(vector<int> npl, ptr<model> neuronTemplate);
 seqBpg* tnnBpg(vector<int> npl, ptr<model> neuronTemplate);
 
-seq* stackedLstm(int count, int units);
-seqBpg* stackedLstmBpg(int count, int units);
+//seq* stackedLstm(int count, int units);
+//seqBpg* stackedLstmBpg(int count, int units);
 
 seq* neuronSm();
 seq* neuronTh();
@@ -91,7 +91,7 @@ seqBpg* neuronSmBpg();
 seqBpg* neuronThBpg();
 seqBpg* neuronLRBpg(double m);
 
-void initParam(model* m, vector<ptr<ptr<param>>>* paramVecOutput);
+void initParam(model* m, vector<ptr<param>*>& paramVecOutput);
 
 //void attToLSTMFwd(att* a, lstm* l);
 //void attToLSTMFwd(attBpg* a, lstmBpg* l);
@@ -118,13 +118,13 @@ class bias : public model {
 public:
 	MODELFIELDS
 	bias();
-	ptr<ptr<param>> prm;
+	ptr<param> prm;
 };
 class biasBpg : public modelBpg {
 public:
 	MODELBPGFIELDS
 	biasBpg();
-	ptr<ptr<param>> prm;
+	ptr<param> prm;
 };
 class act : public model {
 public:
@@ -146,13 +146,13 @@ class weight : public model {
 public:
 	MODELFIELDS
 	weight();
-	ptr<ptr<param>> prm;
+	ptr<param> prm;
 };
 class weightBpg : public modelBpg {
 public:
 	MODELBPGFIELDS
 	weightBpg();
-	ptr<ptr<param>> prm;
+	ptr<param> prm;
 };
 class wSet : public model, public vector<ptr<model>> {
 public:

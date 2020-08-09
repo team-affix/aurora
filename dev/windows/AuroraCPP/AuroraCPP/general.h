@@ -1,6 +1,8 @@
 #pragma once
 #include "superHeader.h"
 
+using namespace cv;
+
 template<class T>
 class ptr : public shared_ptr<T> {
 public:
@@ -52,3 +54,4 @@ vector<T> concat(vector<T>* a, vector<T>* b) {
 	}
 	return result;
 }
+

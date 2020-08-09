@@ -11,4 +11,6 @@
 #include <assert.h>
 #include <memory>
 #include <Windows.h>
+#include <opencv2/opencv.hpp>
+#include <filesystem>
 using namespace std;
