@@ -2,6 +2,7 @@
 #include "superHeader.h"
 #include "optimization.h"
 #include "maths.h"
+#include "general.h"
 
 #pragma region Defs
 
@@ -44,9 +45,14 @@ class muTS;
 class mu;
 class attTS;
 class att;
+class cnl;
+class cnn;
 
 seq* tnn(vector<int> npl, vector<ptr<model>> layerNeuronTemplates);
 seq* tnn(vector<int> npl, ptr<model> neuronTemplate);
+seq* cnn(ptr<model> _cnl, int _cnls);
+seq* cnn(int _a, int _b, int _cnls);
+seq* cnn(vector<ptr<model>> _cnls);
 
 //seq* stackedLstm(int count, int units);
 //seq* stackedlstm(int count, int units);
@@ -56,6 +62,8 @@ seq* neuronTh();
 seq* neuronLR(double m);
 
 void initParam(model* m, vector<ptr<param>*>& paramVecOutput);
+void initParams(model* m, vector<ptr<param>*>& paramVecOutput);
+void initParams(ptr<model> m, vector<ptr<param>*>& paramVecOutput);
 
 //void attToLSTMFwd(att* a, lstm* l);
 //void attToLSTMFwd(att* a, lstm* l);
@@ -112,6 +120,8 @@ class seq : public model, public vector<ptr<model>> {
 public:
 	SEQFIELDS
 	seq();
+	seq(vector<ptr<model>>& _models);
+	seq(initializer_list<ptr<model>> _models);
 };
 class layer : public model, public vector<ptr<model>> {
 public:
@@ -119,6 +129,7 @@ public:
 	layer();
 	layer(int a, model* modelTemplate);
 	layer(int a, ptr<model> modelTemplate);
+	layer(initializer_list<ptr<model>> _models);
 };
 class sync : public model, public vector<ptr<model>> {
 public:
@@ -272,4 +283,29 @@ public:
 	// the input hidden state is a matrix, because it intakes one vector representing the decoder lstm's hidden state at every timestep
 	ptr<cType> hTIn;
 	ptr<cType> hTInGrad;
+};
+class cnl : public model, public vector<ptr<model>> {
+public:
+	SEQFIELDS
+	cnl();
+	cnl(int _a, int _b);
+	cnl(int _a, int _b, ptr<model> _filterTemplate);
+	virtual void prep(int a);
+	virtual void unroll(int a);
+	virtual void clear();
+
+	int numSteps(int xSize);
+	int ySize(int xSize);
+	int xSize(int ySize);
+
+	int a;
+	int b;
+
+	ptr<model> filterTemplate;
+
+	// models that have been instantiated and are prepared for use, when unroll is called
+	vector<ptr<model>> prepared;
+
+private:
+	ptr<cType> comp_LenA;
 };

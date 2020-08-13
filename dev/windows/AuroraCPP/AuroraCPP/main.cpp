@@ -27,12 +27,13 @@ void trainLstmMut();
 void trainMuBpg();
 void trainMuMut();
 void trainAttBpg();
+void trainCnnBpg();
 void trainAccelerator();
 void trainDigitRecognizer();
 
 int main() {
 
-	trainTnnBpg();
+	trainCnnBpg();
 	return 0;
 
 }
@@ -40,10 +41,10 @@ int main() {
 void trainTnnBpg() {
 
 	ptr<model> nlr = neuronLR(0.3);
-	ptr<seq> s = tnn({ 2, 5, 1 }, { nlr, nlr, nlr });
+	ptr<model> s = tnn({ 2, 5, 1 }, { nlr, nlr, nlr });
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
-	s->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	initParams(s, paramPtrVec);
 
 	// set up random engine for initializing param states
 	uniform_real_distribution<double> u(-1, 1);
@@ -924,6 +925,70 @@ void trainAttBpg() {
 
 }
 
+void trainCnnBpg() {
+
+	ptr<model> nlr = neuronLR(0.3);
+	ptr<model> filter = tnn({ 3, 1 }, nlr);
+	ptr<model> _cnl = new cnl(3, 1, filter);
+	seq* s = cnn(_cnl, 3);
+	ptr<model> c = s;
+	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
+	initParams(c, paramPtrVec);
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(43);
+
+	vector<paramSgd*> params = vector<paramSgd*>();
+	for (ptr<param>* pptr : paramPtrVec) {
+
+		paramSgd* p = new paramSgd();
+		p->gradient = 0;
+		p->learnRate = 0.02;
+		p->state = urd(re);
+		params.push_back(p);
+
+		pptr->reset(p);
+
+	}
+
+	for (int i = 0; i < s->size(); i++) {
+		cnl* _cnl = (cnl*)s->at(i).get();
+		_cnl->prep(8);
+		_cnl->unroll(8);
+	}
+
+	ptr<cType> inputs = new cType{
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 1, 3, 3, 4, 5, 6, 5 },
+	};
+	ptr<cType> desired = new cType{
+		{ 0, 2 },
+		{ 1, 2 },
+	};
+
+	c->yGrad = make1D(2);
+
+	for (int epoch = 0; epoch < 1000000; epoch++) {
+
+		for (int tsIndex = 0; tsIndex < inputs->vVector.size(); tsIndex++) {
+			c->x = inputs->vVector.at(tsIndex);
+			c->fwd();
+			sub1D(c->y, desired->vVector.at(tsIndex), c->yGrad);
+			c->bwd();
+		}
+
+		for (paramSgd* p : params) {
+			p->state -= p->learnRate * p->gradient;
+			p->gradient = 0;
+		}
+
+		if (epoch % 1000 == 0) {
+			cout << sum1D(abs1D(c->yGrad))->vDouble << endl;
+		}
+
+	}
+
+}
+
 void trainAccelerator() {
 
 	ptr<model> nlr = neuronLR(0.3);
@@ -1157,7 +1222,7 @@ ptr<cType> toCType(Mat a) {
 
 			 // blue, green, red
 			Vec3b pxl = a.at<Vec3b>(y, x);
-			resultRow->at(x)->vDouble = pxl.val[1];
+			resultRow->at(x)->vDouble = pxl.val[2];
 
 		}
 	}
@@ -1166,21 +1231,15 @@ ptr<cType> toCType(Mat a) {
 
 }
 
-void compressWithKernal(ptr<cType> inputs, int i) {
+ptr<cType> extract_unroll_concat(ptr<cType> mat, int kWidth, int kHeight, int horStride, int verStride) {
 
-	for (int j = 0; j < inputs->vVector.at(i)->vVector.size(); j++) {
-		ptr<cType> img = inputs->vVector.at(i)->vVector.at(j);
-		vector<ptr<cType>> strided = strideKernal(img, 8, 8, 6, 6);
-
-		inputs->vVector.at(i)->vVector.at(j) = make1D(strided.size());
-		img = inputs->vVector.at(i)->vVector.at(j);
-
-		for (int k = 0; k < strided.size(); k++) {
-			ptr<cType> mean = mean1D(unroll(strided.at(k)));
-			img->vVector.at(k) = mean;
-		}
+	vector<ptr<cType>> strided = strideKernal(mat, kWidth, kHeight, horStride, verStride);
+	ptr<cType> compiled = make1D(kWidth * kHeight * strided.size());
+	for (int i = 0; i < strided.size(); i++) {
+		copy1D(unroll(strided.at(i)), compiled, 0, kWidth * kHeight, i * kWidth * kHeight);
 	}
-	
+	return compiled;
+
 }
 
 void trainDigitRecognizer() {
@@ -1199,63 +1258,37 @@ void trainDigitRecognizer() {
 
 	ptr<cType> inputs_separated_by_type = make1D(10);
 
-	directory_iterator end_itr;
-	for (int i = 0; i < paths.size(); i++) {
-		for (directory_iterator itr(paths.at(i)); itr != end_itr; ++itr) {
-
-			string dir = itr->path().generic_string();
-			Mat mat = imread(itr->path().generic_string());
-			ptr<cType> c = toCType(mat);
-			inputs_separated_by_type->vVector.at(i)->vVector.push_back(c);
-			mat.release();
-
-		}
-	}
-
-	vector<thread> kernalThreads = vector<thread>();
-	for (int i = 0; i < inputs_separated_by_type->vVector.size(); i++) {
-#if 0
-		kernalThreads.push_back(thread(compressWithKernal, inputs_separated_by_type, i));
-#else
-		compressWithKernal(inputs_separated_by_type, i);
-#endif
-	}
-
-	for (int i = 0; i < kernalThreads.size(); i++) {
-		kernalThreads.at(i).join();
-	}
-
 	ptr<cType> inputs = new cType();
 	ptr<cType> desired = new cType();
 
-	// desegregate inputs
-	for (int i = 0; i < inputs_separated_by_type->vVector.size(); i++) {
-		for (int j = 0; j < inputs_separated_by_type->vVector.at(i)->vVector.size(); j++) {
-			inputs->vVector.push_back(inputs_separated_by_type->vVector.at(i)->vVector.at(j));
-			desired->vVector.push_back(new cType{ (double)i });
-		}
-	}
+	directory_iterator end_itr;
+	for (int typeIndex = 0; typeIndex < paths.size(); typeIndex++) {
+		for (directory_iterator itr(paths.at(typeIndex)); itr != end_itr; ++itr) {
 
-	// normalize inputs
-	for (int i = 0; i < inputs->vVector.size(); i++) {
-		norm1D(inputs->vVector.at(i), inputs->vVector.at(i));
+			string dir = itr->path().generic_string();
+			Mat mat = imread(itr->path().generic_string());
+			ptr<cType> originalMatrix = toCType(mat);
+			mat.release();
+			inputs_separated_by_type->vVector.at(typeIndex)->vVector.push_back(extract_unroll_concat(originalMatrix, 10, 10, 15, 15));
+
+		}
 	}
 
 	ptr<model> nlr = neuronLR(0.3);
 	ptr<model> nth = neuronTh();
-	seq* t = tnn({ (int)inputs->vVector.at(0)->vVector.size(), 24, 16, 1 }, { nth, nth, nth, nlr });
+	seq* t = tnn({ (int)inputs->vVector.at(0)->vVector.size(), 24, 8, 1 }, { nth, nth, nth, nlr });
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
 	t->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
 
-	uniform_real_distribution<double> urd(-1, 1);
+	uniform_real_distribution<double> urd(-0.001, 0.001);
 	default_random_engine re(46);
 
 	vector<paramMom*> params = vector<paramMom*>();
 	for (ptr<param>* pptr : paramPtrVec) {
 		paramMom* p = new paramMom();
 		p->gradient = 0;
-		p->learnRate = 0.00002;
+		p->learnRate = 0.00000002;
 		p->state = urd(re);
 		p->beta = 0;
 		p->momentum = 0;
@@ -1290,8 +1323,6 @@ void trainDigitRecognizer() {
 }
 
 #pragma endregion
-
-
 
 string exportParams(vector<ptr<param>*>& paramPtrVec) {
 	string result = "";
