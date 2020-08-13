@@ -526,6 +526,13 @@ void concat(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 	vector<ptr<cType>>* bVec = &b->vVector;
 	vector<ptr<cType>>* outVec = &output->vVector;
 
+	size_t aVecSize = aVec->size();
+	size_t bVecSize = bVec->size();
+
+	if (outVec->size() < aVecSize + bVecSize) {
+		outVec->resize(aVecSize + bVecSize);
+	}
+
 	int index = 0;
 	for (int i = 0; i < aVec->size(); i++) {
 		outVec->at(index) = aVec->at(i);

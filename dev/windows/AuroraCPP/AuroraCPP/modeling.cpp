@@ -24,6 +24,29 @@ seq* tnn(vector<int> npl, ptr<model> neuronTemplate) {
 	result->push_back(new layer(npl.back(), neuronTemplate));
 	return result;
 }
+seq* cnn(ptr<model> _cnl, int _cnls) {
+	
+	seq* result = new seq();
+	for (int i = 0; i < _cnls; i++) {
+		result->push_back(_cnl->clone());
+	}
+	return result;
+}
+seq* cnn(int _a, int _b, int _cnls) {
+
+	seq* result = new seq();
+	for (int i = 0; i < _cnls; i++) {
+		result->push_back(new cnl(_a, _b));
+	}
+	return result;
+
+}
+seq* cnn(vector<ptr<model>> _cnls) {
+
+	seq* result = new seq(_cnls);
+	return result;
+
+}
 seq* neuronSm() {
 
 	// construct tanh neuron
@@ -68,6 +91,12 @@ void initParam(model* m, vector<ptr<param>*>& paramVecOutput) {
 		w->prm = ptr<param>();
 		paramVecOutput.push_back(&w->prm);
 	}
+}
+void initParams(model* m, vector<ptr<param>*>& paramVecOutput) {
+	m->modelWise([&paramVecOutput](model* subModel) { initParam(subModel, paramVecOutput); });
+}
+void initParams(ptr<model> m, vector<ptr<param>*>& paramVecOutput) {
+	initParams(m.get(), paramVecOutput);
 }
 #pragma endregion
 
@@ -232,10 +261,11 @@ void wSet::modelWise(function<void(model*)> func) {
 }
 ptr<model> wSet::clone() {
 	wSet* result = new wSet();
-	result->x = new cType(*x);
-	result->y = new cType(*y);
-	result->xGrad = new cType(*xGrad);
-	result->yGrad = new cType(*yGrad);
+	result->x = new cType();
+	result->y = make1D(a);
+	result->xGrad = new cType();
+	result->yGrad = make1D(a);
+	result->a = a;
 	for (int i = 0; i < a; i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -306,10 +336,12 @@ void wJunc::modelWise(function<void(model*)> func) {
 }
 ptr<model> wJunc::clone() {
 	wJunc* result = new wJunc();
-	result->x = new cType(*x);
-	result->y = new cType(*y);
-	result->xGrad = new cType(*xGrad);
-	result->yGrad = new cType(*yGrad);
+	result->x = make1D(a);
+	result->y = make1D(b);
+	result->xGrad = make1D(a);
+	result->yGrad = make1D(b);
+	result->a = a;
+	result->b = b;
 	for (int i = 0; i < a; i++) {
 		result->push_back(at(i)->clone());
 	}
@@ -318,10 +350,29 @@ ptr<model> wJunc::clone() {
 #pragma endregion
 #pragma region seq
 seq::seq() {
+
 	x = new cType(0);
 	y = new cType(0);
 	xGrad = new cType(0);
 	yGrad = new cType(0);
+
+}
+seq::seq(vector<ptr<model>>& _models) {
+	
+	for (int i = 0; i < _models.size(); i++) {
+		push_back(_models.at(i));
+	}
+
+}
+seq::seq(initializer_list<ptr<model>> _models) {
+
+	x = new cType(0);
+	y = new cType(0);
+	xGrad = new cType(0);
+	yGrad = new cType(0);
+
+	assign(_models);
+
 }
 void seq::fwd() {
 
@@ -415,6 +466,26 @@ layer::layer(int a, ptr<model> modelTemplate) {
 		yGrad->vVector.push_back(new cType({}));
 
 		push_back(modelTemplate->clone());
+
+	}
+
+}
+layer::layer(initializer_list<ptr<model>> _models) {
+
+	x = new cType({});
+	y = new cType({});
+	xGrad = new cType({});
+	yGrad = new cType({});
+
+	assign(_models);
+
+	for (int i = 0; i < size(); i++) {
+
+		// initialize the x, y, xGrad, yGrad cTypes as vectors to insure that all members of the cType are initialized
+		x->vVector.push_back(new cType({}));
+		y->vVector.push_back(new cType({}));
+		xGrad->vVector.push_back(new cType({}));
+		yGrad->vVector.push_back(new cType({}));
 
 	}
 
@@ -998,6 +1069,7 @@ mu::mu(int _xUnits, int _cTUnits, int _hTUnits) {
 	muTSTemplate = new muTS(xUnits, cTUnits, hTUnits, gateTemplate);
 
 }
+// Input layer size: xUnits + cTUnits + hTUnits. Output layer size: cTUnits + hTUnits
 mu::mu(int _xUnits, int _cTUnits, int _hTUnits, ptr<model> _gate) {
 
 	this->xUnits = _xUnits;
@@ -1497,6 +1569,151 @@ void att::clear() {
 	hTInGrad->vVector.clear();
 
 }
+#pragma endregion
+#pragma region cnl
+cnl::cnl() {
+
+}
+cnl::cnl(int _a, int _b) {
+
+	this->a = _a;
+	this->b = _b;
+
+	ptr<model> nlr = neuronLR(0.3);
+	this->filterTemplate = tnn({ a, b }, nlr);
+
+	filterTemplate->x = make1D(a);
+	filterTemplate->xGrad = make1D(a);
+	filterTemplate->y = make1D(b);
+	filterTemplate->yGrad = make1D(b);
+
+	comp_LenA = make1D(a);
+
+}
+cnl::cnl(int _a, int _b, ptr<model> _filter) {
+	
+	this->a = _a;
+	this->b = _b;
+
+	this->filterTemplate = _filter;
+	filterTemplate->x = make1D(a);
+	filterTemplate->xGrad = make1D(a);
+	filterTemplate->y = make1D(b);
+	filterTemplate->yGrad = make1D(b);
+
+	comp_LenA = make1D(a);
+
+}
+void cnl::fwd() {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* xVec = &x->vVector;
+	vector<ptr<cType>>* yVec = &y->vVector;
+
+	int xVecSize = xVec->size();
+	xGrad = make1D(xVecSize);
+	assert(xVecSize >= a);
+	y = make1D(ySize(xVecSize));
+
+	for (int xIndex = 0; xIndex <= xVecSize - a; xIndex++) {
+		
+		model* m = (model*)at(xIndex).get();
+		copy1D(x, m->x, xIndex, a, 0);
+		m->fwd();
+		copy1D(m->y, y, 0, b, xIndex * b);
+
+	}
+
+}
+void cnl::bwd() {
+
+	// pull in reference to vector to save compute
+	vector<ptr<cType>>* xGradVec = &xGrad->vVector;
+	vector<ptr<cType>>* yGradVec = &yGrad->vVector;
+
+	int yGradVecSize = yGradVec->size();
+	assert(yGradVecSize >= b);
+
+	// clear the xGradVector
+	clear1D(xGrad);
+
+	for (int xGradIndex = 0; xGradIndex <= xGradVec->size() - a; xGradIndex++) {
+
+		model* m = (model*)at(xGradIndex).get();
+		copy(xGrad, comp_LenA, xGradIndex, a, 0);
+		int yGradIndex = xGradIndex * b;
+		copy1D(yGrad, m->yGrad, yGradIndex, b, 0);
+		m->bwd();
+		add1D(comp_LenA, m->xGrad, comp_LenA);
+
+	}
+
+}
+ptr<model> cnl::clone() {
+
+	cnl* result = new cnl(a, b, filterTemplate->clone());
+	return result;
+
+}
+void cnl::modelWise(function<void(model*)> func) {
+
+	func(this);
+	filterTemplate->modelWise(func);
+
+}
+void cnl::prep(int a) {
+
+	for (int i = 0; i < a; i++) {
+		prepared.push_back(filterTemplate->clone());
+	}
+
+}
+void cnl::unroll(int a) {
+
+	for (int i = 0; i < a; i++) {
+		push_back(prepared.at(size()));
+	}
+
+}
+void cnl::clear() {
+	vector<ptr<model>>::clear();
+}
+int cnl::numSteps(int xSize) {
+	double d_x_size = (double)xSize;
+	double d_a = (double)a;
+	double d_num_strides = floor((d_x_size - d_a) + 1);
+	if (d_num_strides < 0) {
+		return 0;
+	}
+	else {
+		return (int)d_num_strides;
+	}
+}
+int cnl::ySize(int xSize) {
+
+	double d_x_size = (double)xSize;
+	double d_a = (double)a;
+	double d_b = (double)b;
+	double d_num_strides = floor((d_x_size - d_a) + 1);
+	if (d_num_strides < 0) {
+		return 0;
+	}
+	else {
+		double d_y_size = d_b * d_num_strides;
+		return (int)d_y_size;
+	}
+
+}
+int cnl::xSize(int ySize) {
+
+	double d_y_size = (double)ySize;
+	double d_a = (double)a;
+	double d_b = (double)b;
+	double d_x_size = d_y_size / d_b + d_a;
+	return (int)d_x_size;
+
+}
+
 #pragma endregion
 
 #pragma endregion
