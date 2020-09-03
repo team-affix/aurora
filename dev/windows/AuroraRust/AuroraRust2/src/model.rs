@@ -3,6 +3,6 @@ use crate::math::*;
 
 pub trait Model {
     fn fwd(&mut self, input: Carry) -> Carry;
-    fn getX(&mut self) -> Carry;
-    fn getY(&mut self) -> Carry;
+    fn getX(&self) -> &Carry;
+    fn getY(&self) -> &Carry;
 }

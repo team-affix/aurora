@@ -12,11 +12,11 @@ impl Model for Seq {
     fn fwd(&mut self, input: Carry) -> Carry {
         runSeq(self, input)
     }
-    fn getX(&mut self) -> Carry {
-        self.x.
+    fn getX(&self) -> &Carry {
+        &self.x
     }
-    fn getY(&mut self) -> Carry {
-        self.y
+    fn getY(&self) -> &Carry {
+        &self.y
     }
 }
 
