@@ -61,9 +61,9 @@ seq* neuronSm();
 seq* neuronTh();
 seq* neuronLR(double m);
 
-void initParam(model* m, vector<ptr<param>*>& paramVecOutput);
-void initParams(model* m, vector<ptr<param>*>& paramVecOutput);
-void initParams(ptr<model> m, vector<ptr<param>*>& paramVecOutput);
+void extractParam(model* m, vector<ptr<param>*>& paramVecOutput);
+void extractParams(model* m, vector<ptr<param>*>& paramVecOutput);
+void extractParams(ptr<model> m, vector<ptr<param>*>& paramVecOutput);
 
 //void attToLSTMFwd(att* a, lstm* l);
 //void attToLSTMFwd(att* a, lstm* l);
