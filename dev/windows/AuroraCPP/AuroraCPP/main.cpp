@@ -33,7 +33,7 @@ void trainDigitRecognizer();
 
 int main() {
 
-	trainCnnBpg();
+	trainLstmBpg();
 	return 0;
 
 }
@@ -44,7 +44,7 @@ void trainTnnBpg() {
 	ptr<model> s = tnn({ 2, 5, 1 }, { nlr, nlr, nlr });
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
-	initParams(s, paramPtrVec);
+	extractParams(s, paramPtrVec);
 
 	// set up random engine for initializing param states
 	uniform_real_distribution<double> u(-1, 1);
@@ -120,7 +120,7 @@ void trainTnnMut() {
 	ptr<seq> s = tnn({ 2, 5, 1 }, { nlr, nlr, nlr });
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
-	s->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	s->modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
 
 	// set up random engine for initializing param states
 	uniform_real_distribution<double> u(-1, 1);
@@ -207,7 +207,7 @@ void trainSyncBpg() {
 	seq* templateNN = tnn({ 2, 5, 1 }, nlr);
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
-	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	extractParams(templateNN, paramPtrVec);
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(43);
@@ -270,7 +270,7 @@ void trainSyncMut() {
 	seq* templateNN = tnn({ 2, 5, 1 }, nlr);
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
-	templateNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	templateNN->modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(43);
@@ -356,9 +356,9 @@ void trainLstmBpg() {
 	ptr<model> outNN = tnn({ 7, 1 }, nlr);
 
 	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
-	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
-	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
-	l1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	inNN->modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
+	outNN->modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
+	l1.modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(46);
@@ -469,9 +469,9 @@ void trainLstmMut() {
 	ptr<model> outNN = tnn({ 5, 1 }, nlr);
 
 	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
-	inNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
-	outNN->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
-	l1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	inNN->modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
+	outNN->modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
+	l1.modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(45);
@@ -582,7 +582,7 @@ void trainMuBpg() {
 	mu m1 = mu(2, 7, 1);
 
 	vector <ptr<param>*> paramPtrVec = vector <ptr<param>*>();
-	m1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	m1.modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-0.1, 0.1);
 	default_random_engine re(44);
@@ -689,8 +689,8 @@ void trainMuMut() {
 	mu m2 = mu(10, 10, 1);
 
 	vector<ptr<param>*> paramPtrs = vector<ptr<param>*>();
-	m.modelWise([&paramPtrs](model* m) {initParam(m, paramPtrs); });
-	m2.modelWise([&paramPtrs](model* m) {initParam(m, paramPtrs); });
+	m.modelWise([&paramPtrs](model* m) {extractParam(m, paramPtrs); });
+	m2.modelWise([&paramPtrs](model* m) {extractParam(m, paramPtrs); });
 	
 	uniform_real_distribution<double> urd(-0.1, 0.1);
 	default_random_engine re(49);
@@ -810,8 +810,8 @@ void trainAttBpg() {
 	mu m1 = mu(2, 10, 1);
 
 	vector<ptr<param>*> paramPtrVec = vector <ptr<param>*>();
-	a1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
-	m1.modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	a1.modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
+	m1.modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-0.1, 0.1);
 	default_random_engine re(43);
@@ -933,7 +933,7 @@ void trainCnnBpg() {
 	seq* s = cnn(_cnl, 3);
 	ptr<model> c = s;
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
-	initParams(c, paramPtrVec);
+	extractParams(c, paramPtrVec);
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(43);
 
@@ -1003,12 +1003,12 @@ void trainAccelerator() {
 	sync accSync(accMuTS);
 
 	vector<ptr<param>*> subParamPtrVec = vector<ptr<param>*>();
-	subLstm.modelWise([&subParamPtrVec](model* m) { initParam(m, subParamPtrVec); });
-	subSyncIn.modelWise([&subParamPtrVec](model* m) { initParam(m, subParamPtrVec); });
-	subSyncOut.modelWise([&subParamPtrVec](model* m) { initParam(m, subParamPtrVec); });
+	subLstm.modelWise([&subParamPtrVec](model* m) { extractParam(m, subParamPtrVec); });
+	subSyncIn.modelWise([&subParamPtrVec](model* m) { extractParam(m, subParamPtrVec); });
+	subSyncOut.modelWise([&subParamPtrVec](model* m) { extractParam(m, subParamPtrVec); });
 
 	vector<ptr<param>*> accParamPtrVec = vector<ptr<param>*>();
-	accSync.modelWise([&accParamPtrVec](model* m) { initParam(m, accParamPtrVec); });
+	accSync.modelWise([&accParamPtrVec](model* m) { extractParam(m, accParamPtrVec); });
 
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(46);
@@ -1279,7 +1279,7 @@ void trainDigitRecognizer() {
 	seq* t = tnn({ (int)inputs->vVector.at(0)->vVector.size(), 24, 8, 1 }, { nth, nth, nth, nlr });
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
-	t->modelWise([&paramPtrVec](model* m) { initParam(m, paramPtrVec); });
+	t->modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
 
 	uniform_real_distribution<double> urd(-0.001, 0.001);
 	default_random_engine re(46);

@@ -74,7 +74,7 @@ seq* neuronLR(double m) {
 	return nlr;
 
 }
-void initParam(model* m, vector<ptr<param>*>& paramVecOutput) {
+void extractParam(model* m, vector<ptr<param>*>& paramVecOutput) {
 	if (bias* b = dynamic_cast<bias*>(m)) {
 		b->prm = ptr<param>();
 		paramVecOutput.push_back(&b->prm);
@@ -92,11 +92,11 @@ void initParam(model* m, vector<ptr<param>*>& paramVecOutput) {
 		paramVecOutput.push_back(&w->prm);
 	}
 }
-void initParams(model* m, vector<ptr<param>*>& paramVecOutput) {
-	m->modelWise([&paramVecOutput](model* subModel) { initParam(subModel, paramVecOutput); });
+void extractParams(model* m, vector<ptr<param>*>& paramVecOutput) {
+	m->modelWise([&paramVecOutput](model* subModel) { extractParam(subModel, paramVecOutput); });
 }
-void initParams(ptr<model> m, vector<ptr<param>*>& paramVecOutput) {
-	initParams(m.get(), paramVecOutput);
+void extractParams(ptr<model> m, vector<ptr<param>*>& paramVecOutput) {
+	extractParams(m.get(), paramVecOutput);
 }
 #pragma endregion
 
