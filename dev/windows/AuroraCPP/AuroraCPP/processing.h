@@ -3,4 +3,4 @@
 #include "maths.h"
 using namespace std;
 
-vector<ptr<cType>> strideKernal(ptr<cType> a, int kWidth, int kHeight, int horStride, int verStride);
+vector<ptr<cType>> stride(ptr<cType> a, int kWidth, int kHeight, int horStride, int verStride);

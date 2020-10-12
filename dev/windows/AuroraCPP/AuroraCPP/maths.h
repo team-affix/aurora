@@ -20,15 +20,21 @@ public:
 	vector<ptr<cType>> vVector;
 };
 
+ptr<cType> make1D(int a, double initVal);
 ptr<cType> make1D(int a);
+ptr<cType> make2D(int a, int b, double initVal);
 ptr<cType> make2D(int a, int b);
+ptr<cType> make3D(int a, int b, int c, double initVal);
 ptr<cType> make3D(int a, int b, int c);
+ptr<cType> make4D(int a, int b, int c, int d, double initVal);
 ptr<cType> make4D(int a, int b, int c, int d);
+ptr<cType> make5D(int a, int b, int c, int d, int e, double initVal);
 ptr<cType> make5D(int a, int b, int c, int d, int e);
 
 void clear0D(ptr<cType> a);
 void clear1D(ptr<cType> a);
 void clear2D(ptr<cType> a);
+void clear2D(ptr<cType> a, int startIndex, int count);
 
 void copy(ptr<cType> a, ptr<cType> output, int sourceStartIndex, int count, int destStartIndex);
 void copy0D(ptr<cType> a, ptr<cType> output);
@@ -56,10 +62,12 @@ ptr<cType> sub2D(ptr<cType> a, ptr<cType> b);
 void mult0D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 void mult1D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 void mult2D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
+void mult3D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 
 ptr<cType> mult0D(ptr<cType> a, ptr<cType> b);
 ptr<cType> mult1D(ptr<cType> a, ptr<cType> b);
 ptr<cType> mult2D(ptr<cType> a, ptr<cType> b);
+ptr<cType> mult3D(ptr<cType> a, ptr<cType> b);
 
 void div0D(ptr<cType> a, ptr<cType> b, ptr<cType> output);
 void div1D(ptr<cType> a, ptr<cType> b, ptr<cType> output);

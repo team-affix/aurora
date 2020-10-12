@@ -8,6 +8,8 @@ using namespace cv;
 
 uint allocated_memory;
 
+
+
 void* operator new(size_t size) {
 	allocated_memory += size;
 	return malloc(size);
@@ -29,11 +31,11 @@ void trainMuMut();
 void trainAttBpg();
 void trainCnnBpg();
 void trainAccelerator();
-void trainDigitRecognizer();
+void trainSmLstm();
 
 int main() {
 
-	trainLstmBpg();
+	trainSmLstm();
 	return 0;
 
 }
@@ -1210,119 +1212,286 @@ void trainAccelerator() {
 
 #pragma region "Digit Recognition"
 
-ptr<cType> toCType(Mat a) {
+//ptr<cType> loadData(const char* fileName) {
+//
+//	std::ifstream ifs(fileName);
+//	string s((std::istreambuf_iterator<char>(ifs)),
+//		std::istreambuf_iterator<char>());
+//	vector<string> lines = strsplit(s, '\n');
+//
+//	ptr<cType> result = new cType();
+//	
+//	for (int i = 0; i, lines.size(); i++) {
+//		string& line = lines.at(i);
+//		vector<string> rows = strsplit(line, '')
+//	}
+//
+//}
+//
+//void trainDigitRecognizer() {
+//
+//	const char* positiveDataPath = "D:\\files\\data\\IR\\detect-letter-a\\export\\positive.dat";
+//	const char* negativeDataPath = "D:\\files\\data\\IR\\detect-letter-a\\export\\negative.dat";
+//
+//
+//
+//}
 
-	ptr<cType> result = make2D(a.rows, a.cols);
+#pragma endregion
 
-	vector<ptr<cType>>* resultVec = &result->vVector;
+#pragma region smlstm
 
-	for (int y = 0; y < a.rows; y++) {
-		vector<ptr<cType>>* resultRow = &resultVec->at(y)->vVector;
-		for (int x = 0; x < a.cols; x++) {
+void trainSmLstm() {
 
-			 // blue, green, red
-			Vec3b pxl = a.at<Vec3b>(y, x);
-			resultRow->at(x)->vDouble = pxl.val[2];
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(36);
 
-		}
-	}
-
-	return result;
-
-}
-
-ptr<cType> extract_unroll_concat(ptr<cType> mat, int kWidth, int kHeight, int horStride, int verStride) {
-
-	vector<ptr<cType>> strided = strideKernal(mat, kWidth, kHeight, horStride, verStride);
-	ptr<cType> compiled = make1D(kWidth * kHeight * strided.size());
-	for (int i = 0; i < strided.size(); i++) {
-		copy1D(unroll(strided.at(i)), compiled, 0, kWidth * kHeight, i * kWidth * kHeight);
-	}
-	return compiled;
-
-}
-
-void trainDigitRecognizer() {
-
-	vector<string> paths = { 
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\0", 
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\1",
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\2",
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\3",
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\4",
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\5",
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\6",
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\7",
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\8",
-	"D:\\files\\files\\jpg\\datasets\\hand-written-digits\\0004_CH4M\\9" };
-
-	ptr<cType> inputs_separated_by_type = make1D(10);
-
-	ptr<cType> inputs = new cType();
-	ptr<cType> desired = new cType();
-
-	directory_iterator end_itr;
-	for (int typeIndex = 0; typeIndex < paths.size(); typeIndex++) {
-		for (directory_iterator itr(paths.at(typeIndex)); itr != end_itr; ++itr) {
-
-			string dir = itr->path().generic_string();
-			Mat mat = imread(itr->path().generic_string());
-			ptr<cType> originalMatrix = toCType(mat);
-			mat.release();
-			inputs_separated_by_type->vVector.at(typeIndex)->vVector.push_back(extract_unroll_concat(originalMatrix, 10, 10, 15, 15));
-
-		}
-	}
-
-	ptr<model> nlr = neuronLR(0.3);
-	ptr<model> nth = neuronTh();
-	seq* t = tnn({ (int)inputs->vVector.at(0)->vVector.size(), 24, 8, 1 }, { nth, nth, nth, nlr });
+	sync* sIn = new sync(tnn({ 2, 10 }, { neuronLR(0.3), neuronLR(0.3) }));
+	lstm* l0 = new lstm(10);
+	sync* sOut = new sync(tnn({ 10, 1 }, { neuronLR(0.3), neuronLR(0.3) }));
 
 	vector<ptr<param>*> paramPtrVec = vector<ptr<param>*>();
-	t->modelWise([&paramPtrVec](model* m) { extractParam(m, paramPtrVec); });
-
-	uniform_real_distribution<double> urd(-0.001, 0.001);
-	default_random_engine re(46);
+	extractParams(sIn, paramPtrVec);
+	extractParams(l0, paramPtrVec);
+	extractParams(sOut, paramPtrVec);
 
 	vector<paramMom*> params = vector<paramMom*>();
-	for (ptr<param>* pptr : paramPtrVec) {
-		paramMom* p = new paramMom();
-		p->gradient = 0;
-		p->learnRate = 0.00000002;
-		p->state = urd(re);
-		p->beta = 0;
-		p->momentum = 0;
-		pptr->reset(p);
-		params.push_back(p);
+	for (ptr<param>* paramPtr : paramPtrVec) {
+		paramMom* param = new paramMom();
+		param->beta = 0.9;
+		param->learnRate = 0.00002;
+		param->state = urd(re);
+		paramPtr->reset(param);
+		params.push_back(param);
 	}
 
-	sync s = sync(t);
+	sIn->prep(15);
+	l0->prep(15);
+	sOut->prep(15);
+	sIn->unroll(15);
+	l0->unroll(15);
+	sOut->unroll(15);
 
-	s.prep(inputs->vVector.size());
-	s.unroll(inputs->vVector.size());
+	ptr<cType> inputs = new cType{
+		{
+			{30, 0.01708},
+			{30, 0.01762},
+			{30, 0.01760},
+			{30, 0.01762},
+			{30, 0.01773},
+			{30, 0.01764},
+			{30, 0.01735},
+			{30, 0.01762},
+			{30, 0.01713},
+			{30, 0.01747},
+			{30, 0.01751},
+			{30, 0.01738},
+			{30, 0.01728},
+			{30, 0.01731},
+			{30, 0.01703},
+		},
+		{
+			{1, 0.01836},
+			{1, 0.01839},
+			{1, 0.01839},
+			{1, 0.01842},
+			{1, 0.01839},
+			{1, 0.01841},
+			{1, 0.01843},
+			{1, 0.01840},
+			{1, 0.01841},
+			{1, 0.01840},
+			{1, 0.01839},
+			{1, 0.01840},
+			{1, 0.01841},
+			{1, 0.01840},
+			{1, 0.01834},
+		},
+		{
+			{1, 0.01834},
+			{1, 0.01839},
+			{1, 0.01846},
+			{1, 0.01845},
+			{1, 0.01843},
+			{1, 0.01846},
+			{1, 0.01848},
+			{1, 0.01850},
+			{1, 0.01849},
+			{1, 0.01849},
+			{1, 0.01848},
+			{1, 0.01851},
+			{1, 0.01856},
+			{1, 0.01856},
+			{1, 0.01858},
+		},
+	};
+	ptr<cType> outputs = new cType{
+		{
+			{0.01762},
+			{0.01760},
+			{0.01762},
+			{0.01773},
+			{0.01764},
+			{0.01735},
+			{0.01762},
+			{0.01713},
+			{0.01747},
+			{0.01751},
+			{0.01738},
+			{0.01728},
+			{0.01731},
+			{0.01703},
+			{0.01717},
+		},
+		{
+			{0.01839},
+			{0.01839},
+			{0.01842},
+			{0.01839},
+			{0.01841},
+			{0.01843},
+			{0.01840},
+			{0.01841},
+			{0.01840},
+			{0.01839},
+			{0.01840},
+			{0.01841},
+			{0.01840},
+			{0.01834},
+			{0.01834},
+		},
+		{
+			{0.01839},
+			{0.01846},
+			{0.01845},
+			{0.01843},
+			{0.01846},
+			{0.01848},
+			{0.01850},
+			{0.01849},
+			{0.01849},
+			{0.01848},
+			{0.01851},
+			{0.01856},
+			{0.01856},
+			{0.01858},
+			{0.01852},
+		},
+	};
 
-	s.yGrad = make2D(desired->vVector.size(), 1);
+	mult3D(inputs, make3D(inputs->vVector.size(), 15, 2, 100), inputs);
+	mult3D(outputs, make3D(outputs->vVector.size(), 15, 1, 100), outputs);
 
-	for (int epoch = 0; epoch < 100000; epoch++) {
-		s.x = inputs;
-		s.fwd();
-		sub2D(s.y, desired, s.yGrad);
-		s.bwd();
+	sOut->yGrad = make2D(15, 1);
 
-		for (paramMom* p : params) {
-			p->momentum = p->beta * p->momentum + (1 - p->beta) * p->gradient;
-			p->state -= p->learnRate * p->momentum;
-			p->gradient = 0;
+	ptr<cType> absMat = make2D(15, 1);
+	ptr<cType> costVec = make1D(1);
+
+	int kiloepoch = 1;
+	while (true) {
+		ptr<cType> cost = new cType(0);
+
+		for (int i = 0; i < 1000; i++) {
+			for (int tsIndex = 0; tsIndex < inputs->vVector.size(); tsIndex++) {
+				sIn->x = inputs->vVector.at(tsIndex);
+				sIn->fwd();
+				l0->x = sIn->y;
+				l0->fwd();
+				sOut->x = l0->y;
+				sOut->fwd();
+				sub2D(sOut->y, outputs->vVector.at(tsIndex), sOut->yGrad);
+				clear2D(sOut->yGrad, 0, 5);
+				sOut->bwd();
+				l0->yGrad = sOut->xGrad;
+				l0->bwd();
+				sIn->yGrad = l0->xGrad;
+				sIn->bwd();
+			}
+		}
+		for (paramMom* param : params) {
+			param->momentum = param->beta * param->momentum + (1 - param->beta) * param->gradient;
+			param->state -= param->learnRate * param->momentum;
+			param->gradient = 0;
+			param->learnRate = (double)(kiloepoch % 10 + 1)/(double)100000;
 		}
 
-		if (epoch % 5 == 0) {
-			cout << sum1D(sum2D(abs2D(s.yGrad)))->vDouble << endl;
-		}
+		abs2D(sOut->yGrad, absMat);
+		sum2D(absMat, costVec);
+		sum1D(costVec, cost);
+
+		cout << cost->vDouble << endl;
+
+		kiloepoch++;
 	}
+
+}
+
+void getSmTrainingSets(int n, ptr<cType> inputs, ptr<cType> outputs) {
+
+	// training sets are separated by intervals of 30 minutes.
+	// training sets refer to the crypto price: zil in usd
+
+	double validSets[][2] = 
+	{
+		{0, 1}
+	};
 
 }
 
 #pragma endregion
+
+#pragma region finalizer
+
+struct finalizerTrainingSet {
+	finalizerTrainingSet() {
+		m_paramPtrVec = vector<ptr<param>*>();
+	}
+	ptr<model> m_model;
+	vector<ptr<param>*> m_paramPtrVec;
+};
+
+finalizerTrainingSet getFinalizerTrainingSet_XOR() {
+
+	finalizerTrainingSet result = finalizerTrainingSet();
+
+	result.m_model = tnn({ 2, 5, 1 }, neuronLR(0.3));
+	extractParams(result.m_model, result.m_paramPtrVec);
+	
+
+}
+
+vector<finalizerTrainingSet> getFinalizerTrainingSets() {
+
+	vector<finalizerTrainingSet> result = vector<finalizerTrainingSet>();
+
+}
+
+void trainFinalizer() {
+
+	// set finalizer model params
+	int finalizerInputSize = 2;
+	int finalizerCentralSize = 15;
+	int finalizerOutputSize = 1;
+	ptr<model> finalizerNeuron = neuronLR(0.3);
+	// instantiate finalizer model
+	sync* finalizerInputSync = new sync(tnn({ finalizerInputSize, finalizerCentralSize }, finalizerNeuron));
+	lstm* finalizerLstm = new lstm(finalizerCentralSize);
+	sync* finalizerOutputSync = new sync(tnn({ finalizerInputSize, finalizerCentralSize }, finalizerNeuron));
+	seq* finalizer = new seq({ finalizerInputSync, finalizerLstm, finalizerOutputSync });
+	ptr<model> finalizerEncapsulated = finalizer;
+	// instantiate finalizer parameters
+	vector<ptr<param>*> finalizerParamPtrs = vector<ptr<param>*>();
+	extractParams(finalizerEncapsulated, finalizerParamPtrs);
+
+	// finalizer training data
+	vector<finalizerTrainingSet> finalizerTrainingSets = getFinalizerTrainingSets();
+
+}
+
+
+
+#pragma endregion
+
 
 string exportParams(vector<ptr<param>*>& paramPtrVec) {
 	string result = "";

@@ -25,10 +25,20 @@ cType::cType(initializer_list<cType> a) {
 	}
 }
 
-ptr<cType> make1D(int a) {
+ptr<cType> make1D(int a, double initVal) {
 	cType* result = new cType({});
 	for (int i = 0; i < a; i++) {
-		result->vVector.push_back(new cType(0));
+		result->vVector.push_back(new cType(initVal));
+	}
+	return result;
+}
+ptr<cType> make1D(int a) {
+	return make1D(a, 0);
+}
+ptr<cType> make2D(int a, int b, double initVal) {
+	cType* result = new cType({});
+	for (int i = 0; i < a; i++) {
+		result->vVector.push_back(make1D(b, initVal));
 	}
 	return result;
 }
@@ -39,6 +49,13 @@ ptr<cType> make2D(int a, int b) {
 	}
 	return result;
 }
+ptr<cType> make3D(int a, int b, int c, double initVal) {
+	cType* result = new cType({});
+	for (int i = 0; i < a; i++) {
+		result->vVector.push_back(make2D(b, c, initVal));
+	}
+	return result;
+}
 ptr<cType> make3D(int a, int b, int c) {
 	cType* result = new cType({});
 	for (int i = 0; i < a; i++) {
@@ -46,10 +63,24 @@ ptr<cType> make3D(int a, int b, int c) {
 	}
 	return result;
 }
+ptr<cType> make4D(int a, int b, int c, int d, double initVal) {
+	cType* result = new cType({});
+	for (int i = 0; i < a; i++) {
+		result->vVector.push_back(make3D(b, c, d, initVal));
+	}
+	return result;
+}
 ptr<cType> make4D(int a, int b, int c, int d) {
 	cType* result = new cType({});
 	for (int i = 0; i < a; i++) {
 		result->vVector.push_back(make3D(b, c, d));
+	}
+	return result;
+}
+ptr<cType> make5D(int a, int b, int c, int d, int e, double initVal) {
+	cType* result = new cType({});
+	for (int i = 0; i < a; i++) {
+		result->vVector.push_back(make4D(b, c, d, e, initVal));
 	}
 	return result;
 }
@@ -75,6 +106,13 @@ void clear1D(ptr<cType> a) {
 void clear2D(ptr<cType> a) {
 	vector<ptr<cType>>* vVec = &a->vVector;
 	for (int i = 0; i < vVec->size(); i++) {
+		clear1D(vVec->at(i));
+	}
+}
+
+void clear2D(ptr<cType> a, int startIndex, int count) {
+	vector<ptr<cType>>* vVec = &a->vVector;
+	for (int i = startIndex; i < startIndex + count; i++) {
 		clear1D(vVec->at(i));
 	}
 }
@@ -324,6 +362,21 @@ void mult2D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
 	}
 
 }
+void mult3D(ptr<cType> a, ptr<cType> b, ptr<cType> output) {
+
+	// pull in reference to save compute
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	vector<ptr<cType>>* outVec = &output->vVector;
+
+	// throw exception if vectors are of inequal sizes
+	assert(aVec->size() == bVec->size() && aVec->size() == outVec->size());
+
+	for (int i = 0; i < aVec->size(); i++) {
+		mult2D(aVec->at(i), bVec->at(i), outVec->at(i));
+	}
+
+}
 
 ptr<cType> mult0D(ptr<cType> a, ptr<cType> b) {
 
@@ -353,6 +406,18 @@ ptr<cType> mult2D(ptr<cType> a, ptr<cType> b) {
 
 	for (int i = 0; i < aVec->size(); i++) {
 		result->vVector.push_back(mult1D(aVec->at(i), bVec->at(i)));
+	}
+
+	return result;
+}
+ptr<cType> mult3D(ptr<cType> a, ptr<cType> b) {
+
+	vector<ptr<cType>>* aVec = &a->vVector;
+	vector<ptr<cType>>* bVec = &b->vVector;
+	ptr<cType> result = new cType({});
+
+	for (int i = 0; i < aVec->size(); i++) {
+		result->vVector.push_back(mult2D(aVec->at(i), bVec->at(i)));
 	}
 
 	return result;

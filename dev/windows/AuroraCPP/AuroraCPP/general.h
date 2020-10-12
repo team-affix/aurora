@@ -1,8 +1,6 @@
 #pragma once
 #include "superHeader.h"
 
-using namespace cv;
-
 template<class T>
 class ptr : public shared_ptr<T> {
 public:
@@ -61,3 +59,5 @@ void push_back(vector<T>& a, vector<T>& b) {
 		a.push_back(b.at(i));
 	}
 }
+
+vector<string> strsplit(const string& input, const string& delim);

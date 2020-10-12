@@ -1,6 +1,6 @@
 #include "processing.h"
 
-vector<ptr<cType>> strideKernal(ptr<cType> a, int kWidth, int kHeight, int horStride, int verStride) {
+vector<ptr<cType>> stride(ptr<cType> a, int kWidth, int kHeight, int horStride, int verStride) {
 
 	int width;
 	int height;
