@@ -1,26 +1,32 @@
+# Prerequisites
+*.d
 
-*.cache
-*.suo
-dev/windows/AuroraCS/.vs/AuroraCS/v16/.suo
-dev/windows/AuroraCS/.vs/AuroraCS/DesignTimeBuild/.dtbcache.v2
-dev/windows/AuroraCPP/.vs/AuroraCPP/v16/.suo
-*.opendb
-*.exe
-*.log
-*.db
-*.db-shm
-*.ipch
-dev/windows/AuroraCPP/.vs/AuroraCPP/v16/Browse.VC.db-wal
-dev/windows/AuroraCPP/AuroraCPP/x64/Debug/AuroraCPP.log
-*.ipch
-*.tlog
-dev/windows/AuroraCPP/x64/Debug/AuroraCPP.ilk
-dev/windows/AuroraCPP/x64/Debug/AuroraCPP.pdb
-dev/windows/AuroraCPP/AuroraCPP/x64/Debug/vc142.pdb
-*.idb
-dev/windows/AuroraCPP/AuroraCPP/x64/Debug/main.obj
-dev/windows/AuroraCPP/AuroraCPP/x64/Debug/modeling.obj
-*.png
-*.jpg
-dev/windows/AuroraCPP/AuroraCPP/Debug/0004_CH4M/0/number-1.png
+# Compiled Object files
+*.slo
+*.lo
+*.o
 *.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app

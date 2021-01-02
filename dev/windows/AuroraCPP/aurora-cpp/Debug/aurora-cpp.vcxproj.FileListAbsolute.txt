@@ -1,0 +1,2 @@
+D:\files\programming\GitHub\aurora\dev\windows\AuroraCPP\aurora-cpp\Debug\aurora-cpp.exe
+D:\files\programming\GitHub\aurora\dev\windows\AuroraCPP\aurora-cpp\Debug\aurora-cpp.pdb

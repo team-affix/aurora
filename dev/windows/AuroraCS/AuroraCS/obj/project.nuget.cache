@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "OfLY6rjBszRf4CqX2GnBsOZ5LAr+srAzon2+Z1nAXMoyX6w2U2Z+vGa2P/eSHXxZn9XfyD9m4PTitWYBvfLzgA==",
+  "success": true,
+  "projectFilePath": "D:\\files\\programming\\GitHub\\aurora\\dev\\windows\\AuroraCS\\AuroraCS\\AuroraCS.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\jake\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\jake\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
