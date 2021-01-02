@@ -1,7 +1,0 @@
-﻿  math.cpp
-D:\files\programming\GitHub\aurora\dev\windows\AuroraCPP\aurora-cpp\math.cpp(92,22): warning C4018: '<': signed/unsigned mismatch
-D:\files\programming\GitHub\aurora\dev\windows\AuroraCPP\aurora-cpp\math.cpp(97,22): warning C4018: '<': signed/unsigned mismatch
-D:\files\programming\GitHub\aurora\dev\windows\AuroraCPP\aurora-cpp\math.cpp(102,22): warning C4018: '<': signed/unsigned mismatch
-D:\files\programming\GitHub\aurora\dev\windows\AuroraCPP\aurora-cpp\math.cpp(107,22): warning C4018: '<': signed/unsigned mismatch
-D:\files\programming\GitHub\aurora\dev\windows\AuroraCPP\aurora-cpp\math.cpp(112,22): warning C4018: '<': signed/unsigned mismatch
-  aurora-cpp.vcxproj -> D:\files\programming\GitHub\aurora\dev\windows\AuroraCPP\aurora-cpp\Debug\aurora-cpp.exe
