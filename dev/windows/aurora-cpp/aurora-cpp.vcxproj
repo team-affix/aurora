@@ -19,8 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bias.h" />
     <ClInclude Include="complex.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="weight.h" />
     <ClInclude Include="param.h" />
     <ClInclude Include="param_mom.h" />
     <ClInclude Include="param_sgd.h" />
@@ -28,10 +30,14 @@
     <ClInclude Include="session.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bias.cpp" />
     <ClCompile Include="complex.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
+    <ClCompile Include="weight.cpp" />
     <ClCompile Include="session.cpp" />
+    <ClCompile Include="weight_set.cpp" />
+    <ClCompile Include="weight_set.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

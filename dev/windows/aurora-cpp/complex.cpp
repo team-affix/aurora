@@ -4,12 +4,16 @@
 using namespace aurora;
 using namespace math;
 
+double& complex::val() {
+	return val_ptr.val();
+}
+
 complex::complex() {
 
 }
 
 complex::complex(double _val) {
-	this->val.val() = _val;
+	this->val() = _val;
 }
 
 complex::complex(vector<complex> _vec) {
@@ -45,7 +49,7 @@ complex complex::new_2d(size_t _a, size_t _b) {
 complex complex::sum_1d() {
 	complex result = 0;
 	for (size_t i = 0; i < size(); i++) 
-		result.val.val() += at(i).val.val();
+		result.val() += at(i).val();
 	
 	return result;
 }
@@ -138,7 +142,7 @@ complex complex::add_1d(complex _other) {
 void complex::add_1d(complex _other, complex& _output) {
 	assert(size() == _other.size());
 	for (size_t i = 0; i < size(); i++)
-		_output[i] = at(i).val.val() + _other.at(i).val.val();
+		_output[i] = at(i).val() + _other.at(i).val();
 }
 
 complex complex::sub_1d(complex _other) {
@@ -150,7 +154,7 @@ complex complex::sub_1d(complex _other) {
 void complex::sub_1d(complex _other, complex& _output) {
 	assert(size() == _other.size());
 	for (size_t i = 0; i < size(); i++)
-		_output[i] = at(i).val.val() - _other.at(i).val.val();
+		_output[i] = at(i).val() - _other.at(i).val();
 }
 
 complex complex::mul_1d(complex _other) {
@@ -162,7 +166,7 @@ complex complex::mul_1d(complex _other) {
 void complex::mul_1d(complex _other, complex& _output) {
 	assert(size() == _other.size());
 	for (size_t i = 0; i < size(); i++)
-		_output[i] = at(i).val.val() * _other.at(i).val.val();
+		_output[i] = at(i).val() * _other.at(i).val();
 }
 
 complex complex::div_1d(complex _other) {
@@ -174,7 +178,7 @@ complex complex::div_1d(complex _other) {
 void complex::div_1d(complex _other, complex& _output) {
 	assert(size() == _other.size());
 	for (size_t i = 0; i < size(); i++)
-		_output[i] = at(i).val.val() / _other.at(i).val.val();
+		_output[i] = at(i).val() / _other.at(i).val();
 }
 
 complex complex::dot_1d(complex _other) {
@@ -185,9 +189,9 @@ complex complex::dot_1d(complex _other) {
 
 void complex::dot_1d(complex _other, complex& _output) {
 	assert(size() == _other.size());
-	_output.val.val() = 0;
+	_output.val() = 0;
 	for (size_t i = 0; i < size(); i++)
-		_output.val.val() += at(i).val.val() * _other.at(i).val.val();
+		_output.val() += at(i).val() * _other.at(i).val();
 }
 
 complex complex::add_2d(complex _other) {
@@ -253,19 +257,25 @@ void complex::dot_2d(complex _other, complex& _output) {
 
 void complex::clone(complex& _output) {
 	assert(size() == _output.size());
-	_output.val.val() = val.val();
+	_output.val() = val();
 	for (size_t i = 0; i < size(); i++)
 		at(i).clone(_output.at(i));
 }
 
 void complex::link(complex& _other) {
-	val.link(_other.val);
+	val_ptr.link(_other.val_ptr);
 	for (size_t i = 0; i < size(); i++)
 		at(i).link(_other.at(i));
 }
 
+void complex::unlink() {
+	val_ptr.unlink();
+	for (size_t i = 0; i < size(); i++)
+		at(i).unlink();
+}
+
 complex complex::clone() {
-	complex result = val.val();
+	complex result = val();
 	result.resize(size());
 	for (size_t i = 0; i < size(); i++)
 		result.at(i) = at(i).clone();
@@ -274,10 +284,14 @@ complex complex::clone() {
 
 string complex::to_string() {
 	if (size() == 0)
-		return std::to_string(val.val());
+		return std::to_string(val());
 	string result = "[";
 	for (size_t i = 0; i < size() - 1; i++)
 		result += at(i).to_string() + " ";
 	result += at(size() - 1).to_string() + "]";
 	return result;
+}
+
+complex::operator double& () {
+	return val();
 }

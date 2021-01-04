@@ -22,12 +22,17 @@ namespace aurora {
 
 		public:
 			void operator=(T a) {
-				*shared_ptr<T>::get() = a;
+				val() = a;
 			}
 
 		public:
 			void link(ptr<T>& other) {
 				shared_ptr<T>::reset(other.get());
+			}
+			void unlink() {
+				T temp = val();
+				shared_ptr<T>::reset(new T());
+				val() = temp;
 			}
 
 		};

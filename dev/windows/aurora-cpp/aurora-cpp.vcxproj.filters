@@ -60,6 +60,12 @@
     <ClInclude Include="session.h">
       <Filter>Header Files\optimization</Filter>
     </ClInclude>
+    <ClInclude Include="weight.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
+    <ClInclude Include="bias.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="complex.cpp">
@@ -73,6 +79,18 @@
     </ClCompile>
     <ClCompile Include="session.cpp">
       <Filter>Source Files\optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="weight.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="bias.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="weight_set.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="weight_set.cpp">
+      <Filter>Source Files\modeling</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

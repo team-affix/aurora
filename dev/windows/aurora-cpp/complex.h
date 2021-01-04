@@ -17,7 +17,10 @@ namespace aurora {
 
 		class complex : public vector<complex> {
 		public:
-			ptr<double> val = new double(0);
+			ptr<double> val_ptr = new double(0);
+
+		public:
+			double& val();
 
 		public:
 			complex();
@@ -82,12 +85,16 @@ namespace aurora {
 		public:
 			void clone(complex& output);
 			void link(complex& other);
+			void unlink();
 
 		public:
 			complex clone();
 
 		public:
 			string to_string();
+
+		public:
+			operator double& ();
 
 		};
 	}

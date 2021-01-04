@@ -3,19 +3,23 @@
 using namespace aurora;
 using namespace modeling;
 
+model::~model() {
+
+}
+
 model::model() {
 
 }
 
-model::model(vector<param>& pl) {
+model::model(vector<param*>& pl) {
 
 }
 
-model::model(vector<param_sgd>& pl) {
+model::model(vector<param_sgd*>& pl) {
 
 }
 
-model::model(vector<param_mom>& pl) {
+model::model(vector<param_mom*>& pl) {
 
 }
 
@@ -39,4 +43,9 @@ void model::prepend(model& _other) {
 void model::append(model& _other) {
 	y.link(_other.x);
 	y_grad.link(_other.x_grad);
+}
+
+void model::compile() {
+	y.link(x);
+	x_grad.link(y_grad);
 }
