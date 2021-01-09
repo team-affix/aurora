@@ -39,9 +39,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="complex.h">
-      <Filter>Header Files\math</Filter>
-    </ClInclude>
     <ClInclude Include="ptr.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
@@ -60,17 +57,14 @@
     <ClInclude Include="session.h">
       <Filter>Header Files\optimization</Filter>
     </ClInclude>
-    <ClInclude Include="weight.h">
-      <Filter>Header Files\modeling</Filter>
+    <ClInclude Include="tensor.h">
+      <Filter>Header Files\math</Filter>
     </ClInclude>
-    <ClInclude Include="bias.h">
-      <Filter>Header Files\modeling</Filter>
+    <ClInclude Include="ref.h">
+      <Filter>Header Files\data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="complex.cpp">
-      <Filter>Source Files\math</Filter>
-    </ClCompile>
     <ClCompile Include="model.cpp">
       <Filter>Source Files\modeling</Filter>
     </ClCompile>
@@ -80,17 +74,8 @@
     <ClCompile Include="session.cpp">
       <Filter>Source Files\optimization</Filter>
     </ClCompile>
-    <ClCompile Include="weight.cpp">
-      <Filter>Source Files\modeling</Filter>
-    </ClCompile>
-    <ClCompile Include="bias.cpp">
-      <Filter>Source Files\modeling</Filter>
-    </ClCompile>
-    <ClCompile Include="weight_set.h">
-      <Filter>Header Files\modeling</Filter>
-    </ClCompile>
-    <ClCompile Include="weight_set.cpp">
-      <Filter>Source Files\modeling</Filter>
+    <ClCompile Include="tensor.cpp">
+      <Filter>Source Files\math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,19 +1,20 @@
 #pragma once
-#include "complex.h"
-#include "bias.h"
-#include "weight_set.h"
+#include "tensor.h"
+#include "model.h"
 #include <iostream>
 
-using aurora::math::complex;
-using aurora::modeling::bias;
-using aurora::modeling::weight_set;
-
+using aurora::math::tensor;
+using aurora::modeling::model;
 
 int main() {
 
-	vector<param*> pl = vector<param*>();
+	model m1, m2 = model();
+	m1.append(m2);
 
-	weight_set w(3, pl);
+	m1.compile();
+	m2.compile();
+
+
 
 	return 0;
 }
