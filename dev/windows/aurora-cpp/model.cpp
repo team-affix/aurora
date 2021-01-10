@@ -4,19 +4,19 @@ using namespace aurora;
 using namespace modeling;
 
 tensor& model::x() {
-	return x_ptr.val();
+	return m_x_ptr.val();
 }
 
 tensor& model::y() {
-	return y_ptr.val();
+	return m_y_ptr.val();
 }
 
 tensor& model::x_grad() {
-	return x_grad_ptr.val();
+	return m_x_grad_ptr.val();
 }
 
 tensor& model::y_grad() {
-	return y_grad_ptr.val();
+	return m_y_grad_ptr.val();
 }
 
 model::~model() {
@@ -27,15 +27,15 @@ model::model() {
 
 }
 
-model::model(vector<param*>& pl) {
+model::model(vector<param*>& a_pl) {
 
 }
 
-model::model(vector<param_sgd*>& pl) {
+model::model(vector<param_sgd*>& a_pl) {
 
 }
 
-model::model(vector<param_mom*>& pl) {
+model::model(vector<param_mom*>& a_pl) {
 
 }
 
@@ -43,49 +43,62 @@ void model::fwd() {
 
 }
 
+tensor& model::fwd(tensor a_x) {
+	x() = a_x;
+	fwd();
+	return y();
+}
+
 void model::bwd() {
 
 }
 
-void model::recur(function<void(model*)> _func) {
-	_func(this);
+tensor& model::bwd(tensor a_y_grad) {
+	y_grad() = a_y_grad;
+	bwd();
+	return x_grad();
+}
+
+
+void model::signal(tensor a_y_des) {
+	
+}
+
+void model::cycle(tensor a_x, tensor a_y_des) {
+
+}
+
+void model::recur(function<void(model*)> a_func) {
+	a_func(this);
 }
 
 model* model::clone() {
 	return new model();
 }
 
-model* model::clone(vector<param*>& _pl) {
+model* model::clone(vector<param*>& a_pl) {
 	return new model();
 }
 
-model* model::clone(vector<param_sgd*>& _pl) {
+model* model::clone(vector<param_sgd*>& a_pl) {
 	return new model();
 }
 
-model* model::clone(vector<param_mom*>& _pl) {
+model* model::clone(vector<param_mom*>& a_pl) {
 	return new model();
 }
 
-void model::prepend(model& _other) {
-	x_ptr.link(_other.y_ptr);
-	x_grad_ptr.link(_other.y_grad_ptr);
-	x = x_ptr.get();
-	x_grad = x_grad_ptr.get();
+void model::append(model* a_other) {
+	a_other->m_x_ptr.link(m_y_ptr);
+	a_other->m_x_grad_ptr.link(m_y_grad_ptr);
 }
 
-void model::append(model& _other) {
-	y_ptr.link(_other.x_ptr);
-	y_grad_ptr.link(_other.x_grad_ptr);
-	y = y_ptr.get();
-	y_grad = y_grad_ptr.get();
+void model::prepend(model* a_other) {
+	a_other->m_y_ptr.link(m_x_ptr);
+	a_other->m_y_grad_ptr.link(m_x_grad_ptr);
 }
 
 void model::compile() {
-	y_ptr.link(x_ptr);
-	x_grad_ptr.link(y_grad_ptr);
-	x = x_ptr.get();
-	x_grad = x_grad_ptr.get();
-	y = y_ptr.get();
-	y_grad = y_grad_ptr.get();
+	m_y_ptr.link(m_x_ptr);
+	m_y_grad_ptr.link(m_x_grad_ptr);
 }

@@ -21,12 +21,10 @@ namespace aurora {
 	namespace modeling {
 		class model {
 		public:
-			ptr<tensor> x_ptr = new tensor(0);
-			ptr<tensor> y_ptr = new tensor(0);
-			ptr<tensor> x_grad_ptr = new tensor(0);
-			ptr<tensor> y_grad_ptr = new tensor(0);
-
-		public:
+			ptr<tensor> m_x_ptr = new tensor(0);
+			ptr<tensor> m_y_ptr = new tensor(0);
+			ptr<tensor> m_x_grad_ptr = new tensor(0);
+			ptr<tensor> m_y_grad_ptr = new tensor(0);
 			tensor& x();
 			tensor& y();
 			tensor& x_grad();
@@ -35,24 +33,32 @@ namespace aurora {
 		public:
 			virtual ~model();
 			model();
-			model(vector<param*>& pl);
-			model(vector<param_sgd*>& pl);
-			model(vector<param_mom*>& pl);
+			model(vector<param*>& a_pl);
+			model(vector<param_sgd*>& a_pl);
+			model(vector<param_mom*>& a_pl);
 
 		public:
 			virtual model* clone();
-			virtual model* clone(vector<param*>& pl);
-			virtual model* clone(vector<param_sgd*>& pl);
-			virtual model* clone(vector<param_mom*>& pl);
+			virtual model* clone(vector<param*>& a_pl);
+			virtual model* clone(vector<param_sgd*>& a_pl);
+			virtual model* clone(vector<param_mom*>& a_pl);
 
 		public:
 			virtual void fwd();
+			virtual tensor& fwd(tensor a_x);
 			virtual void bwd();
-			virtual void recur(function<void(model*)> func);
+			virtual tensor& bwd(tensor a_y_grad);
+			virtual void signal(tensor a_y_des);
 
 		public:
-			virtual void prepend(model& other);
-			virtual void append(model& other);
+			virtual void cycle(tensor a_x, tensor a_y_des);
+
+		public:
+			virtual void recur(function<void(model*)> a_func);
+
+		public:
+			virtual void append(model* a_other);
+			virtual void prepend(model* a_other);
 			virtual void compile();
 
 		};

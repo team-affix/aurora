@@ -63,6 +63,9 @@
     <ClInclude Include="ref.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
+    <ClInclude Include="sequential.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -76,6 +79,9 @@
     </ClCompile>
     <ClCompile Include="tensor.cpp">
       <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="sequential.cpp">
+      <Filter>Source Files\modeling</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
