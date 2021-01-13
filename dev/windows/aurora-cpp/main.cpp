@@ -10,6 +10,7 @@ using aurora::modeling::sequential;
 
 int main() {
 
-	
+
+
 	return 0;
 }

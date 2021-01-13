@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bias.h" />
     <ClInclude Include="ref.h" />
     <ClInclude Include="sequential.h" />
     <ClInclude Include="tensor.h" />

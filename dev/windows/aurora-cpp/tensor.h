@@ -34,6 +34,7 @@ namespace aurora {
 
 		public:
 			void set(tensor a_other);
+			void pop(tensor a_other);
 			
 		public:
 			static tensor new_1d(size_t a_a);

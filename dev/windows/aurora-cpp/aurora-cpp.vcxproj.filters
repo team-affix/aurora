@@ -66,6 +66,9 @@
     <ClInclude Include="sequential.h">
       <Filter>Header Files\modeling</Filter>
     </ClInclude>
+    <ClInclude Include="bias.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">

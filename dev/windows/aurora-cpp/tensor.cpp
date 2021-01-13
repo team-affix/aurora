@@ -29,6 +29,11 @@ tensor::tensor(initializer_list<tensor> a_il) {
 }
 
 void tensor::set(tensor a_other) {
+	val() = a_other.val();
+	vec() = a_other.vec();
+}
+
+void tensor::pop(tensor a_other) {
 	a_other.clone(*this);
 }
 
@@ -285,8 +290,6 @@ void tensor::clone(tensor& a_output) {
 void tensor::link(tensor& a_other) {
 	val_ptr.link(a_other.val_ptr);
 	vec_ptr.link(a_other.vec_ptr);
-	for (int i = 0; i < vec().size(); i++)
-		vec().at(i).link(a_other.vec().at(i));
 }
 
 void tensor::unlink() {

@@ -3,22 +3,6 @@
 using namespace aurora;
 using namespace modeling;
 
-tensor& model::x() {
-	return m_x_ptr.val();
-}
-
-tensor& model::y() {
-	return m_y_ptr.val();
-}
-
-tensor& model::x_grad() {
-	return m_x_grad_ptr.val();
-}
-
-tensor& model::y_grad() {
-	return m_y_grad_ptr.val();
-}
-
 model::~model() {
 
 }
@@ -44,9 +28,9 @@ void model::fwd() {
 }
 
 tensor& model::fwd(tensor a_x) {
-	x() = a_x;
+	x.set(a_x);
 	fwd();
-	return y();
+	return y;
 }
 
 void model::bwd() {
@@ -54,9 +38,9 @@ void model::bwd() {
 }
 
 tensor& model::bwd(tensor a_y_grad) {
-	y_grad() = a_y_grad;
+	y_grad = a_y_grad;
 	bwd();
-	return x_grad();
+	return x_grad;
 }
 
 
@@ -89,16 +73,16 @@ model* model::clone(vector<param_mom*>& a_pl) {
 }
 
 void model::append(model* a_other) {
-	a_other->m_x_ptr.link(m_y_ptr);
-	a_other->m_x_grad_ptr.link(m_y_grad_ptr);
+	a_other->x.link(y);
+	a_other->x_grad.link(y_grad);
 }
 
 void model::prepend(model* a_other) {
-	a_other->m_y_ptr.link(m_x_ptr);
-	a_other->m_y_grad_ptr.link(m_x_grad_ptr);
+	a_other->y.link(x);
+	a_other->y_grad.link(x_grad);
 }
 
 void model::compile() {
-	m_y_ptr.link(m_x_ptr);
-	m_y_grad_ptr.link(m_x_grad_ptr);
+	y.link(x);
+	y_grad.link(x_grad);
 }

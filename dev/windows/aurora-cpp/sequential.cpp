@@ -56,9 +56,9 @@ void sequential::fwd() {
 }
 
 tensor& sequential::fwd(tensor a_x) {
-	x() = a_x;
+	x = a_x;
 	fwd();
-	return y();
+	return y;
 }
 
 void sequential::bwd() {
@@ -68,9 +68,9 @@ void sequential::bwd() {
 }
 
 tensor& sequential::bwd(tensor a_y_grad) {
-	y_grad() = a_y_grad;
+	y_grad = a_y_grad;
 	bwd();
-	return x_grad();
+	return x_grad;
 }
 
 void sequential::signal(tensor a_y_des) {
@@ -78,7 +78,7 @@ void sequential::signal(tensor a_y_des) {
 }
 
 void sequential::cycle(tensor a_x, tensor a_y_des) {
-	x() = a_x;
+	x = a_x;
 	fwd();
 	signal(a_y_des);
 	bwd();
@@ -91,15 +91,15 @@ void sequential::recur(function<void(model*)> a_func) {
 }
 
 void sequential::compile() {
-	ptr<tensor> l_x_ptr = m_x_ptr;
-	ptr<tensor> l_x_grad_ptr = m_x_grad_ptr;
+	tensor state = x;
+	tensor gradient = x_grad;
 	for (int i = 0; i < models.size(); i++) {
+		models[i]->x.link(state);
+		models[i]->x_grad.link(gradient);
 		models[i]->compile();
-		models[i]->m_x_ptr.link(l_x_ptr);
-		models[i]->m_x_grad_ptr.link(l_x_grad_ptr);
-		l_x_ptr = models[i]->m_y_ptr;
-		l_x_grad_ptr = models[i]->m_y_grad_ptr;
+		state = models[i]->y;
+		gradient = models[i]->y_grad;
 	}
-	m_y_ptr.link(l_x_ptr);
-	m_y_grad_ptr.link(l_x_grad_ptr);
+	y.link(state);
+	y_grad.link(gradient);
 }

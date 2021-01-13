@@ -21,14 +21,10 @@ namespace aurora {
 	namespace modeling {
 		class model {
 		public:
-			ptr<tensor> m_x_ptr = new tensor(0);
-			ptr<tensor> m_y_ptr = new tensor(0);
-			ptr<tensor> m_x_grad_ptr = new tensor(0);
-			ptr<tensor> m_y_grad_ptr = new tensor(0);
-			tensor& x();
-			tensor& y();
-			tensor& x_grad();
-			tensor& y_grad();
+			tensor x = 0;
+			tensor y = 0;
+			tensor x_grad = 0;
+			tensor y_grad = 0;
 
 		public:
 			virtual ~model();
