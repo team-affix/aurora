@@ -1,20 +1,26 @@
 #pragma once
 #include "model.h"
+#include "weight_set.h"
+#include <vector>
 
 using aurora::modeling::model;
+using aurora::modeling::weight_set;
+using std::vector;
 
 namespace aurora {
 	namespace modeling {
-		class bias : public model {
+		class weight_junction : public model {
 		public:
-			ptr<param> pmt = new param();
+			size_t a;
+			size_t b;
+			vector<ptr<weight_set>> weight_sets;
 
 		public:
-			virtual ~bias();
-			bias();
-			bias(vector<param*>& a_pl);
-			bias(vector<param_sgd*>& a_pl);
-			bias(vector<param_mom*>& a_pl);
+			virtual ~weight_junction();
+			weight_junction();
+			weight_junction(size_t a_a, size_t a_b, vector<param*>& a_pl);
+			weight_junction(size_t a_a, size_t a_b, vector<param_sgd*>& a_pl);
+			weight_junction(size_t a_a, size_t a_b, vector<param_mom*>& a_pl);
 
 		public:
 			virtual model* clone();

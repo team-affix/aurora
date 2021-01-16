@@ -1,20 +1,21 @@
 #pragma once
 #include "model.h"
+#include "param.h"
 
 using aurora::modeling::model;
 
 namespace aurora {
 	namespace modeling {
-		class bias : public model {
+		class weight : public model {
 		public:
 			ptr<param> pmt = new param();
 
 		public:
-			virtual ~bias();
-			bias();
-			bias(vector<param*>& a_pl);
-			bias(vector<param_sgd*>& a_pl);
-			bias(vector<param_mom*>& a_pl);
+			virtual ~weight();
+			weight();
+			weight(vector<param*>& a_pl);
+			weight(vector<param_sgd*>& a_pl);
+			weight(vector<param_mom*>& a_pl);
 
 		public:
 			virtual model* clone();

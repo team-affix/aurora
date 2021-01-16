@@ -27,7 +27,7 @@ namespace aurora {
 
 		public:
 			void link(ptr<T>& other) {
-				shared_ptr<T>::swap(other);
+				*this = other;
 			}
 			void unlink() {
 				T temp = val();

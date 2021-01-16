@@ -67,7 +67,19 @@
       <Filter>Header Files\modeling</Filter>
     </ClInclude>
     <ClInclude Include="bias.h">
-      <Filter>Header Files\math</Filter>
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
+    <ClInclude Include="weight.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
+    <ClInclude Include="weight_set.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
+    <ClInclude Include="weight_junction.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
+    <ClInclude Include="layer.h">
+      <Filter>Header Files\modeling</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +96,30 @@
       <Filter>Source Files\math</Filter>
     </ClCompile>
     <ClCompile Include="sequential.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="bias.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="param.cpp">
+      <Filter>Source Files\optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="param_sgd.cpp">
+      <Filter>Source Files\optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="param_mom.cpp">
+      <Filter>Source Files\optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="weight.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="weight_set.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="weight_junction.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="layer.cpp">
       <Filter>Source Files\modeling</Filter>
     </ClCompile>
   </ItemGroup>

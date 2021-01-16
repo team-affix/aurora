@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <string>
 #include <sstream>
+#include <functional>
 
 using aurora::data::ptr;
 using aurora::data::ref;
@@ -13,6 +14,7 @@ using std::initializer_list;
 using std::back_inserter;
 using std::string;
 using std::stringstream;
+using std::function;
 
 namespace aurora {
 	namespace math {
@@ -21,10 +23,17 @@ namespace aurora {
 		public:
 			ptr<double> val_ptr = new double(0);
 			ptr<vector<tensor>> vec_ptr = new vector<tensor>();
+			tensor* group_next_ptr = nullptr;
+			tensor* group_prev_ptr = nullptr;
 
 		public:
 			double& val();
 			vector<tensor>& vec();
+
+		public:
+			tensor& group_head();
+			tensor& group_tail();
+			size_t group_size();
 
 		public:
 			tensor();
@@ -34,7 +43,9 @@ namespace aurora {
 
 		public:
 			void set(tensor a_other);
-			void pop(tensor a_other);
+
+		public:
+			void resize(size_t a_size);
 			
 		public:
 			static tensor new_1d(size_t a_a);
@@ -65,7 +76,12 @@ namespace aurora {
 			tensor clone_range(size_t a_start, size_t a_len);
 
 		public:
+			void sum_1d(tensor& a_output);
+			void sum_2d(tensor& a_output);
+
+		public:
 			tensor sum_1d();
+			tensor sum_2d();
 
 		public:
 			void add_1d(tensor a_other, tensor& a_output);
@@ -92,12 +108,25 @@ namespace aurora {
 			tensor dot_2d(tensor a_other);
 
 		public:
-			void clone(tensor& a_output);
 			void link(tensor& a_other);
 			void unlink();
 
 		public:
+			void group_recur_fwd(function<void(tensor*)> a_func);
+			void group_recur_bwd(function<void(tensor*)> a_func);
+			void group_recur(function<void(tensor*)> a_func);
+
+		public:
+			void group_link(tensor& a_other);
+			void group_add(tensor& a_other);
+			void group_remove(tensor& a_other);
+			void group_join(tensor& a_other);
+			void group_leave();
+			void group_disband();
+
+		public:
 			tensor clone();
+			tensor link();
 
 		public:
 			string to_string();

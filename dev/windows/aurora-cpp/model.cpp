@@ -27,18 +27,18 @@ void model::fwd() {
 
 }
 
+void model::bwd() {
+
+}
+
 tensor& model::fwd(tensor a_x) {
 	x.set(a_x);
 	fwd();
 	return y;
 }
 
-void model::bwd() {
-
-}
-
 tensor& model::bwd(tensor a_y_grad) {
-	y_grad = a_y_grad;
+	y_grad.set(a_y_grad);
 	bwd();
 	return x_grad;
 }
@@ -73,16 +73,16 @@ model* model::clone(vector<param_mom*>& a_pl) {
 }
 
 void model::append(model* a_other) {
-	a_other->x.link(y);
-	a_other->x_grad.link(y_grad);
+	y.group_add(a_other->x);
+	y_grad.group_add(a_other->x_grad);
 }
 
 void model::prepend(model* a_other) {
-	a_other->y.link(x);
-	a_other->y_grad.link(x_grad);
+	a_other->y.group_add(x);
+	a_other->y_grad.group_add(x_grad);
 }
 
 void model::compile() {
-	y.link(x);
-	y_grad.link(x_grad);
+	y.group_add(x);
+	y_grad.group_add(x_grad);
 }

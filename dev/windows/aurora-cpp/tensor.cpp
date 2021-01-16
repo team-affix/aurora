@@ -5,11 +5,31 @@ using namespace aurora;
 using namespace math;
 
 double& tensor::val() {
-	return *val_ptr.get();
+	return *val_ptr;
 }
 
 vector<tensor>& tensor::vec() {
-	return *vec_ptr.get();
+	return *vec_ptr;
+}
+
+tensor& tensor::group_head() {
+	if (group_prev_ptr == nullptr)
+		return *this;
+	else
+		return group_prev_ptr->group_head();
+}
+
+tensor& tensor::group_tail() {
+	if (group_next_ptr == nullptr)
+		return *this;
+	else
+		return group_next_ptr->group_tail();
+}
+
+size_t tensor::group_size() {
+	size_t result = 0;
+	group_recur([&](tensor* elem) { result += 1; });
+	return result;
 }
 
 tensor::tensor() {
@@ -30,11 +50,13 @@ tensor::tensor(initializer_list<tensor> a_il) {
 
 void tensor::set(tensor a_other) {
 	val() = a_other.val();
-	vec() = a_other.vec();
+	resize(a_other.size());
+	for (size_t i = 0; i < vec().size(); i++)
+		at(i).set(a_other.at(i));
 }
 
-void tensor::pop(tensor a_other) {
-	a_other.clone(*this);
+void tensor::resize(size_t a_size) {
+	vec().resize(a_size);
 }
 
 tensor tensor::new_1d(size_t a_a) {
@@ -55,11 +77,26 @@ tensor tensor::new_2d(size_t a_a, size_t a_b) {
 	return result;
 }
 
+void tensor::sum_1d(tensor& a_output) {
+	for (int i = 0; i < vec().size(); i++)
+		a_output.val() += vec().at(i).val();
+}
+
+void tensor::sum_2d(tensor& a_output) {
+	a_output.clear();
+	for (int i = 0; i < vec().size(); i++)
+		a_output.add_1d(at(i), a_output);
+}
+
 tensor tensor::sum_1d() {
 	tensor result = 0;
-	for (int i = 0; i < vec().size(); i++) 
-		result.val() += vec().at(i).val();
-	
+	sum_1d(result);
+	return result;
+}
+
+tensor tensor::sum_2d() {
+	tensor result = tensor::new_1d(width());
+	sum_2d(result);
 	return result;
 }
 
@@ -167,7 +204,7 @@ tensor tensor::add_1d(tensor a_other) {
 void tensor::add_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i] = vec().at(i).val() + a_other.vec().at(i).val();
+		a_output[i].set(vec().at(i).val() + a_other.vec().at(i).val());
 }
 
 tensor tensor::sub_1d(tensor a_other) {
@@ -179,7 +216,7 @@ tensor tensor::sub_1d(tensor a_other) {
 void tensor::sub_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i] = vec().at(i).val() - a_other.vec().at(i).val();
+		a_output[i].set(vec().at(i).val() - a_other.vec().at(i).val());
 }
 
 tensor tensor::mul_1d(tensor a_other) {
@@ -191,7 +228,7 @@ tensor tensor::mul_1d(tensor a_other) {
 void tensor::mul_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i] = vec().at(i).val() * a_other.vec().at(i).val();
+		a_output[i].set(vec().at(i).val() * a_other.vec().at(i).val());
 }
 
 tensor tensor::div_1d(tensor a_other) {
@@ -203,7 +240,7 @@ tensor tensor::div_1d(tensor a_other) {
 void tensor::div_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i] = vec().at(i).val() / a_other.vec().at(i).val();
+		a_output[i].set(vec().at(i).val() / a_other.vec().at(i).val());
 }
 
 tensor tensor::dot_1d(tensor a_other) {
@@ -228,7 +265,7 @@ tensor tensor::add_2d(tensor a_other) {
 void tensor::add_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i] = vec().at(i).add_1d(a_other[i]);
+		a_output[i].set(vec().at(i).add_1d(a_other[i]));
 }
 
 tensor tensor::sub_2d(tensor a_other) {
@@ -240,7 +277,7 @@ tensor tensor::sub_2d(tensor a_other) {
 void tensor::sub_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i] = vec().at(i).sub_1d(a_other[i]);
+		a_output[i].set(vec().at(i).sub_1d(a_other[i]));
 }
 
 tensor tensor::mul_2d(tensor a_other) {
@@ -252,7 +289,7 @@ tensor tensor::mul_2d(tensor a_other) {
 void tensor::mul_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i] = vec().at(i).mul_1d(a_other[i]);
+		a_output[i].set(vec().at(i).mul_1d(a_other[i]));
 }
 
 tensor tensor::div_2d(tensor a_other) {
@@ -264,7 +301,7 @@ tensor tensor::div_2d(tensor a_other) {
 void tensor::div_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i] = vec().at(i).div_1d(a_other[i]);
+		a_output[i].set(vec().at(i).div_1d(a_other[i]));
 }
 
 tensor tensor::dot_2d(tensor a_other) {
@@ -277,14 +314,7 @@ void tensor::dot_2d(tensor a_other, tensor& a_output) {
 	assert(width() == a_other.height());
 	for (int i = 0; i < height(); i++)
 		for (size_t j = 0; j < a_other.width(); j++)
-			a_output[i][j] = vec().at(i).dot_1d(a_other.col(j));
-}
-
-void tensor::clone(tensor& a_output) {
-	assert(vec().size() == a_output.vec().size());
-	a_output.val() = val();
-	for (int i = 0; i < vec().size(); i++)
-		vec().at(i).clone(a_output.vec().at(i));
+			a_output[i][j].set(vec().at(i).dot_1d(a_other.col(j)));
 }
 
 void tensor::link(tensor& a_other) {
@@ -293,10 +323,62 @@ void tensor::link(tensor& a_other) {
 }
 
 void tensor::unlink() {
-	val_ptr.unlink();
-	vec_ptr.unlink();
-	for (int i = 0; i < vec().size(); i++)
-		vec().at(i).unlink();
+	val_ptr = nullptr;
+	vec_ptr = nullptr;
+}
+void tensor::group_recur_fwd(function<void(tensor*)> a_func) {
+	if (group_next_ptr != nullptr)
+		group_next_ptr->group_recur_fwd(a_func);
+	a_func(this);
+}
+
+void tensor::group_recur_bwd(function<void(tensor*)> a_func) {
+	if (group_prev_ptr != nullptr)
+		group_prev_ptr->group_recur_bwd(a_func);
+	a_func(this);
+}
+
+void tensor::group_recur(function<void(tensor*)> a_func) {
+	if (group_prev_ptr != nullptr)
+		group_prev_ptr->group_recur_bwd(a_func);
+	if (group_next_ptr != nullptr)
+		group_next_ptr->group_recur_fwd(a_func);
+	a_func(this);
+}
+
+void tensor::group_link(tensor& a_other) {
+	group_recur([&](tensor* elem) {elem->link(a_other); });
+}
+
+void tensor::group_add(tensor& a_other) {
+	a_other.group_join(*this);
+}
+
+void tensor::group_remove(tensor& a_other) {
+	a_other.group_leave();
+}
+
+void tensor::group_join(tensor& a_other) {
+	group_recur([&](tensor* elem) {
+		tensor& l_group_tail = a_other.group_tail();
+		elem->link(l_group_tail);
+		l_group_tail.group_next_ptr = elem;
+		elem->group_prev_ptr = &l_group_tail;
+		elem->group_next_ptr = nullptr;
+	});
+}
+
+void tensor::group_leave() {
+	if (group_prev_ptr != nullptr)
+		group_prev_ptr->group_next_ptr = group_next_ptr;
+	if (group_next_ptr != nullptr)
+		group_next_ptr->group_prev_ptr = group_prev_ptr;
+	group_prev_ptr = nullptr;
+	group_next_ptr = nullptr;
+}
+
+void tensor::group_disband() {
+	group_recur([](tensor* elem) {elem->group_leave(); });
 }
 
 tensor tensor::clone() {
@@ -304,6 +386,12 @@ tensor tensor::clone() {
 	result.vec().resize(vec().size());
 	for (int i = 0; i < vec().size(); i++)
 		result.at(i) = at(i).clone();
+	return result;
+}
+
+tensor tensor::link() {
+	tensor result = tensor();
+	result.link(*this);
 	return result;
 }
 

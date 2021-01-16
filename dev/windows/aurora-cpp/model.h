@@ -41,8 +41,8 @@ namespace aurora {
 
 		public:
 			virtual void fwd();
-			virtual tensor& fwd(tensor a_x);
 			virtual void bwd();
+			virtual tensor& fwd(tensor a_x);
 			virtual tensor& bwd(tensor a_y_grad);
 			virtual void signal(tensor a_y_des);
 
