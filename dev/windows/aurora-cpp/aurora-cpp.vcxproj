@@ -20,9 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bias.h" />
+    <ClInclude Include="data.h" />
     <ClInclude Include="layer.h" />
+    <ClInclude Include="leaky_relu.h" />
+    <ClInclude Include="math.h" />
+    <ClInclude Include="modeling.h" />
+    <ClInclude Include="neuron.cpp" />
+    <ClInclude Include="neuron.h" />
+    <ClInclude Include="optimization.h" />
+    <ClInclude Include="pseudo.h" />
     <ClInclude Include="ref.h" />
     <ClInclude Include="sequential.h" />
+    <ClInclude Include="sigmoid.h" />
+    <ClInclude Include="tanh.h" />
     <ClInclude Include="tensor.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="param.h" />
@@ -30,6 +40,7 @@
     <ClInclude Include="param_sgd.h" />
     <ClInclude Include="ptr.h" />
     <ClInclude Include="session.h" />
+    <ClInclude Include="tnn.h" />
     <ClInclude Include="weight.h" />
     <ClInclude Include="weight_junction.h" />
     <ClInclude Include="weight_set.h" />
@@ -37,14 +48,18 @@
   <ItemGroup>
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="layer.cpp" />
+    <ClCompile Include="leaky_relu.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_mom.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="sequential.cpp" />
+    <ClCompile Include="sigmoid.cpp" />
+    <ClCompile Include="tanh.cpp" />
     <ClCompile Include="tensor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="session.cpp" />
+    <ClCompile Include="tnn.cpp" />
     <ClCompile Include="weight.cpp" />
     <ClCompile Include="weight_junction.cpp" />
     <ClCompile Include="weight_set.cpp" />

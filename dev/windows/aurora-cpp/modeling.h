@@ -6,3 +6,4 @@
 #include "weight_set.h"
 #include "weight_junction.h"
 #include "layer.h"
+#include "sigmoid.h"
