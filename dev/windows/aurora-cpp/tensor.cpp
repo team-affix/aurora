@@ -226,7 +226,7 @@ tensor tensor::add_1d(tensor a_other) {
 void tensor::add_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i].set(vec().at(i).val() + a_other.vec().at(i).val());
+		a_output[i].val() = vec().at(i).val() + a_other.vec().at(i).val();
 }
 
 tensor tensor::sub_1d(tensor a_other) {
@@ -238,7 +238,7 @@ tensor tensor::sub_1d(tensor a_other) {
 void tensor::sub_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i].set(vec().at(i).val() - a_other.vec().at(i).val());
+		a_output[i].val() = vec().at(i).val() - a_other.vec().at(i).val();
 }
 
 tensor tensor::mul_1d(tensor a_other) {
@@ -250,7 +250,7 @@ tensor tensor::mul_1d(tensor a_other) {
 void tensor::mul_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i].set(vec().at(i).val() * a_other.vec().at(i).val());
+		a_output[i].val() = vec().at(i).val() * a_other.vec().at(i).val();
 }
 
 tensor tensor::div_1d(tensor a_other) {
@@ -262,7 +262,7 @@ tensor tensor::div_1d(tensor a_other) {
 void tensor::div_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i].set(vec().at(i).val() / a_other.vec().at(i).val());
+		a_output[i].val() = vec().at(i).val() / a_other.vec().at(i).val();
 }
 
 tensor tensor::dot_1d(tensor a_other) {
