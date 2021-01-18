@@ -76,10 +76,14 @@ namespace aurora {
 			tensor clone_range(size_t a_start, size_t a_len);
 
 		public:
+			void abs_1d(tensor& a_output);
+			void abs_2d(tensor& a_output);
 			void sum_1d(tensor& a_output);
 			void sum_2d(tensor& a_output);
 
 		public:
+			tensor abs_1d();
+			tensor abs_2d();
 			tensor sum_1d();
 			tensor sum_2d();
 
@@ -117,7 +121,6 @@ namespace aurora {
 			void group_recur(function<void(tensor*)> a_func);
 
 		public:
-			void group_link(tensor& a_other);
 			void group_add(tensor& a_other);
 			void group_remove(tensor& a_other);
 			void group_join(tensor& a_other);

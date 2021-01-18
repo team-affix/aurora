@@ -91,15 +91,15 @@ void sequential::recur(function<void(model*)> a_func) {
 }
 
 void sequential::compile() {
-	ref<tensor> state = &x;
-	ref<tensor> gradient = &x_grad;
+	tensor* state = &x;
+	tensor* gradient = &x_grad;
 	for (int i = 0; i < models.size(); i++) {
 		models[i]->compile();
-		models[i]->x.group_add(state);
-		models[i]->x_grad.group_add(gradient);
+		models[i]->x.group_add(*state);
+		models[i]->x_grad.group_add(*gradient);
 		state = &models[i]->y;
 		gradient = &models[i]->y_grad;
 	}
-	y.group_add(state);
-	y_grad.group_add(gradient);
+	state->group_add(y);
+	gradient->group_add(y_grad);
 }

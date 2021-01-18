@@ -77,6 +77,16 @@ tensor tensor::new_2d(size_t a_a, size_t a_b) {
 	return result;
 }
 
+void tensor::abs_1d(tensor& a_output) {
+	for (int i = 0; i < vec().size(); i++)
+		a_output.at(i).val() = abs(at(i).val());
+}
+
+void tensor::abs_2d(tensor& a_output) {
+	for (int i = 0; i < vec().size(); i++)
+		at(i).abs_1d(a_output.at(i));
+}
+
 void tensor::sum_1d(tensor& a_output) {
 	for (int i = 0; i < vec().size(); i++)
 		a_output.val() += vec().at(i).val();
@@ -86,6 +96,18 @@ void tensor::sum_2d(tensor& a_output) {
 	a_output.clear();
 	for (int i = 0; i < vec().size(); i++)
 		a_output.add_1d(at(i), a_output);
+}
+
+tensor tensor::abs_1d() {
+	tensor result = new_1d(size());
+	abs_1d(result);
+	return result;
+}
+
+tensor tensor::abs_2d() {
+	tensor result = new_2d(height(), width());
+	abs_2d(result);
+	return result;
 }
 
 tensor tensor::sum_1d() {
@@ -318,8 +340,12 @@ void tensor::dot_2d(tensor a_other, tensor& a_output) {
 }
 
 void tensor::link(tensor& a_other) {
-	val_ptr.link(a_other.val_ptr);
-	vec_ptr.link(a_other.vec_ptr);
+	group_recur([&](tensor* elem) {
+		elem->val_ptr.link(a_other.val_ptr);
+		elem->resize(a_other.size());
+		for (int i = 0; i < a_other.size(); i++)
+			elem->at(i).link(a_other.at(i));
+	});
 }
 
 void tensor::unlink() {
@@ -346,10 +372,6 @@ void tensor::group_recur(function<void(tensor*)> a_func) {
 	a_func(this);
 }
 
-void tensor::group_link(tensor& a_other) {
-	group_recur([&](tensor* elem) {elem->link(a_other); });
-}
-
 void tensor::group_add(tensor& a_other) {
 	a_other.group_join(*this);
 }
@@ -359,9 +381,9 @@ void tensor::group_remove(tensor& a_other) {
 }
 
 void tensor::group_join(tensor& a_other) {
+	link(a_other); // LINKS ENTIRE GROUP TO a_other's GROUP
 	group_recur([&](tensor* elem) {
 		tensor& l_group_tail = a_other.group_tail();
-		elem->link(l_group_tail);
 		l_group_tail.group_next_ptr = elem;
 		elem->group_prev_ptr = &l_group_tail;
 		elem->group_next_ptr = nullptr;

@@ -102,9 +102,6 @@
     <ClInclude Include="pseudo.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="neuron.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClInclude>
     <ClInclude Include="tnn.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
@@ -172,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="leaky_relu.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="neuron.cpp">
+      <Filter>Source Files\pseudo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

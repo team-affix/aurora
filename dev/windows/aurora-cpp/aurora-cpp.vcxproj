@@ -25,7 +25,6 @@
     <ClInclude Include="leaky_relu.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="modeling.h" />
-    <ClInclude Include="neuron.cpp" />
     <ClInclude Include="neuron.h" />
     <ClInclude Include="optimization.h" />
     <ClInclude Include="pseudo.h" />
@@ -49,6 +48,7 @@
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="layer.cpp" />
     <ClCompile Include="leaky_relu.cpp" />
+    <ClCompile Include="neuron.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_mom.cpp" />
     <ClCompile Include="param_sgd.cpp" />
@@ -135,6 +135,9 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>Full</Optimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,8 +152,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <Optimization>Full</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

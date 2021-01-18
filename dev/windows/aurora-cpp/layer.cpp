@@ -26,7 +26,7 @@ layer::layer(size_t a_a, ptr<model> a_model_template, vector<param_mom*>& a_pl) 
 }
 
 layer::layer(initializer_list<ptr<model>> a_il) {
-	//std::copy(a_il.begin(), a_il.end(), models);
+	std::copy(a_il.begin(), a_il.end(), back_inserter(models));
 }
 
 model* layer::clone() {

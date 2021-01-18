@@ -11,8 +11,8 @@ namespace aurora {
 			ptr() {
 			
 			}
-			ptr(T* a) {
-				shared_ptr<T>::reset(a);
+			ptr(T* a) : shared_ptr<T>(a) {
+
 			}
 
 		public:
