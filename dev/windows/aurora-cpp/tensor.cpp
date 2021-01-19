@@ -287,7 +287,7 @@ tensor tensor::add_2d(tensor a_other) {
 void tensor::add_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i].set(vec().at(i).add_1d(a_other[i]));
+		at(i).add_1d(a_other.at(i), a_output.at(i));
 }
 
 tensor tensor::sub_2d(tensor a_other) {
@@ -299,7 +299,7 @@ tensor tensor::sub_2d(tensor a_other) {
 void tensor::sub_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i].set(vec().at(i).sub_1d(a_other[i]));
+		at(i).sub_1d(a_other.at(i), a_output.at(i));
 }
 
 tensor tensor::mul_2d(tensor a_other) {
@@ -311,7 +311,7 @@ tensor tensor::mul_2d(tensor a_other) {
 void tensor::mul_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i].set(vec().at(i).mul_1d(a_other[i]));
+		at(i).mul_1d(a_other.at(i), a_output.at(i));
 }
 
 tensor tensor::div_2d(tensor a_other) {
@@ -323,7 +323,7 @@ tensor tensor::div_2d(tensor a_other) {
 void tensor::div_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
-		a_output[i].set(vec().at(i).div_1d(a_other[i]));
+		at(i).div_1d(a_other.at(i), a_output.at(i));
 }
 
 tensor tensor::dot_2d(tensor a_other) {
@@ -336,7 +336,7 @@ void tensor::dot_2d(tensor a_other, tensor& a_output) {
 	assert(width() == a_other.height());
 	for (int i = 0; i < height(); i++)
 		for (size_t j = 0; j < a_other.width(); j++)
-			a_output[i][j].set(vec().at(i).dot_1d(a_other.col(j)));
+		row(i).dot_1d(a_other.col(j), a_output[i][j]);
 }
 
 void tensor::link(tensor& a_other) {
