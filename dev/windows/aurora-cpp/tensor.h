@@ -19,16 +19,14 @@ using std::function;
 namespace aurora {
 	namespace math {
 
-		class tensor {
+		class tensor : public vector<tensor> {
 		public:
-			ptr<double> val_ptr = new double(0);
-			ptr<vector<tensor>> vec_ptr = new vector<tensor>();
-			tensor* group_next_ptr = nullptr;
 			tensor* group_prev_ptr = nullptr;
+			tensor* group_next_ptr = nullptr;
+			ptr<double> val_ptr = new double(0);
 
 		public:
 			double& val();
-			vector<tensor>& vec();
 
 		public:
 			tensor& group_head();
@@ -43,9 +41,6 @@ namespace aurora {
 
 		public:
 			void set(tensor a_other);
-
-		public:
-			void resize(size_t a_size);
 			
 		public:
 			static tensor new_1d(size_t a_a);
@@ -136,12 +131,9 @@ namespace aurora {
 
 		public:
 			void clear();
-			size_t size();
-			tensor& at(size_t a_a);
 
 		public:
 			operator double& ();
-			tensor& operator[](size_t a_a);
 
 		};
 	}
