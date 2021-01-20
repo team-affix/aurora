@@ -21,46 +21,72 @@ int main() {
 		{0, 0},
 		{0, 1},
 		{1, 0},
-		{1, 1}
+		{1, 1},
+		{0, 2},
+		{3, 0},
+		{4, 4},
+		{4, 0},
+		{4, 1},
+		{4, 2},
+		{5, 2},
+		{5, 3},
+		{0, 0.2},
+		{0, 0.3},
 	};
 	tensor y = {
 		{0},
 		{1},
 		{1},
-		{0}
+		{0},
+		{2},
+		{3},
+		{4},
+		{0},
+		{10},
+		{13},
+		{16},
+		{17},
+		{20},
+		{19},
 	};
 
-	vector<param_sgd*> pl = vector<param_sgd*>();
+	vector<param_mom*> pl = vector<param_mom*>();
 
-	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl);
+	ptr<sequential> s = pseudo::tnn({ 2, 15, 1 }, pseudo::nlr(0.3), pl);
 	s->compile();
 
 	default_random_engine dre(-26);
 	uniform_real_distribution<double> urd(-1, 1);
 
-	for (param_sgd* pmt : pl) {
+	for (param_mom* pmt : pl) {
 		pmt->state() = urd(dre);
-		pmt->learn_rate() = 0.2;
+		pmt->learn_rate() = 0.0002;
+		pmt->beta() = 0.9;
 	}
 
 	printf("");
 
-	for (int epoch = 0; true; epoch++) {
-
+	for (int epoch = 0; epoch < 1000000; epoch++) {
+		
 		if(epoch % 10000 == 0)
 			printf("\033[%d;%dH", 0, 0);
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
 			s->cycle(x[tsIndex], y[tsIndex]);
 			if (epoch % 10000 == 0)
-				std::cout << x[tsIndex].to_string() << " " << s->y.to_string() << std::endl;	
+				std::cout << x[tsIndex].to_string() << " " << s->y.to_string() << std::endl;
 		}
 
-		for (param_sgd* pmt : pl) {
-			pmt->state() -= pmt->learn_rate() * pmt->gradient();
+		for (param_mom* pmt : pl) {
+			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
+			pmt->state() -= pmt->learn_rate() * pmt->momentum();
 			pmt->gradient() = 0;
 		}
 
+	}
+
+	for (param_mom* pmt : pl) {
+		std::cout << pmt->state() << std::endl;
 	}
 
 	return 0;

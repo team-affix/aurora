@@ -167,11 +167,11 @@
     <ClCompile Include="tanh.cpp">
       <Filter>Source Files\modeling</Filter>
     </ClCompile>
-    <ClCompile Include="leaky_relu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="neuron.cpp">
       <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="leaky_relu.cpp">
+      <Filter>Source Files\modeling</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
