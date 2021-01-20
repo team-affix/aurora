@@ -15,44 +15,24 @@ using namespace aurora::optimization;
 using std::default_random_engine;
 using std::uniform_real_distribution;
 
-int main() {
+void tnn_test() {
 
 	tensor x = {
 		{0, 0},
 		{0, 1},
 		{1, 0},
 		{1, 1},
-		{0, 2},
-		{3, 0},
-		{4, 4},
-		{4, 0},
-		{4, 1},
-		{4, 2},
-		{5, 2},
-		{5, 3},
-		{0, 0.2},
-		{0, 0.3},
 	};
 	tensor y = {
 		{0},
 		{1},
 		{1},
 		{0},
-		{2},
-		{3},
-		{4},
-		{0},
-		{10},
-		{13},
-		{16},
-		{17},
-		{20},
-		{19},
 	};
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
-	ptr<sequential> s = pseudo::tnn({ 2, 15, 1 }, pseudo::nlr(0.3), pl);
+	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl);
 	s->compile();
 
 	default_random_engine dre(-26);
@@ -60,15 +40,15 @@ int main() {
 
 	for (param_mom* pmt : pl) {
 		pmt->state() = urd(dre);
-		pmt->learn_rate() = 0.0002;
+		pmt->learn_rate() = 0.02;
 		pmt->beta() = 0.9;
 	}
 
 	printf("");
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
-		
-		if(epoch % 10000 == 0)
+
+		if (epoch % 10000 == 0)
 			printf("\033[%d;%dH", 0, 0);
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
@@ -89,5 +69,15 @@ int main() {
 		std::cout << pmt->state() << std::endl;
 	}
 
+}
+
+void tensor_test() {
+	tensor t1 = { 0, 1, 2, 3 };
+	tensor t2 = t1.link();
+	t2.resize(10);
+}
+
+int main() {
+	tnn_test();
 	return 0;
 }
