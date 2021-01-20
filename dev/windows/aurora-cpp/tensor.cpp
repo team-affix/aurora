@@ -8,6 +8,10 @@ double& tensor::val() {
 	return *val_ptr;
 }
 
+vector<tensor>& tensor::vec() {
+	return *vec_ptr;
+}
+
 tensor& tensor::group_head() {
 	if (group_prev_ptr == nullptr)
 		return *this;
@@ -37,54 +41,60 @@ tensor::tensor(double a_val) {
 }
 
 tensor::tensor(vector<tensor> a_vec) {
-	std::copy(a_vec.begin(), a_vec.end(), back_inserter(*this));
+	std::copy(a_vec.begin(), a_vec.end(), back_inserter(vec()));
 }
 
 tensor::tensor(initializer_list<tensor> a_il) {
-	std::copy(a_il.begin(), a_il.end(), back_inserter(*this));
+	std::copy(a_il.begin(), a_il.end(), back_inserter(vec()));
 }
 
 void tensor::set(tensor a_other) {
 	val() = a_other.val();
 	resize(a_other.size());
-	for (size_t i = 0; i < size(); i++)
+	for (size_t i = 0; i < vec().size(); i++)
 		at(i).set(a_other.at(i));
+}
+
+void tensor::resize(size_t a_size) {
+	vec().resize(a_size);
 }
 
 tensor tensor::new_1d(size_t a_a) {
 	tensor result;
-	result.resize(a_a);
-	for (int i = 0; i < a_a; i++)
+	result.vec().resize(a_a);
+	for (int i = 0; i < a_a; i++) {
 		result[i] = 0;
+	}
 	return result;
 }
 
 tensor tensor::new_2d(size_t a_a, size_t a_b) {
 	tensor result;
-	result.resize(a_a);
+	result.vec().resize(a_a);
 	for (int i = 0; i < a_a; i++) 
 		result[i] = new_1d(a_b);
+	
 	return result;
 }
 
 void tensor::abs_1d(tensor& a_output) {
-	for (int i = 0; i < size(); i++)
+	for (int i = 0; i < vec().size(); i++)
 		a_output.at(i).val() = abs(at(i).val());
 }
 
 void tensor::abs_2d(tensor& a_output) {
-	for (int i = 0; i < size(); i++)
+	for (int i = 0; i < vec().size(); i++)
 		at(i).abs_1d(a_output.at(i));
 }
 
 void tensor::sum_1d(tensor& a_output) {
-	for (int i = 0; i < size(); i++)
-		a_output.val() += at(i).val();
+	for (int i = 0; i < vec().size(); i++)
+		a_output.val() += vec().at(i).val();
 }
 
 void tensor::sum_2d(tensor& a_output) {
 	a_output.clear();
-	for (int i = 0; i < size(); i++)
+	for (int i = 0; i < vec().size(); i++)
 		a_output.add_1d(at(i), a_output);
 }
 
@@ -133,8 +143,8 @@ tensor tensor::down_rank(size_t a_n) {
 }
 
 tensor tensor::down_rank() {
-	assert(size() == 1);
-	return at(0);
+	assert(vec().size() == 1);
+	return vec().at(0);
 }
 
 tensor tensor::unroll() {
@@ -143,22 +153,22 @@ tensor tensor::unroll() {
 	tensor result = new_1d(w * h);
 	for (int i = 0; i < h; i++)
 		for (size_t j = 0; j < w; j++)
-			result[i * w + j] = at(i)[j];
+			result[i * w + j] = vec().at(i)[j];
 	return result;
 }
 
 tensor tensor::roll(size_t a_width) {
-	size_t s = size();
+	size_t s = vec().size();
 	assert(s % a_width == 0);
 	size_t h = s / a_width;
 	tensor result = new_2d(h, a_width);
-	for (int i = 0; i < size(); i++)
-		result[i / a_width][i % a_width] = at(i);
+	for (int i = 0; i < vec().size(); i++)
+		result[i / a_width][i % a_width] = vec().at(i);
 	return result;
 }
 
 size_t tensor::width() {
-	return at(0).size();
+	return vec().at(0).size();
 }
 
 size_t tensor::height() {
@@ -166,14 +176,14 @@ size_t tensor::height() {
 }
 
 tensor tensor::row(size_t a_a) {
-	tensor result = at(a_a);
+	tensor result = vec().at(a_a);
 	return result;
 }
 
 tensor tensor::col(size_t a_a) {
-	tensor result = new_1d(size());
+	tensor result = new_1d(vec().size());
 	for (int i = 0; i < size(); i++)
-		result[i] = at(i)[a_a];
+		result[i] = vec().at(i)[a_a];
 	return result;
 }
 
@@ -202,57 +212,57 @@ tensor tensor::clone_range(size_t a_start, size_t a_len) {
 	{
 		size_t src = a_start + i;
 		size_t dst = i;
-		result[dst] = at(src);
+		result[dst] = vec().at(src);
 	}
 	return result.clone();
 }
 
 tensor tensor::add_1d(tensor a_other) {
-	tensor result = new_1d(size());
+	tensor result = new_1d(vec().size());
 	add_1d(a_other, result);
 	return result;
 }
 
 void tensor::add_1d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
-	for (int i = 0; i < size(); i++)
-		a_output[i].val() = at(i).val() + a_other.at(i).val();
+	assert(vec().size() == a_other.size());
+	for (int i = 0; i < vec().size(); i++)
+		a_output[i].val() = vec().at(i).val() + a_other.vec().at(i).val();
 }
 
 tensor tensor::sub_1d(tensor a_other) {
-	tensor result = new_1d(size());
+	tensor result = new_1d(vec().size());
 	sub_1d(a_other, result);
 	return result;
 }
 
 void tensor::sub_1d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
-	for (int i = 0; i < size(); i++)
-		a_output[i].val() = at(i).val() - a_other.at(i).val();
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
+		a_output[i].val() = vec().at(i).val() - a_other.vec().at(i).val();
 }
 
 tensor tensor::mul_1d(tensor a_other) {
-	tensor result = new_1d(size());
+	tensor result = new_1d(vec().size());
 	mul_1d(a_other, result);
 	return result;
 }
 
 void tensor::mul_1d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
-	for (int i = 0; i < size(); i++)
-		a_output[i].val() = at(i).val() * a_other.at(i).val();
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
+		a_output[i].val() = vec().at(i).val() * a_other.vec().at(i).val();
 }
 
 tensor tensor::div_1d(tensor a_other) {
-	tensor result = new_1d(size());
+	tensor result = new_1d(vec().size());
 	div_1d(a_other, result);
 	return result;
 }
 
 void tensor::div_1d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
-	for (int i = 0; i < size(); i++)
-		a_output[i].val() = at(i).val() / a_other.at(i).val();
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
+		a_output[i].val() = vec().at(i).val() / a_other.vec().at(i).val();
 }
 
 tensor tensor::dot_1d(tensor a_other) {
@@ -262,57 +272,57 @@ tensor tensor::dot_1d(tensor a_other) {
 }
 
 void tensor::dot_1d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
+	assert(vec().size() == a_other.vec().size());
 	a_output.val() = (double)0;
-	for (int i = 0; i < size(); i++)
-		a_output.val() += at(i).val() * a_other.at(i).val();
+	for (int i = 0; i < vec().size(); i++)
+		a_output.val() += vec().at(i).val() * a_other.vec().at(i).val();
 }
 
 tensor tensor::add_2d(tensor a_other) {
-	tensor result = new_2d(size(), at(0).size());
+	tensor result = new_2d(vec().size(), vec().at(0).vec().size());
 	add_2d(a_other, result);
 	return result;
 }
 
 void tensor::add_2d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
-	for (int i = 0; i < size(); i++)
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
 		at(i).add_1d(a_other.at(i), a_output.at(i));
 }
 
 tensor tensor::sub_2d(tensor a_other) {
-	tensor result = new_2d(size(), at(0).size());
+	tensor result = new_2d(vec().size(), vec().at(0).size());
 	sub_2d(a_other, result);
 	return result;
 }
 
 void tensor::sub_2d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
-	for (int i = 0; i < size(); i++)
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
 		at(i).sub_1d(a_other.at(i), a_output.at(i));
 }
 
 tensor tensor::mul_2d(tensor a_other) {
-	tensor result = new_2d(size(), at(0).size());
+	tensor result = new_2d(vec().size(), vec().at(0).size());
 	mul_2d(a_other, result);
 	return result;
 }
 
 void tensor::mul_2d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
-	for (int i = 0; i < size(); i++)
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
 		at(i).mul_1d(a_other.at(i), a_output.at(i));
 }
 
 tensor tensor::div_2d(tensor a_other) {
-	tensor result = new_2d(size(), at(0).size());
+	tensor result = new_2d(vec().size(), vec().at(0).size());
 	div_2d(a_other, result);
 	return result;
 }
 
 void tensor::div_2d(tensor a_other, tensor& a_output) {
-	assert(size() == a_other.size());
-	for (int i = 0; i < size(); i++)
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
 		at(i).div_1d(a_other.at(i), a_output.at(i));
 }
 
@@ -340,10 +350,8 @@ void tensor::link(tensor& a_other) {
 
 void tensor::unlink() {
 	val_ptr = nullptr;
-	for (int i = 0; i < size(); i++)
-		at(i).unlink();
+	vec_ptr = nullptr;
 }
-
 void tensor::group_recur_fwd(function<void(tensor*)> a_func) {
 	if (group_next_ptr != nullptr)
 		group_next_ptr->group_recur_fwd(a_func);
@@ -397,8 +405,8 @@ void tensor::group_disband() {
 
 tensor tensor::clone() {
 	tensor result = tensor(val());
-	result.resize(size());
-	for (int i = 0; i < size(); i++)
+	result.vec().resize(vec().size());
+	for (int i = 0; i < vec().size(); i++)
 		result.at(i) = at(i).clone();
 	return result;
 }
@@ -410,21 +418,33 @@ tensor tensor::link() {
 }
 
 string tensor::to_string() {
-	if (size() == 0)
+	if (vec().size() == 0)
 		return std::to_string(val());
 	string result = "[";
-	for (int i = 0; i < size() - 1; i++)
-		result += at(i).to_string() + " ";
-	result += at(size() - 1).to_string() + "]";
+	for (int i = 0; i < vec().size() - 1; i++)
+		result += vec().at(i).to_string() + " ";
+	result += vec().at(vec().size() - 1).to_string() + "]";
 	return result;
 }
 
 void tensor::clear() {
 	val() = (double)0;
-	for (int i = 0; i < size(); i++)
-		at(i).clear();
+	for (int i = 0; i < vec().size(); i++)
+		vec().at(i).clear();
+}
+
+size_t tensor::size() {
+	return vec().size();
+}
+
+tensor& tensor::at(size_t a_a) {
+	return vec().at(a_a);
 }
 
 tensor::operator double& () {
 	return val();
+}
+
+tensor& tensor::operator[](size_t a) {
+	return vec()[a];
 }
