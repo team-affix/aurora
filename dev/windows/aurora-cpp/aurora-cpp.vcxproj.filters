@@ -117,6 +117,15 @@
     <ClInclude Include="leaky_relu.h">
       <Filter>Header Files\modeling</Filter>
     </ClInclude>
+    <ClInclude Include="random.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="pl_init.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="aurora.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -172,6 +181,12 @@
     </ClCompile>
     <ClCompile Include="leaky_relu.cpp">
       <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="random.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="pl_init.cpp">
+      <Filter>Source Files\pseudo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,9 +1,5 @@
 #pragma once
-#include "data.h"
-#include "math.h"
-#include "modeling.h"
-#include "optimization.h"
-#include "pseudo.h"
+#include "aurora.h"
 #include <random>
 #include <iostream>
 
@@ -35,14 +31,7 @@ int main() {
 	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl);
 	s->compile();
 
-	default_random_engine dre(-26);
-	uniform_real_distribution<double> urd(-1, 1);
-
-	for (param_mom* pmt : pl) {
-		pmt->state() = urd(dre);
-		pmt->learn_rate() = 0.2;
-		pmt->beta() = 0.9;
-	}
+	pseudo::init(pl, 10, -1, 1, 0.2, 0.9);
 
 	printf("");
 
