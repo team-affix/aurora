@@ -2,6 +2,7 @@
 #include "aurora.h"
 #include <random>
 #include <iostream>
+#include <assert.h>
 
 using namespace aurora;
 using namespace aurora::data;
@@ -11,8 +12,32 @@ using namespace aurora::optimization;
 using std::default_random_engine;
 using std::uniform_real_distribution;
 
-int main() {
+void tensor_test() {
 
+	tensor vec_1 = { 0, 1, 2 };
+	tensor vec_2 = vec_1.link();
+	vec_2[0].val() = 10;
+	assert(vec_1[0].val() == 10);
+
+	vec_2.set({ 1, 2, 3 });
+	assert(vec_1[0].val() == 1);
+	assert(vec_1[1].val() == 2);
+	assert(vec_1[2].val() == 3);
+
+	tensor mat_1 = tensor::new_2d(10, 10);
+	tensor mat_1_unroll = mat_1.unroll();
+	assert(mat_1_unroll.size() == 100);
+
+	mat_1_unroll.set(tensor::new_1d(100, 10));
+	assert(mat_1[0][0] == 10);
+
+	tensor mat_2 = mat_1_unroll.roll(10);
+	assert(mat_2.size() == 10);
+
+
+}
+
+void tnn_test() {
 	tensor x = {
 		{0, 0},
 		{0, 1},
@@ -31,12 +56,12 @@ int main() {
 	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl);
 	s->compile();
 
-	pseudo::init(pl, 10, -1, 1, 0.2, 0.9);
+	pseudo::pl_init(pl, 10, -1, 1, 0.2, 0.9);
 
 	printf("");
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
-		
+
 		if (epoch % 10000 == 0) {
 			printf("\033[%d;%dH", 0, 0);
 			std::cout << epoch << std::endl;
@@ -59,6 +84,11 @@ int main() {
 	for (param_mom* pmt : pl) {
 		std::cout << pmt->state() << std::endl;
 	}
+}
+
+int main() {
+
+	tensor_test();
 
 	return 0;
 }

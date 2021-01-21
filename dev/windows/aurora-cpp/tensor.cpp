@@ -60,20 +60,28 @@ void tensor::resize(size_t a_size) {
 }
 
 tensor tensor::new_1d(size_t a_a) {
+	return new_1d(a_a, 0);
+}
+
+tensor tensor::new_1d(size_t a_a, double a_val) {
 	tensor result;
 	result.vec().resize(a_a);
 	for (int i = 0; i < a_a; i++) {
-		result[i] = 0;
+		result[i] = a_val;
 	}
 	return result;
 }
 
 tensor tensor::new_2d(size_t a_a, size_t a_b) {
+	return new_2d(a_a, a_b, 0);
+}
+
+tensor tensor::new_2d(size_t a_a, size_t a_b, double a_val) {
 	tensor result;
 	result.vec().resize(a_a);
-	for (int i = 0; i < a_a; i++) 
-		result[i] = new_1d(a_b);
-	
+	for (int i = 0; i < a_a; i++)
+		result[i] = new_1d(a_b, a_val);
+
 	return result;
 }
 

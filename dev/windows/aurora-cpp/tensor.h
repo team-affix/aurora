@@ -51,7 +51,9 @@ namespace aurora {
 			
 		public:
 			static tensor new_1d(size_t a_a);
+			static tensor new_1d(size_t a_a, double a_val);
 			static tensor new_2d(size_t a_a, size_t a_b);
+			static tensor new_2d(size_t a_a, size_t a_b, double a_val);
 
 		public:
 			tensor up_rank(size_t a_n);

@@ -11,8 +11,8 @@ using std::vector;
 
 namespace aurora {
 	namespace pseudo {
-		void init(vector<param*>& a_pl, int a_rnd_init, double a_state_min, double a_state_max, double a_learn_rate);
-		void init(vector<param_sgd*>& a_pl, int a_rnd_init, double a_state_min, double a_state_max, double a_learn_rate);
-		void init(vector<param_mom*>& a_pl, int a_rnd_init, double a_state_min, double a_state_max, double a_learn_rate, double a_beta);
+		void pl_init(vector<param*>& a_pl, int a_rnd_init, double a_state_min, double a_state_max, double a_learn_rate);
+		void pl_init(vector<param_sgd*>& a_pl, int a_rnd_init, double a_state_min, double a_state_max, double a_learn_rate);
+		void pl_init(vector<param_mom*>& a_pl, int a_rnd_init, double a_state_min, double a_state_max, double a_learn_rate, double a_beta);
 	}
 }
