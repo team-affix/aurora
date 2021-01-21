@@ -40,16 +40,18 @@ int main() {
 
 	for (param_mom* pmt : pl) {
 		pmt->state() = urd(dre);
-		pmt->learn_rate() = 0.0002;
+		pmt->learn_rate() = 0.2;
 		pmt->beta() = 0.9;
 	}
 
 	printf("");
 
-	for (int epoch = 0; epoch < 10000; epoch++) {
+	for (int epoch = 0; epoch < 1000000; epoch++) {
 		
-		if(epoch % 10000 == 0)
+		if (epoch % 10000 == 0) {
 			printf("\033[%d;%dH", 0, 0);
+			std::cout << epoch << std::endl;
+		}
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
 			s->cycle(x[tsIndex], y[tsIndex]);
