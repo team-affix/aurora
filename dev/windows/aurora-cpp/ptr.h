@@ -21,11 +21,6 @@ namespace aurora {
 			}
 
 		public:
-			void operator=(T a) {
-				val() = a;
-			}
-
-		public:
 			void link(ptr<T>& other) {
 				*this = other;
 			}

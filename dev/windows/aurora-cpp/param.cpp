@@ -7,12 +7,12 @@ using aurora::optimization::param;
 using aurora::optimization::param_sgd;
 using aurora::optimization::param_mom;
 
-double& param::state() {
-	return state_ptr.val();
-}
-
 param::~param() {
 
+}
+
+double& param::state() {
+	return state_ptr.val();
 }
 
 double& param::learn_rate() {
