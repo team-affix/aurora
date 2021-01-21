@@ -23,8 +23,10 @@ namespace aurora {
 		public:
 			ptr<double> val_ptr = new double(0);
 			ptr<vector<tensor>> vec_ptr = new vector<tensor>();
-			tensor* group_next_ptr = nullptr;
+
+		public:
 			tensor* group_prev_ptr = nullptr;
+			tensor* group_next_ptr = nullptr;
 
 		public:
 			double& val();

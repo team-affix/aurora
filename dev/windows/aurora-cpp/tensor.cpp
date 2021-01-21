@@ -350,7 +350,8 @@ void tensor::link(tensor& a_other) {
 
 void tensor::unlink() {
 	val_ptr = nullptr;
-	vec_ptr = nullptr;
+	for (int i = 0; i < size(); i++)
+		at(i).unlink();
 }
 void tensor::group_recur_fwd(function<void(tensor*)> a_func) {
 	if (group_next_ptr != nullptr)
