@@ -89,12 +89,14 @@ void tnn_test() {
 }
 
 void tnn_multithread_test() {
+
 	tensor x = {
 		{0, 0},
 		{0, 1},
 		{1, 0},
 		{1, 1},
 	};
+
 	tensor y = {
 		{0},
 		{1},
@@ -130,7 +132,7 @@ void tnn_multithread_test() {
 		}
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
-			ptr<sequential> seq = s[tsIndex];
+			ptr<sequential>& seq = s[tsIndex];
 			tensor& seq_x = x[tsIndex];
 			tensor& seq_y = y[tsIndex];
 			thds[tsIndex] = std::thread([&] {
@@ -162,7 +164,7 @@ void tnn_multithread_test() {
 
 int main() {
 
-	tnn_test();
+	tnn_multithread_test();
 
 	return 0;
 }

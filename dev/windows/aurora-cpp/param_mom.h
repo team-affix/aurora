@@ -1,9 +1,16 @@
 #pragma once
 #include "param_sgd.h"
+#include <mutex>
+
+using std::mutex;
 
 namespace aurora {
 	namespace optimization {
 		class param_mom : public param_sgd {
+		private:
+			mutex momentum_mtx;
+			mutex beta_mtx;
+
 		public:
 			ptr<double> momentum_ptr = new double(0);
 			ptr<double> beta_ptr = new double(0);

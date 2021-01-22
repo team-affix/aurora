@@ -2,10 +2,14 @@
 #include "param.h"
 
 using aurora::optimization::param;
+using std::mutex;
 
 namespace aurora {
 	namespace optimization {
 		class param_sgd : public param {
+		private:
+			mutex gradient_mtx;
+
 		public:
 			ptr<double> gradient_ptr = new double(0);
 
