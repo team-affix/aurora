@@ -1,21 +1,17 @@
 #pragma once
 #include "ptr.h"
 #include <vector>
-#include <mutex>
+#include <functional>
 
 using aurora::data::ptr;
 using std::vector;
-using std::mutex;
+using std::function;
 
 namespace aurora {
 	namespace optimization {
 		class param_sgd;
 		class param_mom;
 		class param {
-		private:
-			mutex state_mtx;
-			mutex learn_rate_mtx;
-
 		public:
 			ptr<double> state_ptr = new double(0);
 			ptr<double> learn_rate_ptr = new double(0);

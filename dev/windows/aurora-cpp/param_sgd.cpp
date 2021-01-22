@@ -6,15 +6,13 @@
 using aurora::optimization::param;
 using aurora::optimization::param_sgd;
 using aurora::optimization::param_mom;
-using std::lock_guard;
-
-double& param_sgd::gradient() {
-	lock_guard<mutex> lock(gradient_mtx);
-	return gradient_ptr.val();
-}
 
 param_sgd::~param_sgd() {
 
+}
+
+double& param_sgd::gradient() {
+	return gradient_ptr.val();
 }
 
 param* param_sgd::clone() {

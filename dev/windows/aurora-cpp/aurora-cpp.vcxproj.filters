@@ -126,6 +126,12 @@
     <ClInclude Include="aurora.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lock_guard.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="persistent_thread.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -186,6 +192,9 @@
       <Filter>Source Files\math</Filter>
     </ClCompile>
     <ClCompile Include="pl_init.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="persistent_thread.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
   </ItemGroup>

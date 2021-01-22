@@ -24,6 +24,7 @@
     <ClInclude Include="data.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="leaky_relu.h" />
+    <ClInclude Include="lock_guard.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="modeling.h" />
     <ClInclude Include="neuron.h" />
@@ -42,6 +43,7 @@
     <ClInclude Include="param_sgd.h" />
     <ClInclude Include="ptr.h" />
     <ClInclude Include="session.h" />
+    <ClInclude Include="persistent_thread.h" />
     <ClInclude Include="tnn.h" />
     <ClInclude Include="weight.h" />
     <ClInclude Include="weight_junction.h" />
@@ -64,6 +66,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="session.cpp" />
+    <ClCompile Include="persistent_thread.cpp" />
     <ClCompile Include="tnn.cpp" />
     <ClCompile Include="weight.cpp" />
     <ClCompile Include="weight_junction.cpp" />

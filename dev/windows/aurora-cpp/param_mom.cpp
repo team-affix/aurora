@@ -6,19 +6,16 @@
 using aurora::optimization::param;
 using aurora::optimization::param_sgd;
 using aurora::optimization::param_mom;
-using std::lock_guard;
 
 param_mom::~param_mom() {
 
 }
 
 double& param_mom::momentum() {
-	lock_guard<mutex> lock(momentum_mtx);
 	return momentum_ptr.val();
 }
 
 double& param_mom::beta() {
-	lock_guard<mutex> lock(beta_mtx);
 	return beta_ptr.val();
 }
 
