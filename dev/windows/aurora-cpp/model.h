@@ -1,4 +1,5 @@
 #pragma once
+#include "macro.h"
 #include "ptr.h"
 #include "ref.h"
 #include "tensor.h"
@@ -27,35 +28,12 @@ namespace aurora {
 			tensor y_grad = 0;
 
 		public:
+			MODEL_FIELDS
 			virtual ~model();
 			model();
 			model(vector<param*>& a_pl);
 			model(vector<param_sgd*>& a_pl);
 			model(vector<param_mom*>& a_pl);
-
-		public:
-			virtual model* clone();
-			virtual model* clone(vector<param*>& a_pl);
-			virtual model* clone(vector<param_sgd*>& a_pl);
-			virtual model* clone(vector<param_mom*>& a_pl);
-
-		public:
-			virtual void fwd();
-			virtual void bwd();
-			virtual tensor& fwd(tensor a_x);
-			virtual tensor& bwd(tensor a_y_grad);
-			virtual void signal(tensor a_y_des);
-
-		public:
-			virtual void cycle(tensor a_x, tensor a_y_des);
-
-		public:
-			virtual void recur(function<void(model*)> a_func);
-
-		public:
-			virtual void append(model* a_other);
-			virtual void prepend(model* a_other);
-			virtual void compile();
 
 		};
 	}

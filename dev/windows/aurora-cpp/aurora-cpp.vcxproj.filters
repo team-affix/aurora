@@ -132,6 +132,12 @@
     <ClInclude Include="persistent_thread.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
+    <ClInclude Include="sync.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
+    <ClInclude Include="macro.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -196,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="persistent_thread.cpp">
       <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="sync.cpp">
+      <Filter>Source Files\modeling</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

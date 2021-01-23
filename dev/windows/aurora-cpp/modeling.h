@@ -9,3 +9,4 @@
 #include "sigmoid.h"
 #include "tanh.h"
 #include "leaky_relu.h"
+#include "sync.h"

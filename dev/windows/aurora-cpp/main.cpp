@@ -257,9 +257,48 @@ void tnn_multithread_test() {
 	}
 }
 
+void sync_xor_test() {
+
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+
+	vector<param_sgd*> pl = vector<param_sgd*>();
+	ptr<sync> s = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl));
+	pseudo::pl_init(pl, 25, -1, 1, 0.2);
+
+	s->prep(4);
+	s->compile();
+
+	s->unroll(4);
+
+	for (int epoch = 0; epoch < 1000000; epoch++) {
+		s->cycle(x, y);
+
+		/*if (epoch % 10000 == 0)
+			std::cout << x.to_string() << std::endl << s->y.to_string() << std::endl << std::endl;*/
+
+		for (param_sgd* pmt : pl) {
+			pmt->state() -= pmt->learn_rate() * pmt->gradient();
+			pmt->gradient() = 0;
+		}
+	}
+
+}
+
 int main() {
 
-
+	sync_xor_test();
 
 	return 0;
 }

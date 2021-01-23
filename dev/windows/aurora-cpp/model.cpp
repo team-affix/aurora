@@ -72,16 +72,6 @@ model* model::clone(vector<param_mom*>& a_pl) {
 	return new model();
 }
 
-void model::append(model* a_other) {
-	y.group_add(a_other->x);
-	y_grad.group_add(a_other->x_grad);
-}
-
-void model::prepend(model* a_other) {
-	a_other->y.group_add(x);
-	a_other->y_grad.group_add(x_grad);
-}
-
 void model::compile() {
 	y.group_add(x);
 	y_grad.group_add(x_grad);
