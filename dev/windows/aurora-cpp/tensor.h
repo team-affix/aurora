@@ -45,6 +45,11 @@ namespace aurora {
 
 		public:
 			void set(tensor a_other);
+			void pop(tensor a_other);
+
+		public:
+			void ref_set(tensor& a_other);
+			void ref_pop(tensor& a_other);
 
 		public:
 			void resize(size_t a_size);

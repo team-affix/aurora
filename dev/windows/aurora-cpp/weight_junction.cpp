@@ -81,13 +81,13 @@ void weight_junction::bwd() {
 }
 
 tensor& weight_junction::fwd(tensor a_x) {
-	x.set(a_x);
+	x.pop(a_x);
 	fwd();
 	return y;
 }
 
 tensor& weight_junction::bwd(tensor a_y_grad) {
-	y_grad.set(a_y_grad);
+	y_grad.pop(a_y_grad);
 	bwd();
 	return x_grad;
 }
@@ -97,7 +97,7 @@ void weight_junction::signal(tensor a_y_des) {
 }
 
 void weight_junction::cycle(tensor a_x, tensor a_y_des) {
-	x.set(a_x);
+	x.pop(a_x);
 	fwd();
 	signal(a_y_des);
 	bwd();

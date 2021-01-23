@@ -55,6 +55,25 @@ void tensor::set(tensor a_other) {
 		at(i).set(a_other.at(i));
 }
 
+void tensor::pop(tensor a_other) {
+	val() = a_other.val();
+	for (size_t i = 0; i < a_other.vec().size(); i++)
+		at(i).pop(a_other.at(i));
+}
+
+void tensor::ref_set(tensor& a_other) {
+	val() = a_other.val();
+	resize(a_other.size());
+	for (size_t i = 0; i < vec().size(); i++)
+		at(i).ref_set(a_other.at(i));
+}
+
+void tensor::ref_pop(tensor& a_other) {
+	val() = a_other.val();
+	for (size_t i = 0; i < vec().size(); i++)
+		at(i).ref_pop(a_other.at(i));
+}
+
 void tensor::resize(size_t a_size) {
 	vec().resize(a_size);
 }

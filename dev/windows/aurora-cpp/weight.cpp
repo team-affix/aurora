@@ -63,13 +63,13 @@ void weight::bwd() {
 }
 
 tensor& weight::fwd(tensor a_x) {
-	x.set(a_x);
+	x.val() = a_x.val();
 	fwd();
 	return y;
 }
 
 tensor& weight::bwd(tensor a_y_grad) {
-	y_grad.set(a_y_grad);
+	y_grad.val() = a_y_grad.val();
 	bwd();
 	return x_grad;
 }
@@ -79,7 +79,7 @@ void weight::signal(tensor a_y_des) {
 }
 
 void weight::cycle(tensor a_x, tensor a_y_des) {
-	x.set(a_x);
+	x.val() = a_x.val();
 	fwd();
 	signal(a_y_des);
 	bwd();
