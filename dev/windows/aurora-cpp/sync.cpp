@@ -49,13 +49,13 @@ void sync::bwd() {
 }
 
 tensor& sync::fwd(tensor a_x) {
-	x.set(a_x);
+	x.pop(a_x);
 	fwd();
 	return y;
 }
 
 tensor& sync::bwd(tensor a_y_grad) {
-	y_grad.set(a_y_grad);
+	y_grad.pop(a_y_grad);
 	bwd();
 	return x_grad;
 }
@@ -66,7 +66,7 @@ void sync::signal(tensor a_y_des) {
 }
 
 void sync::cycle(tensor a_x, tensor a_y_des) {
-	x.set(a_x);
+	x.pop(a_x);
 	fwd();
 	signal(a_y_des);
 	bwd();

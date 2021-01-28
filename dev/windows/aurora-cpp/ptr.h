@@ -9,7 +9,7 @@ namespace aurora {
 		class ptr : public shared_ptr<T> {
 		public:
 			ptr() {
-			
+				
 			}
 			ptr(T* a) : shared_ptr<T>(a) {
 
