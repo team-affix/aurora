@@ -125,6 +125,16 @@ void tensor::sum_2d(tensor& a_output) {
 		a_output.add_1d(at(i), a_output);
 }
 
+void tensor::tanh_1d(tensor& a_output) {
+	for (int i = 0; i < size(); i++)
+		a_output[i].val() = tanh(at(i).val());
+}
+
+void tensor::tanh_2d(tensor& a_output) {
+	for (int i = 0; i < size(); i++)
+		at(i).tanh_1d(a_output.at(i));
+}
+
 tensor tensor::abs_1d() {
 	tensor result = new_1d(size());
 	abs_1d(result);
@@ -146,6 +156,18 @@ tensor tensor::sum_1d() {
 tensor tensor::sum_2d() {
 	tensor result = tensor::new_1d(width());
 	sum_2d(result);
+	return result;
+}
+
+tensor tensor::tanh_1d() {
+	tensor result = tensor::new_1d(size());
+	tanh_1d(result);
+	return result;
+}
+
+tensor tensor::tanh_2d() {
+	tensor result = tensor::new_1d(height(), width());
+	tanh_2d(result);
 	return result;
 }
 
@@ -380,6 +402,7 @@ void tensor::unlink() {
 	for (int i = 0; i < size(); i++)
 		at(i).unlink();
 }
+
 void tensor::group_recur_fwd(function<void(tensor*)> a_func) {
 	if (group_next_ptr != nullptr)
 		group_next_ptr->group_recur_fwd(a_func);

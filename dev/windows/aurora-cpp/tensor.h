@@ -89,12 +89,16 @@ namespace aurora {
 			void abs_2d(tensor& a_output);
 			void sum_1d(tensor& a_output);
 			void sum_2d(tensor& a_output);
+			void tanh_1d(tensor& a_output);
+			void tanh_2d(tensor& a_output);
 
 		public:
 			tensor abs_1d();
 			tensor abs_2d();
 			tensor sum_1d();
 			tensor sum_2d();
+			tensor tanh_1d();
+			tensor tanh_2d();
 
 		public:
 			void add_1d(tensor a_other, tensor& a_output);

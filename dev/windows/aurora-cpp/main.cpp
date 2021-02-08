@@ -470,11 +470,89 @@ void encoder_test() {
 
 }
 
+void lstm_test() {
+	tensor x0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor x1 = {
+		{0, 1},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	tensor y1 = {
+		{1},
+		{1},
+		{1},
+		{1},
+	};
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
+	const int lstm_units = 5;
+
+	vector<param_sgd*> pv;
+	sync* s0 = new sync(pseudo::tnn({ 2, lstm_units }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	}));
+	lstm* l = new lstm(5, [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	});
+	sync* s1 = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	}));
+
+	ptr<sync> s0_ptr = s0;
+	ptr<lstm> l0_ptr = l;
+	ptr<sync> s1_ptr = s1;
+
+	sequential s = sequential({ s0, l, s1 });
+
+	s0->prep(4);
+	l->prep(4);
+	s1->prep(4);
+
+	s.compile();
+
+	s0->unroll(4);
+	l->unroll(4);
+	s1->unroll(4);
+
+	const int checkpoint_interval = 10000;
+
+	for (int epoch = 0; true; epoch++) {
+		s.cycle(x0, y0);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S0: " << s.y.to_string() << std::endl;
+		s.cycle(x1, y1);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S1: " << s.y.to_string() << std::endl;
+		for (param_sgd* pmt : pv) {
+			pmt->state() -= pmt->learn_rate() * pmt->gradient();
+			pmt->gradient() = 0;
+		}
+	}
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	encoder_test();
+	lstm_test();
 
 	return 0;
 }

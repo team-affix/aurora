@@ -138,6 +138,12 @@
     <ClInclude Include="macro.h">
       <Filter>Header Files\modeling</Filter>
     </ClInclude>
+    <ClInclude Include="lstm_ts.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
+    <ClInclude Include="lstm.h">
+      <Filter>Header Files\modeling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -204,6 +210,12 @@
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
     <ClCompile Include="sync.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="lstm_ts.cpp">
+      <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="lstm.cpp">
       <Filter>Source Files\modeling</Filter>
     </ClCompile>
   </ItemGroup>

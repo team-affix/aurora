@@ -10,3 +10,5 @@
 #include "tanh.h"
 #include "leaky_relu.h"
 #include "sync.h"
+#include "lstm_ts.h"
+#include "lstm.h"
