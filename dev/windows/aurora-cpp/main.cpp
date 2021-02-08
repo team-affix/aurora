@@ -77,11 +77,15 @@ void tnn_xor_test() {
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
-	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl);
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
+	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pl.push_back((param_mom*)pmt.get());
+	});
 
 	s->compile();
-
-	pseudo::pl_init(pl, 10, -1, 1, 0.2, 0.9);
 
 	printf("");
 
@@ -152,9 +156,13 @@ void tnn_test() {
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
-	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), pl);
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
 
-	pseudo::pl_init(pl, 10, -1, 1, 0.2, 0.9);
+	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pl.push_back((param_mom*)pmt.get());
+	});
 
 	printf("");
 
@@ -223,10 +231,16 @@ void tnn_multithread_test() {
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
 	const int numClones = 16;
 
 	vector<ptr<sequential>> clones = vector<ptr<sequential>>(numClones);
-	clones[0] = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), pl);
+	clones[0] = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pl.push_back((param_mom*)pmt.get());
+	});
 
 	for (int i = 1; i < clones.size(); i++)
 		clones[i] = (sequential*)clones.front()->clone();
@@ -293,8 +307,14 @@ void sync_xor_test() {
 		{0},
 	};
 
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
 	vector<param_sgd*> pl = vector<param_sgd*>();
-	ptr<sync> s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl));
+	ptr<sync> s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pl.push_back((param_sgd*)pmt.get());
+	}));
 	ptr<sync> s = (sync*)s_prev->clone();
 	pseudo::pl_init(pl, 25, -1, 1, 0.2);
 
@@ -367,7 +387,10 @@ void encoder_test() {
 
 	vector<param_sgd*> pl = vector<param_sgd*>();
 	std::cout << "INSTANTIATING MODEL" << std::endl;
-	ptr<sequential> s = pseudo::tnn({ x_order_1_len, h_1_len, h_2_len, h_3_len, encoded_len, h_3_len, h_2_len, h_1_len, x_order_1_len }, pseudo::nlr(0.3), pl);
+	ptr<sequential> s = pseudo::tnn({ x_order_1_len, h_1_len, h_2_len, h_3_len, encoded_len, h_3_len, h_2_len, h_1_len, x_order_1_len }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd();
+		pl.push_back((param_sgd*)pmt.get());
+	});
 
 	uniform_real_distribution<double> urd((double)-1 / pl.size(), (double)1 / pl.size());
 	default_random_engine dre(801);
@@ -382,8 +405,8 @@ void encoder_test() {
 	}
 	else {
 		std::cout << "INITIALIZING PARAMETER STATES" << std::endl;
-		for (param_sgd* pmt : pl)
-			pmt->state() = urd(dre);
+		for (int i = 0; i < pl.size(); i++)
+			pl[i]->state() = urd(dre);
 	}
 
 	for (param_sgd* pmt : pl) {

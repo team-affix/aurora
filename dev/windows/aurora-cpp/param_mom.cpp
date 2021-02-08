@@ -11,6 +11,15 @@ param_mom::~param_mom() {
 
 }
 
+param_mom::param_mom() {
+
+}
+
+param_mom::param_mom(double a_state, double a_learn_rate, double a_gradient, double a_momentum, double a_beta) : param_sgd(a_state, a_learn_rate, a_gradient) {
+	this->momentum() = a_momentum;
+	this->beta() = a_beta;
+}
+
 double& param_mom::momentum() {
 	return momentum_ptr.val();
 }

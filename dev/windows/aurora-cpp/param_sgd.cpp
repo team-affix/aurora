@@ -11,6 +11,14 @@ param_sgd::~param_sgd() {
 
 }
 
+param_sgd::param_sgd() {
+
+}
+
+param_sgd::param_sgd(double a_state, double a_learn_rate, double a_gradient) : param(a_state, a_learn_rate) {
+	this->gradient() = a_gradient;
+}
+
 double& param_sgd::gradient() {
 	return gradient_ptr.val();
 }

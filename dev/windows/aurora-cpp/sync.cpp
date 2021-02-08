@@ -17,22 +17,8 @@ model* sync::clone() {
 	return result;
 }
 
-model* sync::clone(vector<param*>& a_pl) {
-	sync* result = new sync(model_template->clone(a_pl));
-	result->prep(prepared.size());
-	result->unroll(unrolled.size());
-	return result;
-}
-
-model* sync::clone(vector<param_sgd*>& a_pl) {
-	sync* result = new sync(model_template->clone(a_pl));
-	result->prep(prepared.size());
-	result->unroll(unrolled.size());
-	return result;
-}
-
-model* sync::clone(vector<param_mom*>& a_pl) {
-	sync* result = new sync(model_template->clone(a_pl));
+model* sync::clone(function<void(ptr<param>&)> a_init) {
+	sync* result = new sync(model_template->clone(a_init));
 	result->prep(prepared.size());
 	result->unroll(unrolled.size());
 	return result;

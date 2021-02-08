@@ -18,6 +18,8 @@ namespace aurora {
 
 		public:
 			virtual ~param();
+			param();
+			param(double a_state, double a_learn_rate);
 
 		public:
 			double& state();

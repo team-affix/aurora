@@ -11,16 +11,8 @@ model::model() {
 
 }
 
-model::model(vector<param*>& a_pl) {
-
-}
-
-model::model(vector<param_sgd*>& a_pl) {
-
-}
-
-model::model(vector<param_mom*>& a_pl) {
-
+model::model(function<void(ptr<param>&)> a_init) {
+	
 }
 
 void model::fwd() {
@@ -60,15 +52,7 @@ model* model::clone() {
 	return new model();
 }
 
-model* model::clone(vector<param*>& a_pl) {
-	return new model();
-}
-
-model* model::clone(vector<param_sgd*>& a_pl) {
-	return new model();
-}
-
-model* model::clone(vector<param_mom*>& a_pl) {
+model* model::clone(function<void(ptr<param>&)> a_init) {
 	return new model();
 }
 

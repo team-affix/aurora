@@ -26,27 +26,11 @@ model* sequential::clone() {
 	return result;
 }
 
-model* sequential::clone(vector<param*>& a_pl) {
+model* sequential::clone(function<void(ptr<param>&)> a_init) {
 	sequential* result = new sequential();
 	result->models.resize(models.size());
 	for (int i = 0; i < models.size(); i++)
-		result->models[i] = models[i]->clone(a_pl);
-	return result;
-}
-
-model* sequential::clone(vector<param_sgd*>& a_pl) {
-	sequential* result = new sequential();
-	result->models.resize(models.size());
-	for (int i = 0; i < models.size(); i++)
-		result->models[i] = models[i]->clone(a_pl);
-	return result;
-}
-
-model* sequential::clone(vector<param_mom*>& a_pl) {
-	sequential* result = new sequential();
-	result->models.resize(models.size());
-	for (int i = 0; i < models.size(); i++)
-		result->models[i] = models[i]->clone(a_pl);
+		result->models[i] = models[i]->clone(a_init);
 	return result;
 }
 

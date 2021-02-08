@@ -10,22 +10,10 @@ weight_set::weight_set() {
 
 }
 
-weight_set::weight_set(size_t a_a, vector<param*>& a_pl) {
+weight_set::weight_set(size_t a_a, function<void(ptr<param>&)> a_init) {
 	this->a = a_a;
 	for (int i = 0; i < a_a; i++)
-		weights.push_back(new weight(a_pl));
-}
-
-weight_set::weight_set(size_t a_a, vector<param_sgd*>& a_pl) {
-	this->a = a_a;
-	for (int i = 0; i < a_a; i++)
-		weights.push_back(new weight(a_pl));
-}
-
-weight_set::weight_set(size_t a_a, vector<param_mom*>& a_pl) {
-	this->a = a_a;
-	for (int i = 0; i < a_a; i++)
-		weights.push_back(new weight(a_pl));
+		weights.push_back(new weight(a_init));
 }
 
 model* weight_set::clone() {
@@ -36,27 +24,11 @@ model* weight_set::clone() {
 	return result;
 }
 
-model* weight_set::clone(vector<param*>& a_pl) {
+model* weight_set::clone(function<void(ptr<param>&)> a_init) {
 	weight_set* result = new weight_set();
 	result->a = a;
 	for (int i = 0; i < a; i++)
-		result->weights.push_back((weight*)weights[i]->clone(a_pl));
-	return result;
-}
-
-model* weight_set::clone(vector<param_sgd*>& a_pl) {
-	weight_set* result = new weight_set();
-	result->a = a;
-	for (int i = 0; i < a; i++)
-		result->weights.push_back((weight*)weights[i]->clone(a_pl));
-	return result;
-}
-
-model* weight_set::clone(vector<param_mom*>& a_pl) {
-	weight_set* result = new weight_set();
-	result->a = a;
-	for (int i = 0; i < a; i++)
-		result->weights.push_back((weight*)weights[i]->clone(a_pl));
+		result->weights.push_back((weight*)weights[i]->clone(a_init));
 	return result;
 }
 

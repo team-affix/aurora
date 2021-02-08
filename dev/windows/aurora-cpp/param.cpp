@@ -11,6 +11,15 @@ param::~param() {
 
 }
 
+param::param() {
+
+}
+
+param::param(double a_state, double a_learn_rate) {
+	this->state() = a_state;
+	this->learn_rate() = a_learn_rate;
+}
+
 double& param::state() {
 	return state_ptr.val();
 }
