@@ -10,19 +10,8 @@ bias::bias() {
 
 }
 
-bias::bias(vector<param*>& a_pl) {
-	pmt = new param();
-	a_pl.push_back(pmt.get());
-}
-
-bias::bias(vector<param_sgd*>& a_pl) {
-	pmt = new param_sgd();
-	a_pl.push_back((param_sgd*)pmt.get());
-}
-
-bias::bias(vector<param_mom*>& a_pl) {
-	pmt = new param_mom();
-	a_pl.push_back((param_mom*)pmt.get());
+bias::bias(function<void(ptr<param>&)> a_init) {
+	a_init(pmt);
 }
 
 model* bias::clone() {
@@ -31,24 +20,10 @@ model* bias::clone() {
 	return result;
 }
 
-model* bias::clone(vector<param*>& a_pl) {
+model* bias::clone(function<void(ptr<param>&)> a_init) {
 	bias* result = new bias();
-	result->pmt = pmt->to_param();
-	a_pl.push_back(result->pmt.get());
-	return result;
-}
-
-model* bias::clone(vector<param_sgd*>& a_pl) {
-	bias* result = new bias();
-	result->pmt = pmt->to_param_sgd();
-	a_pl.push_back((param_sgd*)result->pmt.get());
-	return result;
-}
-
-model* bias::clone(vector<param_mom*>& a_pl) {
-	bias* result = new bias();
-	result->pmt = pmt->to_param_mom();
-	a_pl.push_back((param_mom*)result->pmt.get());
+	result->pmt = pmt->clone();
+	a_init(result->pmt);
 	return result;
 }
 

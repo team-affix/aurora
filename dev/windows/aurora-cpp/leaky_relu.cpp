@@ -14,15 +14,7 @@ model* leaky_relu::clone() {
 	return new leaky_relu(m.val());
 }
 
-model* leaky_relu::clone(vector<param*>& a_pl) {
-	return new leaky_relu(m.val());
-}
-
-model* leaky_relu::clone(vector<param_sgd*>& a_pl) {
-	return new leaky_relu(m.val());
-}
-
-model* leaky_relu::clone(vector<param_mom*>& a_pl) {
+model* leaky_relu::clone(function<void(ptr<param>&)> a_init) {
 	return new leaky_relu(m.val());
 }
 

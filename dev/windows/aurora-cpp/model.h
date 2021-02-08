@@ -31,9 +31,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~model();
 			model();
-			model(vector<param*>& a_pl);
-			model(vector<param_sgd*>& a_pl);
-			model(vector<param_mom*>& a_pl);
+			model(function<void(ptr<param>&)> a_init);
 
 		};
 	}

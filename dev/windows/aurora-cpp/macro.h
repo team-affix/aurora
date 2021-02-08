@@ -2,9 +2,7 @@
 
 #define MODEL_FIELDS \
 virtual model* clone(); \
-virtual model* clone(vector<param*>& a_pl); \
-virtual model* clone(vector<param_sgd*>& a_pl); \
-virtual model* clone(vector<param_mom*>& a_pl); \
+virtual model* clone(function<void(ptr<param>&)> a_init); \
 virtual void fwd(); \
 virtual void bwd(); \
 virtual tensor& fwd(tensor a_x); \

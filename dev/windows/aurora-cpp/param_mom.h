@@ -10,6 +10,8 @@ namespace aurora {
 
 		public:
 			virtual ~param_mom();
+			param_mom();
+			param_mom(double a_state, double a_learn_rate, double a_gradient, double a_momentum, double a_beta);
 
 		public:
 			double& momentum();
@@ -17,9 +19,6 @@ namespace aurora {
 
 		public:
 			virtual param* clone();
-			virtual param* to_param();
-			virtual param_sgd* to_param_sgd();
-			virtual param_mom* to_param_mom();
 
 		};
 	}

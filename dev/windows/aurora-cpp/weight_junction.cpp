@@ -10,25 +10,11 @@ weight_junction::weight_junction() {
 
 }
 
-weight_junction::weight_junction(size_t a_a, size_t a_b, vector<param*>& a_pl) {
+weight_junction::weight_junction(size_t a_a, size_t a_b, function<void(ptr<param>&)> a_init) {
 	this->a = a_a;
 	this->b = a_b;
 	for (int i = 0; i < a_a; i++)
-		weight_sets.push_back(new weight_set(a_b, a_pl));
-}
-
-weight_junction::weight_junction(size_t a_a, size_t a_b, vector<param_sgd*>& a_pl) {
-	this->a = a_a;
-	this->b = a_b;
-	for (int i = 0; i < a_a; i++)
-		weight_sets.push_back(new weight_set(a_b, a_pl));
-}
-
-weight_junction::weight_junction(size_t a_a, size_t a_b, vector<param_mom*>& a_pl) {
-	this->a = a_a;
-	this->b = a_b;
-	for (int i = 0; i < a_a; i++)
-		weight_sets.push_back(new weight_set(a_b, a_pl));
+		weight_sets.push_back(new weight_set(a_b, a_init));
 }
 
 model* weight_junction::clone() {
@@ -40,30 +26,12 @@ model* weight_junction::clone() {
 	return result;
 }
 
-model* weight_junction::clone(vector<param*>& a_pl) {
+model* weight_junction::clone(function<void(ptr<param>&)> a_init) {
 	weight_junction* result = new weight_junction();
 	result->a = a;
 	result->b = b;
 	for (int i = 0; i < weight_sets.size(); i++)
-		result->weight_sets.push_back((weight_set*)weight_sets[i]->clone(a_pl));
-	return result;
-}
-
-model* weight_junction::clone(vector<param_sgd*>& a_pl) {
-	weight_junction* result = new weight_junction();
-	result->a = a;
-	result->b = b;
-	for (int i = 0; i < weight_sets.size(); i++)
-		result->weight_sets.push_back((weight_set*)weight_sets[i]->clone(a_pl));
-	return result;
-}
-
-model* weight_junction::clone(vector<param_mom*>& a_pl) {
-	weight_junction* result = new weight_junction();
-	result->a = a;
-	result->b = b;
-	for (int i = 0; i < weight_sets.size(); i++)
-		result->weight_sets.push_back((weight_set*)weight_sets[i]->clone(a_pl));
+		result->weight_sets.push_back((weight_set*)weight_sets[i]->clone(a_init));
 	return result;
 }
 

@@ -19,9 +19,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~weight_junction();
 			weight_junction();
-			weight_junction(size_t a_a, size_t a_b, vector<param*>& a_pl);
-			weight_junction(size_t a_a, size_t a_b, vector<param_sgd*>& a_pl);
-			weight_junction(size_t a_a, size_t a_b, vector<param_mom*>& a_pl);
+			weight_junction(size_t a_a, size_t a_b, function<void(ptr<param>&)> a_init);
 
 		};
 	}

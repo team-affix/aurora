@@ -77,11 +77,15 @@ void tnn_xor_test() {
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
-	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl);
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
+	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pl.push_back((param_mom*)pmt.get());
+	});
 
 	s->compile();
-
-	pseudo::pl_init(pl, 10, -1, 1, 0.2, 0.9);
 
 	printf("");
 
@@ -152,9 +156,13 @@ void tnn_test() {
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
-	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), pl);
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
 
-	pseudo::pl_init(pl, 10, -1, 1, 0.2, 0.9);
+	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pl.push_back((param_mom*)pmt.get());
+	});
 
 	printf("");
 
@@ -223,10 +231,16 @@ void tnn_multithread_test() {
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
 	const int numClones = 16;
 
 	vector<ptr<sequential>> clones = vector<ptr<sequential>>(numClones);
-	clones[0] = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), pl);
+	clones[0] = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pl.push_back((param_mom*)pmt.get());
+	});
 
 	for (int i = 1; i < clones.size(); i++)
 		clones[i] = (sequential*)clones.front()->clone();
@@ -293,8 +307,14 @@ void sync_xor_test() {
 		{0},
 	};
 
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
 	vector<param_sgd*> pl = vector<param_sgd*>();
-	ptr<sync> s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pl));
+	ptr<sync> s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pl.push_back((param_sgd*)pmt.get());
+	}));
 	ptr<sync> s = (sync*)s_prev->clone();
 	pseudo::pl_init(pl, 25, -1, 1, 0.2);
 
@@ -367,7 +387,10 @@ void encoder_test() {
 
 	vector<param_sgd*> pl = vector<param_sgd*>();
 	std::cout << "INSTANTIATING MODEL" << std::endl;
-	ptr<sequential> s = pseudo::tnn({ x_order_1_len, h_1_len, h_2_len, h_3_len, encoded_len, h_3_len, h_2_len, h_1_len, x_order_1_len }, pseudo::nlr(0.3), pl);
+	ptr<sequential> s = pseudo::tnn({ x_order_1_len, h_1_len, h_2_len, h_3_len, encoded_len, h_3_len, h_2_len, h_1_len, x_order_1_len }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd();
+		pl.push_back((param_sgd*)pmt.get());
+	});
 
 	uniform_real_distribution<double> urd((double)-1 / pl.size(), (double)1 / pl.size());
 	default_random_engine dre(801);
@@ -382,8 +405,8 @@ void encoder_test() {
 	}
 	else {
 		std::cout << "INITIALIZING PARAMETER STATES" << std::endl;
-		for (param_sgd* pmt : pl)
-			pmt->state() = urd(dre);
+		for (int i = 0; i < pl.size(); i++)
+			pl[i]->state() = urd(dre);
 	}
 
 	for (param_sgd* pmt : pl) {
@@ -447,11 +470,89 @@ void encoder_test() {
 
 }
 
+void lstm_test() {
+	tensor x0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor x1 = {
+		{0, 1},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	tensor y1 = {
+		{1},
+		{1},
+		{1},
+		{1},
+	};
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
+	const int lstm_units = 5;
+
+	vector<param_sgd*> pv;
+	sync* s0 = new sync(pseudo::tnn({ 2, lstm_units }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	}));
+	lstm* l = new lstm(5, [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	});
+	sync* s1 = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	}));
+
+	ptr<sync> s0_ptr = s0;
+	ptr<lstm> l0_ptr = l;
+	ptr<sync> s1_ptr = s1;
+
+	sequential s = sequential({ s0, l, s1 });
+
+	s0->prep(4);
+	l->prep(4);
+	s1->prep(4);
+
+	s.compile();
+
+	s0->unroll(4);
+	l->unroll(4);
+	s1->unroll(4);
+
+	const int checkpoint_interval = 10000;
+
+	for (int epoch = 0; true; epoch++) {
+		s.cycle(x0, y0);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S0: " << s.y.to_string() << std::endl;
+		s.cycle(x1, y1);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S1: " << s.y.to_string() << std::endl;
+		for (param_sgd* pmt : pv) {
+			pmt->state() -= pmt->learn_rate() * pmt->gradient();
+			pmt->gradient() = 0;
+		}
+	}
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	encoder_test();
+	lstm_test();
 
 	return 0;
 }

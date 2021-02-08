@@ -14,9 +14,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~weight();
 			weight();
-			weight(vector<param*>& a_pl);
-			weight(vector<param_sgd*>& a_pl);
-			weight(vector<param_mom*>& a_pl);
+			weight(function<void(ptr<param>&)> a_init);
 
 		};
 	}

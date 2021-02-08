@@ -10,19 +10,9 @@ layer::layer() {
 
 }
 
-layer::layer(size_t a_a, ptr<model> a_model_template, vector<param*>& a_pl) {
+layer::layer(size_t a_a, ptr<model> a_model_template, function<void(ptr<param>&)> a_init) {
 	for (size_t i = 0; i < a_a; i++)
-		models.push_back(a_model_template->clone(a_pl));
-}
-
-layer::layer(size_t a_a, ptr<model> a_model_template, vector<param_sgd*>& a_pl) {
-	for (size_t i = 0; i < a_a; i++)
-		models.push_back(a_model_template->clone(a_pl));
-}
-
-layer::layer(size_t a_a, ptr<model> a_model_template, vector<param_mom*>& a_pl) {
-	for (size_t i = 0; i < a_a; i++)
-		models.push_back(a_model_template->clone(a_pl));
+		models.push_back(a_model_template->clone(a_init));
 }
 
 layer::layer(initializer_list<ptr<model>> a_il) {
@@ -36,24 +26,10 @@ model* layer::clone() {
 	return result;
 }
 
-model* layer::clone(vector<param*>& a_pl) {
+model* layer::clone(function<void(ptr<param>&)> a_init) {
 	layer* result = new layer();
 	for (size_t i = 0; i < models.size(); i++)
-		result->models.push_back(models[i]->clone(a_pl));
-	return result;
-}
-
-model* layer::clone(vector<param_sgd*>& a_pl) {
-	layer* result = new layer();
-	for (size_t i = 0; i < models.size(); i++)
-		result->models.push_back(models[i]->clone(a_pl));
-	return result;
-}
-
-model* layer::clone(vector<param_mom*>& a_pl) {
-	layer* result = new layer();
-	for (size_t i = 0; i < models.size(); i++)
-		result->models.push_back(models[i]->clone(a_pl));
+		result->models.push_back(models[i]->clone(a_init));
 	return result;
 }
 

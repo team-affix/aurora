@@ -14,15 +14,7 @@ model* tanh::clone() {
 	return new tanh();
 }
 
-model* tanh::clone(vector<param*>& a_pl) {
-	return new tanh();
-}
-
-model* tanh::clone(vector<param_sgd*>& a_pl) {
-	return new tanh();
-}
-
-model* tanh::clone(vector<param_mom*>& a_pl) {
+model* tanh::clone(function<void(ptr<param>&)> a_init) {
 	return new tanh();
 }
 

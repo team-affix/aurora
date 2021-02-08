@@ -11,6 +11,15 @@ param::~param() {
 
 }
 
+param::param() {
+
+}
+
+param::param(double a_state, double a_learn_rate) {
+	this->state() = a_state;
+	this->learn_rate() = a_learn_rate;
+}
+
 double& param::state() {
 	return state_ptr.val();
 }
@@ -21,24 +30,6 @@ double& param::learn_rate() {
 
 param* param::clone() {
 	param* result = new param();
-	result->state() = state();
-	result->learn_rate() = learn_rate();
-	return result;
-}
-
-param* param::to_param() {
-	return clone();
-}
-
-param_sgd* param::to_param_sgd() {
-	param_sgd* result = new param_sgd();
-	result->state() = state();
-	result->learn_rate() = learn_rate();
-	return result;
-}
-
-param_mom* param::to_param_mom() {
-	param_mom* result = new param_mom();
 	result->state() = state();
 	result->learn_rate() = learn_rate();
 	return result;

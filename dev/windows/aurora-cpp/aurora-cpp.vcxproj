@@ -25,6 +25,8 @@
     <ClInclude Include="layer.h" />
     <ClInclude Include="leaky_relu.h" />
     <ClInclude Include="lock_guard.h" />
+    <ClInclude Include="lstm.h" />
+    <ClInclude Include="lstm_ts.h" />
     <ClInclude Include="macro.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="modeling.h" />
@@ -55,6 +57,8 @@
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="layer.cpp" />
     <ClCompile Include="leaky_relu.cpp" />
+    <ClCompile Include="lstm.cpp" />
+    <ClCompile Include="lstm_ts.cpp" />
     <ClCompile Include="neuron.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_mom.cpp" />
