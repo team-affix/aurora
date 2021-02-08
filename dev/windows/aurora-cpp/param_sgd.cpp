@@ -30,22 +30,3 @@ param* param_sgd::clone() {
 	result->gradient() = gradient();
 	return result;
 }
-
-param* param_sgd::to_param() {
-	param* result = new param();
-	result->state() = state();
-	result->learn_rate() = learn_rate();
-	return result;
-}
-
-param_sgd* param_sgd::to_param_sgd() {
-	return (param_sgd*)clone();
-}
-
-param_mom* param_sgd::to_param_mom() {
-	param_mom* result = new param_mom();
-	result->state() = state();
-	result->learn_rate() = learn_rate();
-	result->gradient() = gradient();
-	return result;
-}
