@@ -15,7 +15,7 @@ namespace aurora {
 			param_sgd(double a_state, double a_learn_rate, double a_gradient);
 
 		public:
-			double& gradient();
+			virtual double& gradient();
 
 		public:
 			virtual param* clone();
