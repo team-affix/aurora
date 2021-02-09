@@ -4,7 +4,6 @@
 
 using aurora::optimization::param_sgd;
 using std::mutex;
-using std::lock_guard;
 
 namespace aurora {
 	namespace optimization {
@@ -13,9 +12,7 @@ namespace aurora {
 			ptr<double> gradient_ptr = new double(0);
 
 		public:
-			mutex state_mtx;
-			mutex learn_rate_mtx;
-			mutex gradient_mtx;
+			mutex accum_grad_mutex;
 
 		public:
 			virtual ~param_sgd_mt();
@@ -23,9 +20,7 @@ namespace aurora {
 			param_sgd_mt(double a_state, double a_learn_rate, double a_gradient);
 
 		public:
-			virtual double& state();
-			virtual double& learn_rate();
-			virtual double& gradient();
+			virtual void accum_grad(double a_grad);
 
 		public:
 			virtual param* clone();

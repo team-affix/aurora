@@ -23,6 +23,10 @@ double& param_sgd::gradient() {
 	return gradient_ptr.val();
 }
 
+void param_sgd::accum_grad(double a_grad) {
+	gradient() += a_grad;
+}
+
 param* param_sgd::clone() {
 	param_sgd* result = new param_sgd();
 	result->state() = state();

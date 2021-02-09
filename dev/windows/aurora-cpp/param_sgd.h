@@ -18,6 +18,9 @@ namespace aurora {
 			virtual double& gradient();
 
 		public:
+			virtual void accum_grad(double a_grad);
+
+		public:
 			virtual param* clone();
 
 		};

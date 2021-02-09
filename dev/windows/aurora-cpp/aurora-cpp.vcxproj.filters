@@ -141,9 +141,6 @@
     <ClInclude Include="lstm.h">
       <Filter>Header Files\modeling</Filter>
     </ClInclude>
-    <ClInclude Include="param_mt.h">
-      <Filter>Header Files\optimization</Filter>
-    </ClInclude>
     <ClInclude Include="param_sgd_mt.h">
       <Filter>Header Files\optimization</Filter>
     </ClInclude>
@@ -223,9 +220,6 @@
     </ClCompile>
     <ClCompile Include="lstm.cpp">
       <Filter>Source Files\modeling</Filter>
-    </ClCompile>
-    <ClCompile Include="param_mt.cpp">
-      <Filter>Source Files\optimization</Filter>
     </ClCompile>
     <ClCompile Include="param_sgd_mt.cpp">
       <Filter>Source Files\optimization</Filter>

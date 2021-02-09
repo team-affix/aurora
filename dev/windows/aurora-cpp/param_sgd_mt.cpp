@@ -10,25 +10,14 @@ param_sgd_mt::param_sgd_mt() {
 
 }
 
-param_sgd_mt::param_sgd_mt(double a_state, double a_learn_rate, double a_gradient) {
-	this->state() = a_state;
-	this->learn_rate() = a_learn_rate;
-	this->gradient() = a_gradient;
+param_sgd_mt::param_sgd_mt(double a_state, double a_learn_rate, double a_gradient) : param_sgd(a_state, a_learn_rate, a_gradient) {
+
 }
 
-double& param_sgd_mt::state() {
-	lock_guard<mutex> lock(state_mtx);
-	return state_ptr.val();
-}
-
-double& param_sgd_mt::learn_rate() {
-	lock_guard<mutex> lock(learn_rate_mtx);
-	return learn_rate_ptr.val();
-}
-
-double& param_sgd_mt::gradient() {
-	lock_guard<mutex> lock(gradient_mtx);
-	return gradient_ptr.val();
+void param_sgd_mt::accum_grad(double a_grad) {
+	accum_grad_mutex.lock();
+	gradient() += a_grad;
+	accum_grad_mutex.unlock();
 }
 
 param* param_sgd_mt::clone() {

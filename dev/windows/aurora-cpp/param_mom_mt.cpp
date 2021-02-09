@@ -10,37 +10,14 @@ param_mom_mt::param_mom_mt() {
 
 }
 
-param_mom_mt::param_mom_mt(double a_state, double a_learn_rate, double a_gradient, double a_momentum, double a_beta) {
-	this->state() = a_state;
-	this->learn_rate() = a_learn_rate;
-	this->gradient() = a_gradient;
-	this->momentum() = a_momentum;
-	this->beta() = a_beta;
+param_mom_mt::param_mom_mt(double a_state, double a_learn_rate, double a_gradient, double a_momentum, double a_beta) : param_mom(a_state, a_learn_rate, a_gradient, a_momentum, a_beta) {
+
 }
 
-double& param_mom_mt::state() {
-	lock_guard<mutex> lock(state_mtx);
-	return state_ptr.val();
-}
-
-double& param_mom_mt::learn_rate() {
-	lock_guard<mutex> lock(learn_rate_mtx);
-	return learn_rate_ptr.val();
-}
-
-double& param_mom_mt::gradient() {
-	lock_guard<mutex> lock(gradient_mtx);
-	return gradient_ptr.val();
-}
-
-double& param_mom_mt::momentum() {
-	lock_guard<mutex> lock(momentum_mtx);
-	return momentum_ptr.val();
-}
-
-double& param_mom_mt::beta() {
-	lock_guard<mutex> lock(beta_mtx);
-	return beta_ptr.val();
+void param_mom_mt::accum_grad(double a_grad) {
+	accum_grad_mtx.lock();
+	gradient() += a_grad;
+	accum_grad_mtx.unlock();
 }
 
 param* param_mom_mt::clone() {

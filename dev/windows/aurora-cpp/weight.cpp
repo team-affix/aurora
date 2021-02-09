@@ -33,7 +33,7 @@ void weight::fwd() {
 
 void weight::bwd() {
 	param_sgd* pmt_sgd = (param_sgd*)pmt.get();
-	pmt_sgd->gradient() += y_grad.val() * x.val();
+	pmt_sgd->accum_grad(y_grad.val() * x.val());
 	x_grad.val() = y_grad.val() * pmt->state();
 }
 

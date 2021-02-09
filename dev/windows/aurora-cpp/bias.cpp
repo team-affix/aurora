@@ -33,7 +33,7 @@ void bias::fwd() {
 
 void bias::bwd() {
 	param_sgd* pmt_sgd = (param_sgd*)pmt.get();
-	pmt_sgd->gradient() += y_grad.val();
+	pmt_sgd->accum_grad(y_grad.val());
 }
 
 tensor& bias::fwd(tensor a_x) {
