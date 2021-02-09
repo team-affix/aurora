@@ -126,9 +126,6 @@
     <ClInclude Include="aurora.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lock_guard.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
     <ClInclude Include="persistent_thread.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
@@ -143,6 +140,12 @@
     </ClInclude>
     <ClInclude Include="lstm.h">
       <Filter>Header Files\modeling</Filter>
+    </ClInclude>
+    <ClInclude Include="param_sgd_mt.h">
+      <Filter>Header Files\optimization</Filter>
+    </ClInclude>
+    <ClInclude Include="param_mom_mt.h">
+      <Filter>Header Files\optimization</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -217,6 +220,12 @@
     </ClCompile>
     <ClCompile Include="lstm.cpp">
       <Filter>Source Files\modeling</Filter>
+    </ClCompile>
+    <ClCompile Include="param_sgd_mt.cpp">
+      <Filter>Source Files\optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="param_mom_mt.cpp">
+      <Filter>Source Files\optimization</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

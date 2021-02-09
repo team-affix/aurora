@@ -24,7 +24,6 @@
     <ClInclude Include="data.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="leaky_relu.h" />
-    <ClInclude Include="lock_guard.h" />
     <ClInclude Include="lstm.h" />
     <ClInclude Include="lstm_ts.h" />
     <ClInclude Include="macro.h" />
@@ -32,6 +31,8 @@
     <ClInclude Include="modeling.h" />
     <ClInclude Include="neuron.h" />
     <ClInclude Include="optimization.h" />
+    <ClInclude Include="param_mom_mt.h" />
+    <ClInclude Include="param_sgd_mt.h" />
     <ClInclude Include="pl_init.h" />
     <ClInclude Include="pseudo.h" />
     <ClInclude Include="random.h" />
@@ -62,7 +63,9 @@
     <ClCompile Include="neuron.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_mom.cpp" />
+    <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_sgd.cpp" />
+    <ClCompile Include="param_sgd_mt.cpp" />
     <ClCompile Include="pl_init.cpp" />
     <ClCompile Include="random.cpp" />
     <ClCompile Include="sequential.cpp" />

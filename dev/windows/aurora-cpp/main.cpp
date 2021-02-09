@@ -229,28 +229,23 @@ void tnn_multithread_test() {
 		{20},
 	};
 
-	vector<param_mom*> pl = vector<param_mom*>();
+	vector<param_sgd_mt*> pl = vector<param_sgd_mt*>();
 
 	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(25);
+	default_random_engine re(26);
 
 	const int numClones = 16;
 
-	vector<ptr<sequential>> clones = vector<ptr<sequential>>(numClones);
-	clones[0] = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
-		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
-		pl.push_back((param_mom*)pmt.get());
-	});
+	sync s = sync(pseudo::tnn({ 2, 25, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_sgd_mt(urd(re), 0.0002, 0);
+		pl.push_back((param_sgd_mt*)pmt.get());
+	}));
 
-	for (int i = 1; i < clones.size(); i++)
-		clones[i] = (sequential*)clones.front()->clone();
-
-	for (int i = 0; i < clones.size(); i++)
-		clones[i]->compile();
-
+	s.prep(numClones);
+	s.compile();
+	s.unroll(numClones);
+	
 	pseudo::persistent_thread threads[numClones];
-
-	pseudo::pl_init(pl, 25, -1, 1, 0.0002, 0.9);
 
 	printf("");
 
@@ -262,11 +257,11 @@ void tnn_multithread_test() {
 		}
 
 		for (int tsIndex = 0; tsIndex < numClones; tsIndex++) {
-			ptr<sequential>& seq = clones[tsIndex];
+			sequential& seq = *(sequential*)s.unrolled[tsIndex].get();
 			tensor& seq_x = x[tsIndex];
 			tensor& seq_y = y[tsIndex];
 			threads[tsIndex].execute([&] {
-				seq->cycle(seq_x, seq_y);
+				seq.cycle(seq_x, seq_y);
 			});
 		}
 
@@ -274,19 +269,17 @@ void tnn_multithread_test() {
 			thd.join();
 		}
 
-		if(epoch % 10000 == 0)
-			for (int tsIndex = 0; tsIndex < numClones; tsIndex++)
-				std::cout << x[tsIndex].to_string() << " " << clones[tsIndex]->y.to_string() << std::endl;
+		if (epoch % 10000 == 0)
+			std::cout << s.y.to_string() << std::endl;
 
-		for (param_mom* pmt : pl) {
-			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
-			pmt->state() -= pmt->learn_rate() * pmt->momentum();
+		for (param_sgd_mt* pmt : pl) {
+			pmt->state() -= pmt->learn_rate() * pmt->gradient();
 			pmt->gradient() = 0;
 		}
 
 	}
 
-	for (param_mom* pmt : pl) {
+	for (param_sgd* pmt : pl) {
 		std::cout << pmt->state() << std::endl;
 	}
 }
@@ -503,18 +496,15 @@ void lstm_test() {
 	const int lstm_units = 5;
 
 	vector<param_sgd*> pv;
-	sync* s0 = new sync(pseudo::tnn({ 2, lstm_units }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+
+	auto pmt_init = [&](ptr<param>& pmt) {
 		pmt = new param_sgd(urd(re), 0.02, 0);
 		pv.push_back((param_sgd*)pmt.get());
-	}));
-	lstm* l = new lstm(5, [&](ptr<param>& pmt) {
-		pmt = new param_sgd(urd(re), 0.02, 0);
-		pv.push_back((param_sgd*)pmt.get());
-	});
-	sync* s1 = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
-		pmt = new param_sgd(urd(re), 0.02, 0);
-		pv.push_back((param_sgd*)pmt.get());
-	}));
+	};
+
+	sync* s0 = new sync(pseudo::tnn({ 2, lstm_units }, pseudo::nlr(0.3), pmt_init));
+	lstm* l = new lstm(lstm_units, pmt_init);
+	sync* s1 = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), pmt_init));
 
 	ptr<sync> s0_ptr = s0;
 	ptr<lstm> l0_ptr = l;
@@ -552,7 +542,7 @@ int main() {
 
 	srand(time(NULL));
 
-	lstm_test();
+	tnn_multithread_test();
 
 	return 0;
 }

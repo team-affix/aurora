@@ -22,8 +22,8 @@ namespace aurora {
 			param(double a_state, double a_learn_rate);
 
 		public:
-			double& state();
-			double& learn_rate();
+			virtual double& state();
+			virtual double& learn_rate();
 
 		public:
 			virtual param* clone();
