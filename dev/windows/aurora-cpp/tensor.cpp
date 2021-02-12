@@ -91,6 +91,13 @@ tensor tensor::new_1d(size_t a_a, double a_val) {
 	return result;
 }
 
+tensor tensor::new_1d(size_t a_a, uniform_real_distribution<double>& a_urd, default_random_engine& a_re) {
+	tensor result = new_1d(a_a);
+	for (int i = 0; i < a_a; i++)
+		result[i].val() = a_urd(a_re);
+	return result;
+}
+
 tensor tensor::new_2d(size_t a_a, size_t a_b) {
 	return new_2d(a_a, a_b, 0);
 }
@@ -101,6 +108,13 @@ tensor tensor::new_2d(size_t a_a, size_t a_b, double a_val) {
 	for (int i = 0; i < a_a; i++)
 		result[i] = new_1d(a_b, a_val);
 
+	return result;
+}
+
+tensor tensor::new_2d(size_t a_a, size_t a_b, uniform_real_distribution<double>& a_urd, default_random_engine& a_re) {
+	tensor result = new_1d(a_a);
+	for (int i = 0; i < a_a; i++)
+		result[i] = new_1d(a_b, a_urd, a_re);
 	return result;
 }
 

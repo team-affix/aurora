@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <functional>
+#include <random>
 
 using aurora::data::ptr;
 using aurora::data::ref;
@@ -15,6 +16,8 @@ using std::back_inserter;
 using std::string;
 using std::stringstream;
 using std::function;
+using std::uniform_real_distribution;
+using std::default_random_engine;
 
 namespace aurora {
 	namespace math {
@@ -57,8 +60,10 @@ namespace aurora {
 		public:
 			static tensor new_1d(size_t a_a);
 			static tensor new_1d(size_t a_a, double a_val);
+			static tensor new_1d(size_t a_a, uniform_real_distribution<double>& a_urd, default_random_engine& a_re);
 			static tensor new_2d(size_t a_a, size_t a_b);
 			static tensor new_2d(size_t a_a, size_t a_b, double a_val);
+			static tensor new_2d(size_t a_a, size_t a_b, uniform_real_distribution<double>& a_urd, default_random_engine& a_re);
 
 		public:
 			tensor up_rank(size_t a_n);

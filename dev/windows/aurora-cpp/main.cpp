@@ -538,11 +538,279 @@ void lstm_test() {
 	}
 }
 
+void input_gd() {
+
+#pragma region HYPER CONFIGURE
+	const double learn_rate = 0.002;
+	const double beta = 0.9;
+#pragma endregion
+#pragma region RANDOM INSTANTIATE
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+#pragma endregion
+#pragma region ORDER 0 INSTANTIATE
+	tensor x_0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor y_0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+
+	vector<param_mom*> pv_0;
+	ptr<sync> s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
+		pv_0.push_back((param_mom*)pmt.get());
+	}));
+#pragma endregion
+#pragma region ORDER 1 INSTANTIATE
+	const int x_1_height = 20;
+	tensor x_1 = tensor::new_2d(x_1_height, pv_0.size(), urd, re);
+	vector<param_mom*> pv_1;
+	ptr<sequential> s_1 = pseudo::tnn({ pv_0.size(), pv_0.size() * 2, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
+		pv_1.push_back((param_mom*)pmt.get());
+	});
+#pragma endregion
+#pragma region TENSOR INSTANTIATE
+	tensor pv_0_states = tensor::new_1d(pv_0.size());
+	for (int i = 0; i < pv_0.size(); i++)
+		pv_0_states[i].val_ptr.link(pv_0[i]->state_ptr);
+	tensor deviant_input = tensor::new_1d(pv_0.size(), urd, re);
+	tensor deviant_output = { 0 };
+	tensor deviant_learn_rate_tensor = tensor::new_1d(pv_0.size(), learn_rate);
+	tensor deviant_momentum_tensor = tensor::new_1d(pv_0.size(), 0);
+	tensor deviant_beta_tensor = tensor::new_1d(pv_0.size(), beta);
+	tensor deviant_beta_compliment_tensor = tensor::new_1d(pv_0.size(), 1 - beta);
+#pragma endregion
+#pragma region COMPILE
+	s_0->prep(x_0.size());
+	s_0->compile();
+	s_0->unroll(x_0.size());
+	s_1->compile();
+#pragma endregion
+#pragma region CONFIGURE TRAINING
+	const double min_ts_cost = 1E-1;
+	const int checkpoint_interval = 100;
+	const int deviant_update_amount = 10;
+#pragma endregion
+#pragma region GET ORDER 1 TRAINING SET Y
+	tensor y_1 = tensor::new_2d(x_1.size(), 1);
+	auto get_tsy_1 = [&](tensor tsx_1) {
+		pv_0_states.pop(tsx_1);
+		s_0->fwd(x_0);
+		s_0->signal(y_0);
+		return s_0->y_grad.abs_2d().sum_2d();
+	};
+	for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
+		y_1[tsIndex] = get_tsy_1(x_1[tsIndex]);
+	}
+#pragma endregion
+
+	auto update_params = [&](vector<param_mom*> pv) {
+		for (param_mom* pmt : pv) {
+			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
+			pmt->state() -= pmt->learn_rate() * pmt->gradient();
+			pmt->gradient() = 0;
+		}
+	};
+
+	for (int epoch = 0; true; epoch++) {
+		double epoch_cost = 0;
+		for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
+			s_1->cycle(x_1[tsIndex], y_1[tsIndex]);
+			epoch_cost += s_1->y_grad.abs_1d().sum_1d().val() / x_1.size();
+		}
+
+		if (epoch % checkpoint_interval == 0)
+			std::cout << epoch_cost << std::endl;
+
+		bool cost_low = epoch_cost < min_ts_cost;
+
+		if (cost_low && epoch % checkpoint_interval == 0) {
+			std::cout << "NEW INPUT" << std::endl;
+			// GET NEW ORDER 1 TRAINING SET
+			for (int deviant_update = 0; deviant_update < deviant_update_amount; deviant_update++) {
+				s_1->cycle(deviant_input, deviant_output);
+				deviant_momentum_tensor = deviant_momentum_tensor.mul_1d(deviant_beta_tensor).add_1d(deviant_beta_compliment_tensor.mul_1d(s_1->x_grad));
+				deviant_input = deviant_input.sub_1d(deviant_momentum_tensor.mul_1d(deviant_learn_rate_tensor));
+			}
+
+			// POP BACK OF ORDER 1 TS VECTORS
+			if (x_1.size() >= 25) {
+				x_1.vec().pop_back();
+				y_1.vec().pop_back();
+			}
+
+			// APPEND NEW TRAINING SET
+			x_1.vec().push_back(deviant_input.clone());
+			y_1.vec().push_back(get_tsy_1(deviant_input));
+
+		}
+
+		if (epoch % checkpoint_interval == 0 && cost_low)
+			std::cout << "TEST COST: " << get_tsy_1(deviant_input).sum_1d().val() << std::endl;
+
+		update_params(pv_1);
+	}
+}
+
+void loss_map() {
+
+#pragma region HYPER CONFIGURE
+	const double learn_rate = 0.002;
+	const double beta = 0.9;
+#pragma endregion
+#pragma region RANDOM INSTANTIATE
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+#pragma endregion
+#pragma region ORDER 0 INSTANTIATE
+	tensor x_0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor y_0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+
+	vector<param_mom*> pv_0;
+	ptr<sync> s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
+		pv_0.push_back((param_mom*)pmt.get());
+		}));
+#pragma endregion
+#pragma region ORDER 1 INSTANTIATE
+	const int x_1_height = 10;
+	tensor x_1 = tensor::new_2d(x_1_height, 1, urd, re);
+	vector<param_mom*> pv_1;
+	ptr<sequential> s_1 = pseudo::tnn({ 1, pv_0.size() / 2, pv_0.size() }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
+		pv_1.push_back((param_mom*)pmt.get());
+	});
+#pragma endregion
+#pragma region TENSOR INSTANTIATE
+	tensor pv_0_states = tensor::new_1d(pv_0.size());
+	for (int i = 0; i < pv_0.size(); i++)
+		pv_0_states[i].val_ptr.link(pv_0[i]->state_ptr);
+	tensor deviant_x = { 0 };
+#pragma endregion
+#pragma region COMPILE
+	s_0->prep(x_0.size());
+	s_0->compile();
+	s_0->unroll(x_0.size());
+	s_1->compile();
+#pragma endregion
+#pragma region CONFIGURE TRAINING
+	const double min_ts_cost = 11;
+	const int checkpoint_interval = 100;
+	const int deviant_update_amount = 10;
+#pragma endregion
+#pragma region GET ORDER 1 TRAINING SET Y
+	tensor y_1 = tensor::new_2d(x_1.size(), pv_0.size(), urd, re);
+	auto get_tsx_1 = [&](tensor tsy_1) {
+		pv_0_states.pop(tsy_1);
+		s_0->fwd(x_0);
+		s_0->signal(y_0);
+		return s_0->y_grad.abs_2d().sum_2d();
+	};
+	for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
+		x_1[tsIndex] = get_tsx_1(y_1[tsIndex]);
+	}
+#pragma endregion
+
+	auto update_params = [&](vector<param_mom*> pv) {
+		for (param_mom* pmt : pv) {
+			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
+			pmt->state() -= pmt->learn_rate() * pmt->gradient();
+			pmt->gradient() = 0;
+		}
+	};
+
+	for (int epoch = 0; true; epoch++) {
+		double epoch_cost = 0;
+		for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
+			s_1->cycle(x_1[tsIndex], y_1[tsIndex]);
+			epoch_cost += s_1->y_grad.abs_1d().sum_1d().val() / x_1.size();
+		}
+
+		if (epoch % checkpoint_interval == 0)
+			std::cout << epoch_cost << std::endl;
+
+		bool cost_low = epoch_cost < min_ts_cost;
+
+		if (cost_low && epoch % checkpoint_interval == 0) {
+			std::cout << "NEW INPUT" << std::endl;
+			// GET NEW ORDER 1 TRAINING SET
+			s_1->fwd(deviant_x);
+
+			// POP BACK OF ORDER 1 TS VECTORS
+			x_1.vec().pop_back();
+			y_1.vec().pop_back();
+
+			// APPEND NEW TRAINING SET
+			x_1.vec().push_back(get_tsx_1(s_1->y));
+			y_1.vec().push_back(s_1->y);
+
+		}
+
+		if (epoch % checkpoint_interval == 0 && cost_low)
+			std::cout << "TEST COST: " << get_tsx_1(s_1->fwd(deviant_x)).abs_1d().sum_1d().val() << std::endl;
+
+		update_params(pv_1);
+	}
+}
+
+void policy_gradient() {
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
+	tensor desired_tensor = tensor::new_1d(10, urd, re);
+
+	tensor x_0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor y_0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	vector<param_sgd*> pv;
+	ptr<sync> s = new sync(pseudo::tnn({ 2, 5, 2 }, { pseudo::nlr(0.3), pseudo::nlr(0.3), pseudo::nth() }, [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	}));
+
+	s->prep(4);
+	s->compile();
+	s->unroll(4);
+
+	for (int epoch = 0; true; epoch++) {
+		
+	}
+	
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	tnn_multithread_test();
+	input_gd();
 
 	return 0;
 }
