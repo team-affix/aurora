@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,6 +22,8 @@
     <ClInclude Include="aurora.h" />
     <ClInclude Include="bias.h" />
     <ClInclude Include="data.h" />
+    <ClInclude Include="generation.h" />
+    <ClInclude Include="genome.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="leaky_relu.h" />
     <ClInclude Include="lstm.h" />
@@ -33,7 +35,6 @@
     <ClInclude Include="optimization.h" />
     <ClInclude Include="param_mom_mt.h" />
     <ClInclude Include="param_sgd_mt.h" />
-    <ClInclude Include="pl_init.h" />
     <ClInclude Include="pseudo.h" />
     <ClInclude Include="random.h" />
     <ClInclude Include="ref.h" />
@@ -56,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bias.cpp" />
+    <ClCompile Include="genome.cpp" />
     <ClCompile Include="layer.cpp" />
     <ClCompile Include="leaky_relu.cpp" />
     <ClCompile Include="lstm.cpp" />
@@ -66,7 +68,6 @@
     <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="param_sgd_mt.cpp" />
-    <ClCompile Include="pl_init.cpp" />
     <ClCompile Include="random.cpp" />
     <ClCompile Include="sequential.cpp" />
     <ClCompile Include="sigmoid.cpp" />
@@ -188,8 +189,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <Optimization>Full</Optimization>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -204,6 +205,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

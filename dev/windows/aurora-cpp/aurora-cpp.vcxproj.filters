@@ -120,9 +120,6 @@
     <ClInclude Include="random.h">
       <Filter>Header Files\math</Filter>
     </ClInclude>
-    <ClInclude Include="pl_init.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
     <ClInclude Include="aurora.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -146,6 +143,12 @@
     </ClInclude>
     <ClInclude Include="param_mom_mt.h">
       <Filter>Header Files\optimization</Filter>
+    </ClInclude>
+    <ClInclude Include="generation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="genome.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -206,9 +209,6 @@
     <ClCompile Include="random.cpp">
       <Filter>Source Files\math</Filter>
     </ClCompile>
-    <ClCompile Include="pl_init.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
     <ClCompile Include="persistent_thread.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
@@ -226,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="param_mom_mt.cpp">
       <Filter>Source Files\optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="genome.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

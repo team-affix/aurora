@@ -19,6 +19,9 @@ namespace aurora {
 			T& val() {
 				return *shared_ptr<T>::get();
 			}
+			operator T* () {
+				return shared_ptr<T>::get();
+			}
 
 		public:
 			void link(ptr<T>& other) {

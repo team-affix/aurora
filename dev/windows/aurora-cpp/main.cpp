@@ -309,7 +309,6 @@ void sync_xor_test() {
 		pl.push_back((param_sgd*)pmt.get());
 	}));
 	ptr<sync> s = (sync*)s_prev->clone();
-	pseudo::pl_init(pl, 25, -1, 1, 0.2);
 
 	s->prep(4);
 	s->compile();
@@ -771,46 +770,176 @@ void loss_map() {
 	}
 }
 
-void policy_gradient() {
+void zil_trader() {
 
-	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(25);
+	uniform_real_distribution<double> urd(-0.1, 0.1);
+	uniform_real_distribution<double> urd2(0.1, 3);
+	default_random_engine re(800);
 
-	tensor desired_tensor = tensor::new_1d(10, urd, re);
+	tensor value_tensor_2d = tensor::new_2d(20, 20, urd2, re);
+	tensor value_tensor_3d = tensor::new_1d(value_tensor_2d.size());
+	for (int i = 0; i < value_tensor_3d.size(); i++)
+		value_tensor_3d[i] = value_tensor_2d[i].roll(1);
 
-	tensor x_0 = {
-		{0, 0},
-		{0, 1},
-		{1, 0},
-		{1, 1},
+	vector<param_mom*> pv;
+	auto pmt_init = [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pv.push_back((param_mom*)pmt.get());
 	};
-	tensor y_0 = {
-		{0},
-		{1},
-		{1},
-		{0},
-	};
-	vector<param_sgd*> pv;
-	ptr<sync> s = new sync(pseudo::tnn({ 2, 5, 2 }, { pseudo::nlr(0.3), pseudo::nlr(0.3), pseudo::nth() }, [&](ptr<param>& pmt) {
-		pmt = new param_sgd(urd(re), 0.02, 0);
-		pv.push_back((param_sgd*)pmt.get());
-	}));
 
-	s->prep(4);
-	s->compile();
-	s->unroll(4);
+	size_t lstm_units = 50;
+	size_t episode_len = value_tensor_2d.width();
+	size_t training_sets = value_tensor_2d.height();
+
+	ptr<sync> s0 = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
+	ptr<lstm> l0 = new lstm(lstm_units, pmt_init);
+	ptr<lstm> l1 = new lstm(lstm_units, pmt_init);
+	ptr<lstm> l2 = new lstm(lstm_units, pmt_init);
+	ptr<sync> s1 = new sync(pseudo::tnn({ lstm_units, 2 }, { pseudo::nlr(0.3), pseudo::nth() }, pmt_init));
+	ptr<sequential> seq = new sequential({ s0.get(), l0.get(), l1.get(), l2.get(), s1.get() });
+	sync s = sync(seq.get());
+
+	s0->prep(episode_len);
+	l0->prep(episode_len);
+	l1->prep(episode_len);
+	l2->prep(episode_len);
+	s1->prep(episode_len);
+	s0->compile();
+	l0->compile();
+	l1->compile();
+	l2->compile();
+	s1->compile();
+	s0->unroll(episode_len);
+	l0->unroll(episode_len);
+	l1->unroll(episode_len);
+	l2->unroll(episode_len);
+	s1->unroll(episode_len);
+	s.prep(training_sets);
+	s.compile();
+	s.unroll(training_sets);
+
+	double best_epoch_earnings = 0;
+
+	auto get_actions = [](tensor& action_tensor) {
+		vector<bool> actions = vector<bool>(action_tensor.size());
+		for (int i = 0; i < action_tensor.size(); i++) {
+			tensor action = action_tensor[i]; // WILL BE IN FORM {(ACT), (DO NOTHING)}
+			double act_certainty = action[0].val();
+			double no_certainty = action[1].val();
+			actions[i] = act_certainty > no_certainty;
+		}
+		return actions;
+	};
+
+	auto get_earnings = [&](tensor& value_tensor_1d, vector<bool>& actions) {
+		double zil = 0;
+		double usd = 1;
+		// BUY FIRST, THEN SELL
+		bool purchasing = true;
+		double purchase_price = 0;
+		for (int i = 0; i < actions.size(); i++)
+			if (actions[i]) {
+				double current_price = value_tensor_1d[i].val();
+				if (purchasing) {
+					purchase_price = current_price;
+					zil = usd / current_price;
+				}
+				else {
+					usd = zil * current_price;
+				}
+				purchasing = !purchasing;
+			}
+		return usd - 1;
+	};
+
+	auto des_success = [](vector<bool>& actions) {
+		tensor result = tensor::new_2d(actions.size(), 2);
+		for (int i = 0; i < actions.size(); i++)
+			if (actions[i])
+				result[i][0] = 1;
+			else
+				result[i][1] = 1;
+		return result;
+	};
+
+	auto des_failure = [](vector<bool>& actions) {
+		tensor result = tensor::new_2d(actions.size(), 2);
+		for (int i = 0; i < actions.size(); i++)
+			if (actions[i])
+				result[i][0] = -1;
+			else
+				result[i][1] = -1;
+		return result;
+	};
+
+	auto des = [](double earnings, vector<bool>& actions) {
+		tensor result = tensor::new_2d(actions.size(), 2);
+		for (int i = 0; i < actions.size(); i++)
+			if (actions[i])
+				result[i][0] = std::tanh(earnings * 0.01);
+			else
+				result[i][1] = std::tanh(earnings* 0.01);
+		return result;
+	};
+
+	vector<vector<bool>> epoch_actions = vector<vector<bool>>(training_sets);
 
 	for (int epoch = 0; true; epoch++) {
-		
+
+		double epoch_earnings = 0;
+
+		for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
+			ptr<model> m = s.unrolled[tsIndex];
+			tensor& ts = value_tensor_3d[tsIndex];
+			m->fwd(ts);
+			tensor rcv = tensor::new_2d(episode_len, 2, urd, re);
+			tensor div = tensor::new_2d(episode_len, 2, (epoch) + 1);
+			tensor action_tensor = m->y.add_2d(rcv.div_2d(div));
+			vector<bool> actions = get_actions(action_tensor);
+			epoch_earnings += get_earnings(value_tensor_2d[tsIndex], actions);
+			epoch_actions[tsIndex] = actions;
+		}
+
+		/*if (epoch_earnings > best_epoch_earnings * 0.99) {
+			best_epoch_earnings = epoch_earnings;
+			for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
+				s.unrolled[tsIndex]->signal(des_success(epoch_actions[tsIndex]));
+				s.unrolled[tsIndex]->bwd();
+			}
+		}
+		else {
+			for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
+				s.unrolled[tsIndex]->signal(des_failure(epoch_actions[tsIndex]));
+				s.unrolled[tsIndex]->bwd();
+			}
+		}*/
+
+		for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
+			s.unrolled[tsIndex]->signal(des(epoch_earnings, epoch_actions[tsIndex]));
+			s.unrolled[tsIndex]->bwd();
+		}
+
+		if (epoch % 1 == 0)
+			std::cout << epoch_earnings << std::endl;
+
+		for (param_mom* pmt : pv) {
+			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
+			pmt->state() -= pmt->learn_rate() * pmt->momentum();
+			pmt->gradient() = 0;
+		}
+
 	}
-	
+
 }
+
+
 
 int main() {
 
 	srand(time(NULL));
 
-	input_gd();
+	zil_trader();
 
 	return 0;
+
 }
