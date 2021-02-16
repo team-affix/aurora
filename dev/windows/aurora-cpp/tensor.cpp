@@ -180,7 +180,7 @@ tensor tensor::tanh_1d() {
 }
 
 tensor tensor::tanh_2d() {
-	tensor result = tensor::new_1d(height(), width());
+	tensor result = tensor::new_2d(height(), width());
 	tanh_2d(result);
 	return result;
 }

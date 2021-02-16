@@ -772,18 +772,19 @@ void loss_map() {
 
 void zil_trader() {
 
-	uniform_real_distribution<double> urd(-0.1, 0.1);
+	uniform_real_distribution<double> urd(-1, 1);
 	uniform_real_distribution<double> urd2(0.1, 3);
-	default_random_engine re(800);
+	uniform_real_distribution<double> urd3(-2, 2);
+	default_random_engine re(8040);
 
-	tensor value_tensor_2d = tensor::new_2d(20, 20, urd2, re);
+	tensor value_tensor_2d = tensor::new_2d(2, 20, urd2, re);
 	tensor value_tensor_3d = tensor::new_1d(value_tensor_2d.size());
 	for (int i = 0; i < value_tensor_3d.size(); i++)
 		value_tensor_3d[i] = value_tensor_2d[i].roll(1);
 
 	vector<param_mom*> pv;
 	auto pmt_init = [&](ptr<param>& pmt) {
-		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pmt = new param_mom(urd(re), 0.2, 0, 0, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	};
 
@@ -818,7 +819,6 @@ void zil_trader() {
 	s.compile();
 	s.unroll(training_sets);
 
-	double best_epoch_earnings = 0;
 
 	auto get_actions = [](tensor& action_tensor) {
 		vector<bool> actions = vector<bool>(action_tensor.size());
@@ -882,7 +882,48 @@ void zil_trader() {
 		return result;
 	};
 
+	double prev_epoch_earnings = 0;
+
 	vector<vector<bool>> epoch_actions = vector<vector<bool>>(training_sets);
+
+	tensor action_current = tensor::new_2d(episode_len, 2, urd, re);
+	tensor action_momentum = tensor::new_2d(episode_len, 2, 0);
+	tensor action_beta = tensor::new_2d(episode_len, 2, 0.9);
+	tensor action_beta_compliment = tensor::new_2d(episode_len, 2, 0.1);
+
+	auto update_action_momentum = [&](tensor& rct) {
+		action_momentum = action_momentum.mul_2d(action_beta).add_2d(action_beta_compliment.mul_2d(rct));
+
+	};
+
+	for (int epoch = 0; true; epoch++) {
+		while (true) {
+			tensor test_tensor = action_current.clone();
+			for (int i = 0; i < epoch && i < 5; i++) {
+				int x = rand() % episode_len;
+				int y = rand() % 2;
+				test_tensor[x][y].val() += urd(re);
+			}
+			test_tensor.tanh_2d(test_tensor);
+			vector<bool> actions = get_actions(test_tensor);
+			double epoch_earnings = get_earnings(value_tensor_2d[1], actions);
+			/*if (epoch_earnings > 6699)
+			{
+				std::cout << value_tensor_2d[0].to_string() << std::endl;
+				for (int i = 0; i < actions.size(); i++)
+					std::cout << actions[i] << std::endl;
+				return;
+			}*/
+			if (epoch_earnings > prev_epoch_earnings) {
+				prev_epoch_earnings = epoch_earnings;
+				action_current = test_tensor;
+				break;
+			}
+		}
+		std::cout << prev_epoch_earnings << std::endl;
+	}
+
+
 
 	for (int epoch = 0; true; epoch++) {
 
@@ -893,15 +934,15 @@ void zil_trader() {
 			tensor& ts = value_tensor_3d[tsIndex];
 			m->fwd(ts);
 			tensor rcv = tensor::new_2d(episode_len, 2, urd, re);
-			tensor div = tensor::new_2d(episode_len, 2, (epoch) + 1);
-			tensor action_tensor = m->y.add_2d(rcv.div_2d(div));
+			tensor div = tensor::new_2d(episode_len, 2, (0.01 * epoch) + 0.1);
+			tensor action_tensor = m->y.add_2d(rcv.div_2d(div)).tanh_2d();
 			vector<bool> actions = get_actions(action_tensor);
 			epoch_earnings += get_earnings(value_tensor_2d[tsIndex], actions);
 			epoch_actions[tsIndex] = actions;
 		}
 
-		/*if (epoch_earnings > best_epoch_earnings * 0.99) {
-			best_epoch_earnings = epoch_earnings;
+		if (epoch_earnings >= prev_epoch_earnings) {
+			prev_epoch_earnings = epoch_earnings;
 			for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
 				s.unrolled[tsIndex]->signal(des_success(epoch_actions[tsIndex]));
 				s.unrolled[tsIndex]->bwd();
@@ -912,14 +953,14 @@ void zil_trader() {
 				s.unrolled[tsIndex]->signal(des_failure(epoch_actions[tsIndex]));
 				s.unrolled[tsIndex]->bwd();
 			}
-		}*/
-
-		for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
-			s.unrolled[tsIndex]->signal(des(epoch_earnings, epoch_actions[tsIndex]));
-			s.unrolled[tsIndex]->bwd();
 		}
 
-		if (epoch % 1 == 0)
+		/*for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
+			s.unrolled[tsIndex]->signal(des(epoch_earnings, epoch_actions[tsIndex]));
+			s.unrolled[tsIndex]->bwd();
+		}*/
+
+		if (epoch % 10 == 0)
 			std::cout << epoch_earnings << std::endl;
 
 		for (param_mom* pmt : pv) {
