@@ -1,6 +1,6 @@
 #include "param_sgd_mt.h"
 
-using aurora::optimization::param_sgd_mt;
+using aurora::params::param_sgd_mt;
 
 param_sgd_mt::~param_sgd_mt() {
 

@@ -1,6 +1,6 @@
 #include "sigmoid.h"
 
-using aurora::modeling::sigmoid;
+using aurora::models::sigmoid;
 
 sigmoid::~sigmoid() {
 

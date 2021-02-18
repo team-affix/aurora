@@ -11,8 +11,9 @@
 using namespace aurora;
 using namespace aurora::data;
 using namespace aurora::math;
-using namespace aurora::modeling;
-using namespace aurora::optimization;
+using namespace aurora::models;
+using namespace aurora::params;
+using namespace aurora::evolution;
 using std::default_random_engine;
 using std::uniform_real_distribution;
 
@@ -772,208 +773,148 @@ void loss_map() {
 
 void zil_trader() {
 
-	uniform_real_distribution<double> urd(-1, 1);
-	uniform_real_distribution<double> urd2(0.1, 3);
-	uniform_real_distribution<double> urd3(-2, 2);
-	default_random_engine re(8040);
-
-	tensor value_tensor_2d = tensor::new_2d(2, 20, urd2, re);
+	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
+	uniform_real_distribution<double> zil_urd(0.13, 0.20);
+	default_random_engine re(25);
+#pragma region DATA GATHER
+	const size_t episode_size = 20;
+	tensor value_tensor_2d = tensor::new_2d(10, episode_size, zil_urd, re);
 	tensor value_tensor_3d = tensor::new_1d(value_tensor_2d.size());
 	for (int i = 0; i < value_tensor_3d.size(); i++)
 		value_tensor_3d[i] = value_tensor_2d[i].roll(1);
-
-	vector<param_mom*> pv;
+#pragma endregion
+#pragma region PARAMS
+	vector<param*> pv;
 	auto pmt_init = [&](ptr<param>& pmt) {
-		pmt = new param_mom(urd(re), 0.2, 0, 0, 0.9);
-		pv.push_back((param_mom*)pmt.get());
+		pmt = new param(pmt_urd(re));
+		pv.push_back((param*)pmt.get());
 	};
+#pragma endregion
+#pragma region MODEL
 
-	size_t lstm_units = 50;
-	size_t episode_len = value_tensor_2d.width();
-	size_t training_sets = value_tensor_2d.height();
+	const size_t lstm_units = 20;
+	ptr<sync> sync_in = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
+	ptr<lstm> lstm_mid = new lstm(lstm_units, pmt_init);
+	ptr<sync> sync_out = new sync(pseudo::tnn({ lstm_units, 2 }, { pseudo::nlr(0.3), pseudo::nsm() }, pmt_init));
+	sequential s = { sync_in.get(), lstm_mid.get(), sync_out.get() };
 
-	ptr<sync> s0 = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
-	ptr<lstm> l0 = new lstm(lstm_units, pmt_init);
-	ptr<lstm> l1 = new lstm(lstm_units, pmt_init);
-	ptr<lstm> l2 = new lstm(lstm_units, pmt_init);
-	ptr<sync> s1 = new sync(pseudo::tnn({ lstm_units, 2 }, { pseudo::nlr(0.3), pseudo::nth() }, pmt_init));
-	ptr<sequential> seq = new sequential({ s0.get(), l0.get(), l1.get(), l2.get(), s1.get() });
-	sync s = sync(seq.get());
+	tensor pmt_link_tensor = tensor::new_1d(pv.size());
+	for (int i = 0; i < pmt_link_tensor.size(); i++)
+		pmt_link_tensor[i].val_ptr.link(pv[i]->state_ptr);
 
-	s0->prep(episode_len);
-	l0->prep(episode_len);
-	l1->prep(episode_len);
-	l2->prep(episode_len);
-	s1->prep(episode_len);
-	s0->compile();
-	l0->compile();
-	l1->compile();
-	l2->compile();
-	s1->compile();
-	s0->unroll(episode_len);
-	l0->unroll(episode_len);
-	l1->unroll(episode_len);
-	l2->unroll(episode_len);
-	s1->unroll(episode_len);
-	s.prep(training_sets);
+	sync_in->prep(episode_size);
+	lstm_mid->prep(episode_size);
+	sync_out->prep(episode_size);
 	s.compile();
-	s.unroll(training_sets);
+	sync_in->unroll(episode_size);
+	lstm_mid->unroll(episode_size);
+	sync_out->unroll(episode_size);
 
-
-	auto get_actions = [](tensor& action_tensor) {
-		vector<bool> actions = vector<bool>(action_tensor.size());
-		for (int i = 0; i < action_tensor.size(); i++) {
-			tensor action = action_tensor[i]; // WILL BE IN FORM {(ACT), (DO NOTHING)}
-			double act_certainty = action[0].val();
-			double no_certainty = action[1].val();
-			actions[i] = act_certainty > no_certainty;
-		}
-		return actions;
+#pragma endregion
+#pragma region FUNCS
+	auto get_actions = [&](tensor& a_action_tensor) {
+		vector<bool> result = vector<bool>(a_action_tensor.size());
+		for (int i = 0; i < a_action_tensor.size(); i++)
+			result[i] = a_action_tensor[i][0] > a_action_tensor[i][1];
+		return result;
 	};
-
-	auto get_earnings = [&](tensor& value_tensor_1d, vector<bool>& actions) {
+	auto get_usd = [&](tensor& a_zil_price_1d, vector<bool>& a_actions) {
+		const double start_usd = 100;
+		double usd = start_usd;
 		double zil = 0;
-		double usd = 1;
-		// BUY FIRST, THEN SELL
-		bool purchasing = true;
-		double purchase_price = 0;
-		for (int i = 0; i < actions.size(); i++)
-			if (actions[i]) {
-				double current_price = value_tensor_1d[i].val();
-				if (purchasing) {
-					purchase_price = current_price;
-					zil = usd / current_price;
+		bool buy = true;
+		for (int i = 0; i < a_actions.size(); i++) {
+			if (a_actions[i]) {
+				if (buy) {
+					zil = usd / a_zil_price_1d[i];
 				}
 				else {
-					usd = zil * current_price;
+					usd = zil * a_zil_price_1d[i];
 				}
-				purchasing = !purchasing;
+				buy = !buy;
 			}
-		return usd - 1;
+		}
+		return usd - start_usd;
 	};
-
-	auto des_success = [](vector<bool>& actions) {
-		tensor result = tensor::new_2d(actions.size(), 2);
-		for (int i = 0; i < actions.size(); i++)
-			if (actions[i])
-				result[i][0] = 1;
-			else
-				result[i][1] = 1;
+	auto get_rewards = [&](genome& a_genome) {
+		pmt_link_tensor.pop(a_genome);
+		double result = 0;
+		for (int i = 0; i < value_tensor_3d.size(); i++) {
+			s.fwd(value_tensor_3d[i]);
+			vector<bool> actions = get_actions(s.y);
+			result += get_usd(value_tensor_2d[i], actions);
+		}
 		return result;
 	};
-
-	auto des_failure = [](vector<bool>& actions) {
-		tensor result = tensor::new_2d(actions.size(), 2);
-		for (int i = 0; i < actions.size(); i++)
-			if (actions[i])
-				result[i][0] = -1;
-			else
-				result[i][1] = -1;
-		return result;
-	};
-
-	auto des = [](double earnings, vector<bool>& actions) {
-		tensor result = tensor::new_2d(actions.size(), 2);
-		for (int i = 0; i < actions.size(); i++)
-			if (actions[i])
-				result[i][0] = std::tanh(earnings * 0.01);
-			else
-				result[i][1] = std::tanh(earnings* 0.01);
-		return result;
-	};
-
-	double prev_epoch_earnings = 0;
-
-	vector<vector<bool>> epoch_actions = vector<vector<bool>>(training_sets);
-
-	tensor action_current = tensor::new_2d(episode_len, 2, urd, re);
-	tensor action_momentum = tensor::new_2d(episode_len, 2, 0);
-	tensor action_beta = tensor::new_2d(episode_len, 2, 0.9);
-	tensor action_beta_compliment = tensor::new_2d(episode_len, 2, 0.1);
-
-	auto update_action_momentum = [&](tensor& rct) {
-		action_momentum = action_momentum.mul_2d(action_beta).add_2d(action_beta_compliment.mul_2d(rct));
-
-	};
-
+#pragma endregion
+#pragma region EVOLVE
+	vector<genome> parents = genome(pmt_link_tensor, 0.01, 1).mutate(re, 3);
 	for (int epoch = 0; true; epoch++) {
-		while (true) {
-			tensor test_tensor = action_current.clone();
-			for (int i = 0; i < epoch && i < 5; i++) {
-				int x = rand() % episode_len;
-				int y = rand() % 2;
-				test_tensor[x][y].val() += urd(re);
-			}
-			test_tensor.tanh_2d(test_tensor);
-			vector<bool> actions = get_actions(test_tensor);
-			double epoch_earnings = get_earnings(value_tensor_2d[1], actions);
-			/*if (epoch_earnings > 6699)
-			{
-				std::cout << value_tensor_2d[0].to_string() << std::endl;
-				for (int i = 0; i < actions.size(); i++)
-					std::cout << actions[i] << std::endl;
-				return;
-			}*/
-			if (epoch_earnings > prev_epoch_earnings) {
-				prev_epoch_earnings = epoch_earnings;
-				action_current = test_tensor;
-				break;
-			}
-		}
-		std::cout << prev_epoch_earnings << std::endl;
-	}
-
-
-
-	for (int epoch = 0; true; epoch++) {
-
-		double epoch_earnings = 0;
-
-		for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
-			ptr<model> m = s.unrolled[tsIndex];
-			tensor& ts = value_tensor_3d[tsIndex];
-			m->fwd(ts);
-			tensor rcv = tensor::new_2d(episode_len, 2, urd, re);
-			tensor div = tensor::new_2d(episode_len, 2, (0.01 * epoch) + 0.1);
-			tensor action_tensor = m->y.add_2d(rcv.div_2d(div)).tanh_2d();
-			vector<bool> actions = get_actions(action_tensor);
-			epoch_earnings += get_earnings(value_tensor_2d[tsIndex], actions);
-			epoch_actions[tsIndex] = actions;
-		}
-
-		if (epoch_earnings >= prev_epoch_earnings) {
-			prev_epoch_earnings = epoch_earnings;
-			for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
-				s.unrolled[tsIndex]->signal(des_success(epoch_actions[tsIndex]));
-				s.unrolled[tsIndex]->bwd();
-			}
-		}
-		else {
-			for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
-				s.unrolled[tsIndex]->signal(des_failure(epoch_actions[tsIndex]));
-				s.unrolled[tsIndex]->bwd();
-			}
-		}
-
-		/*for (int tsIndex = 0; tsIndex < value_tensor_3d.size(); tsIndex++) {
-			s.unrolled[tsIndex]->signal(des(epoch_earnings, epoch_actions[tsIndex]));
-			s.unrolled[tsIndex]->bwd();
-		}*/
-
+		generation gen1 = generation(genome::mutate(genome::merge(parents, 100), re), get_rewards);
+		parents = gen1.best(3);
 		if (epoch % 10 == 0)
-			std::cout << epoch_earnings << std::endl;
-
-		for (param_mom* pmt : pv) {
-			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
-			pmt->state() -= pmt->learn_rate() * pmt->momentum();
-			pmt->gradient() = 0;
-		}
-
+			std::cout << get_rewards(parents[0]) << std::endl;
 	}
+#pragma endregion
 
 }
 
+void genome_test() {
 
+#pragma region MODEL
+	uniform_real_distribution<double> pmt_urd(-1, 1);
+	default_random_engine re(26);
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	vector<param*> pv;
+	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+		pmt = new param(pmt_urd(re));
+		pv.push_back(pmt.get());
+	});
+	s->compile();
+#pragma endregion
+#pragma region LINK TENSOR
+	tensor pmt_link_tensor = tensor::new_1d(pv.size());
+	for (int i = 0; i < pmt_link_tensor.size(); i++)
+		pmt_link_tensor[i].val_ptr.link(pv[i]->state_ptr);
+#pragma endregion
+#pragma region GET REWARD
+	auto get_reward = [&](tensor& a_genome) {
+		pmt_link_tensor.pop(a_genome);
+		double cost = 0;
+		for (int i = 0; i < x.size(); i++) {
+			s->fwd(x[i]);
+			s->signal(y[i]);
+			cost += s->y_grad.abs_1d().sum_1d();
+		}
+		return 1 / cost;
+	};
+#pragma endregion
+#pragma region EVOLVE
+	vector<genome> parents = genome(pmt_link_tensor, 1, 0.02).mutate(re, 3);
+	for (int i = 0; i < parents.size(); i++)
+		std::cout << parents[i].to_string() << std::endl;
+	for (int epoch = 0; true; epoch++) {
+		generation gen = generation(genome::mutate(genome::merge(parents, 100), re), get_reward);
+		parents = gen.best(3);
+		if(epoch % 100 == 0)
+			std::cout << 1 / get_reward(parents[0]) << std::endl;
+		for (int i = 0; i < parents.size(); i++)
+			parents[i].learn_rate = 0.02 / (epoch / 40+1);
+	}
+#pragma endregion
+
+}
 
 int main() {
 

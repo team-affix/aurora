@@ -22,6 +22,7 @@
     <ClInclude Include="aurora.h" />
     <ClInclude Include="bias.h" />
     <ClInclude Include="data.h" />
+    <ClInclude Include="evolution.h" />
     <ClInclude Include="generation.h" />
     <ClInclude Include="genome.h" />
     <ClInclude Include="layer.h" />
@@ -30,9 +31,9 @@
     <ClInclude Include="lstm_ts.h" />
     <ClInclude Include="macro.h" />
     <ClInclude Include="math.h" />
-    <ClInclude Include="modeling.h" />
+    <ClInclude Include="models.h" />
     <ClInclude Include="neuron.h" />
-    <ClInclude Include="optimization.h" />
+    <ClInclude Include="params.h" />
     <ClInclude Include="param_mom_mt.h" />
     <ClInclude Include="param_sgd_mt.h" />
     <ClInclude Include="pseudo.h" />
@@ -40,6 +41,7 @@
     <ClInclude Include="ref.h" />
     <ClInclude Include="sequential.h" />
     <ClInclude Include="sigmoid.h" />
+    <ClInclude Include="sort.h" />
     <ClInclude Include="sync.h" />
     <ClInclude Include="tanh.h" />
     <ClInclude Include="tensor.h" />
@@ -48,7 +50,6 @@
     <ClInclude Include="param_mom.h" />
     <ClInclude Include="param_sgd.h" />
     <ClInclude Include="ptr.h" />
-    <ClInclude Include="session.h" />
     <ClInclude Include="persistent_thread.h" />
     <ClInclude Include="tnn.h" />
     <ClInclude Include="weight.h" />
@@ -57,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bias.cpp" />
+    <ClCompile Include="generation.cpp" />
     <ClCompile Include="genome.cpp" />
     <ClCompile Include="layer.cpp" />
     <ClCompile Include="leaky_relu.cpp" />
@@ -71,12 +73,12 @@
     <ClCompile Include="random.cpp" />
     <ClCompile Include="sequential.cpp" />
     <ClCompile Include="sigmoid.cpp" />
+    <ClCompile Include="sort.cpp" />
     <ClCompile Include="sync.cpp" />
     <ClCompile Include="tanh.cpp" />
     <ClCompile Include="tensor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
-    <ClCompile Include="session.cpp" />
     <ClCompile Include="persistent_thread.cpp" />
     <ClCompile Include="tnn.cpp" />
     <ClCompile Include="weight.cpp" />
@@ -189,8 +191,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <Optimization>Disabled</Optimization>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Full</Optimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -205,8 +207,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <Optimization>Disabled</Optimization>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Full</Optimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

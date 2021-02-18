@@ -1,6 +1,6 @@
 #include "lstm.h"
 
-using aurora::modeling::lstm;
+using aurora::models::lstm;
 
 lstm::~lstm() {
 

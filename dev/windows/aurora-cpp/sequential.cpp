@@ -1,6 +1,6 @@
 #include "sequential.h"
 
-using aurora::modeling::sequential;
+using aurora::models::sequential;
 
 sequential::~sequential() {
 

@@ -8,24 +8,23 @@ using std::vector;
 using std::function;
 
 namespace aurora {
-	namespace optimization {
+	namespace params {
 		class param_sgd;
 		class param_mom;
 		class param {
 		public:
 			ptr<double> state_ptr = new double(0);
-			ptr<double> learn_rate_ptr = new double(0);
 
 		public:
 			virtual ~param();
 			param();
-			param(double a_state, double a_learn_rate);
+			param(double a_state);
 
 		public:
 			virtual double& state();
-			virtual double& learn_rate();
 
 		public:
+			virtual void update();
 			virtual param* clone();
 
 		};

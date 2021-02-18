@@ -3,9 +3,9 @@
 #include "param_sgd.h"
 #include "param_mom.h"
 
-using aurora::optimization::param;
-using aurora::optimization::param_sgd;
-using aurora::optimization::param_mom;
+using aurora::params::param;
+using aurora::params::param_sgd;
+using aurora::params::param_mom;
 
 param_mom::~param_mom() {
 
@@ -26,6 +26,12 @@ double& param_mom::momentum() {
 
 double& param_mom::beta() {
 	return beta_ptr.val();
+}
+
+void param_mom::update() {
+	momentum() = beta() * momentum() + (1 - beta()) * gradient();
+	state() -= learn_rate() * momentum();
+	gradient() = 0;
 }
 
 param* param_mom::clone() {

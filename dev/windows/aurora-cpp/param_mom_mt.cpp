@@ -1,6 +1,6 @@
 #include "param_mom_mt.h"
 
-using aurora::optimization::param_mom_mt;
+using aurora::params::param_mom_mt;
 
 param_mom_mt::~param_mom_mt() {
 

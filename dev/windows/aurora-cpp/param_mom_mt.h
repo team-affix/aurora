@@ -2,12 +2,12 @@
 #include "param_mom.h"
 #include <mutex>
 
-using aurora::optimization::param_mom;
+using aurora::params::param_mom;
 using std::mutex;
 using std::lock_guard;
 
 namespace aurora {
-	namespace optimization {
+	namespace params {
 		class param_mom_mt : public param_mom {
 		public:
 			ptr<double> momentum_ptr = new double(0);

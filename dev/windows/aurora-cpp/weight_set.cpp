@@ -1,6 +1,6 @@
 #include "weight_set.h"
 
-using aurora::modeling::weight_set;
+using aurora::models::weight_set;
 
 weight_set::~weight_set() {
 

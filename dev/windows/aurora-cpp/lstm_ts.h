@@ -3,10 +3,10 @@
 #include "layer.h"
 #include "pseudo.h"
 
-using aurora::modeling::model;
+using aurora::models::model;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class lstm_ts : public model {
 		public:
 			size_t units;

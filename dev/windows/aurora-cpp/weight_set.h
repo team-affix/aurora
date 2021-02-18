@@ -2,10 +2,10 @@
 #include "model.h"
 #include "weight.h"
 
-using aurora::modeling::weight;
+using aurora::models::weight;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class weight_set : public model {
 		public:
 			size_t a;

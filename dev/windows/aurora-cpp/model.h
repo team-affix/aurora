@@ -13,13 +13,13 @@ using aurora::data::ptr;
 using aurora::data::ref;
 using std::function;
 using std::vector;
-using aurora::optimization::param;
-using aurora::optimization::param_sgd;
-using aurora::optimization::param_mom;
+using aurora::params::param;
+using aurora::params::param_sgd;
+using aurora::params::param_mom;
 using aurora::math::tensor;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class model {
 		public:
 			tensor x = 0;

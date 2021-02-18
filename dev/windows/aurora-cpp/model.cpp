@@ -1,7 +1,7 @@
 #include "model.h"
 
 using namespace aurora;
-using namespace modeling;
+using namespace models;
 
 model::~model() {
 

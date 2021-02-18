@@ -2,11 +2,11 @@
 #include "param_sgd.h"
 #include <mutex>
 
-using aurora::optimization::param_sgd;
+using aurora::params::param_sgd;
 using std::mutex;
 
 namespace aurora {
-	namespace optimization {
+	namespace params {
 		class param_sgd_mt : public param_sgd {
 		public:
 			ptr<double> gradient_ptr = new double(0);

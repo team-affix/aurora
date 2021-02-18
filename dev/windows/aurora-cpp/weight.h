@@ -2,10 +2,10 @@
 #include "model.h"
 #include "param.h"
 
-using aurora::modeling::model;
+using aurora::models::model;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class weight : public model {
 		public:
 			ptr<param> pmt = new param();

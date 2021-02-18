@@ -1,6 +1,6 @@
 #include "layer.h"
 
-using aurora::modeling::layer;
+using aurora::models::layer;
 
 layer::~layer() {
 

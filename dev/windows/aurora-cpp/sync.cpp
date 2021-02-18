@@ -1,6 +1,6 @@
 #include "sync.h"
 
-using aurora::modeling::sync;
+using aurora::models::sync;
 
 sync::~sync() {
 

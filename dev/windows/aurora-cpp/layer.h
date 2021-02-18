@@ -2,11 +2,11 @@
 #include "model.h"
 #include <vector>
 
-using aurora::modeling::model;
+using aurora::models::model;
 using std::vector;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class layer : public model {
 		public:
 			vector<ptr<model>> models;

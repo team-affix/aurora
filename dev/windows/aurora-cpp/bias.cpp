@@ -1,6 +1,6 @@
 #include "bias.h"
 
-using aurora::modeling::bias;
+using aurora::models::bias;
 
 bias::~bias() {
 

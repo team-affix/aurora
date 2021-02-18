@@ -3,9 +3,9 @@
 #include "param_sgd.h"
 #include "param_mom.h"
 
-using aurora::optimization::param;
-using aurora::optimization::param_sgd;
-using aurora::optimization::param_mom;
+using aurora::params::param;
+using aurora::params::param_sgd;
+using aurora::params::param_mom;
 
 param_sgd::~param_sgd() {
 
@@ -15,8 +15,13 @@ param_sgd::param_sgd() {
 
 }
 
-param_sgd::param_sgd(double a_state, double a_learn_rate, double a_gradient) : param(a_state, a_learn_rate) {
+param_sgd::param_sgd(double a_state, double a_learn_rate, double a_gradient) : param(a_state) {
+	this->learn_rate() = a_learn_rate;
 	this->gradient() = a_gradient;
+}
+
+double& param_sgd::learn_rate() {
+	return learn_rate_ptr.val();
 }
 
 double& param_sgd::gradient() {
@@ -25,6 +30,11 @@ double& param_sgd::gradient() {
 
 void param_sgd::accum_grad(double a_grad) {
 	gradient() += a_grad;
+}
+
+void param_sgd::update() {
+	state() -= learn_rate() * gradient();
+	gradient() = 0;
 }
 
 param* param_sgd::clone() {

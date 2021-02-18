@@ -1,19 +1,25 @@
 #pragma once
 #include "genome.h"
 
-using aurora::optimization::genome;
+using aurora::evolution::genome;
 
 namespace aurora {
-	namespace optimization {
+	namespace evolution {
 		class generation {
 		public:
-			genome parent;
 			vector<genome> genomes;
+			function<double(genome&)> get_reward;
 
 		public:
-			size_t best_child_index();
-			genome& best_child();
-			double cycle_generation();
+			generation();
+			generation(vector<genome> a_genomes, function<double(genome&)> a_get_reward);
+
+		public:
+			genome& best();
+			vector<genome> best(size_t a_genomes);
+			genome& worst();
+			vector<genome> worst(size_t a_genomes);
+			vector<size_t> sort();
 
 		};
 	}

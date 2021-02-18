@@ -3,12 +3,12 @@
 #include "weight_set.h"
 #include <vector>
 
-using aurora::modeling::model;
-using aurora::modeling::weight_set;
+using aurora::models::model;
+using aurora::models::weight_set;
 using std::vector;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class weight_junction : public model {
 		public:
 			size_t a;

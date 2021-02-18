@@ -1,7 +1,7 @@
 #include "lstm_ts.h"
 
-using aurora::modeling::lstm_ts;
-using aurora::modeling::layer;
+using aurora::models::lstm_ts;
+using aurora::models::layer;
 using namespace aurora;
 
 lstm_ts::~lstm_ts() {

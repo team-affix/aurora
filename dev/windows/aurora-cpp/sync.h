@@ -3,11 +3,11 @@
 #include <vector>
 #include <initializer_list>
 
-using aurora::modeling::model;
+using aurora::models::model;
 using std::vector;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class sync : public model {
 		public:
 			ptr<model> model_template;

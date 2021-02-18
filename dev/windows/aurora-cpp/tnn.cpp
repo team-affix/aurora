@@ -3,8 +3,8 @@
 #include "weight_junction.h"
 
 using namespace aurora;
-using modeling::layer;
-using modeling::weight_junction;
+using models::layer;
+using models::weight_junction;
 
 sequential* pseudo::tnn(vector<size_t> a_npl, ptr<model> a_neuron_template, function<void(ptr<param>&)> a_init) {
 	sequential* result = new sequential();

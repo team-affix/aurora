@@ -1,6 +1,6 @@
 #include "weight_junction.h"
 
-using aurora::modeling::weight_junction;
+using aurora::models::weight_junction;
 
 weight_junction::~weight_junction() {
 

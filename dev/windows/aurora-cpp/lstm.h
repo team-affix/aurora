@@ -4,11 +4,11 @@
 #include "lstm_ts.h"
 
 using aurora::data::ptr;
-using aurora::modeling::model;
-using aurora::modeling::lstm_ts;
+using aurora::models::model;
+using aurora::models::lstm_ts;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class lstm : public model {
 		public:
 			size_t units;

@@ -5,17 +5,17 @@
 #include "leaky_relu.h"
 
 using namespace aurora;
-using aurora::modeling::bias;
-using aurora::modeling::sigmoid;
-using aurora::modeling::tanh;
-using aurora::modeling::leaky_relu;
+using aurora::models::bias;
+using aurora::models::sigmoid;
+using aurora::models::tanh;
+using aurora::models::leaky_relu;
 
 sequential* pseudo::nsm() {
 	return new sequential{ new bias(), new sigmoid() };
 }
 
 sequential* pseudo::nth() {
-	return new sequential{ new bias(), new aurora::modeling::tanh() };
+	return new sequential{ new bias(), new aurora::models::tanh() };
 }
 
 sequential* pseudo::nlr(double a_m) {

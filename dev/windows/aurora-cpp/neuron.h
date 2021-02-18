@@ -3,8 +3,8 @@
 #include "sequential.h"
 #include <vector>
 
-using aurora::modeling::model;
-using aurora::modeling::sequential;
+using aurora::models::model;
+using aurora::models::sequential;
 using std::vector;
 
 namespace aurora {

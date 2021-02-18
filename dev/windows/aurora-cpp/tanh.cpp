@@ -1,6 +1,6 @@
 #include "tanh.h"
 
-using aurora::modeling::tanh;
+using aurora::models::tanh;
 
 tanh::~tanh() {
 

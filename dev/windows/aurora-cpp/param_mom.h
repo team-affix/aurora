@@ -2,7 +2,7 @@
 #include "param_sgd.h"
 
 namespace aurora {
-	namespace optimization {
+	namespace params {
 		class param_mom : public param_sgd {
 		public:
 			ptr<double> momentum_ptr = new double(0);
@@ -18,6 +18,7 @@ namespace aurora {
 			virtual double& beta();
 
 		public:
+			virtual void update();
 			virtual param* clone();
 
 		};

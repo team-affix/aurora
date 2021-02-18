@@ -1,6 +1,6 @@
 #include "leaky_relu.h"
 
-using aurora::modeling::leaky_relu;
+using aurora::models::leaky_relu;
 
 leaky_relu::~leaky_relu() {
 

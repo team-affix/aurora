@@ -1,10 +1,10 @@
 #pragma once
 #include "model.h"
 
-using aurora::modeling::model;
+using aurora::models::model;
 
 namespace aurora {
-	namespace modeling {
+	namespace models {
 		class tanh : public model {
 		public:
 			MODEL_FIELDS
