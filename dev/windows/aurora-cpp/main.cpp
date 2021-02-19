@@ -889,7 +889,7 @@ void genome_test() {
 		pmt_link_tensor[i].val_ptr.link(pv[i]->state_ptr);
 #pragma endregion
 #pragma region GET REWARD
-	auto get_reward = [&](tensor& a_genome) {
+	auto get_reward = [&](genome& a_genome) {
 		pmt_link_tensor.pop(a_genome);
 		double cost = 0;
 		for (int i = 0; i < x.size(); i++) {
@@ -901,16 +901,14 @@ void genome_test() {
 	};
 #pragma endregion
 #pragma region EVOLVE
-	vector<genome> parents = genome(pmt_link_tensor, 1, 0.02).mutate(re, 3);
-	for (int i = 0; i < parents.size(); i++)
-		std::cout << parents[i].to_string() << std::endl;
+	vector<genome> parents = genome(pmt_link_tensor, 0.1, 0.2).mutate(re, 3);
 	for (int epoch = 0; true; epoch++) {
-		generation gen = generation(genome::mutate(genome::merge(parents, 100), re), get_reward);
+		generation gen = generation(genome::mutate(genome::merge(parents, 40), re), get_reward);
 		parents = gen.best(3);
 		if(epoch % 100 == 0)
 			std::cout << 1 / get_reward(parents[0]) << std::endl;
-		for (int i = 0; i < parents.size(); i++)
-			parents[i].learn_rate = 0.02 / (epoch / 40+1);
+		/*for (int i = 0; i < parents.size(); i++)
+			parents[i].learn_rate = 0.02 / (epoch / 40+1);*/
 	}
 #pragma endregion
 
@@ -920,7 +918,7 @@ int main() {
 
 	srand(time(NULL));
 
-	zil_trader();
+	genome_test();
 
 	return 0;
 
