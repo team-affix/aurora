@@ -6,35 +6,32 @@ genome::genome() {
 
 }
 
-genome::genome(tensor a_alleles, double a_mut_prob, double a_learn_rate) : tensor(a_alleles) {
-	this->mut_prob = a_mut_prob;
-	this->learn_rate = a_learn_rate;
+genome::genome(tensor a_alleles, function<double(double)> a_random_change) : tensor(a_alleles) {
+	this->random_change = a_random_change;
 }
 
 genome::operator tensor& () {
 	return *this;
 }
 
-genome genome::mutate(default_random_engine& a_re) {
+genome genome::mutate() {
 	genome result = clone();
-	int divisor = 1 / mut_prob;
 	for (int allele = 0; allele < result.size(); allele++)
-		if (rand() % divisor == 0)
-			result[allele].val() += learn_rate * s_urd(a_re);
+		result[allele].val() = random_change(at(allele));
 	return result;
 }
 
-vector<genome> genome::mutate(default_random_engine& a_re, size_t a_children) {
+vector<genome> genome::mutate(size_t a_children) {
 	vector<genome> result = vector<genome>(a_children);
 	for (int child = 0; child < a_children; child++)
-		result[child] = mutate(a_re);
+		result[child] = mutate();
 	return result;
 }
 
-vector<genome> genome::mutate(vector<genome> a_genomes, default_random_engine& a_re) {
+vector<genome> genome::mutate(vector<genome> a_genomes) {
 	vector<genome> result = vector<genome>(a_genomes);
 	for (int i = 0; i < result.size(); i++)
-		result[i] = a_genomes[i].mutate(a_re);
+		result[i] = a_genomes[i].mutate();
 	return result;
 }
 
@@ -71,5 +68,5 @@ vector<genome> genome::merge(vector<genome> a_parents, size_t a_children) {
 }
 
 genome genome::clone() {
-	return genome(tensor::clone(), mut_prob, learn_rate);
+	return genome(tensor::clone(), random_change);
 }

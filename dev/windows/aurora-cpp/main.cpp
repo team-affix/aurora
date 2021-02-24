@@ -16,6 +16,7 @@ using namespace aurora::params;
 using namespace aurora::evolution;
 using std::default_random_engine;
 using std::uniform_real_distribution;
+using std::uniform_int_distribution;
 
 std::string pl_export(vector<param_sgd*>& a_pl) {
 	std::string result;
@@ -775,10 +776,12 @@ void zil_trader() {
 
 	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
 	uniform_real_distribution<double> zil_urd(0.13, 0.20);
+	uniform_int_distribution<int> trade_uid(0, 1);
 	default_random_engine re(25);
+
 #pragma region DATA GATHER
-	const size_t episode_size = 20;
-	tensor value_tensor_2d = tensor::new_2d(10, episode_size, zil_urd, re);
+	const size_t episode_size = 200;
+	tensor value_tensor_2d = tensor::new_2d(1, episode_size, zil_urd, re);
 	tensor value_tensor_3d = tensor::new_1d(value_tensor_2d.size());
 	for (int i = 0; i < value_tensor_3d.size(); i++)
 		value_tensor_3d[i] = value_tensor_2d[i].roll(1);
@@ -798,10 +801,6 @@ void zil_trader() {
 	ptr<sync> sync_out = new sync(pseudo::tnn({ lstm_units, 2 }, { pseudo::nlr(0.3), pseudo::nsm() }, pmt_init));
 	sequential s = { sync_in.get(), lstm_mid.get(), sync_out.get() };
 
-	tensor pmt_link_tensor = tensor::new_1d(pv.size());
-	for (int i = 0; i < pmt_link_tensor.size(); i++)
-		pmt_link_tensor[i].val_ptr.link(pv[i]->state_ptr);
-
 	sync_in->prep(episode_size);
 	lstm_mid->prep(episode_size);
 	sync_out->prep(episode_size);
@@ -815,7 +814,7 @@ void zil_trader() {
 	auto get_actions = [&](tensor& a_action_tensor) {
 		vector<bool> result = vector<bool>(a_action_tensor.size());
 		for (int i = 0; i < a_action_tensor.size(); i++)
-			result[i] = a_action_tensor[i][0] > a_action_tensor[i][1];
+			result[i] = a_action_tensor[i] == 1;
 		return result;
 	};
 	auto get_usd = [&](tensor& a_zil_price_1d, vector<bool>& a_actions) {
@@ -837,25 +836,36 @@ void zil_trader() {
 		return usd - start_usd;
 	};
 	auto get_rewards = [&](genome& a_genome) {
-		pmt_link_tensor.pop(a_genome);
 		double result = 0;
 		for (int i = 0; i < value_tensor_3d.size(); i++) {
-			s.fwd(value_tensor_3d[i]);
-			vector<bool> actions = get_actions(s.y);
+			vector<bool> actions = get_actions(a_genome);
 			result += get_usd(value_tensor_2d[i], actions);
 		}
 		return result;
 	};
 #pragma endregion
+#pragma region MUTATE
+	auto mutate = [&](double val) {
+		if (rand() % 100 == 0)
+			return (double)trade_uid(re);
+		return val;
+	};
+#pragma endregion
 #pragma region EVOLVE
-	vector<genome> parents = genome(pmt_link_tensor, 0.01, 1).mutate(re, 3);
+	vector<genome> parents = genome(tensor::new_1d(episode_size), mutate).mutate(3);
 	for (int epoch = 0; true; epoch++) {
-		generation gen1 = generation(genome::mutate(genome::merge(parents, 100), re), get_rewards);
+		generation gen1 = generation(genome::mutate(genome::merge(parents, 40)), get_rewards);
 		parents = gen1.best(3);
 		if (epoch % 10 == 0)
 			std::cout << get_rewards(parents[0]) << std::endl;
 	}
 #pragma endregion
+
+}
+
+void task_encoder() {
+
+	 
 
 }
 
@@ -900,15 +910,20 @@ void genome_test() {
 		return 1 / cost;
 	};
 #pragma endregion
+#pragma region MUTATE
+	auto mutate = [&](double val) {
+		if (rand() % 100 == 0)
+			return val + pmt_urd(re);
+		return val;
+	};
+#pragma endregion
 #pragma region EVOLVE
-	vector<genome> parents = genome(pmt_link_tensor, 0.1, 0.2).mutate(re, 3);
+	vector<genome> parents = genome(pmt_link_tensor, mutate).mutate(3);
 	for (int epoch = 0; true; epoch++) {
-		generation gen = generation(genome::mutate(genome::merge(parents, 40), re), get_reward);
+		generation gen = generation(genome::mutate(genome::merge(parents, 40)), get_reward);
 		parents = gen.best(3);
 		if(epoch % 100 == 0)
 			std::cout << 1 / get_reward(parents[0]) << std::endl;
-		/*for (int i = 0; i < parents.size(); i++)
-			parents[i].learn_rate = 0.02 / (epoch / 40+1);*/
 	}
 #pragma endregion
 
@@ -918,7 +933,7 @@ int main() {
 
 	srand(time(NULL));
 
-	genome_test();
+	task_encoder();
 
 	return 0;
 

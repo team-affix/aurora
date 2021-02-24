@@ -1,26 +1,26 @@
 #pragma once
 #include "tensor.h"
 #include <assert.h>
+#include <functional>
 
 using aurora::math::tensor;
+using std::function;
 
 namespace aurora {
 	namespace evolution {
-		static uniform_real_distribution<double> s_urd(-1, 1);
 		class genome : public tensor {
 		public:
-			double mut_prob;
-			double learn_rate;
+			function<double(double)> random_change;
 
 		public:
 			genome();
-			genome(tensor a_alleles, double a_mut_prob, double a_learn_rate);
+			genome(tensor a_alleles, function<double(double)> a_random_change);
 			operator tensor& ();
 
 		public:
-			genome mutate(default_random_engine& a_re);
-			vector<genome> mutate(default_random_engine& a_re, size_t a_children);
-			static vector<genome> mutate(vector<genome> a_genomes, default_random_engine& a_re);
+			genome mutate();
+			vector<genome> mutate(size_t a_children);
+			static vector<genome> mutate(vector<genome> a_genomes);
 			
 		public:
 			genome merge(genome& a_spouse);
