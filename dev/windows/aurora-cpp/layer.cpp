@@ -43,24 +43,24 @@ void layer::bwd() {
 		models[i]->bwd();
 }
 
-tensor& layer::fwd(tensor a_x) {
+tensor& layer::fwd(tensor& a_x) {
 	x.pop(a_x);
 	fwd();
 	return y;
 }
 
-tensor& layer::bwd(tensor a_y_grad) {
+tensor& layer::bwd(tensor& a_y_grad) {
 	y_grad.pop(a_y_grad);
 	bwd();
 	return x_grad;
 }
 
-void layer::signal(tensor a_y_des) {
+void layer::signal(tensor& a_y_des) {
 	for (size_t i = 0; i < models.size(); i++)
 		models[i]->signal(a_y_des[i]);
 }
 
-void layer::cycle(tensor a_x, tensor a_y_des) {
+void layer::cycle(tensor& a_x, tensor& a_y_des) {
 	x.pop(a_x);
 	fwd();
 	signal(a_y_des);

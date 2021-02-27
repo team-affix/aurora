@@ -34,24 +34,24 @@ void sync::bwd() {
 		unrolled[i]->bwd();
 }
 
-tensor& sync::fwd(tensor a_x) {
+tensor& sync::fwd(tensor& a_x) {
 	x.pop(a_x);
 	fwd();
 	return y;
 }
 
-tensor& sync::bwd(tensor a_y_grad) {
+tensor& sync::bwd(tensor& a_y_grad) {
 	y_grad.pop(a_y_grad);
 	bwd();
 	return x_grad;
 }
 
-void sync::signal(tensor a_y_des) {
+void sync::signal(tensor& a_y_des) {
 	for (int i = 0; i < unrolled.size(); i++)
 		unrolled[i]->signal(a_y_des[i]);
 }
 
-void sync::cycle(tensor a_x, tensor a_y_des) {
+void sync::cycle(tensor& a_x, tensor& a_y_des) {
 	x.pop(a_x);
 	fwd();
 	signal(a_y_des);

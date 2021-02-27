@@ -337,6 +337,11 @@ int random(int min, int max) {
 	return min + (rand() % static_cast<int>(max - min + 1));
 }
 
+double random_d(double min, double max, default_random_engine& re) {
+	uniform_real_distribution<double> urd(min, max);
+	return urd(re);
+}
+
 tensor get_encoder_x(size_t order_1_len) {
 	tensor result = tensor::new_1d(order_1_len);
 	for (int i = 0; i < order_1_len; i++)
@@ -919,41 +924,41 @@ void zil_mapper() {
 
 struct composite_function {
 	~composite_function(){
-		for (int i = 0; i < layers.size(); i++)
+		for (double i = 0; i < layers.size(); i++)
 			delete layers[i];
 	}
 
-	vector<function<int(int)>*> layers;
-	int operator()(int x) {
+	vector<function<double(double)>*> layers;
+	double operator()(double x) {
 		return layers.back()->operator()(x);
 	}
 };
 
-composite_function get_composite_fn(size_t order) {
-	vector<function<int(int)>*> res_vec;
-	res_vec.push_back(new function<int(int)>([&](int x) { return x; }));
-	for (int i = 1; i < order; i++) {
-		function<int(int)>* layer;
-		function<int(int)>& previous = *res_vec[i - 1];
+composite_function get_composite_fn(size_t order, double min_opd, double max_opd, default_random_engine& re) {
+	vector<function<double(double)>*> res_vec;
+	res_vec.push_back(new function<double(double)>([&](double x) { return x; }));
+	for (double i = 1; i < order; i++) {
+		function<double(double)>* layer;
+		function<double(double)>& previous = *res_vec[i - 1];
 		switch (rand() % 4) {
 		case 0:
-			layer = new function<int(int)>([&](int x) {
-				return previous(x) + rand() % 100;
+			layer = new function<double(double)>([&](double x) {
+				return previous(x) + random_d(min_opd, max_opd, re);
 			});
 			break;
 		case 1:
-			layer = new function<int(int)>([&](int x) {
-				return previous(x) - rand() % 100;
+			layer = new function<double(double)>([&](double x) {
+				return previous(x) - random_d(min_opd, max_opd, re);
 			});
 			break;
 		case 2:
-			layer = new function<int(int)>([&](int x) {
-				return previous(x) * rand() % 100;
+			layer = new function<double(double)>([&](double x) {
+				return previous(x) * random_d(min_opd, max_opd, re);
 			});
 			break;
 		case 3:
-			layer = new function<int(int)>([&](int x) {
-				return previous(x) / rand() % 100;
+			layer = new function<double(double)>([&](double x) {
+				return previous(x) / random_d(min_opd, max_opd, re);
 			});
 			break;
 		}
@@ -962,20 +967,134 @@ composite_function get_composite_fn(size_t order) {
 	return { res_vec };
 }
 
-vector<composite_function> get_composite_fns(size_t num_fns, size_t min_order, size_t max_order) {
-	vector<composite_function> result = vector<composite_function>(num_fns);
-	for (int i = 0; i < num_fns; i++)
-		result[i] = get_composite_fn(random(min_order, max_order));
-	return result;
-}
-
 void task_encoder() {
 
-	for (int i = 0; i < 100; i++) {
-		auto fn = get_composite_fn(10);
-		for (int j = 0; j < 10; j++)
-			std::cout << fn(j) << ", ";
-		std::cout << std::endl;
+	const size_t order_2_set_len = 10;
+	const size_t order_2_set_min_complexity = 1;
+	const size_t order_2_set_max_complexity = 10;
+	const size_t order_1_set_len = 30; // MUST BE MULTIPLE OF 2
+
+	default_random_engine re;
+
+
+	auto init_sets = [&](vector<size_t>& a_train_complexity, vector<size_t>& a_test_complexity, tensor& a_train_x, tensor& a_train_y, tensor& a_test_x, tensor& a_test_y) {
+		const double min_order_0_val = -10;
+		const double max_order_0_val = 10;
+		const double min_opd_val = -10;
+		const double max_opd_val = 10;
+		a_train_complexity = vector<size_t>(order_2_set_len);
+		a_train_x = tensor::new_1d(order_2_set_len);
+		a_train_y = tensor::new_1d(order_2_set_len);
+		// INITIALIZE TRAINING DATA
+		for (int i = 0; i < order_2_set_len; i++) {
+			a_train_complexity[i] = random(order_2_set_min_complexity, order_2_set_max_complexity);
+			auto fn = get_composite_fn(a_train_complexity[i], min_opd_val, max_opd_val, re);
+			tensor x = tensor::new_2d(order_1_set_len, 1);
+			tensor y = tensor::new_2d(order_1_set_len, 1);
+			for (int j = 0; j < order_1_set_len; j += 2) {
+				x[j][0] = random_d(min_order_0_val, max_order_0_val, re);
+				y[j][0] = fn(x[j]);
+				x[j + 1][0] = y[j][0];
+				y[j + 1][0] = x[j][0];
+			}
+			a_train_x[i] = x;
+			a_train_y[i] = y;
+		}
+		a_test_complexity = vector<size_t>(order_2_set_len);
+		a_test_x = tensor::new_1d(order_2_set_len);
+		a_test_y = tensor::new_1d(order_2_set_len);
+		// INITIALIZE TESTING DATA
+		for (int i = 0; i < order_2_set_len; i++) {
+			a_test_complexity[i] = random(order_2_set_min_complexity, order_2_set_max_complexity);
+			auto fn = get_composite_fn(a_test_complexity[i], min_opd_val, max_opd_val, re);
+			tensor x = tensor::new_2d(order_1_set_len, 1);
+			tensor y = tensor::new_2d(order_1_set_len, 1);
+			for (int j = 0; j < order_1_set_len; j += 2) {
+				x[j][0] = random_d(min_order_0_val, max_order_0_val, re);
+				y[j][0] = fn(x[j]);
+				x[j + 1][0] = y[j][0];
+				y[j + 1][0] = x[j][0];
+			}
+			a_test_x[i] = x;
+			a_test_y[i] = y;
+		}
+	};
+
+	vector<size_t> train_complexity;
+	vector<size_t> test_complexity;
+	tensor train_x;
+	tensor train_y;
+	tensor test_x;
+	tensor test_y;
+
+	auto reset_sets = [&] {init_sets(train_complexity, test_complexity, train_x, train_y, test_x, test_y); };
+	reset_sets();
+
+	vector<param_mom*> pv;
+	auto pmt_init = [&](ptr<param>& pmt) {
+		pmt = new param_mom(0, 0, 0, 0, 0.9);
+		pv.push_back((param_mom*)pmt.get());
+	};
+
+	const size_t lstm_units = 20;
+
+	ptr<sync> s_in = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
+	ptr<lstm> l_1 = new lstm(lstm_units, pmt_init);
+	ptr<lstm> l_2 = new lstm(lstm_units, pmt_init);
+	ptr<lstm> l_3 = new lstm(lstm_units, pmt_init);
+	ptr<sync> s_out = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), pmt_init));
+	sequential s = { s_in.get(), l_1.get(), l_2.get(), l_3.get(), s_out.get() };
+
+	double state_structure = 1 / (double)pv.size();
+	double learn_rate_structure = 0.002 / (double)pv.size();
+
+	uniform_real_distribution<double> pmt_urd(-state_structure, state_structure);
+	for (param_mom* pmt : pv) {
+		pmt->state() = pmt_urd(re);
+		pmt->learn_rate() = learn_rate_structure;
+	}
+
+	s_in->prep(order_1_set_len);
+	l_1->prep(order_1_set_len);
+	l_2->prep(order_1_set_len);
+	l_3->prep(order_1_set_len);
+	s_out->prep(order_1_set_len);
+	s.compile();
+	s_in->unroll(order_1_set_len);
+	l_1->unroll(order_1_set_len);
+	l_2->unroll(order_1_set_len);
+	l_3->unroll(order_1_set_len);
+	s_out->unroll(order_1_set_len);
+
+	const size_t checkpoint_interval = 10;
+	const size_t mini_batch_len = 10;
+
+	//TRAIN
+	for (int epoch = 0; true; epoch++) {
+
+		const double cost_structure = 1 / (double)order_2_set_len / (double)order_1_set_len;
+		double train_cost = 0;
+		for (int i = 0; i < 3; i++) {
+			int ts = random(0, order_2_set_len);
+			s.cycle(train_x[ts], train_y[ts]);
+			train_cost += s.y_grad.abs_2d().sum_2d().sum_1d() * cost_structure;
+		}
+
+		double test_cost = 0;
+		for (int ts = 0; ts < order_2_set_len; ts++) {
+			s.fwd(test_x[ts]);
+			s.signal(test_y[ts]);
+			test_cost += s.y_grad.abs_2d().sum_2d().sum_1d() * cost_structure;
+		}
+
+		for (param_mom* pmt : pv) {
+			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
+			pmt->state() -= pmt->learn_rate() * pmt->momentum();
+			pmt->gradient() = 0;
+		}
+
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "TRAIN: " << train_cost << " TEST: " << test_cost << std::endl;
 	}
 
 }

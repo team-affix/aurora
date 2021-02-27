@@ -38,24 +38,24 @@ void lstm::bwd() {
 		unrolled[i]->bwd();
 }
 
-tensor& lstm::fwd(tensor a_x) {
+tensor& lstm::fwd(tensor& a_x) {
 	x.pop(a_x);
 	fwd();
 	return y;
 }
 
-tensor& lstm::bwd(tensor a_y_grad) {
+tensor& lstm::bwd(tensor& a_y_grad) {
 	y_grad.pop(a_y_grad);
 	bwd();
 	return x_grad;
 }
 
-void lstm::signal(tensor a_y_des) {
+void lstm::signal(tensor& a_y_des) {
 	for (int i = 0; i < unrolled.size(); i++)
 		unrolled[i]->signal(a_y_des[i]);
 }
 
-void lstm::cycle(tensor a_x, tensor a_y_des) {
+void lstm::cycle(tensor& a_x, tensor& a_y_des) {
 	x.pop(a_x);
 	fwd();
 	signal(a_y_des);

@@ -32,23 +32,23 @@ void leaky_relu::bwd() {
 		x_grad.val() = y_grad.val() * m.val();
 }
 
-tensor& leaky_relu::fwd(tensor a_x) {
+tensor& leaky_relu::fwd(tensor& a_x) {
 	x.val() = a_x.val();
 	fwd();
 	return y;
 }
 
-tensor& leaky_relu::bwd(tensor a_y_grad) {
+tensor& leaky_relu::bwd(tensor& a_y_grad) {
 	y_grad.val() = a_y_grad.val();
 	bwd();
 	return x_grad;
 }
 
-void leaky_relu::signal(tensor a_y_des) {
+void leaky_relu::signal(tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void leaky_relu::cycle(tensor a_x, tensor a_y_des) {
+void leaky_relu::cycle(tensor& a_x, tensor& a_y_des) {
 	x.val() = a_x.val();
 	fwd();
 	signal(a_y_des);

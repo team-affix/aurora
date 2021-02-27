@@ -23,24 +23,24 @@ void model::bwd() {
 
 }
 
-tensor& model::fwd(tensor a_x) {
+tensor& model::fwd(tensor& a_x) {
 	x.set(a_x);
 	fwd();
 	return y;
 }
 
-tensor& model::bwd(tensor a_y_grad) {
+tensor& model::bwd(tensor& a_y_grad) {
 	y_grad.set(a_y_grad);
 	bwd();
 	return x_grad;
 }
 
 
-void model::signal(tensor a_y_des) {
+void model::signal(tensor& a_y_des) {
 	
 }
 
-void model::cycle(tensor a_x, tensor a_y_des) {
+void model::cycle(tensor& a_x, tensor& a_y_des) {
 
 }
 
