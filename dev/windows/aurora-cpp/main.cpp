@@ -7,6 +7,7 @@
 #include <mutex>
 #include <fstream>
 #include <time.h>
+#include <filesystem>
 
 using namespace aurora;
 using namespace aurora::data;
@@ -863,9 +864,119 @@ void zil_trader() {
 
 }
 
+std::string& ltrim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
+{
+	str.erase(0, str.find_first_not_of(chars));
+	return str;
+}
+
+std::string& rtrim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
+{
+	str.erase(str.find_last_not_of(chars) + 1);
+	return str;
+}
+
+std::string& trim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
+{
+	return ltrim(rtrim(str, chars), chars);
+}
+
+void zil_mapper() {
+	string zil_csv_directory = "D:\\files\\files\\csv\\zil";
+	tensor raw;
+	for (const auto& entry : std::filesystem::directory_iterator(zil_csv_directory)) {
+		tensor csv = tensor::new_2d(num_lines(entry.path().u8string()), 2);
+		string line;
+		std::ifstream ifs(entry);
+		int row = 0;
+		while (std::getline(ifs, line)) {
+			std::istringstream s(line);
+			std::string field;
+			int col = 0;
+			while (getline(s, field, ',')) {
+				string trimmed = trim(field, "\"");
+				if (col == 1)
+					csv[row][col] = std::stod(trimmed);
+				else
+					csv[row][col] = std::stod(trimmed) / 1000 / 60;
+				col++;
+			}
+			row++;
+		}
+		raw.vec().push_back(csv);
+	}
+	tensor x;
+	tensor y;
+	const int num_from_each_csv = 10000;
+	for (tensor& csv : raw.vec()) {
+		for (int ts = 0; ts < num_from_each_csv; ts++)
+		{
+			int minutes_wait = rand() % 240;
+
+		}
+	}
+}
+
+struct composite_function {
+	~composite_function(){
+		for (int i = 0; i < layers.size(); i++)
+			delete layers[i];
+	}
+
+	vector<function<int(int)>*> layers;
+	int operator()(int x) {
+		return layers.back()->operator()(x);
+	}
+};
+
+composite_function get_composite_fn(size_t order) {
+	vector<function<int(int)>*> res_vec;
+	res_vec.push_back(new function<int(int)>([&](int x) { return x; }));
+	for (int i = 1; i < order; i++) {
+		function<int(int)>* layer;
+		function<int(int)>& previous = *res_vec[i - 1];
+		switch (rand() % 4) {
+		case 0:
+			layer = new function<int(int)>([&](int x) {
+				return previous(x) + rand() % 100;
+			});
+			break;
+		case 1:
+			layer = new function<int(int)>([&](int x) {
+				return previous(x) - rand() % 100;
+			});
+			break;
+		case 2:
+			layer = new function<int(int)>([&](int x) {
+				return previous(x) * rand() % 100;
+			});
+			break;
+		case 3:
+			layer = new function<int(int)>([&](int x) {
+				return previous(x) / rand() % 100;
+			});
+			break;
+		}
+		res_vec.push_back(layer);
+	}
+	return { res_vec };
+}
+
+vector<composite_function> get_composite_fns(size_t num_fns, size_t min_order, size_t max_order) {
+	vector<composite_function> result = vector<composite_function>(num_fns);
+	for (int i = 0; i < num_fns; i++)
+		result[i] = get_composite_fn(random(min_order, max_order));
+	return result;
+}
+
 void task_encoder() {
 
-	 
+	for (int i = 0; i < 100; i++) {
+		auto fn = get_composite_fn(10);
+		for (int j = 0; j < 10; j++)
+			std::cout << fn(j) << ", ";
+		std::cout << std::endl;
+	}
 
 }
 
