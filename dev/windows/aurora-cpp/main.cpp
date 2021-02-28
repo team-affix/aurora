@@ -969,9 +969,9 @@ composite_function get_composite_fn(size_t order, double min_opd, double max_opd
 
 void task_encoder() {
 
-	const size_t order_2_set_len = 10;
+	const size_t order_2_set_len = 100;
 	const size_t order_2_set_min_complexity = 1;
-	const size_t order_2_set_max_complexity = 10;
+	const size_t order_2_set_max_complexity = 5;
 	const size_t order_1_set_len = 30; // MUST BE MULTIPLE OF 2
 
 	default_random_engine re;
@@ -1036,7 +1036,7 @@ void task_encoder() {
 		pv.push_back((param_mom*)pmt.get());
 	};
 
-	const size_t lstm_units = 20;
+	const size_t lstm_units = 25;
 
 	ptr<sync> s_in = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
 	ptr<lstm> l_1 = new lstm(lstm_units, pmt_init);
@@ -1046,7 +1046,7 @@ void task_encoder() {
 	sequential s = { s_in.get(), l_1.get(), l_2.get(), l_3.get(), s_out.get() };
 
 	double state_structure = 1 / (double)pv.size();
-	double learn_rate_structure = 0.002 / (double)pv.size();
+	double learn_rate_structure = 0.02 / (double)pv.size();
 
 	uniform_real_distribution<double> pmt_urd(-state_structure, state_structure);
 	for (param_mom* pmt : pv) {
@@ -1066,13 +1066,13 @@ void task_encoder() {
 	l_3->unroll(order_1_set_len);
 	s_out->unroll(order_1_set_len);
 
-	const size_t checkpoint_interval = 10;
-	const size_t mini_batch_len = 10;
+	const size_t checkpoint_interval = 1;
+	const size_t mini_batch_len = 38;
 
 	//TRAIN
 	for (int epoch = 0; true; epoch++) {
 
-		const double cost_structure = 1 / (double)order_2_set_len / (double)order_1_set_len;
+		const double cost_structure = 1 / (double)mini_batch_len / (double)order_1_set_len;
 		double train_cost = 0;
 		for (int i = 0; i < 3; i++) {
 			int ts = random(0, order_2_set_len);
