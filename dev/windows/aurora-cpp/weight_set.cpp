@@ -16,6 +16,11 @@ weight_set::weight_set(size_t a_a, function<void(ptr<param>&)> a_init) {
 		weights.push_back(new weight(a_init));
 }
 
+void weight_set::pmt_wise(function<void(ptr<param>&)> a_func) {
+	for (int i = 0; i < weights.size(); i++)
+		weights[i]->pmt_wise(a_func);
+}
+
 model* weight_set::clone() {
 	weight_set* result = new weight_set();
 	result->a = a;

@@ -49,6 +49,12 @@
     <Filter Include="Source Files\evolution">
       <UniqueIdentifier>{2ef80bf2-9414-431e-bd4d-e2d45716f849}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\basic">
+      <UniqueIdentifier>{7889e4fe-cfe3-4110-bf91-9ba4fa9493c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\basic">
+      <UniqueIdentifier>{1744551b-3818-4897-ad87-df82e773d2d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ptr.h">
@@ -99,9 +105,6 @@
     <ClInclude Include="pseudo.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="tnn.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
     <ClInclude Include="neuron.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
@@ -113,9 +116,6 @@
     </ClInclude>
     <ClInclude Include="leaky_relu.h">
       <Filter>Header Files\models</Filter>
-    </ClInclude>
-    <ClInclude Include="random.h">
-      <Filter>Header Files\math</Filter>
     </ClInclude>
     <ClInclude Include="aurora.h">
       <Filter>Header Files</Filter>
@@ -153,11 +153,26 @@
     <ClInclude Include="genome.h">
       <Filter>Header Files\evolution</Filter>
     </ClInclude>
-    <ClInclude Include="sort.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
     <ClInclude Include="evolution.h">
       <Filter>Header Files\evolution</Filter>
+    </ClInclude>
+    <ClInclude Include="basic.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="tnn.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="param_init.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="session.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="static.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sort.h">
+      <Filter>Header Files\pseudo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -197,9 +212,6 @@
     <ClCompile Include="layer.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
-    <ClCompile Include="tnn.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
     <ClCompile Include="sigmoid.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
@@ -211,9 +223,6 @@
     </ClCompile>
     <ClCompile Include="leaky_relu.cpp">
       <Filter>Source Files\models</Filter>
-    </ClCompile>
-    <ClCompile Include="random.cpp">
-      <Filter>Source Files\math</Filter>
     </ClCompile>
     <ClCompile Include="persistent_thread.cpp">
       <Filter>Source Files\pseudo</Filter>
@@ -239,8 +248,20 @@
     <ClCompile Include="generation.cpp">
       <Filter>Source Files\evolution</Filter>
     </ClCompile>
+    <ClCompile Include="tnn.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="session.cpp">
+      <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="param_init.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
     <ClCompile Include="sort.cpp">
       <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="static.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

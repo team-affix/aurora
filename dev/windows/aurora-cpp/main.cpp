@@ -1163,7 +1163,7 @@ int main() {
 
 	srand(time(NULL));
 
-	task_encoder();
+	tnn_xor_test();
 
 	return 0;
 

@@ -14,6 +14,10 @@ weight::weight(function<void(ptr<param>&)> a_init) {
 	a_init(pmt);
 }
 
+void weight::pmt_wise(function<void(ptr<param>&)> a_func) {
+	a_func(pmt);
+}
+
 model* weight::clone() {
 	weight* result = new weight();
 	result->pmt = pmt;

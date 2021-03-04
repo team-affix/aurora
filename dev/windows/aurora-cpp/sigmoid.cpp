@@ -10,6 +10,10 @@ sigmoid::sigmoid() {
 
 }
 
+void sigmoid::pmt_wise(function<void(ptr<param>&)> a_func) {
+
+}
+
 model* sigmoid::clone() {
 	return new sigmoid();
 }

@@ -14,6 +14,10 @@ bias::bias(function<void(ptr<param>&)> a_init) {
 	a_init(pmt);
 }
 
+void bias::pmt_wise(function<void(ptr<param>&)> a_func) {
+	a_func(pmt);
+}
+
 model* bias::clone() {
 	bias* result = new bias();
 	result->pmt = pmt;

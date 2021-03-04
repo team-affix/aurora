@@ -18,6 +18,11 @@ sequential::sequential(initializer_list<ptr<model>> a_il) {
 	}
 }
 
+void sequential::pmt_wise(function<void(ptr<param>&)> a_func) {
+	for (int i = 0; i < models.size(); i++)
+		models[i]->pmt_wise(a_func);
+}
+
 model* sequential::clone() {
 	sequential* result = new sequential();
 	result->models.resize(models.size());

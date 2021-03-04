@@ -10,6 +10,10 @@ sync::sync(ptr<model> a_model_template) {
 	model_template = a_model_template;
 }
 
+void sync::pmt_wise(function<void(ptr<param>&)> a_func) {
+	model_template->pmt_wise(a_func);
+}
+
 model* sync::clone() {
 	sync* result = new sync(model_template->clone());
 	result->prep(prepared.size());

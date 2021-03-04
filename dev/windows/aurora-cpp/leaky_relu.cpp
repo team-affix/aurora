@@ -10,6 +10,10 @@ leaky_relu::leaky_relu(double a_m) {
 	m.val() = a_m;
 }
 
+void leaky_relu::pmt_wise(function<void(ptr<param>&)> a_func) {
+
+}
+
 model* leaky_relu::clone() {
 	return new leaky_relu(m.val());
 }

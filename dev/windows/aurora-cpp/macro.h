@@ -1,6 +1,7 @@
 #pragma once
 
 #define MODEL_FIELDS \
+virtual void pmt_wise(function<void(ptr<param>&)> a_func); \
 virtual model* clone(); \
 virtual model* clone(function<void(ptr<param>&)> a_init); \
 virtual void fwd(); \

@@ -19,6 +19,11 @@ layer::layer(initializer_list<ptr<model>> a_il) {
 	std::copy(a_il.begin(), a_il.end(), back_inserter(models));
 }
 
+void layer::pmt_wise(function<void(ptr<param>&)> a_func) {
+	for (int i = 0; i < models.size(); i++)
+		models[i]->pmt_wise(a_func);
+}
+
 model* layer::clone() {
 	layer* result = new layer();
 	for (size_t i = 0; i < models.size(); i++)

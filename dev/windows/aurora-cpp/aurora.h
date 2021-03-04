@@ -5,3 +5,4 @@
 #include "params.h"
 #include "pseudo.h"
 #include "evolution.h"
+#include "static.h"

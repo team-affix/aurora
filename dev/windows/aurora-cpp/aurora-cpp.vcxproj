@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aurora.h" />
+    <ClInclude Include="basic.h" />
     <ClInclude Include="bias.h" />
     <ClInclude Include="data.h" />
     <ClInclude Include="evolution.h" />
@@ -36,12 +37,14 @@
     <ClInclude Include="params.h" />
     <ClInclude Include="param_mom_mt.h" />
     <ClInclude Include="param_sgd_mt.h" />
+    <ClInclude Include="param_init.h" />
     <ClInclude Include="pseudo.h" />
-    <ClInclude Include="random.h" />
     <ClInclude Include="ref.h" />
-    <ClInclude Include="sequential.h" />
-    <ClInclude Include="sigmoid.h" />
     <ClInclude Include="sort.h" />
+    <ClInclude Include="static.h" />
+    <ClInclude Include="sequential.h" />
+    <ClInclude Include="session.h" />
+    <ClInclude Include="sigmoid.h" />
     <ClInclude Include="sync.h" />
     <ClInclude Include="tanh.h" />
     <ClInclude Include="tensor.h" />
@@ -66,14 +69,16 @@
     <ClCompile Include="lstm_ts.cpp" />
     <ClCompile Include="neuron.cpp" />
     <ClCompile Include="param.cpp" />
+    <ClCompile Include="param_init.cpp" />
     <ClCompile Include="param_mom.cpp" />
     <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="param_sgd_mt.cpp" />
-    <ClCompile Include="random.cpp" />
     <ClCompile Include="sequential.cpp" />
+    <ClCompile Include="session.cpp" />
     <ClCompile Include="sigmoid.cpp" />
     <ClCompile Include="sort.cpp" />
+    <ClCompile Include="static.cpp" />
     <ClCompile Include="sync.cpp" />
     <ClCompile Include="tanh.cpp" />
     <ClCompile Include="tensor.cpp" />

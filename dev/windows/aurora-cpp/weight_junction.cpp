@@ -17,6 +17,11 @@ weight_junction::weight_junction(size_t a_a, size_t a_b, function<void(ptr<param
 		weight_sets.push_back(new weight_set(a_b, a_init));
 }
 
+void weight_junction::pmt_wise(function<void(ptr<param>&)> a_func) {
+	for (int i = 0; i < weight_sets.size(); i++)
+		weight_sets[i]->pmt_wise(a_func);
+}
+
 model* weight_junction::clone() {
 	weight_junction* result = new weight_junction();
 	result->a = a;

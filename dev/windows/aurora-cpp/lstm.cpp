@@ -20,6 +20,10 @@ lstm::lstm(size_t a_units, ptr<lstm_ts> a_lstm_ts_template) {
 	lstm_ts_template = a_lstm_ts_template;
 }
 
+void lstm::pmt_wise(function<void(ptr<param>&)> a_func) {
+	lstm_ts_template->pmt_wise(a_func);
+}
+
 model* lstm::clone() {
 	return new lstm(units, (lstm_ts*)lstm_ts_template->clone());
 }

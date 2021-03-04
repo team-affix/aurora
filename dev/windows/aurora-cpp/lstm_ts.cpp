@@ -30,6 +30,14 @@ lstm_ts::lstm_ts(size_t a_units, ptr<layer> a_forget_gate, ptr<layer> a_limit_ga
 	this->tanh_gate = a_tanh_gate;
 }
 
+void lstm_ts::pmt_wise(function<void(ptr<param>&)> a_func) {
+	forget_gate->pmt_wise(a_func);
+	limit_gate->pmt_wise(a_func);
+	input_gate->pmt_wise(a_func);
+	output_gate->pmt_wise(a_func);
+	tanh_gate->pmt_wise(a_func);
+}
+
 model* lstm_ts::clone() {
 	return new lstm_ts(units, (layer*)forget_gate->clone(), (layer*)limit_gate->clone(), (layer*)input_gate->clone(), (layer*)output_gate->clone(), (layer*)tanh_gate->clone());
 }

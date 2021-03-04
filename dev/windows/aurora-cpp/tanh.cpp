@@ -10,6 +10,10 @@ tanh::tanh() {
 
 }
 
+void tanh::pmt_wise(function<void(ptr<param>&)> a_func) {
+
+}
+
 model* tanh::clone() {
 	return new tanh();
 }

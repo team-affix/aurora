@@ -48,6 +48,10 @@ void model::recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 
+void model::pmt_wise(function<void(ptr<param>&)> a_func) {
+
+}
+
 model* model::clone() {
 	return new model();
 }
