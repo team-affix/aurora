@@ -119,6 +119,7 @@ void tnn_xor_test() {
 }
 
 void tnn_test() {
+
 	tensor x = {
 		{0, 0},
 		{0, 1},
@@ -159,13 +160,12 @@ void tnn_test() {
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
-	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(25);
+	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), pseudo::dump_pmt(pl));
 
-	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
-		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
-		pl.push_back((param_mom*)pmt.get());
-	});
+	double state_structure = 1 / (double)pl.size();
+	uniform_real_distribution<double> urd(-state_structure, state_structure);
+
+	s->pmt_wise(pseudo::init_pmt(urd, 0.02));
 
 	printf("");
 
@@ -190,6 +190,7 @@ void tnn_test() {
 	for (param_mom* pmt : pl) {
 		std::cout << pmt->state() << std::endl;
 	}
+
 }
 
 void tnn_multithread_test() {
@@ -698,10 +699,10 @@ void loss_map() {
 		}));
 #pragma endregion
 #pragma region ORDER 1 INSTANTIATE
-	const int x_1_height = 10;
+	const int x_1_height = 50;
 	tensor x_1 = tensor::new_2d(x_1_height, 1, urd, re);
 	vector<param_mom*> pv_1;
-	ptr<sequential> s_1 = pseudo::tnn({ 1, pv_0.size() / 2, pv_0.size() }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	ptr<sequential> s_1 = pseudo::tnn({ 1, pv_0.size(), pv_0.size() }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_1.push_back((param_mom*)pmt.get());
 	});
@@ -719,9 +720,9 @@ void loss_map() {
 	s_1->compile();
 #pragma endregion
 #pragma region CONFIGURE TRAINING
-	const double min_ts_cost = 11;
-	const int checkpoint_interval = 100;
-	const int deviant_update_amount = 10;
+	const double min_ts_cost = 8;
+	const int checkpoint_interval = 1000;
+	const tensor deviant_update_amount = { 0.1 };
 #pragma endregion
 #pragma region GET ORDER 1 TRAINING SET Y
 	tensor y_1 = tensor::new_2d(x_1.size(), pv_0.size(), urd, re);
@@ -731,18 +732,16 @@ void loss_map() {
 		s_0->signal(y_0);
 		return s_0->y_grad.abs_2d().sum_2d();
 	};
-	for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
+	for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++)
 		x_1[tsIndex] = get_tsx_1(y_1[tsIndex]);
-	}
 #pragma endregion
 
 	auto update_params = [&](vector<param_mom*> pv) {
-		for (param_mom* pmt : pv) {
-			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
-			pmt->state() -= pmt->learn_rate() * pmt->gradient();
-			pmt->gradient() = 0;
-		}
+		for (param_mom* pmt : pv)
+			pmt->update();
 	};
+
+	double prev_test_cost = 10;
 
 	for (int epoch = 0; true; epoch++) {
 		double epoch_cost = 0;
@@ -759,11 +758,12 @@ void loss_map() {
 		if (cost_low && epoch % checkpoint_interval == 0) {
 			std::cout << "NEW INPUT" << std::endl;
 			// GET NEW ORDER 1 TRAINING SET
+			deviant_x.pop(tensor({ prev_test_cost }).sub_1d(deviant_update_amount));
 			s_1->fwd(deviant_x);
 
 			// POP BACK OF ORDER 1 TS VECTORS
-			x_1.vec().pop_back();
-			y_1.vec().pop_back();
+			x_1.vec().erase(x_1.vec().begin());
+			y_1.vec().erase(y_1.vec().begin());
 
 			// APPEND NEW TRAINING SET
 			x_1.vec().push_back(get_tsx_1(s_1->y));
@@ -771,8 +771,11 @@ void loss_map() {
 
 		}
 
-		if (epoch % checkpoint_interval == 0 && cost_low)
-			std::cout << "TEST COST: " << get_tsx_1(s_1->fwd(deviant_x)).abs_1d().sum_1d().val() << std::endl;
+		if (epoch % checkpoint_interval == 0 && cost_low) {
+			prev_test_cost = get_tsx_1(s_1->fwd(deviant_x)).abs_1d().sum_1d().val();
+			std::cout << "TEST COST: " << prev_test_cost << std::endl;
+
+		}
 
 		update_params(pv_1);
 	}
@@ -1045,7 +1048,7 @@ void task_encoder() {
 	ptr<sync> s_out = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), pmt_init));
 	sequential s = { s_in.get(), l_1.get(), l_2.get(), l_3.get(), s_out.get() };
 
-	double state_structure = 1 / (double)pv.size();
+	double state_structure = 0.001 / (double)pv.size();
 	double learn_rate_structure = 0.02 / (double)pv.size();
 
 	uniform_real_distribution<double> pmt_urd(-state_structure, state_structure);
@@ -1087,11 +1090,8 @@ void task_encoder() {
 			test_cost += s.y_grad.abs_2d().sum_2d().sum_1d() * cost_structure;
 		}
 
-		for (param_mom* pmt : pv) {
-			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
-			pmt->state() -= pmt->learn_rate() * pmt->momentum();
-			pmt->gradient() = 0;
-		}
+		for (param_mom* pmt : pv)
+			pmt->update();
 
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "TRAIN: " << train_cost << " TEST: " << test_cost << std::endl;
