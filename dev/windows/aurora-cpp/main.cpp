@@ -105,12 +105,8 @@ void tnn_xor_test() {
 				std::cout << x[tsIndex].to_string() << " " << s->y.to_string() << std::endl;
 		}
 
-		for (param_mom* pmt : pl) {
-			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
-			pmt->state() -= pmt->learn_rate() * pmt->momentum();
-			pmt->gradient() = 0;
-		}
-
+		for (param_mom* pmt : pl)
+			pmt->update();
 	}
 
 	for (param_mom* pmt : pl) {
@@ -1073,6 +1069,7 @@ void task_encoder() {
 	const size_t mini_batch_len = 38;
 
 	//TRAIN
+
 	for (int epoch = 0; true; epoch++) {
 
 		const double cost_structure = 1 / (double)mini_batch_len / (double)order_1_set_len;
