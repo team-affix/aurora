@@ -8,6 +8,7 @@
 #include <fstream>
 #include <time.h>
 #include <filesystem>
+#include<windows.h>
 
 using namespace aurora;
 using namespace aurora::data;
@@ -926,7 +927,6 @@ struct composite_function {
 		for (double i = 0; i < layers.size(); i++)
 			delete layers[i];
 	}
-
 	vector<function<double(double)>*> layers;
 	double operator()(double x) {
 		return layers.back()->operator()(x);
@@ -1145,10 +1145,11 @@ void genome_test() {
 	};
 #pragma endregion
 #pragma region EVOLVE
-	vector<genome> parents = genome(pmt_link_tensor, mutate).mutate(3);
+	const size_t NUM_PARENTS = 2;
+	vector<genome> parents = genome(pmt_link_tensor, mutate).mutate(NUM_PARENTS);
 	for (int epoch = 0; true; epoch++) {
 		generation gen = generation(genome::mutate(genome::merge(parents, 40)), get_reward);
-		parents = gen.best(3);
+		parents = gen.best(NUM_PARENTS);
 		if(epoch % 100 == 0)
 			std::cout << 1 / get_reward(parents[0]) << std::endl;
 	}
@@ -1156,11 +1157,348 @@ void genome_test() {
 
 }
 
+void pablo_guesser() {
+
+	tensor x {
+		{ 22, 48, 97,  2, 12, 62, 51, 90, 49, 35 },
+		{ 13, 22, 49, 57, 61,  5, 17, 72, 86, 91 },
+	};
+
+	tensor y {
+		{ 48, 97,  2, 12, 62, 51, 90, 49, 35, 26 },
+		{ 22, 49, 57, 61,  5, 17, 72, 86, 91, 87 },
+	};
+
+	for (int i = 0; i < x.size(); i++) {
+		x[i] = x[i].roll(1);
+		y[i] = y[i].roll(1);
+	}
+	// TRAINING EXAMPLES DONE
+
+	uniform_real_distribution<double> urd(-0.1, 0.1);
+	default_random_engine re(25);
+
+	vector<param_mom*> pv;
+	auto pmt_init = [&](ptr<param>& pmt) {
+		pmt = new param_mom(urd(re), 0.0002, 0, 0, 0.9);
+		pv.push_back((param_mom*)pmt.get());
+	};
+
+	const int LSTM_UNITS = 35;
+
+	ptr<sync> s_in = new sync(pseudo::tnn({ 1, LSTM_UNITS }, pseudo::nlr(0.3), pmt_init));
+	ptr<lstm> l_0 = new lstm(LSTM_UNITS, pmt_init);
+	ptr<lstm> l_1 = new lstm(LSTM_UNITS, pmt_init);
+	ptr<sync> s_out = new sync(pseudo::tnn({ LSTM_UNITS, 1 }, pseudo::nlr(0.3), pmt_init));
+	sequential seq { s_in.get(), l_0.get(), l_1.get(), s_out.get() };
+
+	s_in->prep(x.width());
+	l_0->prep(x.width());
+	l_1->prep(x.width());
+	s_out->prep(x.width());
+	seq.compile();
+	s_in->unroll(x.width());
+	l_0->unroll(x.width());
+	l_1->unroll(x.width());
+	s_out->unroll(x.width());
+
+	const int CHECKPOINT = 1000;
+
+	for (int epoch = 0; true; epoch++) {
+
+		if (epoch % CHECKPOINT == 0) {
+			system("cls");
+			printf("\033[%d;%dH", 0, 0);
+		}
+
+		for (int ts = 0; ts < x.height(); ts++) {
+			seq.cycle(x[ts], y[ts]);
+			if (epoch % CHECKPOINT == 0) {
+				std::cout << y[ts].to_string() << std::endl;
+				std::cout << seq.y.to_string() << std::endl << std::endl;
+			}
+		}
+
+
+		for (param_mom* pmt : pv)
+			pmt->update();
+
+	}
+
+}
+
+void rnc_test() {
+	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
+
+	vector<param*> pv;
+
+	auto pmt_init = [&](ptr<param>& pmt) {
+		pmt = new param(pmt_urd(static_vals::aurora_random_engine));
+		pv.push_back(pmt.get());
+	};
+
+	const int memory_units = 5;
+
+	ptr<sequential> in = pseudo::tnn({ 1, memory_units }, pseudo::nlr(0.3), pmt_init);
+	ptr<rnc> r = new rnc(memory_units, pmt_init);
+	ptr<sequential> out = pseudo::tnn({ memory_units, 1 }, pseudo::nlr(0.3), pmt_init);
+	sequential s = sequential{ in.get(), r.get(), out.get() };
+
+	s.compile();
+
+	tensor pmt_link_tensor = tensor::new_1d(pv.size());
+	for (int i = 0; i < pmt_link_tensor.size(); i++)
+		pmt_link_tensor[i].val_ptr.link(pv[i]->state_ptr);
+
+	std::normal_distribution<double> dist(0, 1);
+
+	auto rc = [&](double x) {
+		if (rand() % pv.size() == 0)
+			return x + dist(aurora::static_vals::aurora_random_engine);
+		else
+			return x;
+	};
+
+	bool display = false;
+
+	auto get_reward = [&](genome& child) {
+		pmt_link_tensor.pop(child);
+		tensor x = tensor::new_2d(10, 1, pmt_urd, aurora::static_vals::aurora_random_engine);
+		tensor y = tensor::new_2d(10, 1);
+
+		for (int ts = 0; ts < x.size() - 2; ts++) // COPY TASK, OFFSET BY 2
+			y[ts + 2] = x[ts];
+
+		double cost = 0;
+
+		for (int ts = 0; ts < x.size(); ts++) {
+			s.fwd(x[ts]);
+			s.signal(y[ts]);
+			cost += s.y_grad.abs_1d().sum_1d();
+		}
+
+		double result = (double)1 / cost / ((double)r->s.height()*0.001);
+
+		if (display)
+			std::cout << "COST: " << cost << ", ALLOC: " << r->s.height() << std::endl;
+
+		r->s.resize(0);
+		r->weak_interface->ctx.zero_1d();
+
+		return result;
+	};
+
+	genome parent = genome(pmt_link_tensor, rc);
+
+	for (int epoch = 0; true; epoch++) {
+		generation gen = generation(genome::merge(parent.mutate(40), 40), get_reward);
+		parent = gen.best();
+		if (epoch % 10 == 0) {
+			display = true;
+			std::cout << get_reward(parent) << std::endl;
+			display = false;
+		}
+	}
+
+}
+
+class mm {
+public:
+	mm() {
+
+	}
+	mm(double a_state, double a_gamma, double a_beta) {
+		m_s = a_state;
+		m_gamma = a_gamma;
+		m_beta = a_beta;
+	}
+
+	double sign(double x) {
+		if (x >= 0) return 1;
+		else return -1;
+	}
+	double& state() { return m_s; }
+	double& gamma() { return m_gamma; }
+	double alpha() { return 1 - m_beta; }
+	double& beta() { return m_beta; }
+	double& momentum() { return m_momentum; }
+	void update(double a_c) {
+		m_ds = gamma() * (beta() * momentum() + alpha() * a_c);
+		m_s += m_ds;
+	}
+	void reward(double a_R) {
+		m_dR = a_R - m_R;
+		m_R = a_R;
+		double slope = (m_dR * m_ds);
+		m_momentum = beta() * momentum() +  alpha() * sign(slope);
+	}
+
+private:
+	double m_s = 0;
+	double m_ds = 0;
+	double m_R = 0;
+	double m_dR = 0;
+	double m_gamma = 0;
+	double m_beta = 0;
+	double m_momentum = 0;
+
+};
+
+void test_mm() {
+
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(35);
+
+	vector<param*> pv;
+
+	auto pmt_init = [&](ptr<param>& pmt) {
+		pmt = new param(urd(re));
+		pv.push_back(pmt.get());
+	};
+
+	ptr<model> s = pseudo::tnn({ 2, 20, 1 }, pseudo::nlr(0.3), pmt_init);
+	s->compile();
+
+	const double GAMMA = 0.02;
+	const double BETA = 0.9;
+
+	vector<mm> pmm = vector<mm>(pv.size());
+	for (int i = 0; i < pv.size(); i++)
+		pmm[i] = mm(pv[i]->state(), GAMMA, BETA);
+
+	std::normal_distribution<double> nd(0, 1);
+
+	auto get_rcv = [&]() {
+		/*if (rand() % pv.size() == 0)
+			return nd(re);
+		else*/
+			return nd(re);
+	};
+
+	auto get_reward = [&]() {
+		double cost = 0;
+		for (int ts = 0; ts < x.size(); ts++) {
+			s->fwd(x[ts]);
+			s->signal(y[ts]);
+			cost += s->y_grad.abs_1d().sum_1d();
+		}
+		return 1 / cost;
+	};
+
+	for (int epoch = 0; true; epoch++) {
+		for (int i = 0; i < pmm.size(); i++) {
+			pmm[i].update(get_rcv());
+			pv[i]->state() = pmm[i].state();
+		}
+		double reward = get_reward();
+		for (int i = 0; i < pmm.size(); i++)
+			pmm[i].reward(reward);
+
+		if(epoch % 10000 == 0)
+			for (int i = 0; i < pmm.size(); i++) {
+				pmm[i].gamma() *= 0.7;
+			}
+
+		if (epoch % 100000 == 0) {
+			std::cout << "REWARD: " << reward << ", COST: " << 1 / reward << std::endl;
+		}
+	}
+
+}
+
+void test_new_idea_101() {
+
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+
+	vector<param*> pv;
+
+	std::normal_distribution<double> nd(0, 1);
+	default_random_engine re(28);
+
+	auto pmt_init = [&](ptr<param>& pmt) {
+		pmt = new param(nd(re));
+		pv.push_back(pmt.get());
+	};
+
+	ptr<model> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pmt_init);
+	s->compile();
+
+	auto get_reward = [&]() {
+		double cost = 0;
+		for (int ts = 0; ts < x.size(); ts++) {
+			s->fwd(x[ts]);
+			s->signal(y[ts]);
+			cost += s->y_grad.abs_1d().sum_1d();
+		}
+		return 1 / cost;
+	};
+
+	double GAMMA = 0.002;
+	double reward = get_reward();
+
+	for (int epoch = 0; true; epoch++) {
+		for (int i = 0; i < pv.size(); i++) {
+
+			double state = pv[i]->state();
+
+			pv[i]->state() = state - GAMMA;
+			double new_reward = get_reward();
+
+			const int IMPROVE = 100;
+
+			if (new_reward > reward && rand() % IMPROVE == 0) {
+				reward = new_reward;
+				continue;
+			}
+
+			pv[i]->state() = state + GAMMA;
+			new_reward = get_reward();
+			if (new_reward > reward && rand() % IMPROVE == 0) {
+				reward = new_reward;
+				continue;
+			}
+
+			pv[i]->state() = state;
+
+		}
+
+		if (epoch % 10000 == 0)
+			std::cout << reward << std::endl;
+	}
+
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	tnn_xor_test();
+	test_mm();
 
 	return 0;
 

@@ -149,6 +149,31 @@ void tensor::tanh_2d(tensor& a_output) {
 		at(i).tanh_1d(a_output.at(i));
 }
 
+tensor tensor::mag_1d() {
+	double sum = 0;
+	for (int i = 0; i < size(); i++)
+		sum += pow(at(i), 2);
+	return sqrt(sum);
+}
+
+void tensor::zero_1d() {
+	for (int i = 0; i < size(); i++)
+		at(i).val() = 0;
+}
+
+void tensor::zero_2d() {
+	for (int i = 0; i < size(); i++)
+		at(i).zero_1d();
+}
+
+void tensor::zero() {
+	if (size() == 0)
+		val() = 0;
+	else
+		for (int i = 0; i < size(); i++)
+			at(i).zero();
+}
+
 tensor tensor::abs_1d() {
 	tensor result = new_1d(size());
 	abs_1d(result);
@@ -236,6 +261,44 @@ size_t tensor::width() {
 
 size_t tensor::height() {
 	return size();
+}
+
+tensor tensor::max() {
+	double result = -INFINITY;
+	for (int i = 0; i < size(); i++)
+		if (at(i) > result)
+			result = at(i);
+	return result;
+}
+
+tensor tensor::min() {
+	double result = INFINITY;
+	for (int i = 0; i < size(); i++)
+		if (at(i) < result)
+			result = at(i);
+	return result;
+}
+
+int tensor::arg_max() {
+	double val = -INFINITY;
+	int result = -1;
+	for (int i = 0; i < size(); i++)
+		if (at(i) > val) {
+			val = at(i);
+			result = i;
+		}
+	return result;
+}
+
+int tensor::arg_min() {
+	double val = INFINITY;
+	int result = -1;
+	for (int i = 0; i < size(); i++)
+		if (at(i) < val) {
+			val = at(i);
+			result = i;
+		}
+	return result;
 }
 
 tensor tensor::row(size_t a_a) {
@@ -400,6 +463,13 @@ void tensor::dot_2d(tensor a_other, tensor& a_output) {
 	for (int i = 0; i < height(); i++)
 		for (size_t j = 0; j < a_other.width(); j++)
 		row(i).dot_1d(a_other.col(j), a_output[i][j]);
+}
+
+double tensor::cos_sim(tensor& a_other) {
+	double dot = abs(dot_1d(a_other));
+	double mag_a = mag_1d();
+	double mag_b = a_other.mag_1d();
+	return dot / (mag_a * mag_b);
 }
 
 void tensor::link(tensor& a_other) {

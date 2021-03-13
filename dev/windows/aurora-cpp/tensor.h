@@ -96,6 +96,9 @@ namespace aurora {
 			void sum_2d(tensor& a_output);
 			void tanh_1d(tensor& a_output);
 			void tanh_2d(tensor& a_output);
+			void zero_1d();
+			void zero_2d();
+			void zero();
 
 		public:
 			tensor abs_1d();
@@ -104,6 +107,11 @@ namespace aurora {
 			tensor sum_2d();
 			tensor tanh_1d();
 			tensor tanh_2d();
+			tensor mag_1d();
+			tensor max();
+			tensor min();
+			int arg_max();
+			int arg_min();
 
 		public:
 			void add_1d(tensor a_other, tensor& a_output);
@@ -128,6 +136,7 @@ namespace aurora {
 			tensor mul_2d(tensor a_other);
 			tensor div_2d(tensor a_other);
 			tensor dot_2d(tensor a_other);
+			double cos_sim(tensor& a_other);
 
 		public:
 			void link(tensor& a_other);

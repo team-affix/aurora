@@ -17,3 +17,8 @@ virtual void compile(); \
 MODEL_FIELDS \
 virtual void prep(size_t a_n); \
 virtual void unroll(size_t a_n); \
+
+#define ATTENTION_FIELDS \
+MODEL_FIELDS \
+virtual void prep(size_t a_a, size_t a_b); \
+virtual void unroll(size_t a_a, size_t a_b); \

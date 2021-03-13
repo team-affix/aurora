@@ -37,9 +37,8 @@ vector<genome> genome::mutate(vector<genome> a_genomes) {
 
 genome genome::merge(genome& a_spouse) {
 	genome result = clone();
-	for (int allele = 0; allele < result.size(); allele++)
-		if (rand() % 2 == 0)
-			result[allele].val() = a_spouse[allele].val();
+	size_t slice_index = rand() % size();
+	result.range(0, slice_index).pop(a_spouse.range(0, slice_index));
 	return result;
 }
 
@@ -51,12 +50,10 @@ vector<genome> genome::merge(genome& a_spouse, size_t a_children) {
 }
 
 genome genome::merge(vector<genome> a_parents) {
-	assert(a_parents.size() > 0);
+	assert(a_parents.size() >= 2);
 	genome result = a_parents.front().clone();
-	for (int allele = 0; allele < result.size(); allele++) {
-		size_t parent_index = rand() % a_parents.size();
-		result[allele].val() = a_parents[parent_index][allele].val();
-	}
+	for (int parent = 1; parent < a_parents.size(); parent++)
+		result = result.merge(a_parents[parent]);
 	return result;
 }
 
