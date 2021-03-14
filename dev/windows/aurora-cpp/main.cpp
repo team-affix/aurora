@@ -1410,10 +1410,10 @@ void test_mm() {
 
 		if(epoch % 10000 == 0)
 			for (int i = 0; i < pmm.size(); i++) {
-				pmm[i].gamma() *= 0.7;
+				pmm[i].gamma() *= 0.1;
 			}
 
-		if (epoch % 100000 == 0) {
+		if (epoch % 10000 == 0) {
 			std::cout << "REWARD: " << reward << ", COST: " << 1 / reward << std::endl;
 		}
 	}
