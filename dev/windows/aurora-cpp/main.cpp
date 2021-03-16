@@ -1237,20 +1237,19 @@ void rnc_test() {
 		pv.push_back(pmt.get());
 	};
 
-	const int memory_units = 5;
+	const int x_units = 1;
+	const int y_units = 1;
+	const int weak_units = 15;
+	const int strong_units = 2;
 
-	ptr<sequential> in = pseudo::tnn({ 1, memory_units }, pseudo::nlr(0.3), pmt_init);
-	ptr<rnc> r = new rnc(memory_units, pmt_init);
-	ptr<sequential> out = pseudo::tnn({ memory_units, 1 }, pseudo::nlr(0.3), pmt_init);
-	sequential s = sequential{ in.get(), r.get(), out.get() };
-
-	s.compile();
+	rnc r = rnc(x_units, y_units, weak_units, strong_units, pmt_init);
+	r.compile();
 
 	tensor pmt_link_tensor = tensor::new_1d(pv.size());
 	for (int i = 0; i < pmt_link_tensor.size(); i++)
 		pmt_link_tensor[i].val_ptr.link(pv[i]->state_ptr);
 
-	std::normal_distribution<double> dist(0, 1);
+	std::normal_distribution<double> dist(0, 0.01);
 
 	auto rc = [&](double x) {
 		if (rand() % pv.size() == 0)
@@ -1272,18 +1271,24 @@ void rnc_test() {
 		double cost = 0;
 
 		for (int ts = 0; ts < x.size(); ts++) {
-			s.fwd(x[ts]);
-			s.signal(y[ts]);
-			cost += s.y_grad.abs_1d().sum_1d();
+			r.fwd(x[ts]);
+			r.signal(y[ts]);
+			cost += r.y_grad.abs_1d().sum_1d();
 		}
+		
+		double cost_reciprical = (double)1 / cost;
+		double allocations = r.strong_memory.height();
 
-		double result = (double)1 / cost / ((double)r->s.height()*0.001);
+		const double COST_RECIPRICAL_WEIGHT = 0.9;
+		const double ALLOCATIONS_WEIGHT = 1 - COST_RECIPRICAL_WEIGHT;
+
+		double result = COST_RECIPRICAL_WEIGHT * cost_reciprical - ALLOCATIONS_WEIGHT * allocations;
 
 		if (display)
-			std::cout << "COST: " << cost << ", ALLOC: " << r->s.height() << std::endl;
+			std::cout << "COST: " << cost << ", ALLOC: " << r.strong_memory.height() << std::endl;
 
-		r->s.resize(0);
-		r->weak_interface->ctx.zero_1d();
+		r.strong_memory.resize(0);
+		r.weak_mid->ctx.zero_1d();
 
 		return result;
 	};
@@ -1291,11 +1296,11 @@ void rnc_test() {
 	genome parent = genome(pmt_link_tensor, rc);
 
 	for (int epoch = 0; true; epoch++) {
-		generation gen = generation(genome::merge(parent.mutate(40), 40), get_reward);
+		generation gen = generation(parent.mutate(100), get_reward);
 		parent = gen.best();
-		if (epoch % 10 == 0) {
+		if (epoch % 100 == 0) {
 			display = true;
-			std::cout << get_reward(parent) << std::endl;
+			get_reward(parent);
 			display = false;
 		}
 	}
@@ -1351,6 +1356,8 @@ void test_mm() {
 		{0, 1},
 		{1, 0},
 		{1, 1},
+		{1, 2},
+		{3, 4}
 	};
 
 	tensor y = {
@@ -1358,6 +1365,8 @@ void test_mm() {
 		{1},
 		{1},
 		{0},
+		{5},
+		{12},
 	};
 
 	uniform_real_distribution<double> urd(-1, 1);
@@ -1370,7 +1379,7 @@ void test_mm() {
 		pv.push_back(pmt.get());
 	};
 
-	ptr<model> s = pseudo::tnn({ 2, 20, 1 }, pseudo::nlr(0.3), pmt_init);
+	ptr<model> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pmt_init);
 	s->compile();
 
 	const double GAMMA = 0.02;
@@ -1405,12 +1414,13 @@ void test_mm() {
 			pv[i]->state() = pmm[i].state();
 		}
 		double reward = get_reward();
+		double cost = 1 / reward;
 		for (int i = 0; i < pmm.size(); i++)
 			pmm[i].reward(reward);
 
 		if(epoch % 10000 == 0)
 			for (int i = 0; i < pmm.size(); i++) {
-				pmm[i].gamma() *= 0.1;
+				pmm[i].gamma() *= 0.95;
 			}
 
 		if (epoch % 10000 == 0) {
@@ -1498,7 +1508,7 @@ int main() {
 
 	srand(time(NULL));
 
-	test_mm();
+	rnc_test();
 
 	return 0;
 

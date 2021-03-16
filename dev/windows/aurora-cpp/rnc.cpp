@@ -6,18 +6,62 @@ rnc::rnc() {
 
 }
 
-rnc::rnc(size_t a_units, function<void(ptr<param>&)> a_init) {
-	this->units = a_units;
-	this->weak_interface = new lstm_ts(units, a_init);
-	this->strong_interface = new lstm_ts(units, a_init);
-	this->s = tensor::new_2d(0, a_units);
+rnc::rnc(
+	size_t a_x_units,
+	size_t a_y_units,
+	size_t a_weak_units,
+	size_t a_strong_units,
+	function<void(ptr<param>&)> a_init) {
+
+	this->x_units = a_x_units;
+	this->y_units = a_y_units;
+	this->weak_units = a_weak_units;
+	this->strong_units = a_strong_units;
+
+	this->weak_in = pseudo::tnn({ x_units, weak_units }, pseudo::nlr(0.3), a_init);
+	this->weak_mid = new lstm_ts(weak_units, a_init);
+	this->weak_out = pseudo::tnn({ weak_units, 1 }, pseudo::nlr(0.3), a_init);
+
+	this->strong_in = pseudo::tnn({ x_units, strong_units }, pseudo::nlr(0.3), a_init);
+	this->strong_mid = new lstm_ts(strong_units, a_init);
+	this->strong_out = pseudo::tnn({ strong_units, y_units }, pseudo::nlr(0.3), a_init);
+
+	this->weak_interface = new sequential({ weak_in.get(), weak_mid.get(), weak_out.get() });
+	this->strong_interface = new sequential({ strong_in.get(), strong_mid.get(), strong_out.get() });
+
+	this->strong_memory = tensor::new_2d(0, a_strong_units);
 }
 
-rnc::rnc(size_t a_units, ptr<lstm_ts> a_weak_interface, ptr<lstm_ts> a_strong_interface, tensor a_s) {
-	this->units = a_units;
-	this->weak_interface = a_weak_interface;
-	this->strong_interface = a_strong_interface;
-	this->s = a_s;
+rnc::rnc(
+	size_t a_x_units,
+	size_t a_y_units,
+	size_t a_weak_units,
+	size_t a_strong_units,
+	ptr<model> a_weak_in,
+	ptr<lstm_ts> a_weak_mid,
+	ptr<model> a_weak_out,
+	ptr<model> a_strong_in,
+	ptr<lstm_ts> a_strong_mid,
+	ptr<model> a_strong_out,
+	tensor a_strong_memory) {
+
+	this->x_units = a_x_units;
+	this->y_units = a_y_units;
+	this->weak_units = a_weak_units;
+	this->strong_units = a_strong_units;
+
+	this->weak_in = a_weak_in;
+	this->weak_mid = a_weak_mid;
+	this->weak_out = a_weak_out;
+
+	this->strong_in = a_strong_in;
+	this->strong_mid = a_strong_mid;
+	this->strong_out = a_strong_out;
+
+	this->weak_interface = new sequential({ weak_in.get(), weak_mid.get(), weak_out.get() });
+	this->strong_interface = new sequential({ strong_in.get(), strong_mid.get(), strong_out.get() });
+
+	this->strong_memory = a_strong_memory;
 }
 
 void rnc::pmt_wise(function<void(ptr<param>&)> a_func) {
@@ -26,38 +70,54 @@ void rnc::pmt_wise(function<void(ptr<param>&)> a_func) {
 }
 
 model* rnc::clone() {
-	rnc* result = new rnc(units, (lstm_ts*)weak_interface->clone(), (lstm_ts*)strong_interface->clone(), s.clone());
+	rnc* result = new rnc(
+		x_units,
+		y_units,
+		weak_units,
+		strong_units,
+		weak_in->clone(),
+		(lstm_ts*)weak_mid->clone(),
+		weak_out->clone(),
+		strong_in->clone(),
+		(lstm_ts*)strong_mid->clone(),
+		strong_out->clone(),
+		strong_memory.clone()
+	);
 	return result;
 }
 
 model* rnc::clone(function<void(ptr<param>&)> a_init) {
-	rnc* result = new rnc(units, (lstm_ts*)weak_interface->clone(a_init), (lstm_ts*)strong_interface->clone(a_init), s.clone());
+	rnc* result = new rnc(
+		x_units,
+		y_units,
+		weak_units,
+		strong_units,
+		weak_in->clone(a_init),
+		(lstm_ts*)weak_mid->clone(a_init),
+		weak_out->clone(a_init),
+		strong_in->clone(a_init),
+		(lstm_ts*)strong_mid->clone(a_init),
+		strong_out->clone(a_init),
+		strong_memory.clone()
+	); 
 	return result;
 }
 
 void rnc::fwd() {
 	// TREAT X AS TENSOR 2D
 	weak_interface->fwd();
-	tensor sim_tensor = tensor::new_1d(s.height());
-	for (int slot = 0; slot < s.height(); slot++)
-		sim_tensor[slot] = weak_interface->y.cos_sim(s[slot]);
 
-	const double MAX_SIM_FOR_ALLOC = 0.4;
+	int slot_index = weak_interface->y[0] * 100;
 
-	int slot_index = sim_tensor.arg_max();
-	if (slot_index == -1) {
-		s.vec().push_back(tensor::new_1d(units));
-		slot_index = s.height() - 1;
-	}
-	else if (sim_tensor[slot_index] <= MAX_SIM_FOR_ALLOC) {
-		s.vec().push_back(tensor::new_1d(units));
-		slot_index = s.height() - 1;
+	if (slot_index < 0 || slot_index >= strong_memory.height()) {
+		strong_memory.vec().push_back(tensor::new_1d(strong_units));
+		slot_index = strong_memory.height() - 1;
 	}
 
-	tensor& slot = s[slot_index];
-	strong_interface->ctx.pop(slot);
+	tensor& slot = strong_memory[slot_index];
+	strong_mid->ctx.pop(slot);
 	strong_interface->fwd();
-	slot.pop(strong_interface->cty);
+	slot.pop(strong_mid->cty);
 }
 
 void rnc::bwd() {
@@ -96,8 +156,8 @@ void rnc::recur(function<void(model*)> a_func) {
 void rnc::compile() {
 	weak_interface->compile();
 	strong_interface->compile();
-	x.group_add(weak_interface->x);
-	x.group_add(strong_interface->x);
-	weak_interface->cty.group_add(weak_interface->ctx);
-	strong_interface->y.group_add(y);
+	x.group_join(weak_interface->x);
+	x.group_join(strong_interface->x);
+	y.group_join(strong_interface->y);
+	y_grad.group_join(strong_interface->y_grad);
 }
