@@ -174,10 +174,7 @@
     <ClInclude Include="sort.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="conv_2d.h">
-      <Filter>Header Files\models</Filter>
-    </ClInclude>
-    <ClInclude Include="rnc.h">
+    <ClInclude Include="cnl.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
   </ItemGroup>
@@ -269,7 +266,7 @@
     <ClCompile Include="param_init.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
-    <ClCompile Include="rnc.cpp">
+    <ClCompile Include="cnl.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>

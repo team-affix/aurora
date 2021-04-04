@@ -18,6 +18,10 @@ sequential::sequential(initializer_list<ptr<model>> a_il) {
 	}
 }
 
+sequential::sequential(vector<ptr<model>> a_models) {
+	models = a_models;
+}
+
 void sequential::pmt_wise(function<void(ptr<param>&)> a_func) {
 	for (int i = 0; i < models.size(); i++)
 		models[i]->pmt_wise(a_func);

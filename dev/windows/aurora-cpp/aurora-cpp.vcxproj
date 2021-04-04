@@ -22,7 +22,7 @@
     <ClInclude Include="aurora.h" />
     <ClInclude Include="basic.h" />
     <ClInclude Include="bias.h" />
-    <ClInclude Include="conv_2d.h" />
+    <ClInclude Include="cnl.h" />
     <ClInclude Include="data.h" />
     <ClInclude Include="evolution.h" />
     <ClInclude Include="generation.h" />
@@ -41,7 +41,6 @@
     <ClInclude Include="param_init.h" />
     <ClInclude Include="pseudo.h" />
     <ClInclude Include="ref.h" />
-    <ClInclude Include="rnc.h" />
     <ClInclude Include="sort.h" />
     <ClInclude Include="static.h" />
     <ClInclude Include="sequential.h" />
@@ -63,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bias.cpp" />
+    <ClCompile Include="cnl.cpp" />
     <ClCompile Include="generation.cpp" />
     <ClCompile Include="genome.cpp" />
     <ClCompile Include="layer.cpp" />
@@ -76,7 +76,6 @@
     <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="param_sgd_mt.cpp" />
-    <ClCompile Include="rnc.cpp" />
     <ClCompile Include="sequential.cpp" />
     <ClCompile Include="session.cpp" />
     <ClCompile Include="sigmoid.cpp" />

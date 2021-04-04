@@ -7,7 +7,12 @@ sync::~sync() {
 }
 
 sync::sync(ptr<model> a_model_template) {
-	model_template = a_model_template;
+	this->model_template = a_model_template;
+}
+
+sync::sync(size_t a_max_size, ptr<model> a_model_template) {
+	this->model_template = a_model_template;
+	prep(a_max_size);
 }
 
 void sync::pmt_wise(function<void(ptr<param>&)> a_func) {
@@ -15,14 +20,14 @@ void sync::pmt_wise(function<void(ptr<param>&)> a_func) {
 }
 
 model* sync::clone() {
-	sync* result = new sync(model_template->clone());
+	sync* result = new sync(prepared.size(), model_template->clone());
 	result->prep(prepared.size());
 	result->unroll(unrolled.size());
 	return result;
 }
 
 model* sync::clone(function<void(ptr<param>&)> a_init) {
-	sync* result = new sync(model_template->clone(a_init));
+	sync* result = new sync(prepared.size(), model_template->clone(a_init));
 	result->prep(prepared.size());
 	result->unroll(unrolled.size());
 	return result;
@@ -82,11 +87,15 @@ void sync::compile() {
 }
 
 void sync::prep(size_t a_n) {
+	prepared.clear();
+	prepared.resize(a_n);
 	for (int i = 0; i < a_n; i++)
-		prepared.push_back(model_template->clone());
+		prepared.at(i) = model_template->clone();
 }
 
 void sync::unroll(size_t a_n) {
+	unrolled.clear();
+	unrolled.resize(a_n);
 	for (int i = 0; i < a_n; i++)
-		unrolled.push_back(prepared[unrolled.size()]);
+		unrolled.at(i) = prepared.at(i);
 }

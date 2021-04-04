@@ -22,6 +22,7 @@ namespace aurora {
 			virtual ~sequential();
 			sequential();
 			sequential(initializer_list<ptr<model>> a_il);
+			sequential(vector<ptr<model>> a_models);
 
 		};
 	}

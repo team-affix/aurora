@@ -41,6 +41,7 @@ namespace aurora {
 			size_t group_size();
 
 		public:
+			~tensor();
 			tensor();
 			tensor(double a_val);
 			tensor(vector<tensor> a_vec);
@@ -59,10 +60,10 @@ namespace aurora {
 			
 		public:
 			static tensor new_1d(size_t a_a);
-			static tensor new_1d(size_t a_a, double a_val);
+			static tensor new_1d(size_t a_a, tensor a_val);
 			static tensor new_1d(size_t a_a, uniform_real_distribution<double>& a_urd, default_random_engine& a_re);
 			static tensor new_2d(size_t a_a, size_t a_b);
-			static tensor new_2d(size_t a_a, size_t a_b, double a_val);
+			static tensor new_2d(size_t a_a, size_t a_b, tensor a_val);
 			static tensor new_2d(size_t a_a, size_t a_b, uniform_real_distribution<double>& a_urd, default_random_engine& a_re);
 
 		public:
@@ -83,6 +84,7 @@ namespace aurora {
 			tensor row(size_t a_a);
 			tensor col(size_t a_a);
 			tensor range(size_t a_start, size_t a_len);
+			tensor range_2d(size_t a_row, size_t a_col, size_t a_height, size_t a_width);
 
 		public:
 			tensor clone_row(size_t a_a);
@@ -143,9 +145,13 @@ namespace aurora {
 			void unlink();
 
 		public:
+			void rank_recur(function<void(tensor*)> a_func);
+
+		public:
 			void group_recur_fwd(function<void(tensor*)> a_func);
 			void group_recur_bwd(function<void(tensor*)> a_func);
 			void group_recur(function<void(tensor*)> a_func);
+			bool group_contains(tensor* a_ptr);
 
 		public:
 			void group_add(tensor& a_other);

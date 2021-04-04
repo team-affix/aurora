@@ -12,4 +12,4 @@
 #include "sync.h"
 #include "lstm_ts.h"
 #include "lstm.h"
-#include "rnc.h"
+#include "cnl.h"

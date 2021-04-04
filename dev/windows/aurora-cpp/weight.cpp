@@ -69,5 +69,5 @@ void weight::recur(function<void(model*)> a_func) {
 }
 
 void weight::compile() {
-	
+
 }
