@@ -8,7 +8,8 @@
 #include <fstream>
 #include <time.h>
 #include <filesystem>
-#include<windows.h>
+#include <windows.h>
+#include <fstream>
 
 using namespace aurora;
 using namespace aurora::data;
@@ -19,6 +20,8 @@ using namespace aurora::evolution;
 using std::default_random_engine;
 using std::uniform_real_distribution;
 using std::uniform_int_distribution;
+using std::ifstream;
+using std::ofstream;
 
 std::string pl_export(vector<param_sgd*>& a_pl) {
 	std::string result;
@@ -26,6 +29,23 @@ std::string pl_export(vector<param_sgd*>& a_pl) {
 		result += std::to_string(a_pl[i]->state()) + "\n";
 	result.pop_back();
 	return result;
+}
+
+template<class T>
+void pl_export_to_file(std::string file_name, vector<T*> a_pl) {
+	ofstream ofs(file_name);
+	for (int i = 0; i < a_pl.size(); i++)
+		ofs << a_pl[i]->state() << std::endl;
+	ofs.close();
+}
+
+template<class T>
+void pl_import_from_file(std::string file_name, vector<T*> a_pl) {
+	ifstream ifs(file_name);
+	double state = 0;
+	for (int i = 0; ifs >> state; i++)
+		a_pl[i]->state() = state;
+	ifs.close();
 }
 
 int num_lines(std::string file_name) {
@@ -1633,26 +1653,28 @@ void proc_generator() {
 
 void cnl_test() {
 
+	const size_t X_HEIGHT = 10;
+	const size_t X_WIDTH = 10;
+
 	tensor x = {
-		tensor::new_2d(10, 10, 0),
-		tensor::new_2d(10, 10, 1),
-		tensor::new_2d(10, 10, 2),
+		tensor::new_2d(X_HEIGHT, X_WIDTH, 0),
+		tensor::new_2d(X_HEIGHT, X_WIDTH, 1),
+		tensor::new_2d(X_HEIGHT, X_WIDTH, 2),
 	};
 
 	uniform_real_distribution<double> pmt_urd(-1, 1);
 
-	vector<param_sgd*> pv;
+	vector<param_mom*> pv;
 	auto pmt_init = [&](ptr<param>& pmt) {
-		pmt = new param_sgd(pmt_urd(aurora::static_vals::aurora_random_engine), 0.0002, 0);
-		pv.push_back((param_sgd*)pmt.get());
+		pmt = new param_mom(pmt_urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9);
+		pv.push_back((param_mom*)pmt.get());
 	};
 	
-	ptr<cnl> c1 = new cnl(10, 10, 4, 4, 1, pmt_init);
-	ptr<layer> l1 = new layer(c1->y_strides(), new layer(c1->x_strides(), pseudo::nlr(0.3), pmt_init));
+	ptr<cnl> c1 = new cnl(X_HEIGHT, X_WIDTH, 2, 2, 1, pmt_init);
+	ptr<layer> l1 = new layer(c1->y_strides(), new layer(c1->x_strides(), pseudo::nth(), pmt_init));
 	ptr<cnl> c2 = new cnl(c1->y_strides(), c1->x_strides(), 2, 2, 1, pmt_init);
-	ptr<layer> l2 = new layer(c2->y_strides(), new layer(c2->x_strides(), pseudo::nlr(0.3), pmt_init));
+	ptr<layer> l2 = new layer(c2->y_strides(), new layer(c2->x_strides(), pseudo::nth(), pmt_init));
 	ptr<cnl> c3 = new cnl(c2->y_strides(), c2->x_strides(), 2, 2, 1, pmt_init);
-	ptr<layer> l3 = new layer(c3->y_strides(), new layer(c3->x_strides(), pseudo::nlr(0.3), pmt_init));
 
 	ptr<sequential> s = new sequential {
 		c1.get(),
@@ -1660,7 +1682,6 @@ void cnl_test() {
 		c2.get(),
 		l2.get(),
 		c3.get(),
-		l3.get()
 	};
 
 	std::cout << "COMPILING MODEL" << std::endl;
@@ -1672,7 +1693,7 @@ void cnl_test() {
 		tensor::new_2d(c3 ->y_strides(), c3->x_strides(), 1),
 	};
 
-	c1->unroll(10, 10);
+	c1->unroll(X_HEIGHT, X_WIDTH);
 	c2->unroll(c1->y_strides(), c1->x_strides());
 	c3->unroll(c2->y_strides(), c2->x_strides());
 
@@ -1683,14 +1704,61 @@ void cnl_test() {
 		for (int ts = 0; ts < x.size(); ts++) {
 			s->cycle(x[ts], y[ts]);
 			cost += s->y_grad.abs_2d().sum_2d().sum_1d();
+			if(epoch % 100 == 0)
+				std::cout << s->y.to_string() << std::endl;
 		}
 
-		if (epoch % 10 == 0)
+		if (epoch % 100 == 0)
 			std::cout << cost << std::endl;
 
-		for (param_sgd* pmt : pv)
+		for (param_mom* pmt : pv)
 			pmt->update();
 
+	}
+
+}
+
+void auto_encoder() {
+
+	const size_t H_LEN = 50;
+	const size_t X_LEN = H_LEN * 8 + 1;
+	const size_t NUM_TRAINING_SETS = 10;
+	tensor x = tensor::new_2d(NUM_TRAINING_SETS, X_LEN);
+	for (int i = 0; i < x.size(); i++)
+		for (int j = 0; j < x[i].size(); j++)
+			x[i][j] = (rand() % 256);// / (double)255;
+
+	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
+	default_random_engine re(27);
+
+	vector<param_mom*> pv;
+	auto pmt_init = [&](ptr<param>& pmt) {
+		pmt = new param_mom(pmt_urd(re), 0.0000002 / NUM_TRAINING_SETS, 0, 0, 0.9);
+		pv.push_back((param_mom*)pmt.get());
+	};
+
+	ptr<model> m = pseudo::tnn({ X_LEN, X_LEN, H_LEN, X_LEN, X_LEN }, pseudo::nlr(0.3), pmt_init);
+	ptr<sync> s = new sync(NUM_TRAINING_SETS, m);
+	s->compile();
+	s->unroll(NUM_TRAINING_SETS);
+
+	const string file_name = "auto_encoder";
+
+	const bool IMPORT_FROM_FILE = false;
+
+	if (IMPORT_FROM_FILE)
+		pl_import_from_file(file_name, pv);
+
+	const int CHECKPOINT_INTERVAL = 10;
+
+	for (int epoch = 0; true; epoch++) {
+		s->cycle(x, x);
+		for (param_mom* pmt : pv)
+			pmt->update();
+		if (epoch % CHECKPOINT_INTERVAL == 0) {
+			std::cout << s->y_grad.abs_2d().sum_2d().sum_1d() / NUM_TRAINING_SETS / pv.size() << std::endl;
+			pl_export_to_file(file_name, pv);
+		}
 	}
 
 }
@@ -1699,7 +1767,7 @@ int main() {
 
 	srand(time(NULL));
 
-	tnn_xor_test();
+	auto_encoder();
 
 	return 0;
 

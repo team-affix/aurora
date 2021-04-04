@@ -104,10 +104,10 @@ void cnl::compile() {
 			tensor filter_range_x_grad = x_grad.range_2d(y_start, x_start, filter_height, filter_width).unroll();
 			tensor filter_range_y = y.range_2d(i, j, 1, 1).unroll();
 			tensor filter_range_y_grad = y_grad.range_2d(i, j, 1, 1).unroll();
-			filter->x.group_add(filter_range_x);
-			filter->x_grad.group_add(filter_range_x_grad);
-			filter->y.group_add(filter_range_y);
-			filter->y_grad.group_add(filter_range_y_grad);
+			filter_range_x.group_join_all_ranks(filter->x);
+			filter_range_x_grad.group_join_all_ranks(filter->x_grad);
+			filter_range_y.group_join_all_ranks(filter->y);
+			filter_range_y_grad.group_join_all_ranks(filter->y_grad);
 		}
 	}
 }

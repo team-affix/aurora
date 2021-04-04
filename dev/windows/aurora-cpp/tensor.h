@@ -159,6 +159,11 @@ namespace aurora {
 			void group_join(tensor& a_other);
 			void group_leave();
 			void group_disband();
+			void group_add_all_ranks(tensor& a_other);
+			void group_remove_all_ranks(tensor& a_other);
+			void group_join_all_ranks(tensor& a_other);
+			void group_leave_all_ranks();
+			void group_disband_all_ranks();
 
 		public:
 			tensor clone();

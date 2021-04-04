@@ -245,7 +245,7 @@ tensor tensor::unroll() {
 	tensor result = new_1d(w * h);
 	for (int i = 0; i < h; i++)
 		for (size_t j = 0; j < w; j++)
-			result[i * w + j].group_join(at(i)[j]);
+			result[i * w + j].group_join_all_ranks(at(i)[j]);
 	return result;
 }
 
@@ -255,7 +255,7 @@ tensor tensor::roll(size_t a_width) {
 	size_t h = s / a_width;
 	tensor result = new_2d(h, a_width);
 	for (int i = 0; i < vec().size(); i++)
-		result[i / a_width][i % a_width].group_join(at(i));
+		result[i / a_width][i % a_width].group_join_all_ranks(at(i));
 	return result;
 }
 
@@ -307,14 +307,14 @@ int tensor::arg_min() {
 
 tensor tensor::row(size_t a_a) {
 	tensor result;
-	result.group_join(at(a_a));
+	result.group_join_all_ranks(at(a_a));
 	return result;
 }
 
 tensor tensor::col(size_t a_a) {
 	tensor result = new_1d(vec().size());
 	for (int i = 0; i < size(); i++)
-		result[i].group_join(at(i)[a_a]);
+		result[i].group_join_all_ranks(at(i)[a_a]);
 	return result;
 }
 
@@ -324,7 +324,7 @@ tensor tensor::range(size_t a_start, size_t a_len) {
 	{
 		size_t src = a_start + i;
 		size_t dst = i;
-		result[dst].group_join(at(src));
+		result[dst].group_join_all_ranks(at(src));
 	}
 	return result;
 }
@@ -336,7 +336,7 @@ tensor tensor::range_2d(size_t a_row, size_t a_col, size_t a_height, size_t a_wi
 		size_t src = a_row + i;
 		size_t dst = i;
 		tensor row_section = at(src).range(a_col, a_width);
-		result[dst].group_join(row_section);
+		result[dst].group_join_all_ranks(row_section);
 	}
 	return result;
 }
@@ -551,6 +551,41 @@ void tensor::group_remove(tensor& a_other) {
 void tensor::group_join(tensor& a_other) {
 	link(a_other); // LINKS ENTIRE GROUP TO a_other's GROUP
 	group_recur([&](tensor* elem) {
+		// PREVENT ADDING NODES TO SAME GROUP TWICE
+		if (!a_other.group_contains(elem)) {
+			tensor& l_group_tail = a_other.group_tail();
+			l_group_tail.group_next_ptr = elem;
+			elem->group_prev_ptr = &l_group_tail;
+			elem->group_next_ptr = nullptr;
+		}
+	});
+}
+
+
+void tensor::group_leave() {
+	if (group_prev_ptr != nullptr)
+		group_prev_ptr->group_next_ptr = group_next_ptr;
+	if (group_next_ptr != nullptr)
+		group_next_ptr->group_prev_ptr = group_prev_ptr;
+	group_prev_ptr = nullptr;
+	group_next_ptr = nullptr;
+}
+
+void tensor::group_disband() {
+	group_recur([](tensor* elem) { elem->group_leave(); });
+}
+
+void tensor::group_add_all_ranks(tensor& a_other) {
+	a_other.group_join_all_ranks(*this);
+}
+
+void tensor::group_remove_all_ranks(tensor& a_other) {
+	a_other.group_leave_all_ranks();
+}
+
+void tensor::group_join_all_ranks(tensor& a_other) {
+	link(a_other); // LINKS ENTIRE GROUP TO a_other's GROUP
+	group_recur([&](tensor* elem) {
 
 		for (int i = 0; i < size(); i++)
 			at(i).group_join(a_other.at(i));
@@ -566,17 +601,16 @@ void tensor::group_join(tensor& a_other) {
 	});
 }
 
-void tensor::group_leave() {
-	if (group_prev_ptr != nullptr)
-		group_prev_ptr->group_next_ptr = group_next_ptr;
-	if (group_next_ptr != nullptr)
-		group_next_ptr->group_prev_ptr = group_prev_ptr;
-	group_prev_ptr = nullptr;
-	group_next_ptr = nullptr;
+void tensor::group_leave_all_ranks() {
+	for (int i = 0; i < size(); i++)
+		at(i).group_leave_all_ranks();
+	group_leave();
 }
 
-void tensor::group_disband() {
-	group_recur([](tensor* elem) {elem->group_leave(); });
+void tensor::group_disband_all_ranks() {
+	for (int i = 0; i < size(); i++)
+		at(i).group_disband_all_ranks();
+	group_disband();
 }
 
 tensor tensor::clone() {
