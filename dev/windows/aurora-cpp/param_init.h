@@ -5,6 +5,7 @@
 #include "param_sgd_mt.h"
 #include "param_mom_mt.h"
 #include <random>
+#include <cstdarg>
 
 using namespace aurora::params;
 using std::uniform_real_distribution;
@@ -20,8 +21,7 @@ namespace aurora {
 		function<void(ptr<param>&)> init_pmt(uniform_real_distribution<double> a_urd, vector<param*>& a_pv);
 		function<void(ptr<param>&)> init_pmt(uniform_real_distribution<double> a_urd, double a_learn_rate, vector<param_sgd*>& a_pv);
 		function<void(ptr<param>&)> init_pmt(uniform_real_distribution<double> a_urd, double a_learn_rate, double a_beta, vector<param_mom*>& a_pv);
-		function<void(ptr<param>&)> dump_pmt(vector<param*>& a_pv);
-		function<void(ptr<param>&)> dump_pmt(vector<param_sgd*>& a_pv);
-		function<void(ptr<param>&)> dump_pmt(vector<param_mom*>& a_pv);
+		template<class T>
+		function<void(ptr<param>&)> dump_pmt(vector<T*>& a_pv);
 	}
 }

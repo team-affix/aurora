@@ -1720,9 +1720,9 @@ void cnl_test() {
 
 void auto_encoder() {
 
-	const size_t H_LEN = 50;
-	const size_t X_LEN = H_LEN * 8 + 1;
-	const size_t NUM_TRAINING_SETS = 10;
+	const size_t H_LEN = 25;
+	const size_t X_LEN = H_LEN + 1;
+	const size_t NUM_TRAINING_SETS = 100;
 	tensor x = tensor::new_2d(NUM_TRAINING_SETS, X_LEN);
 	for (int i = 0; i < x.size(); i++)
 		for (int j = 0; j < x[i].size(); j++)
@@ -1737,26 +1737,28 @@ void auto_encoder() {
 		pv.push_back((param_mom*)pmt.get());
 	};
 
-	ptr<model> m = pseudo::tnn({ X_LEN, X_LEN, H_LEN, X_LEN, X_LEN }, pseudo::nlr(0.3), pmt_init);
+	ptr<model> m = pseudo::tnn({ X_LEN, X_LEN / 2, H_LEN, X_LEN / 2, X_LEN }, pseudo::nlr(0.3), pmt_init);
 	ptr<sync> s = new sync(NUM_TRAINING_SETS, m);
 	s->compile();
 	s->unroll(NUM_TRAINING_SETS);
 
 	const string file_name = "auto_encoder";
 
-	const bool IMPORT_FROM_FILE = false;
+	const bool IMPORT_FROM_FILE = true;
 
 	if (IMPORT_FROM_FILE)
 		pl_import_from_file(file_name, pv);
 
-	const int CHECKPOINT_INTERVAL = 10;
+	const int CHECKPOINT_INTERVAL = 1000;
 
 	for (int epoch = 0; true; epoch++) {
 		s->cycle(x, x);
 		for (param_mom* pmt : pv)
 			pmt->update();
 		if (epoch % CHECKPOINT_INTERVAL == 0) {
-			std::cout << s->y_grad.abs_2d().sum_2d().sum_1d() / NUM_TRAINING_SETS / pv.size() << std::endl;
+			std::cout << "COST: " << s->y_grad.abs_2d().sum_2d().sum_1d() / s->y_grad.height() / s->y_grad.width() / NUM_TRAINING_SETS << std::endl;
+			std::cout << "DES: " << x[0][0].to_string() << std::endl;
+			std::cout << "ACT: " << s->y[0][0].to_string() << std::endl;
 			pl_export_to_file(file_name, pv);
 		}
 	}
