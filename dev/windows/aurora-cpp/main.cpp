@@ -1744,7 +1744,7 @@ void auto_encoder() {
 
 	const string file_name = "auto_encoder";
 
-	const bool IMPORT_FROM_FILE = true;
+	const bool IMPORT_FROM_FILE = false;
 
 	if (IMPORT_FROM_FILE)
 		pl_import_from_file(file_name, pv);
@@ -1769,7 +1769,7 @@ int main() {
 
 	srand(time(NULL));
 
-	auto_encoder();
+	tnn_xor_test();
 
 	return 0;
 

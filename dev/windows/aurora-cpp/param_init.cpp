@@ -41,11 +41,3 @@ function<void(ptr<param>&)> pseudo::init_pmt(uniform_real_distribution<double> a
 		a_pv.push_back((param_mom*)pmt.get());
 	};
 }
-
-template<class T>
-function<void(ptr<param>&)> pseudo::dump_pmt(vector<T*>& a_pv) {
-	return [&](ptr<param>& pmt) {
-		pmt = new T();
-		a_pv.push_back((T*)pmt.get());
-	};
-}
