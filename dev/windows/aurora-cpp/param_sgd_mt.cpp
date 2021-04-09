@@ -10,7 +10,7 @@ param_sgd_mt::param_sgd_mt() {
 
 }
 
-param_sgd_mt::param_sgd_mt(double a_state, double a_learn_rate, double a_gradient) : param_sgd(a_state, a_learn_rate, a_gradient) {
+param_sgd_mt::param_sgd_mt(double a_state, double a_drop_chance, double a_learn_rate, double a_gradient) : param_sgd(a_state, a_drop_chance, a_learn_rate, a_gradient) {
 
 }
 

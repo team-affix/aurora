@@ -1,43 +1,43 @@
-#include "param_init.h"
+#include "init_pmt.h"
 #include "static.h"
 
 using namespace aurora;
 
 function<void(ptr<param>&)> initialization::init_pmt(uniform_real_distribution<double> a_urd) {
 	return [&](ptr<param>& pmt) {
-		pmt = new param(a_urd(static_vals::aurora_random_engine));
+		pmt = new param(a_urd(static_vals::re), static_vals::default_drop_chance);
 	};
 }
 
 function<void(ptr<param>&)> initialization::init_pmt(uniform_real_distribution<double> a_urd, double a_learn_rate) {
 	return [&](ptr<param>& pmt) {
-		pmt = new param_sgd(a_urd(static_vals::aurora_random_engine), a_learn_rate, 0);
+		pmt = new param_sgd(a_urd(static_vals::re), static_vals::default_drop_chance, a_learn_rate, 0);
 	};
 }
 
 function<void(ptr<param>&)> initialization::init_pmt(uniform_real_distribution<double> a_urd, double a_learn_rate, double a_beta) {
 	return [&](ptr<param>& pmt) {
-		pmt = new param_mom(a_urd(static_vals::aurora_random_engine), a_learn_rate, 0, 0, a_beta);
+		pmt = new param_mom(a_urd(static_vals::re), static_vals::default_drop_chance, a_learn_rate, 0, 0, a_beta);
 	};
 }
 
 function<void(ptr<param>&)> initialization::init_pmt(uniform_real_distribution<double> a_urd, vector<param*>& a_pv) {
 	return [&](ptr<param>& pmt) {
-		pmt = new param(a_urd(static_vals::aurora_random_engine));
+		pmt = new param(a_urd(static_vals::re), static_vals::default_drop_chance);
 		a_pv.push_back(pmt.get());
 	};
 }
 
 function<void(ptr<param>&)> initialization::init_pmt(uniform_real_distribution<double> a_urd, double a_learn_rate, vector<param_sgd*>& a_pv) {
 	return [&](ptr<param>& pmt) {
-		pmt = new param_sgd(a_urd(static_vals::aurora_random_engine), a_learn_rate, 0);
+		pmt = new param_sgd(a_urd(static_vals::re), static_vals::default_drop_chance, a_learn_rate, 0);
 		a_pv.push_back((param_sgd*)pmt.get());
 	};
 }
 
 function<void(ptr<param>&)> initialization::init_pmt(uniform_real_distribution<double> a_urd, double a_learn_rate, double a_beta, vector<param_mom*>& a_pv) {
 	return [&](ptr<param>& pmt) {
-		pmt = new param_mom(a_urd(static_vals::aurora_random_engine), a_learn_rate, 0, 0, a_beta);
+		pmt = new param_mom(a_urd(static_vals::re), static_vals::default_drop_chance, a_learn_rate, 0, 0, a_beta);
 		a_pv.push_back((param_mom*)pmt.get());
 	};
 }

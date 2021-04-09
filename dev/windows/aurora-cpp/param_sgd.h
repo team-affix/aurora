@@ -13,7 +13,7 @@ namespace aurora {
 		public:
 			virtual ~param_sgd();
 			param_sgd();
-			param_sgd(double a_state, double a_learn_rate, double a_gradient);
+			param_sgd(double a_state, double a_drop_chance, double a_learn_rate, double a_gradient);
 
 		public:
 			virtual double& learn_rate();

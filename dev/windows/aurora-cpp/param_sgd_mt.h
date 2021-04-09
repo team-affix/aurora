@@ -17,7 +17,7 @@ namespace aurora {
 		public:
 			virtual ~param_sgd_mt();
 			param_sgd_mt();
-			param_sgd_mt(double a_state, double a_learn_rate, double a_gradient);
+			param_sgd_mt(double a_state, double a_drop_chance, double a_learn_rate, double a_gradient);
 
 		public:
 			virtual void accum_grad(double a_grad);

@@ -186,7 +186,7 @@
     <ClInclude Include="cnl.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="param_init.h">
+    <ClInclude Include="init_pmt.h">
       <Filter>Header Files\initialization</Filter>
     </ClInclude>
     <ClInclude Include="initialization.h">
@@ -196,6 +196,9 @@
       <Filter>Header Files\beautify</Filter>
     </ClInclude>
     <ClInclude Include="beautify.h">
+      <Filter>Header Files\beautify</Filter>
+    </ClInclude>
+    <ClInclude Include="beautify_init_pmt.h">
       <Filter>Header Files\beautify</Filter>
     </ClInclude>
   </ItemGroup>
@@ -287,7 +290,7 @@
     <ClCompile Include="cnl.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
-    <ClCompile Include="param_init.cpp">
+    <ClCompile Include="init_pmt.cpp">
       <Filter>Source Files\initialization</Filter>
     </ClCompile>
   </ItemGroup>

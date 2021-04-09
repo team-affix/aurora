@@ -10,24 +10,19 @@ sync::sync(ptr<model> a_model_template) {
 	this->model_template = a_model_template;
 }
 
-sync::sync(size_t a_max_size, ptr<model> a_model_template) {
-	this->model_template = a_model_template;
-	prep(a_max_size);
-}
-
 void sync::pmt_wise(function<void(ptr<param>&)> a_func) {
 	model_template->pmt_wise(a_func);
 }
 
 model* sync::clone() {
-	sync* result = new sync(prepared.size(), model_template->clone());
+	sync* result = new sync(model_template->clone());
 	result->prep(prepared.size());
 	result->unroll(unrolled.size());
 	return result;
 }
 
 model* sync::clone(function<void(ptr<param>&)> a_init) {
-	sync* result = new sync(prepared.size(), model_template->clone(a_init));
+	sync* result = new sync(model_template->clone(a_init));
 	result->prep(prepared.size());
 	result->unroll(unrolled.size());
 	return result;

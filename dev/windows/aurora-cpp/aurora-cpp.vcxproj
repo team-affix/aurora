@@ -22,6 +22,7 @@
     <ClInclude Include="aurora.h" />
     <ClInclude Include="basic.h" />
     <ClInclude Include="beautify.h" />
+    <ClInclude Include="beautify_init_pmt.h" />
     <ClInclude Include="bias.h" />
     <ClInclude Include="beautify_models.h" />
     <ClInclude Include="cnl.h" />
@@ -41,7 +42,7 @@
     <ClInclude Include="params.h" />
     <ClInclude Include="param_mom_mt.h" />
     <ClInclude Include="param_sgd_mt.h" />
-    <ClInclude Include="param_init.h" />
+    <ClInclude Include="init_pmt.h" />
     <ClInclude Include="pseudo.h" />
     <ClInclude Include="ref.h" />
     <ClInclude Include="sort.h" />
@@ -74,7 +75,7 @@
     <ClCompile Include="lstm_ts.cpp" />
     <ClCompile Include="neuron.cpp" />
     <ClCompile Include="param.cpp" />
-    <ClCompile Include="param_init.cpp" />
+    <ClCompile Include="init_pmt.cpp" />
     <ClCompile Include="param_mom.cpp" />
     <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_sgd.cpp" />

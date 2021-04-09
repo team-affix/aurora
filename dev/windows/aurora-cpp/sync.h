@@ -18,7 +18,6 @@ namespace aurora {
 			RECURRENT_FIELDS
 			virtual ~sync();
 			sync(ptr<model> a_model_template);
-			sync(size_t a_max_size, ptr<model> a_model_template);
 
 		};
 	}

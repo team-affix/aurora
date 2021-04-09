@@ -10,7 +10,7 @@ param_mom_mt::param_mom_mt() {
 
 }
 
-param_mom_mt::param_mom_mt(double a_state, double a_learn_rate, double a_gradient, double a_momentum, double a_beta) : param_mom(a_state, a_learn_rate, a_gradient, a_momentum, a_beta) {
+param_mom_mt::param_mom_mt(double a_state, double a_drop_chance, double a_learn_rate, double a_gradient, double a_momentum, double a_beta) : param_mom(a_state, a_drop_chance, a_learn_rate, a_gradient, a_momentum, a_beta) {
 
 }
 

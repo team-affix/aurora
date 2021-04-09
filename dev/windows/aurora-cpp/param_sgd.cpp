@@ -15,7 +15,7 @@ param_sgd::param_sgd() {
 
 }
 
-param_sgd::param_sgd(double a_state, double a_learn_rate, double a_gradient) : param(a_state) {
+param_sgd::param_sgd(double a_state, double a_drop_chance, double a_learn_rate, double a_gradient) : param(a_state, a_drop_chance) {
 	this->learn_rate() = a_learn_rate;
 	this->gradient() = a_gradient;
 }
@@ -33,8 +33,11 @@ void param_sgd::accum_grad(double a_grad) {
 }
 
 void param_sgd::update() {
-	state() -= learn_rate() * gradient();
-	gradient() = 0;
+	if (!dropped) {
+		state() -= learn_rate() * gradient();
+		gradient() = 0;
+	}
+	drop();
 }
 
 param* param_sgd::clone() {
