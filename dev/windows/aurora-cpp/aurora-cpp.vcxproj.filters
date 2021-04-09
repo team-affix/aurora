@@ -55,6 +55,18 @@
     <Filter Include="Source Files\basic">
       <UniqueIdentifier>{1744551b-3818-4897-ad87-df82e773d2d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\initialization">
+      <UniqueIdentifier>{a3703a07-8605-40fc-b6cc-13627620fef8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\initialization">
+      <UniqueIdentifier>{5622ddb5-b859-49d9-b138-f86041955205}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\beautify">
+      <UniqueIdentifier>{6cf917ab-4897-4442-875b-3bfafdb8a65d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\beautify">
+      <UniqueIdentifier>{72ee6c20-80d2-4327-909e-c3a2578c5170}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ptr.h">
@@ -162,9 +174,6 @@
     <ClInclude Include="tnn.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="param_init.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
     <ClInclude Include="session.h">
       <Filter>Header Files\basic</Filter>
     </ClInclude>
@@ -176,6 +185,18 @@
     </ClInclude>
     <ClInclude Include="cnl.h">
       <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="param_init.h">
+      <Filter>Header Files\initialization</Filter>
+    </ClInclude>
+    <ClInclude Include="initialization.h">
+      <Filter>Header Files\initialization</Filter>
+    </ClInclude>
+    <ClInclude Include="beautify_models.h">
+      <Filter>Header Files\beautify</Filter>
+    </ClInclude>
+    <ClInclude Include="beautify.h">
+      <Filter>Header Files\beautify</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -263,11 +284,11 @@
     <ClCompile Include="static.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="param_init.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
     <ClCompile Include="cnl.cpp">
       <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="param_init.cpp">
+      <Filter>Source Files\initialization</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -17,6 +17,7 @@ using namespace aurora::math;
 using namespace aurora::models;
 using namespace aurora::params;
 using namespace aurora::evolution;
+using namespace aurora::beautify;
 using std::default_random_engine;
 using std::uniform_real_distribution;
 using std::uniform_int_distribution;
@@ -1743,7 +1744,7 @@ void auto_encoder() {
 		pv.push_back((param_mom*)pmt.get());
 	};
 
-	ptr<model> m = pseudo::tnn({ X_LEN, X_LEN / 2, H_LEN, X_LEN / 2, X_LEN }, pseudo::nlr(0.3), pmt_init);
+	Model m = pseudo::tnn({ X_LEN, X_LEN / 2, H_LEN, X_LEN / 2, X_LEN }, pseudo::nlr(0.3), pmt_init);
 	m->compile();
 
 	const string file_name = "auto_encoder";

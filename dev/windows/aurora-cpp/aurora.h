@@ -7,3 +7,4 @@
 #include "evolution.h"
 #include "static.h"
 #include "initialization.h"
+#include "beautify.h"

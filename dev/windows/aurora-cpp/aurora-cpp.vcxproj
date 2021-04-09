@@ -21,12 +21,15 @@
   <ItemGroup>
     <ClInclude Include="aurora.h" />
     <ClInclude Include="basic.h" />
+    <ClInclude Include="beautify.h" />
     <ClInclude Include="bias.h" />
+    <ClInclude Include="beautify_models.h" />
     <ClInclude Include="cnl.h" />
     <ClInclude Include="data.h" />
     <ClInclude Include="evolution.h" />
     <ClInclude Include="generation.h" />
     <ClInclude Include="genome.h" />
+    <ClInclude Include="initialization.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="leaky_relu.h" />
     <ClInclude Include="lstm.h" />
