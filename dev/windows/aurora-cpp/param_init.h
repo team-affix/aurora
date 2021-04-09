@@ -11,7 +11,7 @@ using namespace aurora::params;
 using std::uniform_real_distribution;
 
 namespace aurora {
-	namespace pseudo {
+	namespace initialization {
 		/*double state_structure(size_t a_pv_len);
 		uniform_real_distribution<double> state(size_t a_pv_len);
 		double learn_rate(size_t a_x_len);*/

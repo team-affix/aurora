@@ -195,12 +195,12 @@ void tnn_test() {
 
 	vector<param_mom*> pl = vector<param_mom*>();
 
-	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), pseudo::dump_pmt(pl));
+	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), initialization::dump_pmt(pl));
 
 	double state_structure = 1 / (double)pl.size();
 	uniform_real_distribution<double> urd(-state_structure, state_structure);
 
-	s->pmt_wise(pseudo::init_pmt(urd, 0.02));
+	s->pmt_wise(initialization::init_pmt(urd, 0.02));
 
 	printf("");
 
