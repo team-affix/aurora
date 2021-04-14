@@ -22,6 +22,7 @@
     <ClInclude Include="aurora.h" />
     <ClInclude Include="basic.h" />
     <ClInclude Include="beautify.h" />
+    <ClInclude Include="beautify_init_pmt.h" />
     <ClInclude Include="bias.h" />
     <ClInclude Include="beautify_models.h" />
     <ClInclude Include="cnl.h" />

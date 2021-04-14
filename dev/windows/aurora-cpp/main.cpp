@@ -1640,7 +1640,8 @@ void proc_generator() {
 		}
 		if(epoch % CHECKPOINT == 0)
 			for (int ts = 0; ts < test_x.size(); ts++) {
-				compressor->cycle(test_x[ts], test_x[ts]);
+				compressor->fwd(test_x[ts]);
+				compressor->signal(test_x[ts]);
 				if (epoch % CHECKPOINT == 0)
 					test_cost += compressor->y_grad.abs_1d().sum_1d();
 				std::cout << "COMPRESSED: " << second_half->x.to_string() << std::endl;
@@ -1778,7 +1779,7 @@ int main() {
 
 	srand(time(NULL));
 
-	auto_encoder();
+	tnn_xor_test();
 
 	return 0;
 
