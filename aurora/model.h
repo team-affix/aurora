@@ -16,7 +16,7 @@ using std::vector;
 using aurora::params::param;
 using aurora::params::param_sgd;
 using aurora::params::param_mom;
-using aurora::math::tensor;
+using aurora::maths::tensor;
 
 namespace aurora {
 	namespace models {
