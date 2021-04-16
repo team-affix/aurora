@@ -1,6 +1,6 @@
 #pragma once
+#include "pch.h"
 #include "param_mom.h"
-#include <mutex>
 
 using aurora::params::param_mom;
 using std::mutex;

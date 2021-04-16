@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "param.h"
 
 using aurora::params::param;

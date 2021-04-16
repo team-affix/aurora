@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "sync.h"
 
 using aurora::models::sync;

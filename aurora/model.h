@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "macro.h"
 #include "ptr.h"
 #include "ref.h"
@@ -6,8 +7,6 @@
 #include "param.h"
 #include "param_sgd.h"
 #include "param_mom.h"
-#include <functional>
-#include <vector>
 
 using aurora::data::ptr;
 using aurora::data::ref;

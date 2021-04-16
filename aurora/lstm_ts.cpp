@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "lstm_ts.h"
 
 using aurora::models::lstm_ts;

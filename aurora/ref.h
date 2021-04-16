@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 namespace aurora {
 	namespace data {

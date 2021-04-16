@@ -1,7 +1,6 @@
 #pragma once
+#include "pch.h"
 #include "ptr.h"
-#include <vector>
-#include <functional>
 
 using aurora::data::ptr;
 using std::vector;

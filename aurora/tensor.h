@@ -1,12 +1,7 @@
 #pragma once
+#include "pch.h"
 #include "ptr.h"
 #include "ref.h"
-#include <vector>
-#include <initializer_list>
-#include <string>
-#include <sstream>
-#include <functional>
-#include <random>
 
 using aurora::data::ptr;
 using aurora::data::ref;

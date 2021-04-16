@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 #define INIT_PMT(right_side, param_vector) \
 [&](ptr<param>& pmt) { \

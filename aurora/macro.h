@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 #define MODEL_FIELDS \
 virtual void pmt_wise(function<void(ptr<param>&)> a_func); \

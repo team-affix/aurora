@@ -1,7 +1,7 @@
 #pragma once
+#include "pch.h"
 #include "model.h"
 #include "weight_set.h"
-#include <vector>
 
 using aurora::models::model;
 using aurora::models::weight_set;

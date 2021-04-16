@@ -1,7 +1,6 @@
 #pragma once
+#include "pch.h"
 #include "tensor.h"
-#include <assert.h>
-#include <functional>
 
 using aurora::maths::tensor;
 using std::function;

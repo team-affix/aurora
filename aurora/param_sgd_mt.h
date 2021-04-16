@@ -1,6 +1,6 @@
 #pragma once
+#include "pch.h"
 #include "param_sgd.h"
-#include <mutex>
 
 using aurora::params::param_sgd;
 using std::mutex;

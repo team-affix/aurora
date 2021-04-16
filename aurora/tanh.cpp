@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "tanh.h"
 
 using aurora::models::tanh;
