@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "data.h"
 #include "model.h"
 #include "lstm_ts.h"

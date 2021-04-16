@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "weight.h"
 
 using aurora::models::weight;

@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "tensor.h"
-#include <assert.h>
 
 using namespace aurora;
 using namespace maths;

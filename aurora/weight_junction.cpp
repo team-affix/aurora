@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "weight_junction.h"
 
 using aurora::models::weight_junction;

@@ -1,7 +1,7 @@
 #pragma once
+#include "pch.h"
 #include "model.h"
 #include "sequential.h"
-#include <vector>
 
 using aurora::models::model;
 using aurora::models::sequential;

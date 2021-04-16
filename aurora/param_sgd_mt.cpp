@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "param_sgd_mt.h"
 
 using aurora::params::param_sgd_mt;

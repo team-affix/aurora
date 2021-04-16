@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "static_vals.h"
 
 using aurora::static_vals;

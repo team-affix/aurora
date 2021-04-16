@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "sequential.h"
 
 using aurora::models::sequential;

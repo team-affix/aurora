@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "session.h"
 
 using aurora::training::session;

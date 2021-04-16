@@ -1,7 +1,6 @@
 #pragma once
+#include "pch.h"
 #include "model.h"
-#include <vector>
-#include <initializer_list>
 
 using aurora::models::model;
 using std::vector;

@@ -201,6 +201,12 @@
     <ClInclude Include="beautify_init_pmt.h">
       <Filter>Header Files\beautify</Filter>
     </ClInclude>
+    <ClInclude Include="basic_constructors.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -289,6 +295,9 @@
     </ClCompile>
     <ClCompile Include="param_init.cpp">
       <Filter>Source Files\initialization</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
