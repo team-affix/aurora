@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <functional>
 
-using aurora::math::tensor;
+using aurora::maths::tensor;
 using std::function;
 
 namespace aurora {

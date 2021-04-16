@@ -1,5 +1,5 @@
 #include "param_init.h"
-#include "static.h"
+#include "static_vals.h"
 
 using namespace aurora;
 

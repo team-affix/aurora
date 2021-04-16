@@ -13,7 +13,7 @@
 
 using namespace aurora;
 using namespace aurora::data;
-using namespace aurora::math;
+using namespace aurora::maths;
 using namespace aurora::models;
 using namespace aurora::params;
 using namespace aurora::evolution;

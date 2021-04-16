@@ -20,7 +20,7 @@ using std::uniform_real_distribution;
 using std::default_random_engine;
 
 namespace aurora {
-	namespace math {
+	namespace maths {
 
 		class tensor {
 		public:

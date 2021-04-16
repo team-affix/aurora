@@ -2,7 +2,7 @@
 #include <assert.h>
 
 using namespace aurora;
-using namespace math;
+using namespace maths;
 
 double& tensor::val() {
 	return *val_ptr;
