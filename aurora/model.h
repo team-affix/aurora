@@ -30,7 +30,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~model();
 			model();
-			model(function<void(ptr<param>&)> a_init);
+			model(function<void(ptr<param>&)> a_func);
 
 		};
 	}

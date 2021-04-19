@@ -38,7 +38,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~lstm_ts();
 			lstm_ts();
-			lstm_ts(size_t a_units, function<void(ptr<param>&)> a_init);
+			lstm_ts(size_t a_units, function<void(ptr<param>&)> a_func);
 			lstm_ts(size_t a_units, ptr<layer> a_forget_gate, ptr<layer> a_limit_gate, ptr<layer> a_input_gate, ptr<layer> a_output_gate, ptr<layer> a_tanh_gate);
 
 		};

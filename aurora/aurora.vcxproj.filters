@@ -207,6 +207,12 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="att.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="att_ts.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -298,6 +304,12 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="att.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="att_ts.cpp">
+      <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

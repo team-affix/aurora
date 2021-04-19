@@ -14,7 +14,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~bias();
 			bias();
-			bias(function<void(ptr<param>&)> a_init);
+			bias(function<void(ptr<param>&)> a_func);
 
 		};
 	}

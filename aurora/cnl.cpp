@@ -12,11 +12,11 @@ cnl::cnl() {
 
 }
 
-cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, function<void(ptr<param>&)> a_init) {
+cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, function<void(ptr<param>&)> a_func) {
 	this->filter_height = a_filter_height;
 	this->filter_width = a_filter_width;
 	this->stride_len = a_stride_len;
-	filter_template = new weight_junction(filter_height * filter_width, 1, a_init);
+	filter_template = new weight_junction(filter_height * filter_width, 1, a_func);
 	filters = new sync(a_input_max_height, new sync(a_input_max_width, filter_template));
 	prep(a_input_max_height, a_input_max_width);
 }
@@ -39,8 +39,8 @@ model* cnl::clone() {
 	return result;
 }
 
-model* cnl::clone(function<void(ptr<param>&)> a_init) {
-	cnl* result = new cnl(input_max_height, input_max_width, filter_height, filter_width, stride_len, filter_template->clone(a_init));
+model* cnl::clone(function<void(ptr<param>&)> a_func) {
+	cnl* result = new cnl(input_max_height, input_max_width, filter_height, filter_width, stride_len, filter_template->clone(a_func));
 	return result;
 }
 

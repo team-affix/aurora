@@ -12,7 +12,7 @@ model::model() {
 
 }
 
-model::model(function<void(ptr<param>&)> a_init) {
+model::model(function<void(ptr<param>&)> a_func) {
 	
 }
 
@@ -57,7 +57,7 @@ model* model::clone() {
 	return new model();
 }
 
-model* model::clone(function<void(ptr<param>&)> a_init) {
+model* model::clone(function<void(ptr<param>&)> a_func) {
 	return new model();
 }
 

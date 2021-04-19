@@ -1775,11 +1775,60 @@ void auto_encoder() {
 
 }
 
+void att_ts_test() {
+
+	tensor ht0 = { 0 };
+	//tensor ht1 = { 1 };
+	tensor x = {
+		{0, 1},
+		{1, 1},
+		{0, 1},
+		{1, 1},
+	};
+	tensor y0 = {
+		0, 1
+	};
+	/*tensor y1 = {
+		1, 1
+	};*/
+
+	uniform_real_distribution<double> pmt_urd(-1, 1);
+
+	vector<param_mom*> pv;
+	auto pmt_init = INIT_PMT(param_mom(pmt_urd(static_vals::aurora_random_engine), 0.02, 0, 0, 0.9), pv);
+
+	ptr<att_ts> a = new att_ts(2, 1, { 3 }, pmt_init);
+	a->prep(4);
+	a->compile();
+	a->unroll(4);
+
+	for (int epoch = 0; true; epoch++) {
+		double cost = 0;
+		//TS 0
+		a->htx.pop(ht0);
+		a->cycle(x, y0);
+		ht0.sub_1d(a->htx_grad, ht0);
+		cost += a->y_grad.abs_1d().sum_1d();
+		//TS 1
+		/*a->htx.pop(ht1);
+		a->cycle(x, y1);
+		cost += a->y_grad.abs_1d().sum_1d();
+		ht1.sub_1d(a->htx_grad, ht1);*/
+
+		for (param_mom* pmt : pv)
+			pmt->update();
+
+		if (epoch % 1000 == 0)
+			std::cout << cost << std::endl;
+	}
+
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	tnn_xor_test();
+	att_ts_test();
 
 	return 0;
 

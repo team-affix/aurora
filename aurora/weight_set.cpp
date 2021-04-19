@@ -11,10 +11,10 @@ weight_set::weight_set() {
 
 }
 
-weight_set::weight_set(size_t a_a, function<void(ptr<param>&)> a_init) {
+weight_set::weight_set(size_t a_a, function<void(ptr<param>&)> a_func) {
 	this->a = a_a;
 	for (int i = 0; i < a_a; i++)
-		weights.push_back(new weight(a_init));
+		weights.push_back(new weight(a_func));
 }
 
 void weight_set::pmt_wise(function<void(ptr<param>&)> a_func) {
@@ -30,11 +30,11 @@ model* weight_set::clone() {
 	return result;
 }
 
-model* weight_set::clone(function<void(ptr<param>&)> a_init) {
+model* weight_set::clone(function<void(ptr<param>&)> a_func) {
 	weight_set* result = new weight_set();
 	result->a = a;
 	for (int i = 0; i < a; i++)
-		result->weights.push_back((weight*)weights[i]->clone(a_init));
+		result->weights.push_back((weight*)weights[i]->clone(a_func));
 	return result;
 }
 

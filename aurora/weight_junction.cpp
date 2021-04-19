@@ -11,11 +11,11 @@ weight_junction::weight_junction() {
 
 }
 
-weight_junction::weight_junction(size_t a_a, size_t a_b, function<void(ptr<param>&)> a_init) {
+weight_junction::weight_junction(size_t a_a, size_t a_b, function<void(ptr<param>&)> a_func) {
 	this->a = a_a;
 	this->b = a_b;
 	for (int i = 0; i < a_a; i++)
-		weight_sets.push_back(new weight_set(a_b, a_init));
+		weight_sets.push_back(new weight_set(a_b, a_func));
 }
 
 void weight_junction::pmt_wise(function<void(ptr<param>&)> a_func) {
@@ -32,12 +32,12 @@ model* weight_junction::clone() {
 	return result;
 }
 
-model* weight_junction::clone(function<void(ptr<param>&)> a_init) {
+model* weight_junction::clone(function<void(ptr<param>&)> a_func) {
 	weight_junction* result = new weight_junction();
 	result->a = a;
 	result->b = b;
 	for (int i = 0; i < weight_sets.size(); i++)
-		result->weight_sets.push_back((weight_set*)weight_sets[i]->clone(a_init));
+		result->weight_sets.push_back((weight_set*)weight_sets[i]->clone(a_func));
 	return result;
 }
 

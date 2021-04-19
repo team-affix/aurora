@@ -26,7 +26,7 @@ namespace aurora {
 			ATTENTION_FIELDS
 			virtual ~cnl();
 			cnl();
-			cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, function<void(ptr<param>&)> a_init);
+			cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, function<void(ptr<param>&)> a_func);
 			cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, ptr<model> a_filter_template);
 
 			size_t x_strides(size_t a_width);

@@ -11,9 +11,9 @@ layer::layer() {
 
 }
 
-layer::layer(size_t a_a, ptr<model> a_model_template, function<void(ptr<param>&)> a_init) {
+layer::layer(size_t a_a, ptr<model> a_model_template, function<void(ptr<param>&)> a_func) {
 	for (size_t i = 0; i < a_a; i++)
-		models.push_back(a_model_template->clone(a_init));
+		models.push_back(a_model_template->clone(a_func));
 }
 
 layer::layer(size_t a_a, ptr<model> a_model_template) {
@@ -37,10 +37,10 @@ model* layer::clone() {
 	return result;
 }
 
-model* layer::clone(function<void(ptr<param>&)> a_init) {
+model* layer::clone(function<void(ptr<param>&)> a_func) {
 	layer* result = new layer();
 	for (size_t i = 0; i < models.size(); i++)
-		result->models.push_back(models[i]->clone(a_init));
+		result->models.push_back(models[i]->clone(a_func));
 	return result;
 }
 

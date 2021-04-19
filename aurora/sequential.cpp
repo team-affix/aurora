@@ -36,11 +36,11 @@ model* sequential::clone() {
 	return result;
 }
 
-model* sequential::clone(function<void(ptr<param>&)> a_init) {
+model* sequential::clone(function<void(ptr<param>&)> a_func) {
 	sequential* result = new sequential();
 	result->models.resize(models.size());
 	for (int i = 0; i < models.size(); i++)
-		result->models[i] = models[i]->clone(a_init);
+		result->models[i] = models[i]->clone(a_func);
 	return result;
 }
 

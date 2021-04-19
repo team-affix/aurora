@@ -1,0 +1,8 @@
+
+void MODEL::prep(size_t a_n, size_t b_n) {
+
+}
+
+void MODEL::unroll(size_t a_n, size_t b_n) {
+
+}

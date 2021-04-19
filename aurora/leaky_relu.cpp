@@ -19,7 +19,7 @@ model* leaky_relu::clone() {
 	return new leaky_relu(m.val());
 }
 
-model* leaky_relu::clone(function<void(ptr<param>&)> a_init) {
+model* leaky_relu::clone(function<void(ptr<param>&)> a_func) {
 	return new leaky_relu(m.val());
 }
 

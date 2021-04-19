@@ -19,7 +19,7 @@ model* sigmoid::clone() {
 	return new sigmoid();
 }
 
-model* sigmoid::clone(function<void(ptr<param>&)> a_init) {
+model* sigmoid::clone(function<void(ptr<param>&)> a_func) {
 	return new sigmoid();
 }
 

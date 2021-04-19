@@ -4,7 +4,7 @@
 #define MODEL_FIELDS \
 virtual void pmt_wise(function<void(ptr<param>&)> a_func); \
 virtual model* clone(); \
-virtual model* clone(function<void(ptr<param>&)> a_init); \
+virtual model* clone(function<void(ptr<param>&)> a_func); \
 virtual void fwd(); \
 virtual void bwd(); \
 virtual tensor& fwd(tensor& a_x); \

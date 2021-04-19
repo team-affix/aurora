@@ -19,7 +19,7 @@ model* tanh::clone() {
 	return new tanh();
 }
 
-model* tanh::clone(function<void(ptr<param>&)> a_init) {
+model* tanh::clone(function<void(ptr<param>&)> a_func) {
 	return new tanh();
 }
 
