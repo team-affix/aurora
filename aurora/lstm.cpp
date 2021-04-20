@@ -11,16 +11,9 @@ lstm::lstm() {
 
 }
 
-lstm::lstm(size_t a_units, size_t a_max_size, function<void(ptr<param>&)> a_func) {
+lstm::lstm(size_t a_units, function<void(ptr<param>&)> a_func) {
 	this->units = a_units;
 	lstm_ts_template = new lstm_ts(units, a_func);
-	prep(a_max_size);
-}
-
-lstm::lstm(size_t a_units, size_t a_max_size, ptr<lstm_ts> a_lstm_ts_template) {
-	this->units = a_units;
-	lstm_ts_template = a_lstm_ts_template;
-	prep(a_max_size);
 }
 
 void lstm::pmt_wise(function<void(ptr<param>&)> a_func) {
@@ -28,11 +21,21 @@ void lstm::pmt_wise(function<void(ptr<param>&)> a_func) {
 }
 
 model* lstm::clone() {
-	return new lstm(units, prepared.size(), (lstm_ts*)lstm_ts_template->clone());
+	lstm* result = new lstm();
+	result->units = units;
+	result->lstm_ts_template = (lstm_ts*)lstm_ts_template->clone();
+	result->prep(prepared.size());
+	result->unroll(unrolled.size());
+	return result;
 }
 
 model* lstm::clone(function<void(ptr<param>&)> a_func) {
-	return new lstm(units, prepared.size(), (lstm_ts*)lstm_ts_template->clone(a_func));
+	lstm* result = new lstm();
+	result->units = units;
+	result->lstm_ts_template = (lstm_ts*)lstm_ts_template->clone(a_func);
+	result->prep(prepared.size());
+	result->unroll(unrolled.size());
+	return result;
 }
 
 void lstm::fwd() {

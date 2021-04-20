@@ -33,8 +33,7 @@ namespace aurora {
 			RECURRENT_FIELDS
 			virtual ~lstm();
 			lstm();
-			lstm(size_t a_units, size_t a_max_size, function<void(ptr<param>&)> a_func);
-			lstm(size_t a_units, size_t a_max_size, ptr<lstm_ts> a_lstm_ts_template);
+			lstm(size_t a_units, function<void(ptr<param>&)> a_func);
 
 		};
 	}

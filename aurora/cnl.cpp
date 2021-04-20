@@ -17,7 +17,7 @@ cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_he
 	this->filter_width = a_filter_width;
 	this->stride_len = a_stride_len;
 	filter_template = new weight_junction(filter_height * filter_width, 1, a_func);
-	filters = new sync(a_input_max_height, new sync(a_input_max_width, filter_template));
+	filters = new sync(new sync(filter_template));
 	prep(a_input_max_height, a_input_max_width);
 }
 
@@ -26,7 +26,7 @@ cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_he
 	this->filter_width = a_filter_width;
 	this->stride_len = a_stride_len;
 	filter_template = a_filter_template;
-	filters = new sync(a_input_max_height, new sync(a_input_max_width, filter_template));
+	filters = new sync(new sync(filter_template));
 	prep(a_input_max_height, a_input_max_width);
 }
 

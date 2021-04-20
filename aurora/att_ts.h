@@ -11,8 +11,9 @@ namespace aurora {
 	namespace models {
 		class att_ts : public model {
 		public:
-			size_t xt_units;
-			size_t ht_units;
+			size_t units;
+
+		public:
 			tensor htx;
 			tensor htx_grad;
 
@@ -24,7 +25,7 @@ namespace aurora {
 			RECURRENT_FIELDS
 			virtual ~att_ts();
 			att_ts();
-			att_ts(size_t a_xt_units, size_t a_ht_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func);
+			att_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func);
 
 		};
 	}
