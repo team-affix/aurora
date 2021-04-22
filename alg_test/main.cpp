@@ -1894,7 +1894,7 @@ void att_lstm_test() {
 	sequential s = sequential({ s0, l, s1 });
 
 	s0->prep(4);
-	l->prep(4, 4);
+	l->prep(4, 4); // OUTPUT LENGTH, THEN INPUT LENGTH
 	s1->prep(4);
 
 	s.compile();
