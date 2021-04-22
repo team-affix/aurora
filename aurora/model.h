@@ -8,8 +8,8 @@
 #include "param_sgd.h"
 #include "param_mom.h"
 
-using aurora::data::ptr;
-using aurora::data::ref;
+using affix_base::data::ptr;
+using affix_base::data::ref;
 using std::function;
 using std::vector;
 using aurora::params::param;

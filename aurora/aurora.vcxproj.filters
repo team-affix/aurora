@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\data">
-      <UniqueIdentifier>{4d3801ec-8348-4c9a-a36a-f440dde015a9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\data">
       <UniqueIdentifier>{25874f64-1755-49fe-b839-1c240fbb685b}</UniqueIdentifier>
     </Filter>
@@ -69,9 +66,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ptr.h">
-      <Filter>Header Files\data</Filter>
-    </ClInclude>
     <ClInclude Include="model.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
@@ -86,9 +80,6 @@
     </ClInclude>
     <ClInclude Include="tensor.h">
       <Filter>Header Files\maths</Filter>
-    </ClInclude>
-    <ClInclude Include="ref.h">
-      <Filter>Header Files\data</Filter>
     </ClInclude>
     <ClInclude Include="sequential.h">
       <Filter>Header Files\models</Filter>
@@ -111,9 +102,6 @@
     <ClInclude Include="maths.h">
       <Filter>Header Files\maths</Filter>
     </ClInclude>
-    <ClInclude Include="data.h">
-      <Filter>Header Files\data</Filter>
-    </ClInclude>
     <ClInclude Include="pseudo.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
@@ -131,9 +119,6 @@
     </ClInclude>
     <ClInclude Include="aurora.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="persistent_thread.h">
-      <Filter>Header Files\pseudo</Filter>
     </ClInclude>
     <ClInclude Include="sync.h">
       <Filter>Header Files\models</Filter>
@@ -179,9 +164,6 @@
     </ClInclude>
     <ClInclude Include="static_vals.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sort.h">
-      <Filter>Header Files\pseudo</Filter>
     </ClInclude>
     <ClInclude Include="cnl.h">
       <Filter>Header Files\models</Filter>
@@ -260,9 +242,6 @@
     <ClCompile Include="leaky_relu.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
-    <ClCompile Include="persistent_thread.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
     <ClCompile Include="sync.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
@@ -289,9 +268,6 @@
     </ClCompile>
     <ClCompile Include="session.cpp">
       <Filter>Source Files\basic</Filter>
-    </ClCompile>
-    <ClCompile Include="sort.cpp">
-      <Filter>Source Files\pseudo</Filter>
     </ClCompile>
     <ClCompile Include="static_vals.cpp">
       <Filter>Source Files</Filter>

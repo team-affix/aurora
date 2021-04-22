@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "ptr.h"
 
-using aurora::data::ptr;
+using affix_base::data::ptr;
 using std::vector;
 using std::function;
 

@@ -29,7 +29,6 @@
     <ClInclude Include="bias.h" />
     <ClInclude Include="beautify_models.h" />
     <ClInclude Include="cnl.h" />
-    <ClInclude Include="data.h" />
     <ClInclude Include="evolution.h" />
     <ClInclude Include="generation.h" />
     <ClInclude Include="genome.h" />
@@ -48,8 +47,6 @@
     <ClInclude Include="param_init.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="pseudo.h" />
-    <ClInclude Include="ref.h" />
-    <ClInclude Include="sort.h" />
     <ClInclude Include="static_vals.h" />
     <ClInclude Include="sequential.h" />
     <ClInclude Include="session.h" />
@@ -61,8 +58,6 @@
     <ClInclude Include="param.h" />
     <ClInclude Include="param_mom.h" />
     <ClInclude Include="param_sgd.h" />
-    <ClInclude Include="ptr.h" />
-    <ClInclude Include="persistent_thread.h" />
     <ClInclude Include="tnn.h" />
     <ClInclude Include="weight.h" />
     <ClInclude Include="weight_junction.h" />
@@ -95,17 +90,20 @@
     <ClCompile Include="sequential.cpp" />
     <ClCompile Include="session.cpp" />
     <ClCompile Include="sigmoid.cpp" />
-    <ClCompile Include="sort.cpp" />
     <ClCompile Include="static_vals.cpp" />
     <ClCompile Include="sync.cpp" />
     <ClCompile Include="tanh.cpp" />
     <ClCompile Include="tensor.cpp" />
     <ClCompile Include="model.cpp" />
-    <ClCompile Include="persistent_thread.cpp" />
     <ClCompile Include="tnn.cpp" />
     <ClCompile Include="weight.cpp" />
     <ClCompile Include="weight_junction.cpp" />
     <ClCompile Include="weight_set.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\affix-base\affix-base\affix-base.vcxproj">
+      <Project>{7b4bfee2-ac81-40ce-a365-529cfc1111b3}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -183,6 +181,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(AFFIX_BASE)\affix-base</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -203,6 +202,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(AFFIX_BASE)\affix-base</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -224,6 +224,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(AFFIX_BASE)\affix-base</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -245,6 +246,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(AFFIX_BASE)\affix-base</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

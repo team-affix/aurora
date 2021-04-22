@@ -3,8 +3,8 @@
 #include "ptr.h"
 #include "ref.h"
 
-using aurora::data::ptr;
-using aurora::data::ref;
+using affix_base::data::ptr;
+using affix_base::data::ref;
 using std::vector;
 using std::initializer_list;
 using std::back_inserter;
