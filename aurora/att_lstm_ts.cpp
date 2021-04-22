@@ -1,17 +1,17 @@
 #include "pch.h"
-#include "att_ts.h"
+#include "att_lstm_ts.h"
 
-using aurora::models::att_ts;
+using aurora::models::att_lstm_ts;
 
-att_ts::~att_ts() {
-
-}
-
-att_ts::att_ts() {
+att_lstm_ts::~att_lstm_ts() {
 
 }
 
-att_ts::att_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func) {
+att_lstm_ts::att_lstm_ts() {
+
+}
+
+att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func) {
 	this->units = a_units;
 	vector<size_t> l_dims;
 	l_dims.push_back(2 * a_units);
@@ -26,12 +26,12 @@ att_ts::att_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>
 	models = new sync(model_template);
 }
 
-void att_ts::pmt_wise(function<void(ptr<param>&)> a_func) {
+void att_lstm_ts::pmt_wise(function<void(ptr<param>&)> a_func) {
 	model_template->pmt_wise(a_func);
 }
 
-model* att_ts::clone() {
-	att_ts* result = new att_ts();
+model* att_lstm_ts::clone() {
+	att_lstm_ts* result = new att_lstm_ts();
 	result->units = units;
 	result->htx = htx.clone();
 	result->htx_grad = htx_grad.clone();
@@ -40,8 +40,8 @@ model* att_ts::clone() {
 	return result;
 }
 
-model* att_ts::clone(function<void(ptr<param>&)> a_func) {
-	att_ts* result = new att_ts();
+model* att_lstm_ts::clone(function<void(ptr<param>&)> a_func) {
+	att_lstm_ts* result = new att_lstm_ts();
 	result->units = units;
 	result->htx = htx.clone();
 	result->htx_grad = htx_grad.clone();
@@ -50,7 +50,7 @@ model* att_ts::clone(function<void(ptr<param>&)> a_func) {
 	return result;
 }
 
-void att_ts::fwd() {
+void att_lstm_ts::fwd() {
 	models->fwd();
 	y.clear();
 	for (int i = 0; i < models->unrolled.size(); i++) {
@@ -60,7 +60,7 @@ void att_ts::fwd() {
 	}
 }
 
-void att_ts::bwd() {
+void att_lstm_ts::bwd() {
 	for (int i = 0; i < models->unrolled.size(); i++) {
 		double att_factor = models->y[i][0].val();
 		double att_factor_grad = 0;
@@ -82,34 +82,34 @@ void att_ts::bwd() {
 	}
 }
 
-tensor& att_ts::fwd(tensor& a_x) {
+tensor& att_lstm_ts::fwd(tensor& a_x) {
 	x.pop(a_x);
 	fwd();
 	return y;
 }
 
-tensor& att_ts::bwd(tensor& a_y_grad) {
+tensor& att_lstm_ts::bwd(tensor& a_y_grad) {
 	y_grad.pop(a_y_grad);
 	bwd();
 	return x_grad;
 }
 
-void att_ts::signal(tensor& a_y_des) {
+void att_lstm_ts::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void att_ts::cycle(tensor& a_x, tensor& a_y_des) {
+void att_lstm_ts::cycle(tensor& a_x, tensor& a_y_des) {
 	x.pop(a_x);
 	fwd();
 	signal(a_y_des);
 	bwd();
 }
 
-void att_ts::recur(function<void(model*)> a_func) {
+void att_lstm_ts::recur(function<void(model*)> a_func) {
 	model_template->recur(a_func);
 }
 
-void att_ts::compile() {
+void att_lstm_ts::compile() {
 	models->compile();
 	this->x = tensor::new_2d(models->prepared.size(), units);
 	this->x_grad = tensor::new_2d(models->prepared.size(), units);
@@ -128,10 +128,10 @@ void att_ts::compile() {
 	}
 }
 
-void att_ts::prep(size_t a_n) {
+void att_lstm_ts::prep(size_t a_n) {
 	models->prep(a_n);
 }
 
-void att_ts::unroll(size_t a_n) {
+void att_lstm_ts::unroll(size_t a_n) {
 	models->unroll(a_n);
 }

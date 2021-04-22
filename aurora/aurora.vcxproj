@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="att.h" />
-    <ClInclude Include="att_ts.h" />
+    <ClInclude Include="att_lstm.h" />
+    <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
     <ClInclude Include="basic.h" />
     <ClInclude Include="basic_constructors.h" />
@@ -69,8 +69,8 @@
     <ClInclude Include="weight_set.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="att.cpp" />
-    <ClCompile Include="att_ts.cpp" />
+    <ClCompile Include="att_lstm.cpp" />
+    <ClCompile Include="att_lstm_ts.cpp" />
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="cnl.cpp" />
     <ClCompile Include="generation.cpp" />

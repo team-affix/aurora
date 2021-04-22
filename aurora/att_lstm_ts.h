@@ -9,7 +9,7 @@ using aurora::models::sync;
 
 namespace aurora {
 	namespace models {
-		class att_ts : public model {
+		class att_lstm_ts : public model {
 		public:
 			size_t units;
 
@@ -23,9 +23,9 @@ namespace aurora {
 
 		public:
 			RECURRENT_FIELDS
-			virtual ~att_ts();
-			att_ts();
-			att_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func);
+			virtual ~att_lstm_ts();
+			att_lstm_ts();
+			att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func);
 
 		};
 	}

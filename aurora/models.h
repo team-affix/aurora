@@ -14,4 +14,5 @@
 #include "lstm_ts.h"
 #include "lstm.h"
 #include "cnl.h"
-#include "att_ts.h"
+#include "att_lstm_ts.h"
+#include "att_lstm.h"

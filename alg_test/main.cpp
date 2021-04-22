@@ -1795,7 +1795,7 @@ void auto_encoder() {
 
 }
 
-void att_ts_test() {
+void att_lstm_ts_test() {
 
 	tensor ht0 = { 0, 1 };
 	//tensor ht1 = { 1 };
@@ -1817,7 +1817,7 @@ void att_ts_test() {
 	vector<param_mom*> pv;
 	auto pmt_init = INIT_PMT(param_mom(pmt_urd(static_vals::aurora_random_engine), 0.02, 0, 0, 0.9), pv);
 
-	ptr<att_ts> a = new att_ts(2, { 3 }, pmt_init);
+	ptr<att_lstm_ts> a = new att_lstm_ts(2, { 3 }, pmt_init);
 	a->prep(4);
 	a->compile();
 	a->unroll(4);
@@ -1844,11 +1844,84 @@ void att_ts_test() {
 
 }
 
+void att_lstm_test() {
+	tensor x0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor x1 = {
+		{0, 1},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	tensor y1 = {
+		{1},
+		{1},
+		{1},
+		{1},
+	};
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
+	const int lstm_units = 5;
+
+	vector<param_sgd*> pv;
+
+	auto pmt_init = [&](ptr<param>& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	};
+
+	sync* s0 = new sync(pseudo::tnn({ 2, lstm_units }, pseudo::nlr(0.3), pmt_init));
+	att_lstm* l = new att_lstm(lstm_units, {lstm_units}, pmt_init);
+	sync* s1 = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), pmt_init));
+
+	ptr<sync> s0_ptr = s0;
+	ptr<att_lstm> l0_ptr = l;
+	ptr<sync> s1_ptr = s1;
+
+	sequential s = sequential({ s0, l, s1 });
+
+	s0->prep(4);
+	l->prep(4, 4);
+	s1->prep(4);
+
+	s.compile();
+
+	s0->unroll(4);
+	l->unroll(4, 4);
+	s1->unroll(4);
+
+	const int checkpoint_interval = 10000;
+
+	for (int epoch = 0; true; epoch++) {
+		s.cycle(x0, y0);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S0: " << s.y.to_string() << std::endl;
+		s.cycle(x1, y1);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S1: " << s.y.to_string() << std::endl;
+		for (param_sgd* pmt : pv)
+			pmt->update();
+	}
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	att_ts_test();
+	att_lstm_test();
 
 	return 0;
 
