@@ -12,7 +12,7 @@
 #include <fstream>
 
 using namespace aurora;
-using namespace aurora::data;
+using namespace affix_base::data;
 using namespace aurora::maths;
 using namespace aurora::models;
 using namespace aurora::params;
@@ -284,7 +284,7 @@ void tnn_multithread_test() {
 	s.compile();
 	s.unroll(numClones);
 	
-	pseudo::persistent_thread threads[numClones];
+	persistent_thread threads[numClones];
 
 	printf("");
 
@@ -299,13 +299,13 @@ void tnn_multithread_test() {
 			sequential& seq = *(sequential*)s.unrolled[tsIndex].get();
 			tensor& seq_x = x[tsIndex];
 			tensor& seq_y = y[tsIndex];
-			threads[tsIndex].execute([&] {
+			threads[tsIndex].call([&] {
 				seq.cycle(seq_x, seq_y);
 			});
 		}
 
-		for (pseudo::persistent_thread& thd : threads) {
-			thd.join();
+		for (persistent_thread& thd : threads) {
+			thd.join_call();
 		}
 
 		if (epoch % 10000 == 0)

@@ -4,7 +4,7 @@
 #include "model.h"
 #include "lstm_ts.h"
 
-using aurora::data::ptr;
+using affix_base::data::ptr;
 using aurora::models::model;
 using aurora::models::lstm_ts;
 

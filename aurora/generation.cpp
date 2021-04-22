@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "generation.h"
-#include "sort.h"
+#include "insertion_index.h"
 
-using namespace aurora::pseudo;
+using namespace affix_base::sorting;
 using aurora::evolution::generation;
 
 generation::generation() {
