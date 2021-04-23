@@ -186,9 +186,6 @@
     <ClInclude Include="basic_constructors.h">
       <Filter>Header Files\basic</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="att_lstm.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
@@ -277,9 +274,6 @@
     </ClCompile>
     <ClCompile Include="param_init.cpp">
       <Filter>Source Files\initialization</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="att_lstm.cpp">
       <Filter>Source Files\models</Filter>
