@@ -1917,11 +1917,59 @@ void att_lstm_test() {
 	}
 }
 
+void dio_test() {
+
+	tensor v = { 3, 7, 4, 2, 1, 0, 0, 2, 99 };
+
+	auto nd = [](double x, double center, double precision) {
+		return exp(-(double)1 / (double)2 * pow(precision * x - center, 2)) / sqrt(2 * 3.141592);
+	};
+
+	auto nd_deriv = [&](double x, double center, double precision) {
+		return (precision * x - center) * nd(x, center, precision);
+	};
+
+	double cost = 0;
+
+	auto get_index_grad = [&](double center, double precision) {
+		const double desired = 99;
+		double predicted = 0;
+		for (int i = 0; i < v.size(); i++)
+			predicted += v[i] * nd(i, center, precision);
+
+		double y_grad = predicted - desired;
+		cost = abs(y_grad);
+
+		double result = 0;
+		for (int i = 0; i < v.size(); i++)
+			result += y_grad * v[i] * nd_deriv(i, center, precision);
+		return result;
+
+	};
+
+	double index = 0.3;
+	double l_precision = 0.01;
+	double learn_rate = 0.001;
+
+	for (int epoch = 0; true; epoch++) {
+		double index_grad = get_index_grad(index, l_precision);
+		index -= learn_rate * index_grad;
+		
+		l_precision *= 1.0001;
+		learn_rate *= 0.999;
+
+		if (epoch % 10000 == 0) {
+			std::cout << index << std::endl;
+		}
+	}
+
+}
+
 int main() {
 
 	srand(time(NULL));
-
-	att_lstm_test();
+	
+	tnn_xor_test();
 
 	return 0;
 
