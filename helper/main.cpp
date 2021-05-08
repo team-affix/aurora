@@ -4,7 +4,7 @@
 
 int main() {
 
-	std::cout << helper::model_impl("att", helper::attention) << std::endl;
+	std::cout << helper::model_impl("ntm_ts", helper::model) << std::endl;
 
 	return 0;
 }

@@ -192,6 +192,9 @@
     <ClInclude Include="att_lstm_ts.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="ntm_ts.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -279,6 +282,9 @@
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="att_lstm_ts.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_ts.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
