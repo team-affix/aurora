@@ -121,6 +121,7 @@ namespace aurora {
 			void mul_2d(tensor a_other, tensor& a_output);
 			void div_2d(tensor a_other, tensor& a_output);
 			void dot_2d(tensor a_other, tensor& a_output);
+			void concat(tensor& a_other, tensor& a_output);
 
 		public:
 			tensor add_1d(tensor a_other);
@@ -134,6 +135,7 @@ namespace aurora {
 			tensor div_2d(tensor a_other);
 			tensor dot_2d(tensor a_other);
 			double cos_sim(tensor& a_other);
+			tensor concat(tensor& a_other);
 
 		public:
 			void link(tensor& a_other);

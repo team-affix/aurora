@@ -41,6 +41,7 @@
     <ClInclude Include="maths.h" />
     <ClInclude Include="models.h" />
     <ClInclude Include="neuron.h" />
+    <ClInclude Include="ntm_read_head.h" />
     <ClInclude Include="ntm_ts.h" />
     <ClInclude Include="params.h" />
     <ClInclude Include="param_mom_mt.h" />
@@ -75,6 +76,7 @@
     <ClCompile Include="lstm.cpp" />
     <ClCompile Include="lstm_ts.cpp" />
     <ClCompile Include="neuron.cpp" />
+    <ClCompile Include="ntm_read_head.cpp" />
     <ClCompile Include="ntm_ts.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_init.cpp" />

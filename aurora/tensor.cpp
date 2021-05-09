@@ -482,11 +482,24 @@ void tensor::dot_2d(tensor a_other, tensor& a_output) {
 		row(i).dot_1d(a_other.col(j), a_output[i][j]);
 }
 
+void tensor::concat(tensor& a_other, tensor& a_output) {
+	for (int i = 0; i < size(); i++)
+		a_output[i] = at(i);
+	for (int i = 0; i < a_other.size(); i++)
+		a_output[i + size()] = a_other[i];
+}
+
 double tensor::cos_sim(tensor& a_other) {
 	double dot = abs(dot_1d(a_other));
 	double mag_a = mag_1d();
 	double mag_b = a_other.mag_1d();
 	return dot / (mag_a * mag_b);
+}
+
+tensor tensor::concat(tensor& a_other) {
+	tensor result = tensor::new_1d(size() + a_other.size());
+	concat(a_other, result);
+	return result;
 }
 
 void tensor::link(tensor& a_other) {

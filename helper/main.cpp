@@ -4,7 +4,7 @@
 
 int main() {
 
-	std::cout << helper::model_impl("ntm_ts", helper::model) << std::endl;
+	std::cout << helper::model_impl("ntm_read_head", helper::model) << std::endl;
 
 	return 0;
 }

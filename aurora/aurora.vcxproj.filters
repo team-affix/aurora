@@ -195,6 +195,9 @@
     <ClInclude Include="ntm_ts.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="ntm_read_head.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -286,6 +289,9 @@
     </ClCompile>
     <ClCompile Include="ntm_ts.cpp">
       <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_read_head.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
