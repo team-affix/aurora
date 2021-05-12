@@ -8,10 +8,11 @@ using aurora::models::layer;
 
 namespace aurora {
 	namespace models {
-		class ntm_read_head : public model {
+		class ntm_rh : public model {
 		public:
 			size_t units;
-			size_t shift_units;
+			size_t y_units;
+			size_t s_units;
 			size_t lr_units;
 			size_t sm_units;
 
@@ -41,9 +42,9 @@ namespace aurora {
 
 		public:
 			MODEL_FIELDS
-			virtual ~ntm_read_head();
-			ntm_read_head();
-			ntm_read_head(vector<size_t> a_dims, size_t a_shift_units, function<void(ptr<param>&)> a_func);
+			virtual ~ntm_rh();
+			ntm_rh();
+			ntm_rh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>&)> a_func);
 
 		};
 	}

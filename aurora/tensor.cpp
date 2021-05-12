@@ -487,6 +487,10 @@ void tensor::concat(tensor& a_other, tensor& a_output) {
 		a_output[i] = at(i);
 	for (int i = 0; i < a_other.size(); i++)
 		a_output[i + size()] = a_other[i];
+	/*tensor our_range = a_output.range(0, size());
+	tensor other_range = a_output.range(size(), a_other.size());
+	our_range.group_join_all_ranks(*this);
+	other_range.group_join_all_ranks(a_other);*/
 }
 
 double tensor::cos_sim(tensor& a_other) {
@@ -574,7 +578,6 @@ void tensor::group_join(tensor& a_other) {
 	});
 }
 
-
 void tensor::group_leave() {
 	if (group_prev_ptr != nullptr)
 		group_prev_ptr->group_next_ptr = group_next_ptr;
@@ -601,8 +604,10 @@ void tensor::group_join_all_ranks(tensor& a_other) {
 	group_recur([&](tensor* elem) {
 
 		for (int i = 0; i < size(); i++)
-			at(i).group_join(a_other.at(i));
+			at(i).group_join_all_ranks(a_other.at(i));
 
+		group_join(a_other);
+		
 		// PREVENT ADDING NODES TO SAME GROUP TWICE
 		if (!a_other.group_contains(elem)) {
 			tensor& l_group_tail = a_other.group_tail();

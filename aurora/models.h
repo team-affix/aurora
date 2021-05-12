@@ -16,3 +16,5 @@
 #include "cnl.h"
 #include "att_lstm_ts.h"
 #include "att_lstm.h"
+#include "ntm_rh.h"
+#include "ntm_wh.h"

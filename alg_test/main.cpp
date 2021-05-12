@@ -100,6 +100,13 @@ void tensor_test() {
 	assert(mat_3[1][0] == 1);
 	assert(mat_3[1][1] == 1);
 
+	tensor t1 = { 1, 2, 3, 4 };
+	tensor t2;
+	tensor t3 = { 5, 6 };
+	t2 = t1.range(0, 2);
+	t2[0].group_join_all_ranks(t3[0]);
+
+
 }
 
 void tnn_xor_test() {
@@ -1725,17 +1732,20 @@ void cnl_test() {
 	c3->unroll(c2->y_strides(), c2->x_strides());
 
 	std::cout << "TRAINING MODEL" << std::endl;
+
+	const int CHECKPOINT_INTERVAL = 10000;
+
 	for (int epoch = 0; true; epoch++) {
 
 		double cost = 0;
 		for (int ts = 0; ts < x.size(); ts++) {
 			s->cycle(x[ts], y[ts]);
 			cost += s->y_grad.abs_2d().sum_2d().sum_1d();
-			if(epoch % 100 == 0)
-				std::cout << s->y.to_string() << std::endl;
+			/*if(epoch % CHECKPOINT_INTERVAL == 0)
+				std::cout << s->y.to_string() << std::endl;*/
 		}
 
-		if (epoch % 100 == 0)
+		if (epoch % CHECKPOINT_INTERVAL == 0)
 			std::cout << cost << std::endl;
 
 		for (param_mom* pmt : pv)
@@ -1919,49 +1929,100 @@ void att_lstm_test() {
 
 void dio_test() {
 
-	tensor v = { 3, 7, 4, 2, 1, 0, 0, 2, 99 };
+	tensor v = { 3, 7, 4, 2, 1 };
 
-	auto nd = [](double x, double center, double precision) {
-		return exp(-(double)1 / (double)2 * pow(precision * x - center, 2)) / sqrt(2 * 3.141592);
+	auto D = [](double x, double a, double b) {
+		return exp(-0.5 * pow(a * (x - b), 2));
 	};
 
-	auto nd_deriv = [&](double x, double center, double precision) {
-		return (precision * x - center) * nd(x, center, precision);
+	auto D_deriv = [&](double x, double a, double b) {
+		return a * (a * (x - b)) * D(x, a, b);
 	};
 
-	double cost = 0;
-
-	auto get_index_grad = [&](double center, double precision) {
-		const double desired = 99;
-		double predicted = 0;
+	const double desired = 2;
+	const double stretch = 1;
+	double predicted = 0;
+	
+	auto get_index_grad = [&](double a, double b) {
+		predicted = 0;
 		for (int i = 0; i < v.size(); i++)
-			predicted += v[i] * nd(i, center, precision);
+			predicted += v[i] * D(stretch*i, a, b);
 
 		double y_grad = predicted - desired;
-		cost = abs(y_grad);
 
 		double result = 0;
 		for (int i = 0; i < v.size(); i++)
-			result += y_grad * v[i] * nd_deriv(i, center, precision);
+			result += y_grad * v[i] * D_deriv(stretch * i, a, b);
 		return result;
 
 	};
 
-	double index = 0.3;
-	double l_precision = 0.01;
-	double learn_rate = 0.001;
+	double index = 0;
+	double precision = 1;
+	double learn_rate = 0.01;
 
 	for (int epoch = 0; true; epoch++) {
-		double index_grad = get_index_grad(index, l_precision);
+		double index_grad = get_index_grad(precision, index);
 		index -= learn_rate * index_grad;
-		
-		l_precision *= 1.0001;
-		learn_rate *= 0.999;
-
+		precision += 0.0000001;
 		if (epoch % 10000 == 0) {
-			std::cout << index << std::endl;
+			std::cout << "INDEX: " << index << std::endl;
+			std::cout << "PREDICT: " << predicted << std::endl;
+			std::cout << "PRECISION: " << precision << std::endl;
 		}
 	}
+
+}
+
+void ntm_read_head_test() {
+
+	tensor des_k = { 0, 1, 2, 3 };
+	tensor des_beta = { 3 };
+	tensor des_gamma = { 0.75 };
+	tensor des_g = { 1 };
+	tensor des_s = { 0.1, 0.5, 0.1 };
+
+	vector<param_sgd*> pv;
+	uniform_real_distribution<double> urd(-1, 1);
+
+	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
+	nrh.compile();
+
+	tensor x = { 0, 1, 2, 3, 4 };
+
+	tensor k_des = { 1, 2, 3, 4, 5 };
+	tensor beta_des = { 2 };
+	tensor gamma_des = { 3 };
+	tensor g_des = { 0.5 };
+	tensor s_des = { 0.1, 0.2, 0.3 };
+
+	/*for (int epoch = 0; true; epoch++) {
+
+		nrh.fwd(x);
+
+		nrh.k_grad.pop(nrh.k.sub_1d(k_des));
+		nrh.beta_grad.pop(nrh.beta.sub_1d(beta_des));
+		nrh.gamma_grad.pop(nrh.gamma.sub_1d(gamma_des));
+		nrh.g_grad.pop(nrh.g.sub_1d(g_des));
+		nrh.s_grad.pop(nrh.s.sub_1d(s_des));
+
+		nrh.bwd();
+
+		for (param_sgd* pmt : pv)
+			pmt->update();
+
+		if (epoch % 10000 == 0) {
+			double cost =
+				nrh.k_grad.abs_1d().sum_1d() +
+				nrh.beta_grad.abs_1d().sum_1d() +
+				nrh.gamma_grad.abs_1d().sum_1d() +
+				nrh.g_grad.abs_1d().sum_1d() +
+				nrh.s_grad.abs_1d().sum_1d();
+			std::cout << cost << std::endl;
+		}
+
+	}*/
+
 
 }
 
@@ -1969,7 +2030,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	tnn_xor_test();
+	ntm_read_head_test();
 
 	return 0;
 

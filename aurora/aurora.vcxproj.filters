@@ -195,7 +195,10 @@
     <ClInclude Include="ntm_ts.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="ntm_read_head.h">
+    <ClInclude Include="ntm_rh.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_wh.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
   </ItemGroup>
@@ -290,8 +293,11 @@
     <ClCompile Include="ntm_ts.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
-    <ClCompile Include="ntm_read_head.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="ntm_rh.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_wh.cpp">
+      <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

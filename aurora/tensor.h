@@ -36,7 +36,7 @@ namespace aurora {
 			size_t group_size();
 
 		public:
-			~tensor();
+			virtual ~tensor();
 			tensor();
 			tensor(double a_val);
 			tensor(vector<tensor> a_vec);
