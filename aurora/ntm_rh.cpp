@@ -24,28 +24,26 @@ ntm_rh::ntm_rh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>
 	lr_units = units + 2;
 	sm_units = s_units + 1;
 	y_units = lr_units + sm_units;
+	
+	vector<size_t> lr_dims = a_dims;
+	vector<size_t> sm_dims = a_dims;
 
-	k = tensor::new_1d(units);
-	k_grad = tensor::new_1d(units);
-	beta = tensor::new_1d(1);
-	beta_grad = tensor::new_1d(1);
-	g = tensor::new_1d(1);
-	g_grad = tensor::new_1d(1);
-	s = tensor::new_1d(s_units);
-	s_grad = tensor::new_1d(s_units);
-	gamma = tensor::new_1d(1);
-	gamma_grad = tensor::new_1d(1);
-	a_dims.push_back(y_units);
+	lr_dims.push_back(lr_units);
+	sm_dims.push_back(sm_units);
 
-	internal_model = pseudo::tnn_no_output(a_dims, pseudo::nth(), a_func);
-	lr_layer = new layer(lr_units, new sequential{ new weight(), pseudo::nlr(0.3) }, a_func);
-	sm_layer = new layer(sm_units, new sequential{ new weight(), pseudo::nsm() }, a_func);
+	vector<ptr<model>> sm_neurons(a_dims.size() + 1);
+	for (int i = 0; i < sm_neurons.size() - 1; i++)
+		sm_neurons[i] = pseudo::nth();
+	sm_neurons.back() = pseudo::nsm();
+
+	lr_model = pseudo::tnn(lr_dims, pseudo::nlr(0.3), a_func);
+	sm_model = pseudo::tnn(sm_dims, sm_neurons, a_func);
+
 }
 
 void ntm_rh::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_model->pmt_wise(a_func);
-	lr_layer->pmt_wise(a_func);
-	sm_layer->pmt_wise(a_func);
+	lr_model->pmt_wise(a_func);
+	sm_model->pmt_wise(a_func);
 }
 
 model* ntm_rh::clone() {
@@ -64,9 +62,8 @@ model* ntm_rh::clone() {
 	result->s_grad = s_grad.clone();
 	result->gamma = s.clone();
 	result->gamma_grad = s_grad.clone();
-	result->internal_model = internal_model->clone();
-	result->lr_layer = (layer*)lr_layer->clone();
-	result->sm_layer = (layer*)sm_layer->clone();
+	result->lr_model = (layer*)lr_model->clone();
+	result->sm_model = (layer*)sm_model->clone();
 	return result;
 }
 
@@ -86,22 +83,20 @@ model* ntm_rh::clone(function<void(ptr<param>&)> a_func) {
 	result->s_grad = s_grad.clone();
 	result->gamma = s.clone();
 	result->gamma_grad = s_grad.clone();
-	result->internal_model = internal_model->clone(a_func);
-	result->lr_layer = (layer*)lr_layer->clone(a_func);
-	result->sm_layer = (layer*)sm_layer->clone(a_func);
+	result->lr_model = (layer*)lr_model->clone(a_func);
+	result->sm_model = (layer*)sm_model->clone(a_func);
 	return result;
 }
 
 void ntm_rh::fwd() {
-	internal_model->fwd();
-	lr_layer->fwd();
-	sm_layer->fwd();
+	lr_model->fwd();
+	sm_model->fwd();
 }
 
 void ntm_rh::bwd() {
-	lr_layer->bwd();
-	sm_layer->bwd();
-	internal_model->bwd();
+	lr_model->bwd();
+	sm_model->bwd();
+	lr_model->x_grad.add_1d(sm_model->x_grad, x_grad);
 }
 
 tensor& ntm_rh::fwd(tensor& a_x) {
@@ -119,8 +114,8 @@ tensor& ntm_rh::bwd(tensor& a_y_grad) {
 void ntm_rh::signal(tensor& a_y_des) {
 	tensor lr_range = a_y_des.range(0, lr_units);
 	tensor sm_range = a_y_des.range(lr_units, sm_units);
-	lr_layer->signal(lr_range);
-	sm_layer->signal(sm_range);
+	lr_model->signal(lr_range);
+	sm_model->signal(sm_range);
 }
 
 void ntm_rh::cycle(tensor& a_x, tensor& a_y_des) {
@@ -132,9 +127,8 @@ void ntm_rh::cycle(tensor& a_x, tensor& a_y_des) {
 
 void ntm_rh::recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_model->recur(a_func);
-	lr_layer->recur(a_func);
-	sm_layer->recur(a_func);
+	lr_model->recur(a_func);
+	sm_model->recur(a_func);
 }
 
 void ntm_rh::compile() {
@@ -144,50 +138,50 @@ void ntm_rh::compile() {
 	y = tensor::new_1d(y_units);
 	y_grad = tensor::new_1d(y_units);
 
-	internal_model->compile();
-	lr_layer->compile();
-	sm_layer->compile();
+	k = tensor::new_1d(units);
+	k_grad = tensor::new_1d(units);
+	beta = tensor::new_1d(1);
+	beta_grad = tensor::new_1d(1);
+	g = tensor::new_1d(1);
+	g_grad = tensor::new_1d(1);
+	s = tensor::new_1d(s_units);
+	s_grad = tensor::new_1d(s_units);
+	gamma = tensor::new_1d(1);
+	gamma_grad = tensor::new_1d(1);
+
+	lr_model->compile();
+	sm_model->compile();
 	
-	tensor y_range = lr_layer->y.concat(sm_layer->y);
-	tensor y_grad_range = lr_layer->y_grad.concat(sm_layer->y_grad);
+	tensor y_range = lr_model->y.concat(sm_model->y);
+	tensor y_grad_range = lr_model->y_grad.concat(sm_model->y_grad);
 	
-	x.group_join(internal_model->x);
-	x_grad.group_join(internal_model->x_grad);
+	x.group_join(lr_model->x);
+	x.group_join(sm_model->x);
 	y.group_join_all_ranks(y_range);
 	y_grad.group_join_all_ranks(y_grad_range);
-	
-	tensor y_lr_range = internal_model->y.range(0, lr_units);
-	tensor y_grad_lr_range = internal_model->y_grad.range(0, lr_units);
-	tensor y_sm_range = internal_model->y.range(lr_units, sm_units);
-	tensor y_grad_sm_range = internal_model->y_grad.range(0, lr_units);
-	
-	lr_layer->x.group_join_all_ranks(y_lr_range);
-	lr_layer->x_grad.group_join_all_ranks(y_grad_lr_range);
-	sm_layer->x.group_join_all_ranks(y_sm_range);
-	sm_layer->x_grad.group_join_all_ranks(y_grad_sm_range);
 
 	size_t lr_y = 0;
 
-	k = lr_layer->y.range(lr_y, units);
-	k_grad = lr_layer->y_grad.range(lr_y, units);
+	k = lr_model->y.range(lr_y, units);
+	k_grad = lr_model->y_grad.range(lr_y, units);
 	lr_y += units;
 
-	beta = lr_layer->y.range(lr_y, 1);
-	beta_grad = lr_layer->y_grad.range(lr_y, 1);
+	beta = lr_model->y.range(lr_y, 1);
+	beta_grad = lr_model->y_grad.range(lr_y, 1);
 	lr_y += 1;
 
-	gamma = lr_layer->y.range(lr_y, 1);
-	gamma_grad = lr_layer->y_grad.range(lr_y, 1);
+	gamma = lr_model->y.range(lr_y, 1);
+	gamma_grad = lr_model->y_grad.range(lr_y, 1);
 	lr_y += 1;
 
 	size_t sm_y = 0;
 
-	g = sm_layer->y.range(sm_y, 1);
-	g_grad = sm_layer->y_grad.range(sm_y, 1);
+	g = sm_model->y.range(sm_y, 1);
+	g_grad = sm_model->y_grad.range(sm_y, 1);
 	sm_y += 1;
 
-	s = sm_layer->y.range(sm_y, s_units);
-	s_grad = sm_layer->y_grad.range(sm_y, s_units);
+	s = sm_model->y.range(sm_y, s_units);
+	s_grad = sm_model->y_grad.range(sm_y, s_units);
 	sm_y += s_units;
 
 }

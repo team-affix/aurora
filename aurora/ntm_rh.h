@@ -34,11 +34,8 @@ namespace aurora {
 			tensor gamma_grad;
 			
 		public:
-			ptr<model> internal_model;
-			// SIZE == units + 2
-			ptr<layer> lr_layer;
-			// SIZE == shift_units + 1
-			ptr<layer> sm_layer;
+			ptr<model> lr_model;
+			ptr<model> sm_model;
 
 		public:
 			MODEL_FIELDS

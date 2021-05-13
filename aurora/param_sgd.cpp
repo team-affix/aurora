@@ -33,6 +33,7 @@ void param_sgd::accum_grad(double a_grad) {
 }
 
 void param_sgd::update() {
+	assert(!isnan(state()) && !isnan(learn_rate()) && !isnan(gradient()));
 	state() -= learn_rate() * gradient();
 	gradient() = 0;
 }

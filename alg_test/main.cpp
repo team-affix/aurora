@@ -2000,7 +2000,8 @@ void ntm_rh_test() {
 	vector<param_sgd*> pv;
 	uniform_real_distribution<double> urd(-1, 1);
 
-	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.000002, 0), pv));
+	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, 3,
+		INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv));
 	nrh.compile();
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
@@ -2056,11 +2057,23 @@ void ntm_rh_test() {
 
 void ntm_wh_test() {
 
-	tensor des_k = { 0, 1, 2, 3 };
-	tensor des_beta = { 3 };
-	tensor des_gamma = { 0.75 };
-	tensor des_g = { 1 };
-	tensor des_s = { 0.1, 0.5, 0.1 };
+	tensor x_0 = { 0, 1, 2, 3, 4 };
+	tensor des_k_0 = { 1, 2, 3, 4, 5 };
+	tensor des_beta_0 = { 2 };
+	tensor des_gamma_0 = { 3 };
+	tensor des_g_0 = { 0.5 };
+	tensor des_s_0 = { 0.1, 0.2, 0.3 };
+	tensor des_e_0 = { 0, 0.1, 0.9, 0.9, 0.2 };
+	tensor des_a_0 = { 1, 2, 3, 4, 5 };
+
+	tensor x_1 = { 1, 2, 3, 3, 4 };
+	tensor des_k_1 = { 0, 1, 2, 3, 4 };
+	tensor des_beta_1 = { 10 };
+	tensor des_gamma_1 = { 5 };
+	tensor des_g_1 = { 0.2 };
+	tensor des_s_1 = { 0.3, 0.9, 0.1 };
+	tensor des_e_1 = { 0.3, 0.2, 0.1, 0.2, 0.3 };
+	tensor des_a_1 = { 3, 0, 0, 1, 2 };
 
 	vector<param_sgd*> pv;
 	uniform_real_distribution<double> urd(-1, 1);
@@ -2068,63 +2081,64 @@ void ntm_wh_test() {
 	ntm_wh nwh = ntm_wh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
 	nwh.compile();
 
-	tensor x = { 0, 1, 2, 3, 4 };
-
-	tensor k_des = { 1, 2, 3, 4, 5 };
-	tensor beta_des = { 2 };
-	tensor gamma_des = { 3 };
-	tensor g_des = { 0.5 };
-	tensor s_des = { 0.1, 0.2, 0.3 };
-	tensor e_des = { 0, 0.1, 0.9, 0.9, 0.2 };
-	tensor a_des = { 1, 2, 3, 4, 5 };
-
 	for (int epoch = 0; epoch < 1000000; epoch++) {
 
-		nwh.fwd(x);
+		double cost = 0;
 
-		nwh.k_grad.pop(nwh.k.sub_1d(k_des));
-		nwh.beta_grad.pop(nwh.beta.sub_1d(beta_des));
-		nwh.gamma_grad.pop(nwh.gamma.sub_1d(gamma_des));
-		nwh.g_grad.pop(nwh.g.sub_1d(g_des));
-		nwh.s_grad.pop(nwh.s.sub_1d(s_des));
-		nwh.e_grad.pop(nwh.e.sub_1d(e_des));
-		nwh.a_grad.pop(nwh.a.sub_1d(a_des));
+		nwh.fwd(x_0);
+
+		nwh.k_grad.pop(nwh.k.sub_1d(des_k_0));
+		nwh.beta_grad.pop(nwh.beta.sub_1d(des_beta_0));
+		nwh.gamma_grad.pop(nwh.gamma.sub_1d(des_gamma_0));
+		nwh.g_grad.pop(nwh.g.sub_1d(des_g_0));
+		nwh.s_grad.pop(nwh.s.sub_1d(des_s_0));
+		nwh.e_grad.pop(nwh.e.sub_1d(des_e_0));
+		nwh.a_grad.pop(nwh.a.sub_1d(des_a_0));
 
 		nwh.bwd();
+
+		cost +=
+			nwh.k_grad.abs_1d().sum_1d() +
+			nwh.beta_grad.abs_1d().sum_1d() +
+			nwh.gamma_grad.abs_1d().sum_1d() +
+			nwh.g_grad.abs_1d().sum_1d() +
+			nwh.s_grad.abs_1d().sum_1d() +
+			nwh.e_grad.abs_1d().sum_1d() +
+			nwh.a_grad.abs_1d().sum_1d();
+
+		nwh.fwd(x_1);
+
+		nwh.k_grad.pop(nwh.k.sub_1d(des_k_1));
+		nwh.beta_grad.pop(nwh.beta.sub_1d(des_beta_1));
+		nwh.gamma_grad.pop(nwh.gamma.sub_1d(des_gamma_1));
+		nwh.g_grad.pop(nwh.g.sub_1d(des_g_1));
+		nwh.s_grad.pop(nwh.s.sub_1d(des_s_1));
+		nwh.e_grad.pop(nwh.e.sub_1d(des_e_0));
+		nwh.a_grad.pop(nwh.a.sub_1d(des_a_0));
+
+		nwh.bwd();
+
+		cost +=
+			nwh.k_grad.abs_1d().sum_1d() +
+			nwh.beta_grad.abs_1d().sum_1d() +
+			nwh.gamma_grad.abs_1d().sum_1d() +
+			nwh.g_grad.abs_1d().sum_1d() +
+			nwh.s_grad.abs_1d().sum_1d() +
+			nwh.e_grad.abs_1d().sum_1d() +
+			nwh.a_grad.abs_1d().sum_1d();;
 
 		for (param_sgd* pmt : pv)
 			pmt->update();
 
 		if (epoch % 10000 == 0) {
-			double cost =
-				nwh.k_grad.abs_1d().sum_1d() +
-				nwh.beta_grad.abs_1d().sum_1d() +
-				nwh.gamma_grad.abs_1d().sum_1d() +
-				nwh.g_grad.abs_1d().sum_1d() +
-				nwh.s_grad.abs_1d().sum_1d() +
-				nwh.e_grad.abs_1d().sum_1d() +
-				nwh.a_grad.abs_1d().sum_1d();
 			std::cout << cost << std::endl;
 		}
 
 	}
 
-	std::cout << 
-		"FINALLY: " << std::endl <<
-		k_des.to_string() << std::endl <<
-		nwh.k.to_string() << std::endl << std::endl <<
-		beta_des.to_string() << std::endl <<
-		nwh.beta.to_string() << std::endl << std::endl <<
-		gamma_des.to_string() << std::endl <<
-		nwh.gamma.to_string() << std::endl << std::endl <<
-		g_des.to_string() << std::endl <<
-		nwh.g.to_string() << std::endl << std::endl <<
-		s_des.to_string() << std::endl <<
-		nwh.s.to_string() << std::endl << std::endl <<
-		e_des.to_string() << std::endl <<
-		nwh.e.to_string() << std::endl << std::endl <<
-		a_des.to_string() << std::endl <<
-		nwh.a.to_string() << std::endl << std::endl;
+}
+
+void ntm_addresser_test() {
 
 }
 
