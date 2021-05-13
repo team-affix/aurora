@@ -36,7 +36,7 @@ ntm_wh::ntm_wh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>
 
 	a_dims.push_back(y_units);
 
-	internal_model = pseudo::tnn(a_dims, pseudo::nlr(0.3), a_func);
+	internal_model = pseudo::tnn(a_dims, pseudo::nth(), a_func);
 	lr_layer = new layer(lr_units, pseudo::nlr(0.3), a_func);
 	sm_layer = new layer(sm_units, pseudo::nsm(), a_func);
 
@@ -123,15 +123,36 @@ void ntm_wh::compile() {
 	sm_layer->x.group_join_all_ranks(y_sm_range);
 	sm_layer->x_grad.group_join_all_ranks(y_grad_sm_range);
 
-	k = lr_layer->y.range(0, units);
-	k_grad = lr_layer->y_grad.range(0, units);
-	beta = lr_layer->y.range(units, 1);
-	beta_grad = lr_layer->y_grad.range(units, 1);
-	gamma = lr_layer->y.range(units + 1, 1);
-	gamma_grad = lr_layer->y_grad.range(units + 1, 1);
-	g = sm_layer->y.range(0, 1);
-	g_grad = sm_layer->y_grad.range(0, 1);
-	s = sm_layer->y.range(1, s_units);
-	s_grad = sm_layer->y_grad.range(1, s_units);
+	size_t lr_y = 0;
+
+	k = lr_layer->y.range(lr_y, units);
+	k_grad = lr_layer->y_grad.range(lr_y, units);
+	lr_y += units;
+
+	beta = lr_layer->y.range(lr_y, 1);
+	beta_grad = lr_layer->y_grad.range(lr_y, 1);
+	lr_y += 1;
+
+	gamma = lr_layer->y.range(lr_y, 1);
+	gamma_grad = lr_layer->y_grad.range(lr_y, 1);
+	lr_y += 1;
+
+	a = lr_layer->y.range(lr_y, units);
+	a_grad = lr_layer->y_grad.range(lr_y, units);
+	lr_y += units;
+
+	size_t sm_y = 0;
+
+	g = sm_layer->y.range(sm_y, 1);
+	g_grad = sm_layer->y_grad.range(sm_y, 1);
+	sm_y += 1;
+
+	s = sm_layer->y.range(sm_y, s_units);
+	s_grad = sm_layer->y_grad.range(sm_y, s_units);
+	sm_y += s_units;
+
+	e = sm_layer->y.range(sm_y, units);
+	e_grad = sm_layer->y_grad.range(sm_y, units);
+	sm_y += units;
 
 }

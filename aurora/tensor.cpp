@@ -484,13 +484,9 @@ void tensor::dot_2d(tensor a_other, tensor& a_output) {
 
 void tensor::concat(tensor& a_other, tensor& a_output) {
 	for (int i = 0; i < size(); i++)
-		a_output[i] = at(i);
+		a_output[i].group_join_all_ranks(at(i));
 	for (int i = 0; i < a_other.size(); i++)
-		a_output[i + size()] = a_other[i];
-	/*tensor our_range = a_output.range(0, size());
-	tensor other_range = a_output.range(size(), a_other.size());
-	our_range.group_join_all_ranks(*this);
-	other_range.group_join_all_ranks(a_other);*/
+		a_output[i + size()].group_join_all_ranks(a_other[i]);
 }
 
 double tensor::cos_sim(tensor& a_other) {

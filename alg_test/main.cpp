@@ -86,26 +86,33 @@ void tensor_test() {
 	tensor mat_2 = mat_1_unroll.roll(10);
 	assert(mat_2.size() == 10);
 
-	tensor mat_3 = tensor::new_2d(10, 10);
-	tensor mat_4;
+	{
+		tensor mat_3 = tensor::new_2d(10, 10);
+		tensor mat_4;
+		{
+			tensor mat_5 = mat_3.range_2d(0, 0, 2, 2);
+			mat_4.group_join(mat_5);
+		}
+		mat_4.pop(tensor::new_2d(2, 2, 1));
+		assert(mat_3[0][0] == 1);
+		assert(mat_3[0][1] == 1);
+		assert(mat_3[1][0] == 1);
+		assert(mat_3[1][1] == 1);
+	}
 
 	{
-		// mat_5 WILL ONLY EXIST IN THIS SCOPE, THEN WILL BE DISCARDED
-		tensor mat_5 = mat_3.range_2d(0, 0, 2, 2);
-		mat_4.group_join(mat_5);
+		tensor t1 = { 1, 2, 3, 4 };
+		tensor t2 = t1.range(0, 2);
+		tensor t3 = { 5, 6 };
+		t2[0].group_join_all_ranks(t3[0]);
+		assert(t1[0] == 5);
 	}
-	mat_4.pop(tensor::new_2d(2, 2, 1));
-	assert(mat_3[0][0] == 1);
-	assert(mat_3[0][1] == 1);
-	assert(mat_3[1][0] == 1);
-	assert(mat_3[1][1] == 1);
 
-	tensor t1 = { 1, 2, 3, 4 };
-	tensor t2;
-	tensor t3 = { 5, 6 };
-	t2 = t1.range(0, 2);
-	t2[0].group_join_all_ranks(t3[0]);
+	{
+		tensor t1 = { 0, 0, 0, 0 };
+		tensor t2 = t1.range(0, 2);
 
+	}
 
 }
 
@@ -1974,7 +1981,7 @@ void dio_test() {
 
 }
 
-void ntm_read_head_test() {
+void ntm_rh_test() {
 
 	tensor des_k = { 0, 1, 2, 3 };
 	tensor des_beta = { 3 };
@@ -1985,7 +1992,7 @@ void ntm_read_head_test() {
 	vector<param_sgd*> pv;
 	uniform_real_distribution<double> urd(-1, 1);
 
-	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
+	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv));
 	nrh.compile();
 
 	tensor x = { 0, 1, 2, 3, 4 };
@@ -1996,7 +2003,7 @@ void ntm_read_head_test() {
 	tensor g_des = { 0.5 };
 	tensor s_des = { 0.1, 0.2, 0.3 };
 
-	/*for (int epoch = 0; true; epoch++) {
+	for (int epoch = 0; epoch < 1000000; epoch++) {
 
 		nrh.fwd(x);
 
@@ -2021,16 +2028,105 @@ void ntm_read_head_test() {
 			std::cout << cost << std::endl;
 		}
 
-	}*/
+	}
 
+
+	std::cout <<
+		"FINALLY: " << std::endl <<
+		k_des.to_string() << std::endl <<
+		nrh.k.to_string() << std::endl << std::endl <<
+		beta_des.to_string() << std::endl <<
+		nrh.beta.to_string() << std::endl << std::endl <<
+		gamma_des.to_string() << std::endl <<
+		nrh.gamma.to_string() << std::endl << std::endl <<
+		g_des.to_string() << std::endl <<
+		nrh.g.to_string() << std::endl << std::endl <<
+		s_des.to_string() << std::endl <<
+		nrh.s.to_string() << std::endl << std::endl;
 
 }
+
+void ntm_wh_test() {
+
+	tensor des_k = { 0, 1, 2, 3 };
+	tensor des_beta = { 3 };
+	tensor des_gamma = { 0.75 };
+	tensor des_g = { 1 };
+	tensor des_s = { 0.1, 0.5, 0.1 };
+
+	vector<param_sgd*> pv;
+	uniform_real_distribution<double> urd(-1, 1);
+
+	ntm_wh nwh = ntm_wh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
+	nwh.compile();
+
+	tensor x = { 0, 1, 2, 3, 4 };
+
+	tensor k_des = { 1, 2, 3, 4, 5 };
+	tensor beta_des = { 2 };
+	tensor gamma_des = { 3 };
+	tensor g_des = { 0.5 };
+	tensor s_des = { 0.1, 0.2, 0.3 };
+	tensor e_des = { 0, 0.1, 0.9, 0.9, 0.2 };
+	tensor a_des = { 1, 2, 3, 4, 5 };
+
+	for (int epoch = 0; epoch < 1000000; epoch++) {
+
+		nwh.fwd(x);
+
+		nwh.k_grad.pop(nwh.k.sub_1d(k_des));
+		nwh.beta_grad.pop(nwh.beta.sub_1d(beta_des));
+		nwh.gamma_grad.pop(nwh.gamma.sub_1d(gamma_des));
+		nwh.g_grad.pop(nwh.g.sub_1d(g_des));
+		nwh.s_grad.pop(nwh.s.sub_1d(s_des));
+		nwh.e_grad.pop(nwh.e.sub_1d(e_des));
+		nwh.a_grad.pop(nwh.a.sub_1d(a_des));
+
+		nwh.bwd();
+
+		for (param_sgd* pmt : pv)
+			pmt->update();
+
+		if (epoch % 10000 == 0) {
+			double cost =
+				nwh.k_grad.abs_1d().sum_1d() +
+				nwh.beta_grad.abs_1d().sum_1d() +
+				nwh.gamma_grad.abs_1d().sum_1d() +
+				nwh.g_grad.abs_1d().sum_1d() +
+				nwh.s_grad.abs_1d().sum_1d() +
+				nwh.e_grad.abs_1d().sum_1d() +
+				nwh.a_grad.abs_1d().sum_1d();
+			std::cout << cost << std::endl;
+		}
+
+	}
+
+	std::cout << 
+		"FINALLY: " << std::endl <<
+		k_des.to_string() << std::endl <<
+		nwh.k.to_string() << std::endl << std::endl <<
+		beta_des.to_string() << std::endl <<
+		nwh.beta.to_string() << std::endl << std::endl <<
+		gamma_des.to_string() << std::endl <<
+		nwh.gamma.to_string() << std::endl << std::endl <<
+		g_des.to_string() << std::endl <<
+		nwh.g.to_string() << std::endl << std::endl <<
+		s_des.to_string() << std::endl <<
+		nwh.s.to_string() << std::endl << std::endl <<
+		e_des.to_string() << std::endl <<
+		nwh.e.to_string() << std::endl << std::endl <<
+		a_des.to_string() << std::endl <<
+		nwh.a.to_string() << std::endl << std::endl;
+
+}
+
+
 
 int main() {
 
 	srand(time(NULL));
 	
-	ntm_read_head_test();
+	ntm_rh_test();
 
 	return 0;
 
