@@ -32,7 +32,6 @@ namespace aurora {
 			virtual void address_interpolate();
 			virtual void address_shift();
 			virtual void address_sharpen();
-
 			
 		public:
 			MODEL_FIELDS

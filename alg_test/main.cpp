@@ -1983,66 +1983,74 @@ void dio_test() {
 
 void ntm_rh_test() {
 
-	tensor des_k = { 0, 1, 2, 3 };
-	tensor des_beta = { 3 };
-	tensor des_gamma = { 0.75 };
-	tensor des_g = { 1 };
-	tensor des_s = { 0.1, 0.5, 0.1 };
+	tensor x_0 = { 0, 1, 2, 3, 4 };
+	tensor des_k_0 = { 0, 1, 2, 3, 4 };
+	tensor des_beta_0 = { 3 };
+	tensor des_gamma_0 = { 0.75 };
+	tensor des_g_0 = { 1 };
+	tensor des_s_0 = { 0.1, 0.5, 0.1 };
+
+	tensor x_1 = { 1, 2, 3, 4, 5 };
+	tensor des_k_1 = { 5, 4, 3, 2, 1 };
+	tensor des_beta_1 = { 9 };
+	tensor des_gamma_1 = { 0.99 };
+	tensor des_g_1 = { 0 };
+	tensor des_s_1 = { 0.5, 0.2, 0.9 };
 
 	vector<param_sgd*> pv;
 	uniform_real_distribution<double> urd(-1, 1);
 
-	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv));
+	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.000002, 0), pv));
 	nrh.compile();
-
-	tensor x = { 0, 1, 2, 3, 4 };
-
-	tensor k_des = { 1, 2, 3, 4, 5 };
-	tensor beta_des = { 2 };
-	tensor gamma_des = { 3 };
-	tensor g_des = { 0.5 };
-	tensor s_des = { 0.1, 0.2, 0.3 };
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
 
-		nrh.fwd(x);
+		double cost = 0;
 
-		nrh.k_grad.pop(nrh.k.sub_1d(k_des));
-		nrh.beta_grad.pop(nrh.beta.sub_1d(beta_des));
-		nrh.gamma_grad.pop(nrh.gamma.sub_1d(gamma_des));
-		nrh.g_grad.pop(nrh.g.sub_1d(g_des));
-		nrh.s_grad.pop(nrh.s.sub_1d(s_des));
+			nrh.fwd(x_0);
 
-		nrh.bwd();
+			nrh.k_grad.pop(nrh.k.sub_1d(des_k_0));
+			nrh.beta_grad.pop(nrh.beta.sub_1d(des_beta_0));
+			nrh.gamma_grad.pop(nrh.gamma.sub_1d(des_gamma_0));
+			nrh.g_grad.pop(nrh.g.sub_1d(des_g_0));
+			nrh.s_grad.pop(nrh.s.sub_1d(des_s_0));
 
-		for (param_sgd* pmt : pv)
-			pmt->update();
+			nrh.bwd();
 
-		if (epoch % 10000 == 0) {
-			double cost =
+			cost +=
 				nrh.k_grad.abs_1d().sum_1d() +
 				nrh.beta_grad.abs_1d().sum_1d() +
 				nrh.gamma_grad.abs_1d().sum_1d() +
 				nrh.g_grad.abs_1d().sum_1d() +
 				nrh.s_grad.abs_1d().sum_1d();
+
+			nrh.fwd(x_1);
+
+			nrh.k_grad.pop(nrh.k.sub_1d(des_k_1));
+			nrh.beta_grad.pop(nrh.beta.sub_1d(des_beta_1));
+			nrh.gamma_grad.pop(nrh.gamma.sub_1d(des_gamma_1));
+			nrh.g_grad.pop(nrh.g.sub_1d(des_g_1));
+			nrh.s_grad.pop(nrh.s.sub_1d(des_s_1));
+
+			nrh.bwd();
+
+			cost +=
+				nrh.k_grad.abs_1d().sum_1d() +
+				nrh.beta_grad.abs_1d().sum_1d() +
+				nrh.gamma_grad.abs_1d().sum_1d() +
+				nrh.g_grad.abs_1d().sum_1d() +
+				nrh.s_grad.abs_1d().sum_1d();
+
+
+		for (param_sgd* pmt : pv)
+			pmt->update();
+
+
+		if (epoch % 10000 == 0) {
 			std::cout << cost << std::endl;
 		}
 
 	}
-
-
-	std::cout <<
-		"FINALLY: " << std::endl <<
-		k_des.to_string() << std::endl <<
-		nrh.k.to_string() << std::endl << std::endl <<
-		beta_des.to_string() << std::endl <<
-		nrh.beta.to_string() << std::endl << std::endl <<
-		gamma_des.to_string() << std::endl <<
-		nrh.gamma.to_string() << std::endl << std::endl <<
-		g_des.to_string() << std::endl <<
-		nrh.g.to_string() << std::endl << std::endl <<
-		s_des.to_string() << std::endl <<
-		nrh.s.to_string() << std::endl << std::endl;
 
 }
 
@@ -2120,13 +2128,11 @@ void ntm_wh_test() {
 
 }
 
-
-
 int main() {
 
 	srand(time(NULL));
 	
-	ntm_rh_test();
+	ntm_wh_test();
 
 	return 0;
 

@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "ntm_rh.h"
+#include "weight.h"
 #include "pseudo.h"
 
 using aurora::models::ntm_rh;
+using aurora::models::weight;
 
 ntm_rh::~ntm_rh() {
 
@@ -35,9 +37,9 @@ ntm_rh::ntm_rh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>
 	gamma_grad = tensor::new_1d(1);
 	a_dims.push_back(y_units);
 
-	internal_model = pseudo::tnn(a_dims, pseudo::nth(), a_func);
-	lr_layer = new layer(lr_units, pseudo::nlr(0.3), a_func);
-	sm_layer = new layer(sm_units, pseudo::nsm(), a_func);
+	internal_model = pseudo::tnn_no_output(a_dims, pseudo::nth(), a_func);
+	lr_layer = new layer(lr_units, new sequential{ new weight(), pseudo::nlr(0.3) }, a_func);
+	sm_layer = new layer(sm_units, new sequential{ new weight(), pseudo::nsm() }, a_func);
 }
 
 void ntm_rh::pmt_wise(function<void(ptr<param>&)> a_func) {

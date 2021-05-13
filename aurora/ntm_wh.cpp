@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "ntm_wh.h"
+#include "weight.h"
 #include "pseudo.h"
 
 using aurora::models::ntm_wh;
+using aurora::models::weight;
 
 ntm_wh::~ntm_wh() {
 
@@ -36,9 +38,9 @@ ntm_wh::ntm_wh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>
 
 	a_dims.push_back(y_units);
 
-	internal_model = pseudo::tnn(a_dims, pseudo::nth(), a_func);
-	lr_layer = new layer(lr_units, pseudo::nlr(0.3), a_func);
-	sm_layer = new layer(sm_units, pseudo::nsm(), a_func);
+	internal_model = pseudo::tnn_no_output(a_dims, pseudo::nth(), a_func);
+	lr_layer = new layer(lr_units, new sequential{ new weight(), pseudo::nlr(0.3) }, a_func);
+	sm_layer = new layer(sm_units, new sequential{ new weight(), pseudo::nsm() }, a_func);
 
 }
 
