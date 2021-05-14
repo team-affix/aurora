@@ -402,10 +402,22 @@ tensor tensor::div_1d(tensor a_other) {
 	return result;
 }
 
+tensor tensor::pow_1d(tensor a_other) {
+	tensor result = new_1d(vec().size());
+	pow_1d(a_other, result);
+	return result;
+}
+
 void tensor::div_1d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
 		a_output[i].val() = vec().at(i).val() / a_other.vec().at(i).val();
+}
+
+void tensor::pow_1d(tensor a_other, tensor& a_output) {
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
+		a_output[i].val() = pow(at(i).val(), a_other.at(i).val());
 }
 
 tensor tensor::dot_1d(tensor a_other) {
@@ -463,10 +475,22 @@ tensor tensor::div_2d(tensor a_other) {
 	return result;
 }
 
+tensor tensor::pow_2d(tensor a_other) {
+	tensor result = new_2d(vec().size(), vec().at(0).size());
+	pow_2d(a_other, result);
+	return result;
+}
+
 void tensor::div_2d(tensor a_other, tensor& a_output) {
 	assert(vec().size() == a_other.vec().size());
 	for (int i = 0; i < vec().size(); i++)
 		at(i).div_1d(a_other.at(i), a_output.at(i));
+}
+
+void tensor::pow_2d(tensor a_other, tensor& a_output) {
+	assert(vec().size() == a_other.vec().size());
+	for (int i = 0; i < vec().size(); i++)
+		at(i).pow_1d(a_other.at(i), a_output.at(i));
 }
 
 tensor tensor::dot_2d(tensor a_other) {

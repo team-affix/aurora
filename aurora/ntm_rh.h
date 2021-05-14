@@ -11,7 +11,6 @@ namespace aurora {
 		class ntm_rh : public model {
 		public:
 			size_t units;
-			size_t y_units;
 			size_t s_units;
 			size_t lr_units;
 			size_t sm_units;

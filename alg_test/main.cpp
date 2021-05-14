@@ -2139,6 +2139,38 @@ void ntm_wh_test() {
 }
 
 void ntm_addresser_test() {
+	tensor m = {
+		{0, 1, 2},
+		{3, 4, 5},
+		{6, 7, 8},
+		{9, 10, 11},
+		{12, 13, 14}
+	};
+	tensor k = { 3, 4, 1 };
+	tensor beta = { 20 };
+	tensor g = { 0.1 };
+	tensor s = { 0.1, 0.2, 0.3 };
+	tensor gamma = { 1 };
+
+	vector<int> valid_shifts = { -1, 0, 1 };
+
+	ntm_addresser addr = ntm_addresser(m.height(), m.width(), valid_shifts);
+	addr.compile();
+
+	addr.m.group_join(m);
+	addr.k.group_join(k);
+	addr.beta.group_join(beta);
+	addr.g.group_join(g);
+	addr.s.group_join(s);
+	addr.gamma.group_join(gamma);
+
+	tensor y_des = { 0.1, 0.2, 0.3, 0.4, 0.5 };
+
+	for (int epoch = 0; epoch < 1000000; epoch++) {
+		addr.fwd();
+		addr.signal(y_des);
+		addr.bwd();
+	}
 
 }
 
@@ -2146,7 +2178,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_wh_test();
+	ntm_addresser_test();
 
 	return 0;
 

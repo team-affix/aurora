@@ -115,11 +115,13 @@ namespace aurora {
 			void sub_1d(tensor a_other, tensor& a_output);
 			void mul_1d(tensor a_other, tensor& a_output);
 			void div_1d(tensor a_other, tensor& a_output);
+			void pow_1d(tensor a_other, tensor& a_output);
 			void dot_1d(tensor a_other, tensor& a_output);
 			void add_2d(tensor a_other, tensor& a_output);
 			void sub_2d(tensor a_other, tensor& a_output);
 			void mul_2d(tensor a_other, tensor& a_output);
 			void div_2d(tensor a_other, tensor& a_output);
+			void pow_2d(tensor a_other, tensor& a_output);
 			void dot_2d(tensor a_other, tensor& a_output);
 			void concat(tensor& a_other, tensor& a_output);
 
@@ -128,11 +130,13 @@ namespace aurora {
 			tensor sub_1d(tensor a_other);
 			tensor mul_1d(tensor a_other);
 			tensor div_1d(tensor a_other);
+			tensor pow_1d(tensor a_other);
 			tensor dot_1d(tensor a_other);
 			tensor add_2d(tensor a_other);
 			tensor sub_2d(tensor a_other);
 			tensor mul_2d(tensor a_other);
 			tensor div_2d(tensor a_other);
+			tensor pow_2d(tensor a_other);
 			tensor dot_2d(tensor a_other);
 			double cos_sim(tensor& a_other);
 			tensor concat(tensor& a_other);

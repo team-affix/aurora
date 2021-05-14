@@ -12,7 +12,6 @@ ntm_rh::~ntm_rh() {
 
 ntm_rh::ntm_rh() {
 	units = 0;
-	y_units = 0;
 	s_units = 0;
 	lr_units = 0;
 	sm_units = 0;
@@ -23,7 +22,6 @@ ntm_rh::ntm_rh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>
 	s_units = a_s_units;
 	lr_units = units + 2;
 	sm_units = s_units + 1;
-	y_units = lr_units + sm_units;
 	
 	vector<size_t> lr_dims = a_dims;
 	vector<size_t> sm_dims = a_dims;
@@ -135,8 +133,8 @@ void ntm_rh::compile() {
 	
 	x = tensor::new_1d(units);
 	x_grad = tensor::new_1d(units);
-	y = tensor::new_1d(y_units);
-	y_grad = tensor::new_1d(y_units);
+	y = tensor::new_1d(lr_units + sm_units);
+	y_grad = tensor::new_1d(lr_units + sm_units);
 
 	k = tensor::new_1d(units);
 	k_grad = tensor::new_1d(units);

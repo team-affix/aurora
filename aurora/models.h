@@ -18,3 +18,4 @@
 #include "att_lstm.h"
 #include "ntm_rh.h"
 #include "ntm_wh.h"
+#include "ntm_addresser.h"
