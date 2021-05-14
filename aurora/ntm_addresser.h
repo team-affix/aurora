@@ -16,6 +16,7 @@ namespace aurora {
 
 		public:
 			tensor m;
+			tensor m_grad;
 			// LR, SIZE == units
 			tensor k;
 			tensor k_grad;

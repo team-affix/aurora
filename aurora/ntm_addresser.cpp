@@ -95,6 +95,7 @@ void ntm_addresser::bwd() {
 	sharp_normalize_grad.add_1d(y_grad, sharp_normalize_grad);
 	sharp_normalize_grad.add_1d(wy_grad, sharp_normalize_grad);
 	bwd_sharp_normalize();
+	sharp_normalize_grad.clear();
 	bwd_sharp();
 	bwd_shift();
 	bwd_interpolate();
@@ -106,16 +107,21 @@ void ntm_addresser::bwd() {
 
 void ntm_addresser::bwd_similar() {
 	k_grad.clear();
+	m_grad.clear();
 	for (int i = 0; i < k.size(); i++)
 		for (int j = 0; j < m.height(); j++) {
 			tensor& slot = m[j];
 			double& mag_product = magnitude_product_vector[j];
 			double& dot_product = dot_product_vector[j];
 			double& mem_mag = memory_magnitude_vector[j];
-			double a = slot[i] / mag_product;
-			double b = dot_product * mem_mag * k[i];
-			double c = pow(mag_product, 2) * key_magnitude;
-			k_grad[i].val() += similar_grad[j] * (a - b / c);
+			double k_a = slot[i] / mag_product;
+			double k_b = dot_product * k[i];
+			double k_c = mem_mag * pow(key_magnitude, 3);
+			k_grad[i].val() += similar_grad[j] * (k_a - k_b / k_c);
+			double m_a = k[i] / mag_product;
+			double m_b = dot_product * slot[i];
+			double m_c = key_magnitude * pow(mem_mag, 3);
+			m_grad[j][i].val() += similar_grad[j] * (m_a - m_b / m_c);
 		}
 }
 
@@ -130,7 +136,7 @@ void ntm_addresser::bwd_sparse() {
 void ntm_addresser::bwd_sparse_normalize() {
 	for (int i = 0; i < sparse_normalize_grad.size(); i++)
 		sparse_grad[i].val() =
-			sparse_normalize_grad[i] * (sparse_sum - sparse[i]) / sparse_sum;
+			sparse_normalize_grad[i] * (sparse_sum - sparse[i]) / pow(sparse_sum, 2);
 }
 
 void ntm_addresser::bwd_interpolate() {
@@ -160,15 +166,15 @@ void ntm_addresser::bwd_shift() {
 void ntm_addresser::bwd_sharp() {
 	gamma_grad.clear();
 	for (int i = 0; i < sharpen_grad.size(); i++) {
-		shift_grad[i].val() = gamma[0] * pow(shift[i], gamma[0] - 1);
-		gamma_grad[0].val() += log(shift[i]) * sharpen[i];
+		shift_grad[i].val() = sharpen_grad[i] * gamma[0] * pow(shift[i], gamma[0] - 1);
+		gamma_grad[0].val() += sharpen_grad[i] * log(shift[i]) * sharpen[i];
 	}
 }
 
 void ntm_addresser::bwd_sharp_normalize() {
 	for (int i = 0; i < sharp_normalize_grad.size(); i++)
 		sharpen_grad[i].val() =
-		sharp_normalize_grad[i] * (sharpen_sum - sharpen[i]) / sharpen_sum;
+		sharp_normalize_grad[i] * (sharpen_sum - sharpen[i]) / pow(sharpen_sum, 2);
 }
 
 tensor& ntm_addresser::fwd(tensor& a_x) {
@@ -203,6 +209,8 @@ void ntm_addresser::compile() {
 	y = tensor::new_1d(m_height);
 	y_grad = tensor::new_1d(m_height);
 
+	m = tensor::new_2d(m_height, m_width);
+	m_grad = tensor::new_2d(m_height, m_width);
 	k = tensor::new_1d(m_width);
 	k_grad = tensor::new_1d(m_width);
 	beta = tensor::new_1d(1);

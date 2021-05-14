@@ -2139,40 +2139,63 @@ void ntm_wh_test() {
 }
 
 void ntm_addresser_test() {
-	tensor m = {
-		{0, 1, 2},
-		{3, 4, 5},
-		{6, 7, 8},
-		{9, 10, 11},
-		{12, 13, 14}
-	};
-	tensor k = { 3, 4, 1 };
-	tensor beta = { 20 };
-	tensor g = { 0.1 };
-	tensor s = { 0.1, 0.2, 0.3 };
-	tensor gamma = { 1 };
+
+	uniform_real_distribution<double> urd(-1, 1);
+
+	tensor x = { 1, 2, 3, 4, 5 };
+	tensor m = tensor::new_2d(6, 5, urd, aurora::static_vals::aurora_random_engine);
 
 	vector<int> valid_shifts = { -1, 0, 1 };
 
+	const double learn_rate = 0.02;
+
+	vector<param_sgd*> pv;
+
+	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, valid_shifts.size(), INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), learn_rate, 0), pv));
 	ntm_addresser addr = ntm_addresser(m.height(), m.width(), valid_shifts);
+	nrh.compile();
 	addr.compile();
 
 	addr.m.group_join(m);
-	addr.k.group_join(k);
-	addr.beta.group_join(beta);
-	addr.g.group_join(g);
-	addr.s.group_join(s);
-	addr.gamma.group_join(gamma);
+	addr.k.group_join(nrh.k);
+	addr.beta.group_join(nrh.beta);
+	addr.g.group_join(nrh.g);
+	addr.s.group_join(nrh.s);
+	addr.gamma.group_join(nrh.gamma);
+	addr.k_grad.group_join(nrh.k_grad);
+	addr.beta_grad.group_join(nrh.beta_grad);
+	addr.g_grad.group_join(nrh.g_grad);
+	addr.s_grad.group_join(nrh.s_grad);
+	addr.gamma_grad.group_join(nrh.gamma_grad);
 
-	tensor y_des = { 0.1, 0.2, 0.3, 0.4, 0.5 };
+	tensor y_des = { 0, 0, 0.1, 0, 0, 0.9 };
+
+	tensor k_lr_vector = tensor::new_1d(nrh.k.size(), learn_rate);
+	tensor beta_lr_vector = tensor::new_1d(nrh.beta.size(), learn_rate);
+	tensor g_lr_vector = tensor::new_1d(nrh.g.size(), learn_rate);
+	tensor s_lr_vector = tensor::new_1d(nrh.s.size(), learn_rate);
+	tensor gamma_lr_vector = tensor::new_1d(nrh.gamma.size(), learn_rate);
+	tensor m_lr_matrix = tensor::new_2d(m.height(), m.width(), learn_rate);
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
+
+		nrh.fwd(x);
 		addr.fwd();
 		addr.signal(y_des);
 		addr.bwd();
+		nrh.bwd();
+
+		if(epoch % 1000 == 0)
+			std::cout << addr.y_grad.abs_1d().sum_1d() << std::endl;
+
+		for (param_sgd* pmt : pv)
+			pmt->update();
+
 	}
 
 }
+
+
 
 int main() {
 
