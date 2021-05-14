@@ -209,15 +209,11 @@ void tnn_test() {
 	};
 
 	vector<param_mom*> pl = vector<param_mom*>();
+	uniform_real_distribution<double> urd(-1, 1);
 
-	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), initialization::dump_pmt(pl));
-
-	double state_structure = 1 / (double)pl.size();
-	uniform_real_distribution<double> urd(-state_structure, state_structure);
-
-	s->pmt_wise(initialization::init_pmt(urd, 0.02));
-
-	printf("");
+	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), INIT_PMT(param_mom(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9),
+		pl));
+	s->compile();
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
 
@@ -226,8 +222,16 @@ void tnn_test() {
 			std::cout << epoch << std::endl;
 		}
 
-		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++)
+		double cost = 0;
+
+		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
 			s->cycle(x[tsIndex], y[tsIndex]);
+			cost += s->y_grad.abs_1d().sum_1d();
+		}
+
+		if (epoch % 10000 == 0) {
+			std::cout << cost << std::endl;
+		}
 
 		for (param_mom* pmt : pl) {
 			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
@@ -2143,7 +2147,10 @@ void ntm_addresser_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 
 	tensor x = { 1, 2, 3, 4, 5 };
+	tensor y_des = { 0, 0, 0, 0, 0, 1 };
+
 	tensor m = tensor::new_2d(6, 5, urd, aurora::static_vals::aurora_random_engine);
+	tensor m_grad = tensor::new_2d(6, 5, 0);
 
 	vector<int> valid_shifts = { -1, 0, 1 };
 
@@ -2151,42 +2158,22 @@ void ntm_addresser_test() {
 
 	vector<param_sgd*> pv;
 
-	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, valid_shifts.size(), INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), learn_rate, 0), pv));
-	ntm_addresser addr = ntm_addresser(m.height(), m.width(), valid_shifts);
-	nrh.compile();
-	addr.compile();
+	ntm_rh* nrh = new ntm_rh({ 5, 6, 7 }, valid_shifts.size(), INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), learn_rate, 0), pv));
+	ntm_addresser* addr = new ntm_addresser(m.height(), m.width(), valid_shifts);
+	
+	sequential s { nrh, addr };
+	s.compile();
 
-	addr.m.group_join(m);
-	addr.k.group_join(nrh.k);
-	addr.beta.group_join(nrh.beta);
-	addr.g.group_join(nrh.g);
-	addr.s.group_join(nrh.s);
-	addr.gamma.group_join(nrh.gamma);
-	addr.k_grad.group_join(nrh.k_grad);
-	addr.beta_grad.group_join(nrh.beta_grad);
-	addr.g_grad.group_join(nrh.g_grad);
-	addr.s_grad.group_join(nrh.s_grad);
-	addr.gamma_grad.group_join(nrh.gamma_grad);
+	addr->m.group_join(m);
+	addr->m_grad.group_join(m_grad);
 
-	tensor y_des = { 0, 0, 0.1, 0, 0, 0.9 };
-
-	tensor k_lr_vector = tensor::new_1d(nrh.k.size(), learn_rate);
-	tensor beta_lr_vector = tensor::new_1d(nrh.beta.size(), learn_rate);
-	tensor g_lr_vector = tensor::new_1d(nrh.g.size(), learn_rate);
-	tensor s_lr_vector = tensor::new_1d(nrh.s.size(), learn_rate);
-	tensor gamma_lr_vector = tensor::new_1d(nrh.gamma.size(), learn_rate);
-	tensor m_lr_matrix = tensor::new_2d(m.height(), m.width(), learn_rate);
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
 
-		nrh.fwd(x);
-		addr.fwd();
-		addr.signal(y_des);
-		addr.bwd();
-		nrh.bwd();
+		s.cycle(x, y_des);
 
 		if(epoch % 1000 == 0)
-			std::cout << addr.y_grad.abs_1d().sum_1d() << std::endl;
+			std::cout << s.y_grad.abs_1d().sum_1d() << std::endl;
 
 		for (param_sgd* pmt : pv)
 			pmt->update();
@@ -2195,13 +2182,11 @@ void ntm_addresser_test() {
 
 }
 
-
-
 int main() {
 
 	srand(time(NULL));
 	
-	ntm_addresser_test();
+	tnn_test();
 
 	return 0;
 

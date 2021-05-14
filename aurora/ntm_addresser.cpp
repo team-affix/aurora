@@ -206,6 +206,8 @@ void ntm_addresser::recur(function<void(model*)> a_func) {
 
 void ntm_addresser::compile() {
 
+	x = tensor::new_1d(m_width + valid_shifts.size() + 3);
+	x_grad = tensor::new_1d(m_width + valid_shifts.size() + 3);
 	y = tensor::new_1d(m_height);
 	y_grad = tensor::new_1d(m_height);
 
@@ -253,6 +255,21 @@ void ntm_addresser::compile() {
 
 	y.group_join(wy);
 	y.group_join(sharp_normalize);
+
+	tensor x_range = k
+		.concat(beta)
+		.concat(gamma)
+		.concat(g)
+		.concat(s);
+	tensor x_grad_range =
+		k_grad
+		.concat(beta_grad)
+		.concat(gamma_grad)
+		.concat(g_grad)
+		.concat(s_grad);
+
+	x.group_join_all_ranks(x_range);
+	x_grad.group_join_all_ranks(x_grad_range);
 
 }
 

@@ -89,11 +89,11 @@ void sequential::compile() {
 	tensor* gradient = &x_grad;
 	for (int i = 0; i < models.size(); i++) {
 		models[i]->compile();
-		models[i]->x.group_add(*state);
-		models[i]->x_grad.group_add(*gradient);
+		models[i]->x.group_add_all_ranks(*state);
+		models[i]->x_grad.group_add_all_ranks(*gradient);
 		state = &models[i]->y;
 		gradient = &models[i]->y_grad;
 	}
-	state->group_add(y);
-	gradient->group_add(y_grad);
+	state->group_add_all_ranks(y);
+	gradient->group_add_all_ranks(y_grad);
 }
