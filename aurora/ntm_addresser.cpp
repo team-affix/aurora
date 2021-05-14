@@ -122,14 +122,14 @@ void ntm_addresser::bwd_similar() {
 void ntm_addresser::bwd_sparse() {
 	beta_grad.clear();
 	for (int i = 0; i < sparse_grad.size(); i++) {
-		similar_grad[i].val() = beta[0] * sparse[i];
-		beta_grad[0].val() += similar[i] * sparse[i];
+		similar_grad[i].val() = beta[0] * sparse_grad[i];
+		beta_grad[0].val() += similar[i] * sparse_grad[i];
 	}
 }
 
 void ntm_addresser::bwd_sparse_normalize() {
 	for (int i = 0; i < sparse_normalize_grad.size(); i++)
-		sparse_grad[i].val() = 
+		sparse_grad[i].val() =
 			sparse_normalize_grad[i] * (sparse_sum - sparse[i]) / sparse_sum;
 }
 
