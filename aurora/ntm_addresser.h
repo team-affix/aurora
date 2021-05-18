@@ -8,15 +8,15 @@ namespace aurora {
 	namespace models {
 		class ntm_addresser : public model {
 		public:
-			size_t m_width = 0;
-			size_t m_height = 0;
+			size_t memory_height = 0;
+			size_t memory_width = 0;
 
 		public:
 			vector<int> valid_shifts;
 
 		public:
-			tensor m;
-			tensor m_grad;
+			tensor mx;
+			tensor mx_grad;
 			// LR, SIZE == units
 			tensor k;
 			tensor k_grad;

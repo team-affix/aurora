@@ -42,9 +42,11 @@
     <ClInclude Include="models.h" />
     <ClInclude Include="neuron.h" />
     <ClInclude Include="ntm_addresser.h" />
+    <ClInclude Include="ntm_reader.h" />
     <ClInclude Include="ntm_rh.h" />
     <ClInclude Include="ntm_ts.h" />
     <ClInclude Include="ntm_wh.h" />
+    <ClInclude Include="ntm_writer.h" />
     <ClInclude Include="params.h" />
     <ClInclude Include="param_mom_mt.h" />
     <ClInclude Include="param_sgd_mt.h" />
@@ -79,9 +81,11 @@
     <ClCompile Include="lstm_ts.cpp" />
     <ClCompile Include="neuron.cpp" />
     <ClCompile Include="ntm_addresser.cpp" />
+    <ClCompile Include="ntm_reader.cpp" />
     <ClCompile Include="ntm_rh.cpp" />
     <ClCompile Include="ntm_ts.cpp" />
     <ClCompile Include="ntm_wh.cpp" />
+    <ClCompile Include="ntm_writer.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_init.cpp" />
     <ClCompile Include="param_mom.cpp" />

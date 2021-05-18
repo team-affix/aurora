@@ -19,3 +19,4 @@
 #include "ntm_rh.h"
 #include "ntm_wh.h"
 #include "ntm_addresser.h"
+#include "ntm_ts.h"

@@ -40,7 +40,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~ntm_rh();
 			ntm_rh();
-			ntm_rh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>&)> a_func);
+			ntm_rh(size_t a_units, vector<size_t> a_h_dims, size_t a_s_units, function<void(ptr<param>&)> a_func);
 
 		};
 	}

@@ -139,7 +139,7 @@ namespace aurora {
 			tensor pow_2d(tensor a_other);
 			tensor dot_2d(tensor a_other);
 			double cos_sim(tensor& a_other);
-			tensor concat(tensor& a_other);
+			tensor concat(tensor a_other);
 
 		public:
 			void link(tensor& a_other);

@@ -4,7 +4,7 @@
 
 int main() {
 
-	std::cout << helper::model_impl("ntm_addresser", helper::model) << std::endl;
+	std::cout << helper::model_impl("ntm_writer", helper::model) << std::endl;
 
 	return 0;
 }

@@ -14,11 +14,14 @@ ntm_wh::ntm_wh() {
 
 }
 
-ntm_wh::ntm_wh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>&)> a_func) {
-	units = a_dims[0];
+ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_h_dims, size_t a_s_units, function<void(ptr<param>&)> a_func) {
+	units = a_units;
 	s_units = a_s_units;
 	lr_units = units + units + 2;
 	sm_units = s_units + units + 1;
+
+	vector<size_t> a_dims = a_h_dims;
+	a_dims.insert(a_dims.begin(), a_units);
 
 	vector<size_t> lr_dims = a_dims;
 	vector<size_t> sm_dims = a_dims;
@@ -111,8 +114,8 @@ void ntm_wh::compile() {
 	lr_model->compile();
 	sm_model->compile();
 
-	tensor y_range = lr_model->y.concat(sm_model->y);
-	tensor y_grad_range = lr_model->y_grad.concat(sm_model->y_grad);
+	tensor y_range = lr_model->y.range(0, lr_units - units).concat(sm_model->y.range(0, sm_units - units));
+	tensor y_grad_range = lr_model->y_grad.range(0, lr_units - units).concat(sm_model->y_grad.range(0, sm_units - units));
 
 	x.group_join(lr_model->x);
 	x.group_join(sm_model->x);

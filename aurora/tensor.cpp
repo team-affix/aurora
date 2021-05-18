@@ -520,7 +520,7 @@ double tensor::cos_sim(tensor& a_other) {
 	return dot / (mag_a * mag_b);
 }
 
-tensor tensor::concat(tensor& a_other) {
+tensor tensor::concat(tensor a_other) {
 	tensor result = tensor::new_1d(size() + a_other.size());
 	concat(a_other, result);
 	return result;

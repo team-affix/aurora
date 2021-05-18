@@ -12,8 +12,8 @@ ntm_addresser::ntm_addresser() {
 }
 
 ntm_addresser::ntm_addresser(size_t a_height, size_t a_width, vector<int> a_valid_shifts) {
-	m_height = a_height;
-	m_width = a_width;
+	memory_height = a_height;
+	memory_width = a_width;
 	valid_shifts = a_valid_shifts;
 }
 
@@ -22,12 +22,12 @@ void ntm_addresser::pmt_wise(function<void(ptr<param>&)> a_func) {
 }
 
 model* ntm_addresser::clone() {
-	ntm_addresser* result = new ntm_addresser(m_height, m_width, valid_shifts);
+	ntm_addresser* result = new ntm_addresser(memory_height, memory_width, valid_shifts);
 	return result;
 }
 
 model* ntm_addresser::clone(function<void(ptr<param>&)> a_func) {
-	ntm_addresser* result = new ntm_addresser(m_height, m_width, valid_shifts);
+	ntm_addresser* result = new ntm_addresser(memory_height, memory_width, valid_shifts);
 	return result;
 }
 
@@ -43,10 +43,10 @@ void ntm_addresser::fwd() {
 
 void ntm_addresser::fwd_similar() {
 	key_magnitude = k.mag_1d();
-	for (int i = 0; i < m.height(); i++) {
-		memory_magnitude_vector[i].val() = m[i].mag_1d();
+	for (int i = 0; i < mx.height(); i++) {
+		memory_magnitude_vector[i].val() = mx[i].mag_1d();
 		magnitude_product_vector[i].val() = key_magnitude * memory_magnitude_vector[i];
-		dot_product_vector[i].val() = k.dot_1d(m[i]);
+		dot_product_vector[i].val() = k.dot_1d(mx[i]);
 		similar[i].val() = dot_product_vector[i] / (key_magnitude * memory_magnitude_vector[i]);
 	}
 }
@@ -107,10 +107,10 @@ void ntm_addresser::bwd() {
 
 void ntm_addresser::bwd_similar() {
 	k_grad.clear();
-	m_grad.clear();
+	mx_grad.clear();
 	for (int i = 0; i < k.size(); i++)
-		for (int j = 0; j < m.height(); j++) {
-			tensor& slot = m[j];
+		for (int j = 0; j < mx.height(); j++) {
+			tensor& slot = mx[j];
 			double& mag_product = magnitude_product_vector[j];
 			double& dot_product = dot_product_vector[j];
 			double& mem_mag = memory_magnitude_vector[j];
@@ -121,7 +121,7 @@ void ntm_addresser::bwd_similar() {
 			double m_a = k[i] / mag_product;
 			double m_b = dot_product * slot[i];
 			double m_c = key_magnitude * pow(mem_mag, 3);
-			m_grad[j][i].val() += similar_grad[j] * (m_a - m_b / m_c);
+			mx_grad[j][i].val() += similar_grad[j] * (m_a - m_b / m_c);
 		}
 }
 
@@ -206,15 +206,15 @@ void ntm_addresser::recur(function<void(model*)> a_func) {
 
 void ntm_addresser::compile() {
 
-	x = tensor::new_1d(m_width + valid_shifts.size() + 3);
-	x_grad = tensor::new_1d(m_width + valid_shifts.size() + 3);
-	y = tensor::new_1d(m_height);
-	y_grad = tensor::new_1d(m_height);
+	x = tensor::new_1d(memory_width + valid_shifts.size() + 3);
+	x_grad = tensor::new_1d(memory_width + valid_shifts.size() + 3);
+	y = tensor::new_1d(memory_height);
+	y_grad = tensor::new_1d(memory_height);
 
-	m = tensor::new_2d(m_height, m_width);
-	m_grad = tensor::new_2d(m_height, m_width);
-	k = tensor::new_1d(m_width);
-	k_grad = tensor::new_1d(m_width);
+	mx = tensor::new_2d(memory_height, memory_width);
+	mx_grad = tensor::new_2d(memory_height, memory_width);
+	k = tensor::new_1d(memory_width);
+	k_grad = tensor::new_1d(memory_width);
 	beta = tensor::new_1d(1);
 	beta_grad = tensor::new_1d(1);
 	g = tensor::new_1d(1);
@@ -224,34 +224,34 @@ void ntm_addresser::compile() {
 	gamma = tensor::new_1d(1);
 	gamma_grad = tensor::new_1d(1);
 
-	wx = tensor::new_1d(m_height);
-	wx_grad = tensor::new_1d(m_height);
-	wy = tensor::new_1d(m_height);
-	wy_grad = tensor::new_1d(m_height);
+	wx = tensor::new_1d(memory_height);
+	wx_grad = tensor::new_1d(memory_height);
+	wy = tensor::new_1d(memory_height);
+	wy_grad = tensor::new_1d(memory_height);
 
-	memory_magnitude_vector = tensor::new_1d(m_height);
-	magnitude_product_vector = tensor::new_1d(m_height);
-	dot_product_vector = tensor::new_1d(m_height);
-	similar = tensor::new_1d(m_height);
-	similar_grad = tensor::new_1d(m_height);
+	memory_magnitude_vector = tensor::new_1d(memory_height);
+	magnitude_product_vector = tensor::new_1d(memory_height);
+	dot_product_vector = tensor::new_1d(memory_height);
+	similar = tensor::new_1d(memory_height);
+	similar_grad = tensor::new_1d(memory_height);
 
-	sparse = tensor::new_1d(m_height);
-	sparse_grad = tensor::new_1d(m_height);
+	sparse = tensor::new_1d(memory_height);
+	sparse_grad = tensor::new_1d(memory_height);
 
-	sparse_normalize = tensor::new_1d(m_height);
-	sparse_normalize_grad = tensor::new_1d(m_height);
+	sparse_normalize = tensor::new_1d(memory_height);
+	sparse_normalize_grad = tensor::new_1d(memory_height);
 
-	interpolate = tensor::new_1d(m_height);
-	interpolate_grad = tensor::new_1d(m_height);
+	interpolate = tensor::new_1d(memory_height);
+	interpolate_grad = tensor::new_1d(memory_height);
 
-	shift = tensor::new_1d(m_height);
-	shift_grad = tensor::new_1d(m_height);
+	shift = tensor::new_1d(memory_height);
+	shift_grad = tensor::new_1d(memory_height);
 
-	sharpen = tensor::new_1d(m_height);
-	sharpen_grad = tensor::new_1d(m_height);
+	sharpen = tensor::new_1d(memory_height);
+	sharpen_grad = tensor::new_1d(memory_height);
 
-	sharp_normalize = tensor::new_1d(m_height);
-	sharp_normalize_grad = tensor::new_1d(m_height);
+	sharp_normalize = tensor::new_1d(memory_height);
+	sharp_normalize_grad = tensor::new_1d(memory_height);
 
 	y.group_join(wy);
 	y.group_join(sharp_normalize);

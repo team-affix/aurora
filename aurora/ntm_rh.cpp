@@ -17,11 +17,14 @@ ntm_rh::ntm_rh() {
 	sm_units = 0;
 }
 
-ntm_rh::ntm_rh(vector<size_t> a_dims, size_t a_s_units, function<void(ptr<param>&)> a_func) {
-	units = a_dims[0];
+ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_h_dims, size_t a_s_units, function<void(ptr<param>&)> a_func) {
+	units = a_units;
 	s_units = a_s_units;
 	lr_units = units + 2;
 	sm_units = s_units + 1;
+
+	vector<size_t> a_dims = a_h_dims;
+	a_dims.insert(a_dims.begin(), a_units);
 	
 	vector<size_t> lr_dims = a_dims;
 	vector<size_t> sm_dims = a_dims;

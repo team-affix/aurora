@@ -2004,7 +2004,7 @@ void ntm_rh_test() {
 	vector<param_sgd*> pv;
 	uniform_real_distribution<double> urd(-1, 1);
 
-	ntm_rh nrh = ntm_rh({ 5, 6, 7 }, 3,
+	ntm_rh nrh = ntm_rh(5, { 6, 7 }, 3,
 		INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv));
 	nrh.compile();
 
@@ -2082,7 +2082,7 @@ void ntm_wh_test() {
 	vector<param_sgd*> pv;
 	uniform_real_distribution<double> urd(-1, 1);
 
-	ntm_wh nwh = ntm_wh({ 5, 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
+	ntm_wh nwh = ntm_wh(5, { 6, 7 }, 3, INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
 	nwh.compile();
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
@@ -2142,7 +2142,7 @@ void ntm_wh_test() {
 
 }
 
-void ntm_addresser_test() {
+void ntm_addresser_rh_test() {
 
 	uniform_real_distribution<double> urd(-1, 1);
 
@@ -2158,21 +2158,21 @@ void ntm_addresser_test() {
 
 	vector<param_sgd*> pv;
 
-	ntm_rh* nrh = new ntm_rh({ 5, 6, 7 }, valid_shifts.size(), INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), learn_rate, 0), pv));
+	ntm_rh* nrh = new ntm_rh(5, { 6, 7 }, valid_shifts.size(), INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), learn_rate, 0), pv));
 	ntm_addresser* addr = new ntm_addresser(m.height(), m.width(), valid_shifts);
 	
 	sequential s { nrh, addr };
 	s.compile();
 
-	addr->m.group_join(m);
-	addr->m_grad.group_join(m_grad);
+	addr->mx.group_join(m);
+	addr->mx_grad.group_join(m_grad);
 
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
 
 		s.cycle(x, y_des);
 
-		if(epoch % 1000 == 0)
+		if(epoch % 10000 == 0)
 			std::cout << s.y_grad.abs_1d().sum_1d() << std::endl;
 
 		for (param_sgd* pmt : pv)
@@ -2182,11 +2182,81 @@ void ntm_addresser_test() {
 
 }
 
+void ntm_addresser_wh_test() {
+
+	uniform_real_distribution<double> urd(-0.1, 0.1);
+
+	tensor x = { 1, 2, 3, 4, 5 };
+	tensor y_des = { 0, 0, 0, 0, 0, 1 };
+
+	tensor m = tensor::new_2d(6, 5, urd, aurora::static_vals::aurora_random_engine);
+	tensor m_grad = tensor::new_2d(6, 5, 0);
+
+	vector<int> valid_shifts = { -1, 0, 1 };
+
+	const double learn_rate = 0.02;
+
+	vector<param_sgd*> pv;
+
+	ntm_wh* nwh = new ntm_wh(5, { 6, 7 }, valid_shifts.size(), INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), learn_rate, 0), pv));
+	ntm_addresser* addr = new ntm_addresser(m.height(), m.width(), valid_shifts);
+
+	sequential s { nwh, addr };
+	s.compile();
+
+	addr->mx.group_join(m);
+	addr->mx_grad.group_join(m_grad);
+
+
+	for (int epoch = 0; epoch < 1000000; epoch++) {
+
+		s.cycle(x, y_des);
+
+		if (epoch % 10000 == 0)
+			std::cout << s.y_grad.abs_1d().sum_1d() << std::endl;
+
+		for (param_sgd* pmt : pv)
+			pmt->update();
+
+	}
+
+}
+
+void ntm_ts_test() {
+
+	tensor x_0 = { 1, 2, 3, 4, 5 };
+	vector<int> valid_shifts = { -1, 0, 1 };
+
+	uniform_real_distribution<double> pmt_urd(-1, 1);
+	uniform_real_distribution<double> mem_urd(-1, 1);
+
+	vector<param_sgd*> pv;
+
+	auto init_pmt = INIT_PMT(param_sgd(pmt_urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv);
+
+	ntm_ts n = ntm_ts(10, 5, 1, 1, { 6, 7, 8 }, valid_shifts, init_pmt);
+	n.compile();
+
+	tensor m = tensor::new_2d(10, 5, mem_urd, aurora::static_vals::aurora_random_engine);
+	n.mx.pop(m);
+
+	tensor y_des_0 = m[0].clone();
+
+	for (int epoch = 0; true; epoch++) {
+		n.cycle(x_0, y_des_0);
+		for (param_sgd* pmt : pv)
+			pmt->update();
+		if (epoch % 100 == 0)
+			std::cout << n.y_grad.abs_1d().sum_1d() << std::endl;
+	}
+
+}
+
 int main() {
 
 	srand(time(NULL));
 	
-	tnn_test();
+	ntm_ts_test();
 
 	return 0;
 
