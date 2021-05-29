@@ -24,3 +24,7 @@
 #include "ntm_sparsify.h"
 #include "normalize.h"
 #include "ntm_content_addresser.h"
+#include "interpolate.h"
+#include "shift.h"
+#include "power.h"
+#include "ntm_location_addresser.h"

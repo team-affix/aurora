@@ -2128,6 +2128,188 @@ void ntm_content_addresser_test() {
 
 }
 
+void interpolate_test() {
+
+	size_t units = 5;
+
+	ptr<layer> l_softmax = new layer(1, new sigmoid());
+	l_softmax->compile();
+	ptr<interpolate> l_interpolate = new interpolate(units);
+	l_interpolate->compile();
+
+	l_softmax->y.group_join(l_interpolate->amount);
+	l_softmax->y_grad.group_join(l_interpolate->amount_grad);
+
+	uniform_real_distribution<double> urd(-10, 10);
+
+	const double amount_des = 0.7;
+
+	tensor x = tensor::new_2d(2, units, urd, aurora::static_vals::aurora_random_engine);
+	tensor y = tensor::new_1d(units);
+	for (int i = 0; i < units; i++) {
+		y[i].val() = amount_des * x[0][i] + (1 - amount_des) * x[1][i];
+	}
+
+	tensor lr_tensor = tensor::new_1d(1, 0.0002);
+
+	for (int epoch = 0; true; epoch++) {
+
+		l_softmax->fwd();
+		l_interpolate->cycle(x, y);
+		l_softmax->bwd();
+
+		tensor update = l_softmax->x_grad.mul_1d(lr_tensor);
+
+		l_softmax->x.sub_1d(update, l_softmax->x);
+
+		Sleep(10);
+
+		if (epoch % 100 == 0)
+			std::cout << l_interpolate->amount.to_string() << std::endl;
+
+	}
+
+}
+
+int positive_modulo(int i, int n) {
+	return (i % n + n) % n;
+}
+
+void shift_test() {
+
+	size_t units = 5;
+	vector<int> valid_shifts = { -1, 0, 1 };
+
+	ptr<layer> l_softmax = new layer(valid_shifts.size(), new sigmoid());
+	l_softmax->compile();
+	ptr<shift> l_shift = new shift(5, valid_shifts);
+	l_shift->compile();
+
+	l_softmax->y.group_join(l_shift->amount);
+	l_softmax->y_grad.group_join(l_shift->amount_grad);
+
+	uniform_real_distribution<double> urd(0, 1);
+
+	tensor amount_des = { 0.3, 0.5, 0.9 };
+
+	tensor x = tensor::new_1d(units, urd, aurora::static_vals::aurora_random_engine);
+	tensor y = tensor::new_1d(units);
+	for (int i = 0; i < units; i++)
+		for (int j = 0; j < valid_shifts.size(); j++) {
+			int dst = positive_modulo(i + valid_shifts[j], units);
+			y[dst].val() += x[i] * amount_des[j];
+		}
+
+	tensor lr_tensor = tensor::new_1d(valid_shifts.size(), 0.02);
+
+	for (int epoch = 0; true; epoch++) {
+
+		l_softmax->fwd();
+		l_shift->cycle(x, y);
+		l_softmax->bwd();
+
+		tensor update = l_softmax->x_grad.mul_1d(lr_tensor);
+		l_softmax->x.sub_1d(update, l_softmax->x);
+
+		if (epoch % 1000 == 0)
+			std::cout << l_shift->amount.to_string() << std::endl;
+
+	}
+
+}
+
+void power_test() {
+
+	size_t units = 5;
+
+	ptr<power> p = new power(units);
+	p->compile();
+
+	uniform_real_distribution<double> urd(0, 1);
+
+	const double amount_des = 3;
+
+	tensor x = tensor::new_1d(units, urd, aurora::static_vals::aurora_random_engine);
+	tensor y = tensor::new_1d(units);
+	for (int i = 0; i < units; i++)
+		y[i].val() = pow(x[i], amount_des);
+
+	tensor lr_tensor = tensor::new_1d(1, 0.02);
+
+	for (int epoch = 0; true; epoch++) {
+
+		p->cycle(x, y);
+
+		tensor update = p->amount_grad.mul_1d(lr_tensor);
+
+		p->amount.sub_1d(update, p->amount);
+
+		if (epoch % 10000 == 0)
+			std::cout << p->amount.to_string() << std::endl;
+
+	}
+
+}
+
+void ntm_location_addresser_test() {
+
+	size_t memory_height = 10;
+	vector<int> valid_shifts = { -1, 0, 1 };
+
+	ptr<layer> l_g_sm = new layer(1, new sigmoid());
+	l_g_sm->compile();
+	ptr<layer> l_s_sm = new layer(valid_shifts.size(), new sigmoid());
+	l_s_sm->compile();
+	ptr<ntm_location_addresser> p = new ntm_location_addresser(memory_height, valid_shifts);
+	p->compile();
+
+	l_g_sm->y.group_join(p->g);
+	l_g_sm->y_grad.group_join(p->g_grad);
+
+	l_s_sm->y.group_join(p->s);
+	l_s_sm->y_grad.group_join(p->s_grad);
+
+	uniform_real_distribution<double> urd(0, 1);
+
+	p->g.pop(tensor::new_1d(1, urd, aurora::static_vals::aurora_random_engine));
+	p->s.pop(tensor::new_1d(valid_shifts.size(), urd, aurora::static_vals::aurora_random_engine));
+	p->gamma.pop(tensor::new_1d(1, urd, aurora::static_vals::aurora_random_engine));
+
+	tensor x = tensor::new_1d(memory_height, 0.1);
+	x[2].val() = 0.8;
+	tensor y = tensor::new_1d(memory_height);
+	y[1].val() = 1;
+
+	const double lr = 0.2;
+
+	tensor g_lr = tensor::new_1d(1, lr);
+	tensor s_lr = tensor::new_1d(valid_shifts.size(), lr);
+	tensor gamma_lr = tensor::new_1d(1, lr);
+
+	for (int epoch = 0; true; epoch++) {
+
+		l_g_sm->fwd();
+		l_s_sm->fwd();
+		p->cycle(x, y);
+		l_s_sm->bwd();
+		l_g_sm->bwd();
+
+		tensor g_update = l_g_sm->x_grad.mul_1d(g_lr);
+		tensor s_update = l_s_sm->x_grad.mul_1d(s_lr);
+		tensor gamma_update = p->gamma_grad.mul_1d(gamma_lr);
+
+		l_g_sm->x.sub_1d(g_update, l_g_sm->x);
+		l_s_sm->x.sub_1d(s_update, l_s_sm->x);
+		p->gamma.sub_1d(gamma_update, p->gamma);
+
+		if (epoch % 1000 == 0)
+			std::cout << y.to_string() << std::endl << p->y.to_string() 
+			<< std::endl << std::endl;
+
+	}
+
+}
+
 void ntm_rh_test() {
 
 	tensor x_0 = { 0, 1, 2, 3, 4 };
@@ -2399,7 +2581,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_content_addresser_test();
+	ntm_location_addresser_test();
 
 	return 0;
 

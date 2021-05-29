@@ -33,6 +33,7 @@
     <ClInclude Include="generation.h" />
     <ClInclude Include="genome.h" />
     <ClInclude Include="initialization.h" />
+    <ClInclude Include="interpolate.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="leaky_relu.h" />
     <ClInclude Include="lstm.h" />
@@ -44,6 +45,7 @@
     <ClInclude Include="normalize.h" />
     <ClInclude Include="ntm_addresser.h" />
     <ClInclude Include="ntm_content_addresser.h" />
+    <ClInclude Include="ntm_location_addresser.h" />
     <ClInclude Include="ntm_reader.h" />
     <ClInclude Include="ntm_rh.h" />
     <ClInclude Include="cos_sim.h" />
@@ -55,7 +57,9 @@
     <ClInclude Include="param_mom_mt.h" />
     <ClInclude Include="param_sgd_mt.h" />
     <ClInclude Include="param_init.h" />
+    <ClInclude Include="power.h" />
     <ClInclude Include="pseudo.h" />
+    <ClInclude Include="shift.h" />
     <ClInclude Include="static_vals.h" />
     <ClInclude Include="sequential.h" />
     <ClInclude Include="session.h" />
@@ -80,6 +84,7 @@
     <ClCompile Include="cos_sim.cpp" />
     <ClCompile Include="generation.cpp" />
     <ClCompile Include="genome.cpp" />
+    <ClCompile Include="interpolate.cpp" />
     <ClCompile Include="layer.cpp" />
     <ClCompile Include="leaky_relu.cpp" />
     <ClCompile Include="lstm.cpp" />
@@ -88,6 +93,7 @@
     <ClCompile Include="normalize.cpp" />
     <ClCompile Include="ntm_addresser.cpp" />
     <ClCompile Include="ntm_content_addresser.cpp" />
+    <ClCompile Include="ntm_location_addresser.cpp" />
     <ClCompile Include="ntm_reader.cpp" />
     <ClCompile Include="ntm_rh.cpp" />
     <ClCompile Include="ntm_sparsify.cpp" />
@@ -100,8 +106,10 @@
     <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="param_sgd_mt.cpp" />
+    <ClCompile Include="power.cpp" />
     <ClCompile Include="sequential.cpp" />
     <ClCompile Include="session.cpp" />
+    <ClCompile Include="shift.cpp" />
     <ClCompile Include="sigmoid.cpp" />
     <ClCompile Include="static_vals.cpp" />
     <ClCompile Include="sync.cpp" />
