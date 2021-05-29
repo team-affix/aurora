@@ -1985,6 +1985,149 @@ void dio_test() {
 
 }
 
+void cos_sim_test() {
+	
+	size_t units = 4;
+
+	ptr<cos_sim> p = new cos_sim(units);
+	p->compile();
+
+	uniform_real_distribution<double> urd(-100, 100);
+	p->x.pop(tensor::new_2d(2, units, urd, aurora::static_vals::aurora_random_engine));
+
+	tensor desired = 1;
+
+	for (int epoch = 0; true; epoch++) {
+
+		p->cycle(p->x, desired);
+
+		tensor update = p->x_grad.mul_2d(tensor::new_2d(2, units, 2));
+
+		p->x.sub_2d(update, p->x);
+
+		if (epoch % 1000 == 0) {
+			std::cout << p->x.to_string() << std::endl << std::endl;
+			std::cout << p->y.to_string() << std::endl;
+		}
+
+	}
+
+}
+
+void ntm_sparsify_test() {
+
+	size_t memory_height = 5;
+
+	ptr<ntm_sparsify> p = new ntm_sparsify(memory_height);
+	p->compile();
+
+
+	uniform_real_distribution<double> urd(0, 1);
+
+	p->x.pop(tensor::new_1d(memory_height, urd, aurora::static_vals::aurora_random_engine));
+		
+	double beta_des = 3;
+
+	tensor x = tensor::new_1d(memory_height, urd, aurora::static_vals::aurora_random_engine);
+	tensor y = tensor::new_1d(memory_height);
+	for (int i = 0; i < x.size(); i++)
+		y[i].val() = exp(beta_des * x[i]);
+
+	for (int epoch = 0; true; epoch++) {
+
+		p->cycle(x, y);
+
+		p->beta[0].val() -= 0.0002 * p->beta_grad[0];
+
+		// WE ARE SLEEPING HERE
+		Sleep(10);
+
+		if (epoch % 10 == 0) {
+			std::cout << y.to_string() << std::endl << p->y.to_string() << std::endl;
+			std::cout << p->beta.to_string() << std::endl << std::endl;
+		}
+
+	}
+
+}
+
+void normalize_test() {
+
+	size_t units = 5;
+
+	ptr<normalize> p = new normalize(units);
+	p->compile();
+
+	uniform_real_distribution<double> urd(-10, 10);
+
+	p->x.pop(tensor::new_1d(units, urd, aurora::static_vals::aurora_random_engine));
+	tensor y = { 0.5, 0.1, 0.1, 0.1, 0.2 };
+
+	tensor lr_tensor = tensor::new_1d(units, 0.02);
+
+	for (int epoch = 0; true; epoch++) {
+
+		p->cycle(p->x, y);
+
+		tensor update = p->x_grad.mul_1d(lr_tensor);
+
+		p->x.sub_1d(update, p->x);
+
+		if (epoch % 10000 == 0) {
+			std::cout << y.to_string() << std::endl << p->y.to_string() << std::endl << std::endl;
+		}
+
+	}
+}
+
+void ntm_content_addresser_test() {
+
+	size_t memory_height = 5;
+	size_t memory_width = 10;
+
+	ptr<ntm_content_addresser> p = new ntm_content_addresser(memory_height, memory_width);
+	p->compile();
+
+	uniform_real_distribution<double> urd(-1, 1);
+
+	p->key.pop(tensor::new_1d(memory_width, urd, aurora::static_vals::aurora_random_engine));
+	p->beta.pop(tensor::new_1d(1, urd, aurora::static_vals::aurora_random_engine));
+	p->x.pop(tensor::new_2d(memory_height, memory_width, urd, aurora::static_vals::aurora_random_engine));
+
+	tensor y = tensor::new_1d(memory_height);
+
+	const size_t index_to_see = 1;
+	y[index_to_see].val() = 1;
+
+	const double lr = 0.02;
+	tensor beta_lr_tensor = tensor::new_1d(1, lr);
+	tensor key_lr_tensor = tensor::new_1d(memory_width, lr);
+
+	for (int epoch = 0; true; epoch++) {
+
+		p->cycle(p->x, y);
+
+		tensor beta_update = p->beta_grad.mul_1d(beta_lr_tensor);
+		tensor key_update = p->key_grad.mul_1d(key_lr_tensor);
+
+		p->beta.sub_1d(beta_update, p->beta);
+		p->key.sub_1d(key_update, p->key);
+
+		if (epoch % 1000 == 0) {
+			std::cout <<
+				"INDEX: " << std::to_string(index_to_see) << std::endl <<
+				p->x[index_to_see].to_string() << std::endl <<
+				p->key.to_string() << std::endl <<
+				p->y.to_string() << std::endl <<
+				p->beta[0].to_string() << std::endl <<
+				p->key.cos_sim(p->x[index_to_see]) << std::endl <<
+				std::endl;
+		}
+
+	}
+
+}
+
 void ntm_rh_test() {
 
 	tensor x_0 = { 0, 1, 2, 3, 4 };
@@ -2256,7 +2399,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_ts_test();
+	ntm_content_addresser_test();
 
 	return 0;
 

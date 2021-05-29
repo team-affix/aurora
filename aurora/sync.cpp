@@ -75,10 +75,10 @@ void sync::compile() {
 	y_grad.resize(prepared.size());
 	for (int i = 0; i < prepared.size(); i++) {
 		prepared[i]->compile();
-		x[i].group_join(prepared[i]->x);
-		y[i].group_join(prepared[i]->y);
-		x_grad[i].group_join(prepared[i]->x_grad);
-		y_grad[i].group_join(prepared[i]->y_grad);
+		x[i].group_join_all_ranks(prepared[i]->x);
+		y[i].group_join_all_ranks(prepared[i]->y);
+		x_grad[i].group_join_all_ranks(prepared[i]->x_grad);
+		y_grad[i].group_join_all_ranks(prepared[i]->y_grad);
 	}
 }
 

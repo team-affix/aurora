@@ -20,3 +20,7 @@
 #include "ntm_wh.h"
 #include "ntm_addresser.h"
 #include "ntm_ts.h"
+#include "cos_sim.h"
+#include "ntm_sparsify.h"
+#include "normalize.h"
+#include "ntm_content_addresser.h"
