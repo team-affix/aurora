@@ -1,6 +1,10 @@
 #pragma once
 #include "pch.h"
-#include "models.h"
+#include "model.h"
+#include "sync.h"
+#include "cos_sim.h"
+#include "ntm_sparsify.h"
+#include "normalize.h"
 
 using aurora::models::model;
 

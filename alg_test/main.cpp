@@ -2102,6 +2102,7 @@ void ntm_content_addresser_test() {
 	const double lr = 0.02;
 	tensor beta_lr_tensor = tensor::new_1d(1, lr);
 	tensor key_lr_tensor = tensor::new_1d(memory_width, lr);
+	//tensor x_lr_tensor = tensor::new_2d(memory_height, memory_width, lr);
 
 	for (int epoch = 0; true; epoch++) {
 
@@ -2109,9 +2110,11 @@ void ntm_content_addresser_test() {
 
 		tensor beta_update = p->beta_grad.mul_1d(beta_lr_tensor);
 		tensor key_update = p->key_grad.mul_1d(key_lr_tensor);
+		//tensor x_update = p->x_grad.mul_2d(x_lr_tensor);
 
 		p->beta.sub_1d(beta_update, p->beta);
 		p->key.sub_1d(key_update, p->key);
+		//p->x.sub_2d(x_update, p->x);
 
 		if (epoch % 1000 == 0) {
 			std::cout <<
@@ -2285,6 +2288,7 @@ void ntm_location_addresser_test() {
 	tensor g_lr = tensor::new_1d(1, lr);
 	tensor s_lr = tensor::new_1d(valid_shifts.size(), lr);
 	tensor gamma_lr = tensor::new_1d(1, lr);
+	//tensor x_lr = tensor::new_1d(memory_height, lr);
 
 	for (int epoch = 0; true; epoch++) {
 
@@ -2297,13 +2301,96 @@ void ntm_location_addresser_test() {
 		tensor g_update = l_g_sm->x_grad.mul_1d(g_lr);
 		tensor s_update = l_s_sm->x_grad.mul_1d(s_lr);
 		tensor gamma_update = p->gamma_grad.mul_1d(gamma_lr);
+		//tensor x_update = p->x_grad.mul_1d(x_lr);
 
 		l_g_sm->x.sub_1d(g_update, l_g_sm->x);
 		l_s_sm->x.sub_1d(s_update, l_s_sm->x);
 		p->gamma.sub_1d(gamma_update, p->gamma);
+		//p->x.sub_1d(x_update, p->x);
 
 		if (epoch % 1000 == 0)
 			std::cout << y.to_string() << std::endl << p->y.to_string() 
+			<< std::endl << std::endl;
+
+	}
+
+}
+
+void ntm_addresser_test() {
+
+	size_t memory_height = 5;
+	size_t memory_width = 5;
+	vector<int> valid_shifts = { -1, 0, 1 };
+
+	ptr<layer> l_g_sm = new layer(1, new sigmoid());
+	l_g_sm->compile();
+	ptr<layer> l_s_sm = new layer(valid_shifts.size(), new sigmoid());
+	l_s_sm->compile();
+	ptr<ntm_addresser> p = new ntm_addresser(memory_height, memory_width, valid_shifts);
+	p->compile();
+
+	uniform_real_distribution<double> urd(-1, 1);
+	uniform_real_distribution<double> sm_urd(0, 1);
+	uniform_real_distribution<double> pos_urd(1, 3);
+
+	const size_t prev_selected_index = 3;
+
+	p->wx.pop(tensor::new_1d(memory_height));
+	p->wx[prev_selected_index].val() = 1;
+
+	p->x.pop(tensor::new_2d(memory_height, memory_width, urd, aurora::static_vals::aurora_random_engine));
+	p->key.pop(tensor::new_1d(memory_width, urd, aurora::static_vals::aurora_random_engine));
+	p->beta.pop(tensor::new_1d(1, urd, aurora::static_vals::aurora_random_engine));
+	p->gamma.pop(tensor::new_1d(1, pos_urd, aurora::static_vals::aurora_random_engine));
+	l_g_sm->x.pop(tensor::new_1d(1, sm_urd, aurora::static_vals::aurora_random_engine));
+	l_s_sm->x.pop(tensor::new_1d(valid_shifts.size(), sm_urd, aurora::static_vals::aurora_random_engine));
+
+	l_g_sm->y.group_join(p->g);
+	l_g_sm->y_grad.group_join(p->g_grad);
+	l_s_sm->y.group_join(p->s);
+	l_s_sm->y_grad.group_join(p->s_grad);
+
+	const size_t selected_index = 1;
+	tensor y = tensor::new_1d(memory_height);
+	y[selected_index].val() = 1;
+
+	const double lr = 0.002;
+
+	//tensor wx_lr = tensor::new_1d(memory_height, lr);
+	tensor x_lr = tensor::new_2d(memory_height, memory_width, lr);
+	tensor key_lr = tensor::new_1d(memory_width, lr);
+	tensor beta_lr = tensor::new_1d(1, lr);
+	tensor gamma_lr = tensor::new_1d(1, lr);
+	tensor g_lr = tensor::new_1d(1, lr);
+	tensor s_lr = tensor::new_1d(valid_shifts.size(), lr);
+
+	for (int epoch = 0; true; epoch++) {
+
+		l_g_sm->fwd();
+		l_s_sm->fwd();
+		p->cycle(p->x, y);
+		l_s_sm->bwd();
+		l_g_sm->bwd();
+
+		// NEVER UPDATE WX LIKE THIS. WX SHOULD BE BETWEEN 0 AND 1
+		//tensor wx_update = p->wx_grad.mul_1d(wx_lr);
+		tensor x_update = p->x_grad.mul_2d(x_lr);
+		tensor key_update = p->key_grad.mul_1d(key_lr);
+		tensor beta_update = p->beta_grad.mul_1d(beta_lr);
+		tensor gamma_update = p->gamma_grad.mul_1d(gamma_lr);
+		tensor g_update = l_g_sm->x_grad.mul_1d(g_lr);
+		tensor s_update = l_s_sm->x_grad.mul_1d(s_lr);
+		
+		//p->wx.sub_1d(wx_update, p->wx);
+		p->x.sub_2d(x_update, p->x);
+		p->key.sub_1d(key_update, p->key);
+		p->beta.sub_1d(beta_update, p->beta);
+		p->gamma.sub_1d(gamma_update, p->gamma);
+		l_g_sm->x.sub_1d(g_update, l_g_sm->x);
+		l_s_sm->x.sub_1d(s_update, l_s_sm->x);
+
+		if (epoch % 1000 == 0)
+			std::cout << y.to_string() << std::endl << p->y.to_string()
 			<< std::endl << std::endl;
 
 	}
@@ -2467,112 +2554,43 @@ void ntm_wh_test() {
 
 }
 
-void ntm_addresser_rh_test() {
+void ntm_reader_test() {
 
-	uniform_real_distribution<double> urd(-1, 1);
-
-	tensor x = { 1, 2, 3, 4, 5 };
-	tensor y_des = { 0, 0, 0, 0, 0, 1 };
-
-	tensor m = tensor::new_2d(6, 5, urd, aurora::static_vals::aurora_random_engine);
-	tensor m_grad = tensor::new_2d(6, 5, 0);
-
+	size_t memory_height = 5;
+	size_t memory_width = 5;
 	vector<int> valid_shifts = { -1, 0, 1 };
 
-	const double learn_rate = 0.02;
+	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
+	uniform_real_distribution<double> mem_urd(-10, 10);
 
 	vector<param_sgd*> pv;
+	auto pmt_init = INIT_PMT(
+		param_sgd(pmt_urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv);
 
-	ntm_rh* nrh = new ntm_rh(5, { 6, 7 }, valid_shifts.size(), INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), learn_rate, 0), pv));
-	ntm_addresser* addr = new ntm_addresser(m.height(), m.width(), valid_shifts);
-	
-	sequential s { nrh, addr };
-	s.compile();
+	ptr<ntm_reader> p = new ntm_reader(memory_height, memory_width, valid_shifts, {memory_width, memory_width + 5}, pmt_init);
+	p->compile();
 
-	addr->mx.group_join(m);
-	addr->mx_grad.group_join(m_grad);
+	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
 
+	const size_t selected_index = 2;
+	tensor y = p->mx[selected_index];
 
-	for (int epoch = 0; epoch < 1000000; epoch++) {
-
-		s.cycle(x, y_des);
-
-		if(epoch % 10000 == 0)
-			std::cout << s.y_grad.abs_1d().sum_1d() << std::endl;
-
-		for (param_sgd* pmt : pv)
-			pmt->update();
-
-	}
-
-}
-
-void ntm_addresser_wh_test() {
-
-	uniform_real_distribution<double> urd(-0.1, 0.1);
-
-	tensor x = { 1, 2, 3, 4, 5 };
-	tensor y_des = { 0, 0, 0, 0, 0, 1 };
-
-	tensor m = tensor::new_2d(6, 5, urd, aurora::static_vals::aurora_random_engine);
-	tensor m_grad = tensor::new_2d(6, 5, 0);
-
-	vector<int> valid_shifts = { -1, 0, 1 };
-
-	const double learn_rate = 0.02;
-
-	vector<param_sgd*> pv;
-
-	ntm_wh* nwh = new ntm_wh(5, { 6, 7 }, valid_shifts.size(), INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), learn_rate, 0), pv));
-	ntm_addresser* addr = new ntm_addresser(m.height(), m.width(), valid_shifts);
-
-	sequential s { nwh, addr };
-	s.compile();
-
-	addr->mx.group_join(m);
-	addr->mx_grad.group_join(m_grad);
-
-
-	for (int epoch = 0; epoch < 1000000; epoch++) {
-
-		s.cycle(x, y_des);
-
-		if (epoch % 10000 == 0)
-			std::cout << s.y_grad.abs_1d().sum_1d() << std::endl;
-
-		for (param_sgd* pmt : pv)
-			pmt->update();
-
-	}
-
-}
-
-void ntm_ts_test() {
-
-	tensor x_0 = { 1, 2, 3, 4, 5 };
-	vector<int> valid_shifts = { -1, 0, 1 };
-
-	uniform_real_distribution<double> pmt_urd(-1, 1);
-	uniform_real_distribution<double> mem_urd(-1, 1);
-
-	vector<param_sgd*> pv;
-
-	auto init_pmt = INIT_PMT(param_sgd(pmt_urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv);
-
-	ntm_ts n = ntm_ts(10, 5, 1, 1, { 6, 7, 8 }, valid_shifts, init_pmt);
-	n.compile();
-
-	tensor m = tensor::new_2d(10, 5, mem_urd, aurora::static_vals::aurora_random_engine);
-	n.mx.pop(m);
-
-	tensor y_des_0 = m[0].clone();
+	/*tensor y = tensor::new_1d(memory_width);
+	for (int i = 0; i < memory_width; i++)
+		y[i].val() = 0.5*p->mx[2][i] + 0.5*p->mx[4][i];*/
 
 	for (int epoch = 0; true; epoch++) {
-		n.cycle(x_0, y_des_0);
+
+		p->cycle(p->x, y);
+
 		for (param_sgd* pmt : pv)
 			pmt->update();
-		if (epoch % 100 == 0)
-			std::cout << n.y_grad.abs_1d().sum_1d() << std::endl;
+
+		if (epoch % 1000 == 0)
+			std::cout << "DESIRED: " << y.to_string() << std::endl <<
+			"ACTUAL:  " << p->y.to_string() << std::endl <<
+			"GAMMA: " << p->internal_addresser->gamma[0].to_string() << std::endl << std::endl;
+
 	}
 
 }
@@ -2581,7 +2599,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_location_addresser_test();
+	ntm_reader_test();
 
 	return 0;
 

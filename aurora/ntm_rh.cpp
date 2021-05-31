@@ -113,10 +113,7 @@ tensor& ntm_rh::bwd(tensor& a_y_grad) {
 }
 
 void ntm_rh::signal(tensor& a_y_des) {
-	tensor lr_range = a_y_des.range(0, lr_units);
-	tensor sm_range = a_y_des.range(lr_units, sm_units);
-	lr_model->signal(lr_range);
-	sm_model->signal(sm_range);
+	y.sub_1d(a_y_des, y_grad);
 }
 
 void ntm_rh::cycle(tensor& a_x, tensor& a_y_des) {

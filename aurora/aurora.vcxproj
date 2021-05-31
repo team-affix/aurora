@@ -50,9 +50,7 @@
     <ClInclude Include="ntm_rh.h" />
     <ClInclude Include="cos_sim.h" />
     <ClInclude Include="ntm_sparsify.h" />
-    <ClInclude Include="ntm_ts.h" />
     <ClInclude Include="ntm_wh.h" />
-    <ClInclude Include="ntm_writer.h" />
     <ClInclude Include="params.h" />
     <ClInclude Include="param_mom_mt.h" />
     <ClInclude Include="param_sgd_mt.h" />
@@ -97,9 +95,7 @@
     <ClCompile Include="ntm_reader.cpp" />
     <ClCompile Include="ntm_rh.cpp" />
     <ClCompile Include="ntm_sparsify.cpp" />
-    <ClCompile Include="ntm_ts.cpp" />
     <ClCompile Include="ntm_wh.cpp" />
-    <ClCompile Include="ntm_writer.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_init.cpp" />
     <ClCompile Include="param_mom.cpp" />

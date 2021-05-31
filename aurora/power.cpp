@@ -33,8 +33,9 @@ model* power::clone(function<void(ptr<param>&)> a_func) {
 
 void power::fwd() {
 	double& pow_amount = amount[0];
-	for (int i = 0; i < units; i++)
+	for (int i = 0; i < units; i++) {
 		y[i].val() = pow(x[i], pow_amount);
+	}
 }
 
 void power::bwd() {
