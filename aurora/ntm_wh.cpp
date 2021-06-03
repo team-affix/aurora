@@ -2,6 +2,7 @@
 #include "ntm_wh.h"
 #include "weight.h"
 #include "pseudo.h"
+#include "leaky_rexu.h"
 
 using aurora::models::ntm_wh;
 using aurora::models::weight;
@@ -35,7 +36,19 @@ ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_h_dims, size_t a_s_units, functi
 	sm_neurons.back() = pseudo::nsm();
 
 	lr_model = pseudo::tnn(lr_dims, pseudo::nlr(0.3), a_func);
+
+	sequential* l_lr_model = (sequential*)lr_model.get();
+	layer* l_lr_output = (layer*)l_lr_model->models.back().get();
+	sequential* l_beta_neuron = (sequential*)l_lr_output->models[units].get();
+	sequential* l_gamma_neuron = (sequential*)l_lr_output->models[units + 1].get();
+	// USE LEAKY REXU TO RESTRICT DOMAIN TO >0 AND >1
+	l_beta_neuron->models.erase(l_beta_neuron->models.begin() + 1);
+	l_beta_neuron->models.push_back(new leaky_rexu(1));
+	l_gamma_neuron->models.erase(l_gamma_neuron->models.begin() + 1);
+	l_gamma_neuron->models.push_back(new leaky_rexu(2));
+
 	sm_model = pseudo::tnn(sm_dims, sm_neurons, a_func);
+	internal_shift_normalize = new normalize(s_units);
 
 }
 
@@ -61,6 +74,7 @@ model* ntm_wh::clone() {
 	result->a_grad = a_grad.clone();
 	result->lr_model = (layer*)lr_model->clone();
 	result->sm_model = (layer*)sm_model->clone();
+	result->internal_shift_normalize = (normalize*)internal_shift_normalize->clone();
 	return result;
 }
 
@@ -86,6 +100,7 @@ model* ntm_wh::clone(function<void(ptr<param>&)> a_func) {
 	result->a_grad = a_grad.clone();
 	result->lr_model = (layer*)lr_model->clone(a_func);
 	result->sm_model = (layer*)sm_model->clone(a_func);
+	result->internal_shift_normalize = (normalize*)internal_shift_normalize->clone(a_func);
 	return result;
 }
 
@@ -113,9 +128,10 @@ void ntm_wh::compile() {
 
 	lr_model->compile();
 	sm_model->compile();
+	internal_shift_normalize->compile();
 
-	tensor y_range = lr_model->y.range(0, lr_units - units).concat(sm_model->y.range(0, sm_units - units));
-	tensor y_grad_range = lr_model->y_grad.range(0, lr_units - units).concat(sm_model->y_grad.range(0, sm_units - units));
+	tensor y_range = lr_model->y.range(0, lr_units - units).concat(sm_model->y.range(0, 1)).concat(internal_shift_normalize->y);
+	tensor y_grad_range = lr_model->y_grad.range(0, lr_units - units).concat(sm_model->y_grad.range(0, 1)).concat(internal_shift_normalize->y_grad);
 
 	x.group_join(lr_model->x);
 	x.group_join(sm_model->x);
@@ -146,12 +162,17 @@ void ntm_wh::compile() {
 	g_grad = sm_model->y_grad.range(sm_y, 1);
 	sm_y += 1;
 
-	s = sm_model->y.range(sm_y, s_units);
-	s_grad = sm_model->y_grad.range(sm_y, s_units);
+	tensor s_range = sm_model->y.range(sm_y, s_units);
+	tensor s_grad_range = sm_model->y_grad.range(sm_y, s_units);
 	sm_y += s_units;
 
 	e = sm_model->y.range(sm_y, units);
 	e_grad = sm_model->y_grad.range(sm_y, units);
 	sm_y += units;
+
+	s_range.group_join_all_ranks(internal_shift_normalize->x);
+	s_grad_range.group_join_all_ranks(internal_shift_normalize->x_grad);
+	internal_shift_normalize->y.group_join_all_ranks(s);
+	internal_shift_normalize->y_grad.group_join_all_ranks(s_grad);
 
 }

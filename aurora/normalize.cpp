@@ -34,6 +34,7 @@ model* normalize::clone(function<void(ptr<param>&)> a_func) {
 void normalize::fwd() {
 	x.abs_1d(x_abs);
 	sum = x_abs.sum_1d();
+	assert(sum != 0);
 	for (int i = 0; i < units; i++)
 		y[i].val() = x[i] / sum;
 }
@@ -41,8 +42,10 @@ void normalize::fwd() {
 void normalize::bwd() {
 	double reciprocal = 1.0 / sum;
 	double reciprocal_squared = reciprocal * reciprocal;
-	for (int i = 0; i < units; i++)
+	for (int i = 0; i < units; i++) {
 		x_grad[i].val() = y_grad[i] * (reciprocal - reciprocal_squared * x[i]);
+		assert(x_grad[i] != 0 && !isnan(x_grad[i]) && !isinf(x_grad[i]));
+	}
 }
 
 tensor& normalize::fwd(tensor& a_x) {
@@ -79,3 +82,4 @@ void normalize::compile() {
 	y_grad = tensor::new_1d(units);
 	x_abs = tensor::new_1d(units);
 }
+

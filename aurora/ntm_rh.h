@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "model.h"
 #include "layer.h"
+#include "normalize.h"
 
 using aurora::models::model;
 using aurora::models::layer;
@@ -35,6 +36,7 @@ namespace aurora {
 		public:
 			ptr<model> lr_model;
 			ptr<model> sm_model;
+			ptr<normalize> internal_shift_normalize;
 
 		public:
 			MODEL_FIELDS

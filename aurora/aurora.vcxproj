@@ -30,6 +30,7 @@
     <ClInclude Include="beautify_models.h" />
     <ClInclude Include="cnl.h" />
     <ClInclude Include="evolution.h" />
+    <ClInclude Include="leaky_rexu.h" />
     <ClInclude Include="generation.h" />
     <ClInclude Include="genome.h" />
     <ClInclude Include="initialization.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="cos_sim.h" />
     <ClInclude Include="ntm_sparsify.h" />
     <ClInclude Include="ntm_wh.h" />
+    <ClInclude Include="ntm_writer.h" />
     <ClInclude Include="params.h" />
     <ClInclude Include="param_mom_mt.h" />
     <ClInclude Include="param_sgd_mt.h" />
@@ -80,6 +82,7 @@
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="cnl.cpp" />
     <ClCompile Include="cos_sim.cpp" />
+    <ClCompile Include="leaky_rexu.cpp" />
     <ClCompile Include="generation.cpp" />
     <ClCompile Include="genome.cpp" />
     <ClCompile Include="interpolate.cpp" />
@@ -96,6 +99,7 @@
     <ClCompile Include="ntm_rh.cpp" />
     <ClCompile Include="ntm_sparsify.cpp" />
     <ClCompile Include="ntm_wh.cpp" />
+    <ClCompile Include="ntm_writer.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_init.cpp" />
     <ClCompile Include="param_mom.cpp" />

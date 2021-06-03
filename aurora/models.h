@@ -28,3 +28,5 @@
 #include "ntm_location_addresser.h"
 #include "ntm_addresser.h"
 #include "ntm_reader.h"
+#include "ntm_writer.h"
+#include "leaky_rexu.h"

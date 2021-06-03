@@ -2571,8 +2571,9 @@ void ntm_reader_test() {
 	p->compile();
 
 	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
+	p->wx[1].val() = 1;
 
-	const size_t selected_index = 2;
+	const size_t selected_index = 4;
 	tensor y = p->mx[selected_index];
 
 	/*tensor y = tensor::new_1d(memory_width);
@@ -2595,11 +2596,65 @@ void ntm_reader_test() {
 
 }
 
+void ntm_writer_test() {
+
+	size_t memory_height = 5;
+	size_t memory_width = 5;
+	vector<int> valid_shifts = { -1, 0, 1 };
+
+	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
+	uniform_real_distribution<double> mem_urd(-10, 10);
+
+	default_random_engine dre(25);
+
+	vector<param_mom*> pv;
+	auto pmt_init = INIT_PMT(
+		param_mom(pmt_urd(dre), 0.0002, 0, 0, 0.9), pv);
+
+	ptr<ntm_writer> p = new ntm_writer(memory_height, memory_width, valid_shifts, { memory_width }, pmt_init);
+	p->compile();
+
+	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
+	p->wx[2].val() = 1;
+
+	const size_t selected_index = 1;
+	tensor y = p->mx.clone();
+	y[selected_index].add_1d(tensor::new_1d(memory_width, 1), y[selected_index]);
+
+	/*tensor y = tensor::new_1d(memory_width);
+	for (int i = 0; i < memory_width; i++)
+		y[i].val() = 0.5*p->mx[2][i] + 0.5*p->mx[4][i];*/
+
+	for (int epoch = 0; true; epoch++) {
+
+		p->cycle(p->x, y);
+
+		for (param_mom* pmt : pv)
+			pmt->update();
+
+		double cost = p->y_grad.abs_2d().sum_2d().sum_1d();
+
+		if (epoch % 1000 == 0)
+			std::cout << std::to_string(cost) << std::endl <<
+			"G: " << p->internal_addresser->g[0].to_string() << std::endl <<
+			"S: " << p->internal_addresser->s.to_string() << std::endl <<
+			"GAMMA: " << p->internal_addresser->gamma[0].to_string() << std::endl <<
+			"BETA:     " << p->internal_addresser->beta[0].to_string() << std::endl <<
+			"WY: " << p->wy.to_string() << std::endl <<
+			"SIM_TENSOR: " << p->internal_addresser->internal_content_addresser->internal_similarity->y.to_string() << std::endl <<
+			"DES Y: " << y.to_string() << std::endl <<
+			"ACT Y: " << p->y.to_string() << std::endl <<
+			std::endl << std::endl;
+
+	}
+
+}
+
 int main() {
 
 	srand(time(NULL));
 	
-	ntm_reader_test();
+	ntm_writer_test();
 
 	return 0;
 

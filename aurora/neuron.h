@@ -12,5 +12,6 @@ namespace aurora {
 		sequential* nsm();
 		sequential* nth();
 		sequential* nlr(double a_m);
+		sequential* nlrexu(double a_k);
 	}
 }
