@@ -44,6 +44,7 @@
     <ClInclude Include="models.h" />
     <ClInclude Include="neuron.h" />
     <ClInclude Include="normalize.h" />
+    <ClInclude Include="ntm.h" />
     <ClInclude Include="ntm_addresser.h" />
     <ClInclude Include="ntm_content_addresser.h" />
     <ClInclude Include="ntm_location_addresser.h" />
@@ -51,6 +52,7 @@
     <ClInclude Include="cos_sim.h" />
     <ClInclude Include="ntm_rh.h" />
     <ClInclude Include="ntm_sparsify.h" />
+    <ClInclude Include="ntm_ts.h" />
     <ClInclude Include="ntm_wh.h" />
     <ClInclude Include="ntm_writer.h" />
     <ClInclude Include="params.h" />
@@ -92,12 +94,14 @@
     <ClCompile Include="lstm_ts.cpp" />
     <ClCompile Include="neuron.cpp" />
     <ClCompile Include="normalize.cpp" />
+    <ClCompile Include="ntm.cpp" />
     <ClCompile Include="ntm_addresser.cpp" />
     <ClCompile Include="ntm_content_addresser.cpp" />
     <ClCompile Include="ntm_location_addresser.cpp" />
     <ClCompile Include="ntm_reader.cpp" />
     <ClCompile Include="ntm_rh.cpp" />
     <ClCompile Include="ntm_sparsify.cpp" />
+    <ClCompile Include="ntm_ts.cpp" />
     <ClCompile Include="ntm_wh.cpp" />
     <ClCompile Include="ntm_writer.cpp" />
     <ClCompile Include="param.cpp" />

@@ -30,3 +30,5 @@
 #include "ntm_reader.h"
 #include "ntm_writer.h"
 #include "leaky_rexu.h"
+#include "ntm_ts.h"
+#include "ntm.h"

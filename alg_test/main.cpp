@@ -2665,6 +2665,74 @@ void ntm_writer_test() {
 			"DES Y: " << y[selected_index].to_string() << std::endl <<
 			"ACT Y: " << p->y[selected_index].to_string() << std::endl <<
 			std::endl << std::endl;
+	}
+
+}
+
+void ntm_test() {
+
+	size_t memory_height = 5;
+	size_t memory_width = 10;
+	size_t num_readers = 1;
+	size_t num_writers = 1;
+	vector<int> valid_shifts = { -1, 0, 1 };
+	vector<size_t> head_hidden_dims = { memory_width };
+
+	uniform_real_distribution<double> pmt_urd(-1, 1);
+	uniform_real_distribution<double> ts_urd(-10, 10);
+	uniform_real_distribution<double> mem_urd(-10, 10);
+	default_random_engine dre(26);
+
+	vector<param_mom*> pv;
+
+	auto pmt_init = INIT_PMT(param_mom(pmt_urd(dre), 0.000000002, 0, 0, 0.9), pv);
+
+	ptr<ntm> p = new ntm(
+		memory_height,
+		memory_width,
+		num_readers,
+		num_writers,
+		valid_shifts,
+		head_hidden_dims,
+		pmt_init);
+
+	const size_t num_ts = 4;
+
+	p->prep(num_ts);
+	p->compile();
+	p->unroll(num_ts);
+
+	tensor x = {
+		tensor::new_2d(num_ts, memory_width),
+		tensor::new_2d(num_ts, memory_width),
+	};
+
+	for (int i = 0; i < x.size(); i++)
+		x[i][0].pop(tensor::new_1d(memory_width, ts_urd, dre));
+	
+	tensor y = {
+		tensor::new_2d(num_ts, memory_width, 0),
+		tensor::new_2d(num_ts, memory_width, 1),
+	};
+
+	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, dre));
+	p->unrolled[0]->internal_readers[0]->wx[0].val() = 1;
+	p->unrolled[0]->internal_writers[0]->wx[0].val() = 1;
+
+	for (int epoch = 0; true; epoch++) {
+
+		double cost = 0;
+
+		for (int ts = 0; ts < x.size(); ts++) {
+			p->cycle(x[ts], y[ts]);
+			cost += p->y_grad.abs_2d().sum_2d().sum_1d();
+		}
+
+		for (param_mom* pmt : pv)
+			pmt->update();
+
+		if (epoch % 100 == 0)
+			std::cout << cost << std::endl;
 
 	}
 
@@ -2674,7 +2742,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_rh_test();
+	ntm_test();
 
 	return 0;
 
