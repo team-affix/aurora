@@ -105,8 +105,8 @@ void ntm_reader::compile() {
 	internal_head->compile();
 	internal_addresser->compile();
 
-	internal_head->k.group_join(internal_addresser->key);
-	internal_head->k_grad.group_join(internal_addresser->key_grad);
+	internal_head->key.group_join(internal_addresser->key);
+	internal_head->key_grad.group_join(internal_addresser->key_grad);
 	internal_head->beta.group_join(internal_addresser->beta);
 	internal_head->beta_grad.group_join(internal_addresser->beta_grad);
 	internal_head->g.group_join(internal_addresser->g);

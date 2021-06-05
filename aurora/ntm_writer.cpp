@@ -62,8 +62,8 @@ void ntm_writer::bwd() {
 	for (int i = 0; i < memory_height; i++)
 		for (int j = 0; j < memory_width; j++) {
 			mx_grad[i][j].val() = y_grad[i][j] * weighted_erase_compliment[i][j];
-			internal_addresser->y_grad[i].val() += y_grad[i][j] *
-				-mx[i][j] * internal_head->e[j] + internal_head->a[j];
+			internal_addresser->y_grad[i].val() += y_grad[i][j] * 
+				(-mx[i][j] * internal_head->e[j] + internal_head->a[j]);
 			internal_head->e_grad[j].val() += y_grad[i][j] *
 				-mx[i][j] * internal_addresser->y[i];
 			internal_head->a_grad[j].val() += y_grad[i][j] *
@@ -118,16 +118,16 @@ void ntm_writer::compile() {
 	internal_head->compile();
 	internal_addresser->compile();
 
-	internal_head->k.group_join(internal_addresser->key);
-	internal_head->k_grad.group_join(internal_addresser->key_grad);
-	internal_head->beta.group_join(internal_addresser->beta);
-	internal_head->beta_grad.group_join(internal_addresser->beta_grad);
-	internal_head->g.group_join(internal_addresser->g);
-	internal_head->g_grad.group_join(internal_addresser->g_grad);
-	internal_head->s.group_join(internal_addresser->s);
-	internal_head->s_grad.group_join(internal_addresser->s_grad);
-	internal_head->gamma.group_join(internal_addresser->gamma);
-	internal_head->gamma_grad.group_join(internal_addresser->gamma_grad);
+	internal_head->internal_rh->key.group_join(internal_addresser->key);
+	internal_head->internal_rh->key_grad.group_join(internal_addresser->key_grad);
+	internal_head->internal_rh->beta.group_join(internal_addresser->beta);
+	internal_head->internal_rh->beta_grad.group_join(internal_addresser->beta_grad);
+	internal_head->internal_rh->g.group_join(internal_addresser->g);
+	internal_head->internal_rh->g_grad.group_join(internal_addresser->g_grad);
+	internal_head->internal_rh->s.group_join(internal_addresser->s);
+	internal_head->internal_rh->s_grad.group_join(internal_addresser->s_grad);
+	internal_head->internal_rh->gamma.group_join(internal_addresser->gamma);
+	internal_head->internal_rh->gamma_grad.group_join(internal_addresser->gamma_grad);
 
 	x.group_join_all_ranks(internal_head->x);
 	x_grad.group_join_all_ranks(internal_head->x_grad);

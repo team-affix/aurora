@@ -11,6 +11,12 @@ tanh::tanh() {
 
 }
 
+tanh::tanh(double a_a, double a_b, double a_c) {
+	a = a_a;
+	b = a_b;
+	c = a_c;
+}
+
 void tanh::pmt_wise(function<void(ptr<param>&)> a_func) {
 
 }
@@ -24,11 +30,11 @@ model* tanh::clone(function<void(ptr<param>&)> a_func) {
 }
 
 void tanh::fwd() {
-	y.val() = std::tanh(x.val());
+	y.val() = a * std::tanh(b * x.val()) + c;
 }
 
 void tanh::bwd() {
-	x_grad.val() = y_grad.val() / pow(cosh(x.val()), 2);
+	x_grad.val() = y_grad.val() * a / pow(cosh(b * x.val()), 2) * b;
 }
 
 tensor& tanh::fwd(tensor& a_x) {

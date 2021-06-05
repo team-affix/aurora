@@ -137,7 +137,7 @@ void tnn_xor_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(25);
 
-	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nth(), [&](ptr<param>& pmt) {
 		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
 		pl.push_back((param_mom*)pmt.get());
 	});
@@ -166,6 +166,22 @@ void tnn_xor_test() {
 	for (param_mom* pmt : pl) {
 		std::cout << pmt->state() << std::endl;
 	}
+}
+
+void tanh_test() {
+
+	ptr<models::tanh> p = new models::tanh(1, 1, 0);
+	p->compile();
+	tensor x = 0;
+	assert(p->fwd(x) == 0);
+	x = 1;
+	assert(p->fwd(x) == std::tanh(1));
+	p = new models::tanh(1, 1, 1);
+	x = -999999;
+	assert(p->fwd(x) == 0);
+	x = 9999999;
+	assert(p->fwd(x) == 2);
+
 }
 
 void tnn_test() {
@@ -2426,7 +2442,7 @@ void ntm_rh_test() {
 
 			nrh.fwd(x_0);
 
-			nrh.k_grad.pop(nrh.k.sub_1d(des_k_0));
+			nrh.key_grad.pop(nrh.key.sub_1d(des_k_0));
 			nrh.beta_grad.pop(nrh.beta.sub_1d(des_beta_0));
 			nrh.gamma_grad.pop(nrh.gamma.sub_1d(des_gamma_0));
 			nrh.g_grad.pop(nrh.g.sub_1d(des_g_0));
@@ -2435,7 +2451,7 @@ void ntm_rh_test() {
 			nrh.bwd();
 
 			cost +=
-				nrh.k_grad.abs_1d().sum_1d() +
+				nrh.key_grad.abs_1d().sum_1d() +
 				nrh.beta_grad.abs_1d().sum_1d() +
 				nrh.gamma_grad.abs_1d().sum_1d() +
 				nrh.g_grad.abs_1d().sum_1d() +
@@ -2443,7 +2459,7 @@ void ntm_rh_test() {
 
 			nrh.fwd(x_1);
 
-			nrh.k_grad.pop(nrh.k.sub_1d(des_k_1));
+			nrh.key_grad.pop(nrh.key.sub_1d(des_k_1));
 			nrh.beta_grad.pop(nrh.beta.sub_1d(des_beta_1));
 			nrh.gamma_grad.pop(nrh.gamma.sub_1d(des_gamma_1));
 			nrh.g_grad.pop(nrh.g.sub_1d(des_g_1));
@@ -2452,7 +2468,7 @@ void ntm_rh_test() {
 			nrh.bwd();
 
 			cost +=
-				nrh.k_grad.abs_1d().sum_1d() +
+				nrh.key_grad.abs_1d().sum_1d() +
 				nrh.beta_grad.abs_1d().sum_1d() +
 				nrh.gamma_grad.abs_1d().sum_1d() +
 				nrh.g_grad.abs_1d().sum_1d() +
@@ -2503,50 +2519,50 @@ void ntm_wh_test() {
 
 		nwh.fwd(x_0);
 
-		nwh.k_grad.pop(nwh.k.sub_1d(des_k_0));
-		nwh.beta_grad.pop(nwh.beta.sub_1d(des_beta_0));
-		nwh.gamma_grad.pop(nwh.gamma.sub_1d(des_gamma_0));
-		nwh.g_grad.pop(nwh.g.sub_1d(des_g_0));
-		nwh.s_grad.pop(nwh.s.sub_1d(des_s_0));
+		nwh.internal_rh->key_grad.pop(nwh.internal_rh->key.sub_1d(des_k_0));
+		nwh.internal_rh->beta_grad.pop(nwh.internal_rh->beta.sub_1d(des_beta_0));
+		nwh.internal_rh->gamma_grad.pop(nwh.internal_rh->gamma.sub_1d(des_gamma_0));
+		nwh.internal_rh->g_grad.pop(nwh.internal_rh->g.sub_1d(des_g_0));
+		nwh.internal_rh->s_grad.pop(nwh.internal_rh->s.sub_1d(des_s_0));
 		nwh.e_grad.pop(nwh.e.sub_1d(des_e_0));
 		nwh.a_grad.pop(nwh.a.sub_1d(des_a_0));
 
 		nwh.bwd();
 
 		cost +=
-			nwh.k_grad.abs_1d().sum_1d() +
-			nwh.beta_grad.abs_1d().sum_1d() +
-			nwh.gamma_grad.abs_1d().sum_1d() +
-			nwh.g_grad.abs_1d().sum_1d() +
-			nwh.s_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->key_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->beta_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->gamma_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->g_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->s_grad.abs_1d().sum_1d() +
 			nwh.e_grad.abs_1d().sum_1d() +
 			nwh.a_grad.abs_1d().sum_1d();
 
 		nwh.fwd(x_1);
 
-		nwh.k_grad.pop(nwh.k.sub_1d(des_k_1));
-		nwh.beta_grad.pop(nwh.beta.sub_1d(des_beta_1));
-		nwh.gamma_grad.pop(nwh.gamma.sub_1d(des_gamma_1));
-		nwh.g_grad.pop(nwh.g.sub_1d(des_g_1));
-		nwh.s_grad.pop(nwh.s.sub_1d(des_s_1));
+		nwh.internal_rh->key_grad.pop(nwh.internal_rh->key.sub_1d(des_k_1));
+		nwh.internal_rh->beta_grad.pop(nwh.internal_rh->beta.sub_1d(des_beta_1));
+		nwh.internal_rh->gamma_grad.pop(nwh.internal_rh->gamma.sub_1d(des_gamma_1));
+		nwh.internal_rh->g_grad.pop(nwh.internal_rh->g.sub_1d(des_g_1));
+		nwh.internal_rh->s_grad.pop(nwh.internal_rh->s.sub_1d(des_s_1));
 		nwh.e_grad.pop(nwh.e.sub_1d(des_e_0));
 		nwh.a_grad.pop(nwh.a.sub_1d(des_a_0));
 
 		nwh.bwd();
 
 		cost +=
-			nwh.k_grad.abs_1d().sum_1d() +
-			nwh.beta_grad.abs_1d().sum_1d() +
-			nwh.gamma_grad.abs_1d().sum_1d() +
-			nwh.g_grad.abs_1d().sum_1d() +
-			nwh.s_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->key_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->beta_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->gamma_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->g_grad.abs_1d().sum_1d() +
+			nwh.internal_rh->s_grad.abs_1d().sum_1d() +
 			nwh.e_grad.abs_1d().sum_1d() +
 			nwh.a_grad.abs_1d().sum_1d();;
 
 		for (param_sgd* pmt : pv)
 			pmt->update();
 
-		if (epoch % 10000 == 0) {
+		if (epoch % 1000 == 0) {
 			std::cout << cost << std::endl;
 		}
 
@@ -2571,9 +2587,9 @@ void ntm_reader_test() {
 	p->compile();
 
 	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
-	p->wx[1].val() = 1;
+	//p->wx[1].val() = 1;
 
-	const size_t selected_index = 4;
+	const size_t selected_index = 1;
 	tensor y = p->mx[selected_index];
 
 	/*tensor y = tensor::new_1d(memory_width);
@@ -2588,7 +2604,9 @@ void ntm_reader_test() {
 			pmt->update();
 
 		if (epoch % 1000 == 0)
-			std::cout << "DESIRED: " << y.to_string() << std::endl <<
+			std::cout <<
+			"WY: " << p->internal_addresser->wy.to_string() << std::endl <<
+			"DESIRED: " << y.to_string() << std::endl <<
 			"ACTUAL:  " << p->y.to_string() << std::endl <<
 			"GAMMA: " << p->internal_addresser->gamma[0].to_string() << std::endl << std::endl;
 
@@ -2602,20 +2620,21 @@ void ntm_writer_test() {
 	size_t memory_width = 5;
 	vector<int> valid_shifts = { -1, 0, 1 };
 
-	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
+	uniform_real_distribution<double> pmt_urd(-1, 1);
 	uniform_real_distribution<double> mem_urd(-10, 10);
 
-	default_random_engine dre(25);
+	default_random_engine dre(27);
 
 	vector<param_mom*> pv;
 	auto pmt_init = INIT_PMT(
-		param_mom(pmt_urd(dre), 0.0002, 0, 0, 0.9), pv);
+		param_mom(pmt_urd(dre), 0.000002, 0, 0, 0.9), pv);
 
 	ptr<ntm_writer> p = new ntm_writer(memory_height, memory_width, valid_shifts, { memory_width }, pmt_init);
 	p->compile();
 
 	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
-	p->wx[2].val() = 1;
+	p->wx[2].val() = 0.5;
+	p->wx[1].val() = 0.5;
 
 	const size_t selected_index = 1;
 	tensor y = p->mx.clone();
@@ -2642,8 +2661,9 @@ void ntm_writer_test() {
 			"BETA:     " << p->internal_addresser->beta[0].to_string() << std::endl <<
 			"WY: " << p->wy.to_string() << std::endl <<
 			"SIM_TENSOR: " << p->internal_addresser->internal_content_addresser->internal_similarity->y.to_string() << std::endl <<
-			"DES Y: " << y.to_string() << std::endl <<
-			"ACT Y: " << p->y.to_string() << std::endl <<
+			"A: " << p->internal_head->a.to_string() << std::endl <<
+			"DES Y: " << y[selected_index].to_string() << std::endl <<
+			"ACT Y: " << p->y[selected_index].to_string() << std::endl <<
 			std::endl << std::endl;
 
 	}
@@ -2654,7 +2674,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_writer_test();
+	ntm_rh_test();
 
 	return 0;
 

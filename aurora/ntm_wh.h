@@ -1,31 +1,30 @@
 #pragma once
-#include "pch.h"
 #include "ntm_rh.h"
-#include "layer.h"
 
-using aurora::models::ntm_rh;
-using aurora::models::layer;
+using aurora::models::model;
 
 namespace aurora {
 	namespace models {
-		class ntm_wh : public ntm_rh {
+		class ntm_wh : public model {
 		public:
-			// SM, SIZE == units
-			tensor e;
-			tensor e_grad;
-			// LR, SIZE == units
+			size_t units = 0;
+
+		public:
 			tensor a;
 			tensor a_grad;
+			tensor e;
+			tensor e_grad;
 
 		public:
+			ptr<ntm_rh> internal_rh;
+			ptr<model> a_model;
+			ptr<model> e_model;
+
+		public:
+			MODEL_FIELDS
 			virtual ~ntm_wh();
 			ntm_wh();
-			ntm_wh(size_t a_units, vector<size_t> a_h_dims, size_t a_s_units, function<void(ptr<param>&)> a_func);
-
-		public:
-			virtual model* clone();
-			virtual model* clone(function<void(ptr<param>&)> a_func);
-			virtual void compile();
+			ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units, function<void(ptr<param>&)> a_func);
 
 		};
 	}
