@@ -44,10 +44,10 @@ ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 
 	// DO NOT LOOP THROUGH OUTPUT LAYER
 	for (int i = 0; i < dims.size(); i++) {
-		beta_neurons.push_back(pseudo::nlr(0.3));
+		beta_neurons.push_back(pseudo::nth());
 		g_neurons.push_back(pseudo::nth());
 		s_neurons.push_back(pseudo::nth());
-		gamma_neurons.push_back(pseudo::nlr(0.3));
+		gamma_neurons.push_back(pseudo::nth());
 	}
 	beta_neurons.push_back(pseudo::nlrexu(1));
 	g_neurons.push_back(pseudo::nsm());

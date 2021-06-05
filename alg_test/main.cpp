@@ -2620,21 +2620,21 @@ void ntm_writer_test() {
 	size_t memory_width = 5;
 	vector<int> valid_shifts = { -1, 0, 1 };
 
-	uniform_real_distribution<double> pmt_urd(-1, 1);
+	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
 	uniform_real_distribution<double> mem_urd(-10, 10);
 
 	default_random_engine dre(27);
 
 	vector<param_mom*> pv;
 	auto pmt_init = INIT_PMT(
-		param_mom(pmt_urd(dre), 0.000002, 0, 0, 0.9), pv);
+		param_mom(pmt_urd(dre), 0.00002, 0, 0, 0.9), pv);
 
 	ptr<ntm_writer> p = new ntm_writer(memory_height, memory_width, valid_shifts, { memory_width }, pmt_init);
 	p->compile();
 
 	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
-	p->wx[2].val() = 0.5;
-	p->wx[1].val() = 0.5;
+	p->wx[4].val() = 0.4;
+	p->wx[3].val() = 0.6;
 
 	const size_t selected_index = 1;
 	tensor y = p->mx.clone();
@@ -2653,7 +2653,7 @@ void ntm_writer_test() {
 
 		double cost = p->y_grad.abs_2d().sum_2d().sum_1d();
 
-		if (epoch % 1000 == 0)
+		if (epoch % 10000 == 0)
 			std::cout << std::to_string(cost) << std::endl <<
 			"G: " << p->internal_addresser->g[0].to_string() << std::endl <<
 			"S: " << p->internal_addresser->s.to_string() << std::endl <<
