@@ -4,7 +4,7 @@
 
 int main() {
 
-	std::cout << helper::model_impl("exponential", helper::model) << std::endl;
+	std::cout << helper::model_impl("ntm_wh", helper::model) << std::endl;
 
 	return 0;
 }

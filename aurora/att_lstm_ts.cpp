@@ -118,7 +118,7 @@ void att_lstm_ts::compile() {
 	this->htx = tensor::new_1d(units);
 	this->htx_grad = tensor::new_1d(units);
 	for (int i = 0; i < models->prepared.size(); i++) {
-		// CONCAT ORDER: HT, **THEN** XT
+		// cat ORDER: HT, **THEN** XT
 		tensor htx_range = models->prepared[i]->x.range(0, units);
 		tensor x_range = models->prepared[i]->x.range(units, units);
 		tensor x_grad_range = models->prepared[i]->x_grad.range(units, units);

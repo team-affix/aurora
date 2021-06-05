@@ -192,12 +192,6 @@
     <ClInclude Include="att_lstm_ts.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="ntm_rh.h">
-      <Filter>Header Files\models</Filter>
-    </ClInclude>
-    <ClInclude Include="ntm_wh.h">
-      <Filter>Header Files\models</Filter>
-    </ClInclude>
     <ClInclude Include="ntm_addresser.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
@@ -232,6 +226,12 @@
       <Filter>Header Files\models</Filter>
     </ClInclude>
     <ClInclude Include="leaky_rexu.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_rh.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_wh.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
   </ItemGroup>
@@ -323,12 +323,6 @@
     <ClCompile Include="att_lstm_ts.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
-    <ClCompile Include="ntm_rh.cpp">
-      <Filter>Source Files\models</Filter>
-    </ClCompile>
-    <ClCompile Include="ntm_wh.cpp">
-      <Filter>Source Files\models</Filter>
-    </ClCompile>
     <ClCompile Include="ntm_addresser.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
@@ -363,6 +357,12 @@
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="leaky_rexu.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_rh.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_wh.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>

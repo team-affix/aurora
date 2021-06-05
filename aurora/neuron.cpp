@@ -21,6 +21,10 @@ sequential* pseudo::nth() {
 	return new sequential{ new bias(), new aurora::models::tanh() };
 }
 
+sequential* pseudo::nth(double a_a, double a_b, double a_c) {
+	return new sequential{ new bias(), new aurora::models::tanh(a_a, a_b, a_c) };
+}
+
 sequential* pseudo::nlr(double a_m) {
 	return new sequential{ new bias(), new leaky_relu(a_m) };
 }

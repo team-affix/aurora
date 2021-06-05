@@ -48,8 +48,8 @@
     <ClInclude Include="ntm_content_addresser.h" />
     <ClInclude Include="ntm_location_addresser.h" />
     <ClInclude Include="ntm_reader.h" />
-    <ClInclude Include="ntm_rh.h" />
     <ClInclude Include="cos_sim.h" />
+    <ClInclude Include="ntm_rh.h" />
     <ClInclude Include="ntm_sparsify.h" />
     <ClInclude Include="ntm_wh.h" />
     <ClInclude Include="ntm_writer.h" />

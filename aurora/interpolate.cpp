@@ -35,7 +35,7 @@ void interpolate::fwd() {
 	double& interpolate_amount = amount[0];
 	amount_compliment = 1.0 - interpolate_amount;
 	for (int i = 0; i < units; i++)
-		y[i].val() = x[0][i] * interpolate_amount + x[1][i] * amount_compliment;
+		y[i].val() = x[1][i] * interpolate_amount + x[0][i] * amount_compliment;
 }
 
 void interpolate::bwd() {
@@ -43,9 +43,9 @@ void interpolate::bwd() {
 	double& interpolate_amount_grad = amount_grad[0];
 	interpolate_amount_grad = 0;
 	for (int i = 0; i < units; i++) {
-		x_grad[0][i].val() = y_grad[i].val() * interpolate_amount;
-		x_grad[1][i].val() = y_grad[i].val() * amount_compliment;
-		interpolate_amount_grad += y_grad[i] * (x[0][i] - x[1][i]);
+		x_grad[1][i].val() = y_grad[i] * interpolate_amount;
+		x_grad[0][i].val() = y_grad[i] * amount_compliment;
+		interpolate_amount_grad += y_grad[i] * (x[1][i] - x[0][i]);
 	}
 }
 

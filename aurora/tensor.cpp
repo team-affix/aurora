@@ -506,7 +506,7 @@ void tensor::dot_2d(tensor a_other, tensor& a_output) {
 		row(i).dot_1d(a_other.col(j), a_output[i][j]);
 }
 
-void tensor::concat(tensor& a_other, tensor& a_output) {
+void tensor::cat(tensor& a_other, tensor& a_output) {
 	for (int i = 0; i < size(); i++)
 		a_output[i].group_join_all_ranks(at(i));
 	for (int i = 0; i < a_other.size(); i++)
@@ -520,9 +520,9 @@ double tensor::cos_sim(tensor& a_other) {
 	return dot / (mag_a * mag_b);
 }
 
-tensor tensor::concat(tensor a_other) {
+tensor tensor::cat(tensor a_other) {
 	tensor result = tensor::new_1d(size() + a_other.size());
-	concat(a_other, result);
+	cat(a_other, result);
 	return result;
 }
 
