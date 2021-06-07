@@ -2671,10 +2671,10 @@ void ntm_writer_test() {
 
 void ntm_test() {
 
-	size_t memory_height = 2;
-	size_t memory_width = 20;
+	size_t memory_height = 5;
+	size_t memory_width = 5;
 	size_t num_readers = 1;
-	size_t num_writers = 2;
+	size_t num_writers = 1;
 	vector<int> valid_shifts = { -1, 0, 1 };
 	vector<size_t> head_hidden_dims = { memory_width, memory_width };
 
@@ -2685,7 +2685,7 @@ void ntm_test() {
 
 	vector<param_sgd*> pv;
 
-	auto pmt_init = INIT_PMT(param_sgd(pmt_urd(dre), 0.0002, 0), pv);
+	auto pmt_init = INIT_PMT(param_sgd(pmt_urd(dre), 0.002, 0), pv);
 
 	ptr<sync> s_in = new sync(pseudo::tnn({ 2, memory_width, memory_width }, pseudo::nlr(0.3), pmt_init));
 
@@ -2746,7 +2746,7 @@ void ntm_test() {
 	p->unrolled[0]->internal_readers[0]->wx[0].val() = 1;
 	p->unrolled[0]->internal_writers[0]->wx[0].val() = 1;
 
-	const size_t checkpoint_interval = 100;
+	const size_t checkpoint_interval = 1000;
 
 	for (int epoch = 0; true; epoch++) {
 

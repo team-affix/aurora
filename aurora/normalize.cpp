@@ -44,7 +44,7 @@ void normalize::bwd() {
 	double reciprocal_squared = reciprocal * reciprocal;
 	for (int i = 0; i < units; i++) {
 		x_grad[i].val() = y_grad[i] * (reciprocal - reciprocal_squared * x[i]);
-		assert(x_grad[i] != 0 && !isnan(x_grad[i]) && !isinf(x_grad[i]));
+		//assert(x_grad[i] != 0 && !isnan(x_grad[i]) && !isinf(x_grad[i]));
 	}
 }
 

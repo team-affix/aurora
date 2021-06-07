@@ -70,6 +70,7 @@ void ntm_writer::bwd() {
 				internal_addresser->y[i];
 		}
 	internal_addresser->bwd();
+	mx_grad.add_2d(internal_addresser->x_grad, mx_grad);
 	internal_head->bwd();
 }
 
@@ -132,7 +133,6 @@ void ntm_writer::compile() {
 	x.group_join_all_ranks(internal_head->x);
 	x_grad.group_join_all_ranks(internal_head->x_grad);
 	mx.group_join_all_ranks(internal_addresser->x);
-	mx_grad.group_join_all_ranks(internal_addresser->x_grad);
 	wx.group_join_all_ranks(internal_addresser->wx);
 	wx_grad.group_join_all_ranks(internal_addresser->wx_grad);
 	internal_addresser->wy.group_join_all_ranks(wy);

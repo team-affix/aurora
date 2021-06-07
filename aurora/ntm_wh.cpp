@@ -115,6 +115,8 @@ void ntm_wh::compile() {
 	e_model->compile();
 
 	x.group_join_all_ranks(internal_rh->x);
+	x.group_join_all_ranks(a_model->x);
+	x.group_join_all_ranks(e_model->x);
 
 	a.group_join_all_ranks(a_model->y);
 	a_grad.group_join_all_ranks(a_model->y_grad);
