@@ -2671,12 +2671,12 @@ void ntm_writer_test() {
 
 void ntm_test() {
 
-	size_t memory_height = 5;
+	size_t memory_height = 1;
 	size_t memory_width = 5;
 	size_t num_readers = 1;
 	size_t num_writers = 1;
 	vector<int> valid_shifts = { -1, 0, 1 };
-	vector<size_t> head_hidden_dims = { memory_width, memory_width };
+	vector<size_t> head_hidden_dims = { memory_width };
 
 	uniform_real_distribution<double> pmt_urd(-1, 1);
 	uniform_real_distribution<double> ts_urd(-10, 10);
@@ -2685,9 +2685,9 @@ void ntm_test() {
 
 	vector<param_sgd*> pv;
 
-	auto pmt_init = INIT_PMT(param_sgd(pmt_urd(dre), 0.002, 0), pv);
+	auto pmt_init = INIT_PMT(param_sgd(pmt_urd(dre), 0.02, 0), pv);
 
-	ptr<sync> s_in = new sync(pseudo::tnn({ 2, memory_width, memory_width }, pseudo::nlr(0.3), pmt_init));
+	ptr<sync> s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3), pmt_init));
 
 	ptr<ntm> p = new ntm(
 		memory_height,
@@ -2698,7 +2698,7 @@ void ntm_test() {
 		head_hidden_dims,
 		pmt_init);
 
-	ptr<sync> s_out = new sync(pseudo::tnn({ memory_width, memory_width, 1 }, pseudo::nlr(0.3), pmt_init));
+	ptr<sync> s_out = new sync(pseudo::tnn({ memory_width, 1 }, pseudo::nlr(0.3), pmt_init));
 
 	ptr<sequential> s = new sequential { s_in.get(), p.get(), s_out.get() };
 
@@ -2742,7 +2742,7 @@ void ntm_test() {
 		},
 	};
 
-	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, dre));
+	//p->mx.pop(tensor::new_2d(memory_height, memory_width, 1));
 	p->unrolled[0]->internal_readers[0]->wx[0].val() = 1;
 	p->unrolled[0]->internal_writers[0]->wx[0].val() = 1;
 

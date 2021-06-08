@@ -124,6 +124,7 @@ void ntm_location_addresser::compile() {
 	gamma_grad.group_join(internal_power->amount_grad);
 
 	wx.group_join(internal_interpolate->x[0]);
+	wx[0].val() = 1; // MUST INITIALIZE wx TO BE A NORMALIZED DISTRIBUTION
 	wx_grad.group_join(internal_interpolate->x_grad[0]);
 	x.group_join(internal_interpolate->x[1]);
 	x_grad.group_join(internal_interpolate->x_grad[1]);

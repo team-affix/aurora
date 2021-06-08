@@ -111,7 +111,7 @@ void ntm::compile() {
 	x_grad = tensor::new_2d(prepared.size(), memory_width);
 	y = tensor::new_2d(prepared.size(), memory_width);
 	y_grad = tensor::new_2d(prepared.size(), memory_width);
-	mx = tensor::new_2d(memory_height, memory_width);
+	mx = tensor::new_2d(memory_height, memory_width, 1.0);	
 	mx_grad = tensor::new_2d(memory_height, memory_width);
 	my = tensor::new_2d(memory_height, memory_width);
 	my_grad = tensor::new_2d(memory_height, memory_width);
@@ -132,7 +132,7 @@ void ntm::compile() {
 		prepared[i]->y_grad.group_join(y_grad[i]);
 		prepared[i]->hty_grad.group_join(internal_lstm->prepared[i]->hty_grad);
 		
-		l_mx->group_join(prepared[i]->mx);
+		prepared[i]->mx.group_join(*l_mx);
 		l_mx_grad->group_join(prepared[i]->mx_grad);
 
 		l_mx = &prepared[i]->my;
