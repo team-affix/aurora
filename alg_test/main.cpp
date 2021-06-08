@@ -2671,7 +2671,7 @@ void ntm_writer_test() {
 
 void ntm_test() {
 
-	size_t memory_height = 1;
+	size_t memory_height = 2;
 	size_t memory_width = 5;
 	size_t num_readers = 1;
 	size_t num_writers = 1;
@@ -2683,9 +2683,9 @@ void ntm_test() {
 	uniform_real_distribution<double> mem_urd(-1, 1);
 	default_random_engine dre(27);
 
-	vector<param_sgd*> pv;
+	vector<param_mom*> pv;
 
-	auto pmt_init = INIT_PMT(param_sgd(pmt_urd(dre), 0.02, 0), pv);
+	auto pmt_init = INIT_PMT(param_mom(pmt_urd(dre), 0.0002, 0, 0, 0.9), pv);
 
 	ptr<sync> s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3), pmt_init));
 
@@ -2743,8 +2743,8 @@ void ntm_test() {
 	};
 
 	//p->mx.pop(tensor::new_2d(memory_height, memory_width, 1));
-	p->unrolled[0]->internal_readers[0]->wx[0].val() = 1;
-	p->unrolled[0]->internal_writers[0]->wx[0].val() = 1;
+	/*p->unrolled[0]->internal_readers[0]->wx[0].val() = 1;
+	p->unrolled[0]->internal_writers[0]->wx[0].val() = 1;*/
 
 	const size_t checkpoint_interval = 1000;
 
@@ -2761,7 +2761,7 @@ void ntm_test() {
 		}
 
 
-		for (param_sgd* pmt : pv)
+		for (param_mom* pmt : pv)
 			pmt->update();
 
 		if (epoch % checkpoint_interval == 0)
