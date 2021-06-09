@@ -1,8 +1,0 @@
-
-void MODEL::prep(size_t a_n) {
-
-}
-
-void MODEL::unroll(size_t a_n) {
-
-}
