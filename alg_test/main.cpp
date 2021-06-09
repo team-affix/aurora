@@ -137,7 +137,7 @@ void tnn_xor_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(25);
 
-	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nth(), [&](ptr<param>& pmt) {
+	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
 		pl.push_back((param_mom*)pmt.get());
 	});
