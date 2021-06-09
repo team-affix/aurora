@@ -2671,14 +2671,14 @@ void ntm_writer_test() {
 
 void ntm_test() {
 
-	size_t memory_height = 2;
+	size_t memory_height = 5;
 	size_t memory_width = 5;
-	size_t num_readers = 2;
-	size_t num_writers = 2;
+	size_t num_readers = 1;
+	size_t num_writers = 1;
 	vector<int> valid_shifts = { -1, 0, 1 };
 	vector<size_t> head_hidden_dims = { memory_width };
 
-	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
+	uniform_real_distribution<double> pmt_urd(-1, 1);
 	uniform_real_distribution<double> ts_urd(-10, 10);
 	uniform_real_distribution<double> mem_urd(-1, 1);
 	default_random_engine dre(27);
