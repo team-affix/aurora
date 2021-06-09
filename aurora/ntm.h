@@ -19,6 +19,16 @@ namespace aurora {
 			tensor my_grad;
 
 		public:
+			tensor read_wx;
+			tensor read_wx_grad;
+			tensor read_wy;
+			tensor read_wy_grad;
+			tensor write_wx;
+			tensor write_wx_grad;
+			tensor write_wy;
+			tensor write_wy_grad;
+
+		public:
 			ptr<lstm> internal_lstm;
 			ptr<ntm_ts> ntm_ts_template;
 			vector<ptr<ntm_ts>> prepared;
