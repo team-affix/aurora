@@ -1,0 +1,11 @@
+#pragma once
+#include "pch.h"
+#include "affix_base.h"
+#include "maths.h"
+#include "models.h"
+#include "params.h"
+#include "pseudo.h"
+#include "evolution.h"
+#include "static_vals.h"
+#include "initialization.h"
+#include "beautify.h"

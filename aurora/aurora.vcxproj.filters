@@ -1,0 +1,381 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\data">
+      <UniqueIdentifier>{25874f64-1755-49fe-b839-1c240fbb685b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pseudo">
+      <UniqueIdentifier>{998375a9-2650-488e-a537-5d225d9d4faa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pseudo">
+      <UniqueIdentifier>{31f1715c-1e11-4861-a4f2-c46c45101bad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\evolution">
+      <UniqueIdentifier>{b75bca92-e5b4-4407-93ba-4320ff251fb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\models">
+      <UniqueIdentifier>{cd550793-81d0-41c3-9ead-150ba8074e13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\models">
+      <UniqueIdentifier>{c9cf61d3-6134-4f81-81a0-28dee2ec87c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\params">
+      <UniqueIdentifier>{c63fd232-8b8c-4a20-b206-96df21504fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\params">
+      <UniqueIdentifier>{b60fae51-2479-43e8-a22a-8090662bc063}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\evolution">
+      <UniqueIdentifier>{2ef80bf2-9414-431e-bd4d-e2d45716f849}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\basic">
+      <UniqueIdentifier>{7889e4fe-cfe3-4110-bf91-9ba4fa9493c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\basic">
+      <UniqueIdentifier>{1744551b-3818-4897-ad87-df82e773d2d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\initialization">
+      <UniqueIdentifier>{a3703a07-8605-40fc-b6cc-13627620fef8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\initialization">
+      <UniqueIdentifier>{5622ddb5-b859-49d9-b138-f86041955205}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\beautify">
+      <UniqueIdentifier>{6cf917ab-4897-4442-875b-3bfafdb8a65d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\beautify">
+      <UniqueIdentifier>{72ee6c20-80d2-4327-909e-c3a2578c5170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\maths">
+      <UniqueIdentifier>{5ac1cccd-5d6d-4d98-8573-b04c39103662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\maths">
+      <UniqueIdentifier>{33ee9bc0-3a64-4cd4-99ec-5bdc80b7ec7d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="model.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="param.h">
+      <Filter>Header Files\params</Filter>
+    </ClInclude>
+    <ClInclude Include="param_mom.h">
+      <Filter>Header Files\params</Filter>
+    </ClInclude>
+    <ClInclude Include="param_sgd.h">
+      <Filter>Header Files\params</Filter>
+    </ClInclude>
+    <ClInclude Include="tensor.h">
+      <Filter>Header Files\maths</Filter>
+    </ClInclude>
+    <ClInclude Include="sequential.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="bias.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="weight.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="weight_set.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="weight_junction.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="layer.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="maths.h">
+      <Filter>Header Files\maths</Filter>
+    </ClInclude>
+    <ClInclude Include="pseudo.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="neuron.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="sigmoid.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="tanh.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="leaky_relu.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="aurora.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sync.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="macro.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="lstm_ts.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="lstm.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="param_sgd_mt.h">
+      <Filter>Header Files\params</Filter>
+    </ClInclude>
+    <ClInclude Include="param_mom_mt.h">
+      <Filter>Header Files\params</Filter>
+    </ClInclude>
+    <ClInclude Include="models.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="params.h">
+      <Filter>Header Files\params</Filter>
+    </ClInclude>
+    <ClInclude Include="generation.h">
+      <Filter>Header Files\evolution</Filter>
+    </ClInclude>
+    <ClInclude Include="genome.h">
+      <Filter>Header Files\evolution</Filter>
+    </ClInclude>
+    <ClInclude Include="evolution.h">
+      <Filter>Header Files\evolution</Filter>
+    </ClInclude>
+    <ClInclude Include="basic.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="tnn.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="session.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="static_vals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cnl.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="param_init.h">
+      <Filter>Header Files\initialization</Filter>
+    </ClInclude>
+    <ClInclude Include="initialization.h">
+      <Filter>Header Files\initialization</Filter>
+    </ClInclude>
+    <ClInclude Include="beautify_models.h">
+      <Filter>Header Files\beautify</Filter>
+    </ClInclude>
+    <ClInclude Include="beautify.h">
+      <Filter>Header Files\beautify</Filter>
+    </ClInclude>
+    <ClInclude Include="beautify_init_pmt.h">
+      <Filter>Header Files\beautify</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_constructors.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="att_lstm.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="att_lstm_ts.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_addresser.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="cos_sim.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_sparsify.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="normalize.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_content_addresser.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="interpolate.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="shift.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="power.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_location_addresser.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_reader.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_writer.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="leaky_rexu.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_rh.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_wh.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm_ts.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ntm.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="model.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="tensor.cpp">
+      <Filter>Source Files\maths</Filter>
+    </ClCompile>
+    <ClCompile Include="sequential.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="bias.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="param.cpp">
+      <Filter>Source Files\params</Filter>
+    </ClCompile>
+    <ClCompile Include="param_sgd.cpp">
+      <Filter>Source Files\params</Filter>
+    </ClCompile>
+    <ClCompile Include="param_mom.cpp">
+      <Filter>Source Files\params</Filter>
+    </ClCompile>
+    <ClCompile Include="weight.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="weight_set.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="weight_junction.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="layer.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="sigmoid.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="tanh.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="neuron.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="leaky_relu.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="sync.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="lstm_ts.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="lstm.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="param_sgd_mt.cpp">
+      <Filter>Source Files\params</Filter>
+    </ClCompile>
+    <ClCompile Include="param_mom_mt.cpp">
+      <Filter>Source Files\params</Filter>
+    </ClCompile>
+    <ClCompile Include="genome.cpp">
+      <Filter>Source Files\evolution</Filter>
+    </ClCompile>
+    <ClCompile Include="generation.cpp">
+      <Filter>Source Files\evolution</Filter>
+    </ClCompile>
+    <ClCompile Include="tnn.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="session.cpp">
+      <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="static_vals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cnl.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="param_init.cpp">
+      <Filter>Source Files\initialization</Filter>
+    </ClCompile>
+    <ClCompile Include="att_lstm.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="att_lstm_ts.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_addresser.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="cos_sim.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_sparsify.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="normalize.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_content_addresser.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="interpolate.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="shift.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="power.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_location_addresser.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_reader.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_writer.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="leaky_rexu.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_rh.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_wh.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm_ts.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ntm.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

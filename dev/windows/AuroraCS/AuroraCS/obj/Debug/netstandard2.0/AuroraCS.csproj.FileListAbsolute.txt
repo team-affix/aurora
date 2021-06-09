@@ -1,9 +1,0 @@
-C:\Users\teama\Documents\MEGA\programming\NuGet\NuGet\netstandard2.0\AuroraCS.deps.json
-C:\Users\teama\Documents\MEGA\programming\NuGet\NuGet\netstandard2.0\AuroraCS.dll
-C:\Users\teama\Documents\MEGA\programming\NuGet\NuGet\netstandard2.0\AuroraCS.pdb
-C:\Users\teama\source\repos\AuroraCS\AuroraCS\obj\Debug\netstandard2.0\AuroraCS.csprojAssemblyReference.cache
-C:\Users\teama\source\repos\AuroraCS\AuroraCS\obj\Debug\netstandard2.0\AuroraCS.AssemblyInfoInputs.cache
-C:\Users\teama\source\repos\AuroraCS\AuroraCS\obj\Debug\netstandard2.0\AuroraCS.AssemblyInfo.cs
-C:\Users\teama\source\repos\AuroraCS\AuroraCS\obj\Debug\netstandard2.0\AuroraCS.dll
-C:\Users\teama\source\repos\AuroraCS\AuroraCS\obj\Debug\netstandard2.0\AuroraCS.pdb
-C:\Users\teama\source\repos\AuroraCS\AuroraCS\obj\Debug\netstandard2.0\AuroraCS.csproj.CopyComplete
