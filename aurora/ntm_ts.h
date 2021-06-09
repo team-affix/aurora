@@ -24,6 +24,16 @@ namespace aurora {
 			tensor accum_my_grad;
 
 		public:
+			tensor read_wx;
+			tensor read_wx_grad;
+			tensor read_wy;
+			tensor read_wy_grad;
+			tensor write_wx;
+			tensor write_wx_grad;
+			tensor write_wy;
+			tensor write_wy_grad;
+
+		public:
 			vector<ptr<ntm_reader>> internal_readers;
 			vector<ptr<ntm_writer>> internal_writers;
 

@@ -2673,19 +2673,19 @@ void ntm_test() {
 
 	size_t memory_height = 2;
 	size_t memory_width = 5;
-	size_t num_readers = 1;
-	size_t num_writers = 1;
+	size_t num_readers = 2;
+	size_t num_writers = 2;
 	vector<int> valid_shifts = { -1, 0, 1 };
 	vector<size_t> head_hidden_dims = { memory_width };
 
-	uniform_real_distribution<double> pmt_urd(-1, 1);
+	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
 	uniform_real_distribution<double> ts_urd(-10, 10);
 	uniform_real_distribution<double> mem_urd(-1, 1);
 	default_random_engine dre(27);
 
 	vector<param_mom*> pv;
 
-	auto pmt_init = INIT_PMT(param_mom(pmt_urd(dre), 0.0002, 0, 0, 0.9), pv);
+	auto pmt_init = INIT_PMT(param_mom(pmt_urd(dre), 0.002, 0, 0, 0.9), pv);
 
 	ptr<sync> s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3), pmt_init));
 
@@ -2725,8 +2725,13 @@ void ntm_test() {
 			{1, 0},
 			{1, 1}
 		},
+		/*{
+			{1, 1},
+			{0, 1},
+			{1, 0},
+			{1, 1}
+		},*/
 	};
-	
 	tensor y = {
 		{
 			{0},
@@ -2740,11 +2745,13 @@ void ntm_test() {
 			{1},
 			{1}
 		},
+		/*{
+			{0},
+			{0},
+			{0},
+			{0}
+		},*/
 	};
-
-	//p->mx.pop(tensor::new_2d(memory_height, memory_width, 1));
-	/*p->unrolled[0]->internal_readers[0]->wx[0].val() = 1;
-	p->unrolled[0]->internal_writers[0]->wx[0].val() = 1;*/
 
 	const size_t checkpoint_interval = 1000;
 

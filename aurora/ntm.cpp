@@ -116,12 +116,27 @@ void ntm::compile() {
 	my = tensor::new_2d(memory_height, memory_width);
 	my_grad = tensor::new_2d(memory_height, memory_width);
 
+	// CREATE TENSORS FOR OUTERMOST WEIGHTINGS (wx,wy)
+	read_wx = tensor::new_2d(ntm_ts_template->internal_readers.size(), memory_height);
+	read_wx_grad = tensor::new_2d(ntm_ts_template->internal_readers.size(), memory_height);
+	read_wy = tensor::new_2d(ntm_ts_template->internal_readers.size(), memory_height);
+	read_wy_grad = tensor::new_2d(ntm_ts_template->internal_readers.size(), memory_height);
+	write_wx = tensor::new_2d(ntm_ts_template->internal_writers.size(), memory_height);
+	write_wx_grad = tensor::new_2d(ntm_ts_template->internal_writers.size(), memory_height);
+	write_wy = tensor::new_2d(ntm_ts_template->internal_writers.size(), memory_height);
+	write_wy_grad = tensor::new_2d(ntm_ts_template->internal_writers.size(), memory_height);
+
 	internal_lstm->compile();
 	x.group_join_all_ranks(internal_lstm->x);
 	x_grad.group_join_all_ranks(internal_lstm->x_grad);
 
 	tensor* l_mx = &mx;
 	tensor* l_mx_grad = &mx_grad;
+
+	tensor* l_read_wx = &read_wx;
+	tensor* l_read_wx_grad = &read_wx_grad;
+	tensor* l_write_wx = &write_wx;
+	tensor* l_write_wx_grad = &write_wx_grad;
 
 	for (int i = 0; i < prepared.size(); i++) {
 		
@@ -138,20 +153,25 @@ void ntm::compile() {
 		l_mx = &prepared[i]->my;
 		l_mx_grad = &prepared[i]->my_grad;
 
-		if (i > 0) {
-			for (int j = 0; j < prepared[i]->internal_readers.size(); j++) {
-				prepared[i]->internal_readers[j]->wx.group_join(prepared[i - 1]->internal_readers[j]->wy);
-				prepared[i]->internal_readers[j]->wx_grad.group_join(prepared[i - 1]->internal_readers[j]->wy_grad);
-			}
-			for (int j = 0; j < prepared[i]->internal_writers.size(); j++) {
-				prepared[i]->internal_writers[j]->wx.group_join(prepared[i - 1]->internal_writers[j]->wy);
-				prepared[i]->internal_writers[j]->wx_grad.group_join(prepared[i - 1]->internal_writers[j]->wy_grad);
-			}
-		}
+		l_read_wx->group_join_all_ranks(prepared[i]->read_wx);
+		l_read_wx_grad->group_join_all_ranks(prepared[i]->read_wx_grad);
+		l_write_wx->group_join_all_ranks(prepared[i]->write_wx);
+		l_write_wx_grad->group_join_all_ranks(prepared[i]->write_wx_grad);
+
+		l_read_wx = &prepared[i]->read_wy;
+		l_read_wx_grad = &prepared[i]->read_wy_grad;
+		l_write_wx = &prepared[i]->write_wy;
+		l_write_wx_grad = &prepared[i]->write_wy_grad;
+
 	}
 
 	l_mx->group_join(my);
 	l_mx_grad->group_join(my_grad);
+
+	l_read_wx->group_join_all_ranks(read_wy);
+	l_read_wx_grad->group_join_all_ranks(read_wy_grad);
+	l_write_wx->group_join_all_ranks(write_wy);
+	l_write_wx_grad->group_join_all_ranks(write_wy_grad);
 
 }
 

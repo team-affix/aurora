@@ -126,6 +126,16 @@ void ntm_ts::compile() {
 	reader_y_grad = tensor::new_1d(memory_width);
 	accum_my_grad = tensor::new_2d(memory_height, memory_width);
 
+	// CREATE TENSORS FOR OUTERMOST WEIGHTINGS (wx,wy)
+	read_wx = tensor::new_2d(internal_readers.size(), memory_height);
+	read_wx_grad = tensor::new_2d(internal_readers.size(), memory_height);
+	read_wy = tensor::new_2d(internal_readers.size(), memory_height);
+	read_wy_grad = tensor::new_2d(internal_readers.size(), memory_height);
+	write_wx = tensor::new_2d(internal_writers.size(), memory_height);
+	write_wx_grad = tensor::new_2d(internal_writers.size(), memory_height);
+	write_wy = tensor::new_2d(internal_writers.size(), memory_height);
+	write_wy_grad = tensor::new_2d(internal_writers.size(), memory_height);
+
 	tensor* l_mx = &mx;
 	tensor* l_mx_grad = &mx_grad;
 
@@ -136,6 +146,11 @@ void ntm_ts::compile() {
 		internal_writers[i]->mx_grad.group_join_all_ranks(*l_mx_grad);
 		l_mx = &internal_writers[i]->y;
 		l_mx_grad = &internal_writers[i]->y_grad;
+
+		write_wx[i].group_join(internal_writers[i]->wx);
+		write_wx_grad[i].group_join(internal_writers[i]->wx_grad);
+		write_wy[i].group_join(internal_writers[i]->wy);
+		write_wy_grad[i].group_join(internal_writers[i]->wy_grad);
 	}
 
 	l_mx->group_join_all_ranks(my);
@@ -146,6 +161,11 @@ void ntm_ts::compile() {
 		internal_readers[i]->x.group_join_all_ranks(x);
 		internal_readers[i]->mx.group_join_all_ranks(my);
 		internal_readers[i]->y_grad.group_join_all_ranks(reader_y_grad);
+
+		read_wx[i].group_join(internal_readers[i]->wx);
+		read_wx_grad[i].group_join(internal_readers[i]->wx_grad);
+		read_wy[i].group_join(internal_readers[i]->wy);
+		read_wy_grad[i].group_join(internal_readers[i]->wy_grad);
 	}
 
 }
