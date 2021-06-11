@@ -26,8 +26,8 @@ att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(
 	models = new sync(model_template);
 }
 
-void att_lstm_ts::pmt_wise(function<void(ptr<param>&)> a_func) {
-	model_template->pmt_wise(a_func);
+void att_lstm_ts::param_recur(function<void(ptr<param>&)> a_func) {
+	model_template->param_recur(a_func);
 }
 
 model* att_lstm_ts::clone() {
@@ -86,8 +86,8 @@ void att_lstm_ts::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void att_lstm_ts::recur(function<void(model*)> a_func) {
-	model_template->recur(a_func);
+void att_lstm_ts::model_recur(function<void(model*)> a_func) {
+	model_template->model_recur(a_func);
 }
 
 void att_lstm_ts::compile() {

@@ -25,9 +25,9 @@ layer::layer(initializer_list<Model> a_il) {
 	std::copy(a_il.begin(), a_il.end(), back_inserter(models));
 }
 
-void layer::pmt_wise(function<void(ptr<param>&)> a_func) {
+void layer::param_recur(function<void(ptr<param>&)> a_func) {
 	for (int i = 0; i < models.size(); i++)
-		models[i]->pmt_wise(a_func);
+		models[i]->param_recur(a_func);
 }
 
 model* layer::clone() {
@@ -59,10 +59,10 @@ void layer::signal(tensor& a_y_des) {
 		models[i]->signal(a_y_des[i]);
 }
 
-void layer::recur(function<void(model*)> a_func) {
+void layer::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 	for (size_t i = 0; i < models.size(); i++)
-		models[i]->recur(a_func);
+		models[i]->model_recur(a_func);
 }
 
 void layer::compile() {

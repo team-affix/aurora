@@ -146,12 +146,12 @@ namespace aurora {
 			void unlink();
 
 		public:
-			void rank_recur(function<void(tensor*)> a_func);
+			void rank_model_recur(function<void(tensor*)> a_func);
 
 		public:
 			void group_recur_fwd(function<void(tensor*)> a_func);
 			void group_recur_bwd(function<void(tensor*)> a_func);
-			void group_recur(function<void(tensor*)> a_func);
+			void group_model_recur(function<void(tensor*)> a_func);
 			bool group_contains(tensor* a_ptr);
 
 		public:

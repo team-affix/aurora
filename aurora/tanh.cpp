@@ -17,7 +17,7 @@ tanh::tanh(double a_a, double a_b, double a_c) {
 	c = a_c;
 }
 
-void tanh::pmt_wise(function<void(ptr<param>&)> a_func) {
+void tanh::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -41,7 +41,7 @@ void tanh::signal(tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void tanh::recur(function<void(model*)> a_func) {
+void tanh::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

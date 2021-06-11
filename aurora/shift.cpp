@@ -16,7 +16,7 @@ shift::shift(size_t a_units, vector<int> a_valid_shifts) {
 	valid_shifts = a_valid_shifts;
 }
 
-void shift::pmt_wise(function<void(ptr<param>&)> a_func) {
+void shift::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -58,7 +58,7 @@ void shift::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void shift::recur(function<void(model*)> a_func) {
+void shift::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

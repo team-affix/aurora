@@ -15,7 +15,7 @@ power::power(size_t a_units) {
 	units = a_units;
 }
 
-void power::pmt_wise(function<void(ptr<param>&)> a_func) {
+void power::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -52,7 +52,7 @@ void power::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void power::recur(function<void(model*)> a_func) {
+void power::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

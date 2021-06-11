@@ -28,11 +28,11 @@ void model::signal(tensor& a_y_des) {
 	
 }
 
-void model::recur(function<void(model*)> a_func) {
+void model::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 
-void model::pmt_wise(function<void(ptr<param>&)> a_func) {
+void model::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 

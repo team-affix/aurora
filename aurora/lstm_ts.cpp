@@ -31,12 +31,12 @@ lstm_ts::lstm_ts(size_t a_units, Layer a_forget_gate, Layer a_limit_gate, Layer 
 	this->tanh_gate = a_tanh_gate;
 }
 
-void lstm_ts::pmt_wise(function<void(ptr<param>&)> a_func) {
-	forget_gate->pmt_wise(a_func);
-	limit_gate->pmt_wise(a_func);
-	input_gate->pmt_wise(a_func);
-	output_gate->pmt_wise(a_func);
-	tanh_gate->pmt_wise(a_func);
+void lstm_ts::param_recur(function<void(ptr<param>&)> a_func) {
+	forget_gate->param_recur(a_func);
+	limit_gate->param_recur(a_func);
+	input_gate->param_recur(a_func);
+	output_gate->param_recur(a_func);
+	tanh_gate->param_recur(a_func);
 }
 
 model* lstm_ts::clone() {
@@ -88,13 +88,13 @@ void lstm_ts::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void lstm_ts::recur(function<void(model*)> a_func) {
+void lstm_ts::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	forget_gate->recur(a_func);
-	limit_gate->recur(a_func);
-	input_gate->recur(a_func);
-	output_gate->recur(a_func);
-	tanh_gate->recur(a_func);
+	forget_gate->model_recur(a_func);
+	limit_gate->model_recur(a_func);
+	input_gate->model_recur(a_func);
+	output_gate->model_recur(a_func);
+	tanh_gate->model_recur(a_func);
 }
 
 void lstm_ts::compile() {

@@ -11,7 +11,7 @@ leaky_relu::leaky_relu(double a_m) {
 	m.val() = a_m;
 }
 
-void leaky_relu::pmt_wise(function<void(ptr<param>&)> a_func) {
+void leaky_relu::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -41,7 +41,7 @@ void leaky_relu::signal(tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void leaky_relu::recur(function<void(model*)> a_func) {
+void leaky_relu::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

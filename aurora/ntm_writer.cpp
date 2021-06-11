@@ -18,9 +18,9 @@ ntm_writer::ntm_writer(size_t a_memory_height, size_t a_memory_width, vector<int
 	internal_addresser = new ntm_addresser(a_memory_height, a_memory_width, a_valid_shifts);
 }
 
-void ntm_writer::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_head->pmt_wise(a_func);
-	internal_addresser->pmt_wise(a_func);
+void ntm_writer::param_recur(function<void(ptr<param>&)> a_func) {
+	internal_head->param_recur(a_func);
+	internal_addresser->param_recur(a_func);
 }
 
 model* ntm_writer::clone() {
@@ -78,10 +78,10 @@ void ntm_writer::signal(tensor& a_y_des) {
 	y.sub_2d(a_y_des, y_grad);
 }
 
-void ntm_writer::recur(function<void(model*)> a_func) {
+void ntm_writer::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_head->recur(a_func);
-	internal_addresser->recur(a_func);
+	internal_head->model_recur(a_func);
+	internal_addresser->model_recur(a_func);
 }
 
 void ntm_writer::compile() {

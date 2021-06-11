@@ -15,7 +15,7 @@ weight::weight(function<void(ptr<param>&)> a_func) {
 	a_func(pmt);
 }
 
-void weight::pmt_wise(function<void(ptr<param>&)> a_func) {
+void weight::param_recur(function<void(ptr<param>&)> a_func) {
 	a_func(pmt);
 }
 
@@ -46,7 +46,7 @@ void weight::signal(tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void weight::recur(function<void(model*)> a_func) {
+void weight::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

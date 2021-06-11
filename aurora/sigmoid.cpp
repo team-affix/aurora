@@ -11,7 +11,7 @@ sigmoid::sigmoid() {
 
 }
 
-void sigmoid::pmt_wise(function<void(ptr<param>&)> a_func) {
+void sigmoid::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -35,7 +35,7 @@ void sigmoid::signal(tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void sigmoid::recur(function<void(model*)> a_func) {
+void sigmoid::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

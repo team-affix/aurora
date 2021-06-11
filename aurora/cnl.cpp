@@ -30,8 +30,8 @@ cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_he
 	prep(a_input_max_height, a_input_max_width);
 }
 
-void cnl::pmt_wise(function<void(ptr<param>&)> a_func) {
-	filter_template->pmt_wise(a_func);
+void cnl::param_recur(function<void(ptr<param>&)> a_func) {
+	filter_template->param_recur(a_func);
 }
 
 model* cnl::clone() {
@@ -57,9 +57,9 @@ void cnl::signal(tensor& a_y_des) {
 	filters->signal(y_des_reshaped);
 }
 
-void cnl::recur(function<void(model*)> a_func) {
+void cnl::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	filter_template->recur(a_func);
+	filter_template->model_recur(a_func);
 }
 
 void cnl::compile() {

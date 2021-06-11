@@ -15,7 +15,7 @@ bias::bias(function<void(ptr<param>&)> a_func) {
 	a_func(pmt);
 }
 
-void bias::pmt_wise(function<void(ptr<param>&)> a_func) {
+void bias::param_recur(function<void(ptr<param>&)> a_func) {
 	a_func(pmt);
 }
 
@@ -45,7 +45,7 @@ void bias::signal(tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void bias::recur(function<void(model*)> a_func) {
+void bias::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

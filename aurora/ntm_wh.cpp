@@ -31,10 +31,10 @@ ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 	e_model = pseudo::tnn(dims, e_neurons, a_func);
 }
 
-void ntm_wh::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_rh->pmt_wise(a_func);
-	a_model->pmt_wise(a_func);
-	e_model->pmt_wise(a_func);
+void ntm_wh::param_recur(function<void(ptr<param>&)> a_func) {
+	internal_rh->param_recur(a_func);
+	a_model->param_recur(a_func);
+	e_model->param_recur(a_func);
 }
 
 model* ntm_wh::clone() {
@@ -75,11 +75,11 @@ void ntm_wh::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_wh::recur(function<void(model*)> a_func) {
+void ntm_wh::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_rh->recur(a_func);
-	a_model->recur(a_func);
-	e_model->recur(a_func);
+	internal_rh->model_recur(a_func);
+	a_model->model_recur(a_func);
+	e_model->model_recur(a_func);
 }
 
 void ntm_wh::compile() {

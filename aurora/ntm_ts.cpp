@@ -29,11 +29,11 @@ ntm_ts::ntm_ts(
 
 }
 
-void ntm_ts::pmt_wise(function<void(ptr<param>&)> a_func) {
+void ntm_ts::param_recur(function<void(ptr<param>&)> a_func) {
 	for (int i = 0; i < internal_readers.size(); i++)
-		internal_readers[i]->pmt_wise(a_func);
+		internal_readers[i]->param_recur(a_func);
 	for (int i = 0; i < internal_writers.size(); i++)
-		internal_writers[i]->pmt_wise(a_func);
+		internal_writers[i]->param_recur(a_func);
 }
 
 model* ntm_ts::clone() {
@@ -87,12 +87,12 @@ void ntm_ts::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_ts::recur(function<void(model*)> a_func) {
+void ntm_ts::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 	for (int i = 0; i < internal_readers.size(); i++)
-		internal_readers[i]->recur(a_func);
+		internal_readers[i]->model_recur(a_func);
 	for (int i = 0; i < internal_writers.size(); i++)
-		internal_writers[i]->recur(a_func);
+		internal_writers[i]->model_recur(a_func);
 }
 
 void ntm_ts::compile() {

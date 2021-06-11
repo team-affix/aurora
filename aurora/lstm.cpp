@@ -16,8 +16,8 @@ lstm::lstm(size_t a_units, function<void(ptr<param>&)> a_func) {
 	lstm_ts_template = new lstm_ts(units, a_func);
 }
 
-void lstm::pmt_wise(function<void(ptr<param>&)> a_func) {
-	lstm_ts_template->pmt_wise(a_func);
+void lstm::param_recur(function<void(ptr<param>&)> a_func) {
+	lstm_ts_template->param_recur(a_func);
 }
 
 model* lstm::clone() {
@@ -53,9 +53,9 @@ void lstm::signal(tensor& a_y_des) {
 		unrolled[i]->signal(a_y_des[i]);
 }
 
-void lstm::recur(function<void(model*)> a_func) {
+void lstm::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	lstm_ts_template->recur(a_func);
+	lstm_ts_template->model_recur(a_func);
 }
 
 void lstm::compile() {

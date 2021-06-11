@@ -15,7 +15,7 @@ interpolate::interpolate(size_t a_units) {
 	units = a_units;
 }
 
-void interpolate::pmt_wise(function<void(ptr<param>&)> a_func) {
+void interpolate::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -53,7 +53,7 @@ void interpolate::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void interpolate::recur(function<void(model*)> a_func) {
+void interpolate::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

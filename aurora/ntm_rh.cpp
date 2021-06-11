@@ -61,12 +61,12 @@ ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 	gamma_model = pseudo::tnn(gamma_dims, gamma_neurons, a_func);
 }
 
-void ntm_rh::pmt_wise(function<void(ptr<param>&)> a_func) {
-	key_model->pmt_wise(a_func);
-	beta_model->pmt_wise(a_func);
-	g_model->pmt_wise(a_func);
-	s_model->pmt_wise(a_func);
-	gamma_model->pmt_wise(a_func);
+void ntm_rh::param_recur(function<void(ptr<param>&)> a_func) {
+	key_model->param_recur(a_func);
+	beta_model->param_recur(a_func);
+	g_model->param_recur(a_func);
+	s_model->param_recur(a_func);
+	gamma_model->param_recur(a_func);
 }
 
 model* ntm_rh::clone() {
@@ -121,13 +121,13 @@ void ntm_rh::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_rh::recur(function<void(model*)> a_func) {
+void ntm_rh::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	key_model->recur(a_func);
-	beta_model->recur(a_func);
-	g_model->recur(a_func);
-	s_model->recur(a_func);
-	gamma_model->recur(a_func);
+	key_model->model_recur(a_func);
+	beta_model->model_recur(a_func);
+	g_model->model_recur(a_func);
+	s_model->model_recur(a_func);
+	gamma_model->model_recur(a_func);
 }
 
 void ntm_rh::compile() {

@@ -17,9 +17,9 @@ att_lstm::att_lstm(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<pa
 	internal_lstm = new lstm(a_units, a_func);
 }
 
-void att_lstm::pmt_wise(function<void(ptr<param>&)> a_func) {
-	models->pmt_wise(a_func);
-	internal_lstm->pmt_wise(a_func);
+void att_lstm::param_recur(function<void(ptr<param>&)> a_func) {
+	models->param_recur(a_func);
+	internal_lstm->param_recur(a_func);
 }
 
 model* att_lstm::clone() {
@@ -61,9 +61,9 @@ void att_lstm::signal(tensor& a_y_des) {
 	internal_lstm->signal(a_y_des);
 }
 
-void att_lstm::recur(function<void(model*)> a_func) {
-	models->recur(a_func);
-	internal_lstm->recur(a_func);
+void att_lstm::model_recur(function<void(model*)> a_func) {
+	models->model_recur(a_func);
+	internal_lstm->model_recur(a_func);
 }
 
 void att_lstm::compile() {

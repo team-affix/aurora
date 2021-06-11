@@ -18,9 +18,9 @@ weight_junction::weight_junction(size_t a_a, size_t a_b, function<void(ptr<param
 		weight_sets.push_back(new weight_set(a_b, a_func));
 }
 
-void weight_junction::pmt_wise(function<void(ptr<param>&)> a_func) {
+void weight_junction::param_recur(function<void(ptr<param>&)> a_func) {
 	for (int i = 0; i < weight_sets.size(); i++)
-		weight_sets[i]->pmt_wise(a_func);
+		weight_sets[i]->param_recur(a_func);
 }
 
 model* weight_junction::clone() {
@@ -58,10 +58,10 @@ void weight_junction::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void weight_junction::recur(function<void(model*)> a_func) {
+void weight_junction::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 	for (int i = 0; i < weight_sets.size(); i++)
-		weight_sets[i]->recur(a_func);
+		weight_sets[i]->model_recur(a_func);
 }
 
 void weight_junction::compile() {

@@ -15,7 +15,7 @@ normalize::normalize(size_t a_units) {
 	units = a_units;
 }
 
-void normalize::pmt_wise(function<void(ptr<param>&)> a_func) {
+void normalize::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -52,7 +52,7 @@ void normalize::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void normalize::recur(function<void(model*)> a_func) {
+void normalize::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

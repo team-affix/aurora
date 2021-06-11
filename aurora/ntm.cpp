@@ -35,9 +35,9 @@ ntm::ntm(
 
 }
 
-void ntm::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_lstm->pmt_wise(a_func);
-	ntm_ts_template->pmt_wise(a_func);
+void ntm::param_recur(function<void(ptr<param>&)> a_func) {
+	internal_lstm->param_recur(a_func);
+	ntm_ts_template->param_recur(a_func);
 }
 
 model* ntm::clone() {
@@ -81,10 +81,10 @@ void ntm::signal(tensor& a_y_des) {
 	y.sub_2d(a_y_des, y_grad);
 }
 
-void ntm::recur(function<void(model*)> a_func) {
+void ntm::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_lstm->recur(a_func);
-	ntm_ts_template->recur(a_func);
+	internal_lstm->model_recur(a_func);
+	ntm_ts_template->model_recur(a_func);
 }
 
 void ntm::compile() {

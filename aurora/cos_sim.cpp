@@ -15,7 +15,7 @@ cos_sim::cos_sim(size_t a_units) {
 	units = a_units;
 }
 
-void cos_sim::pmt_wise(function<void(ptr<param>&)> a_func) {
+void cos_sim::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -66,7 +66,7 @@ void cos_sim::signal(tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void cos_sim::recur(function<void(model*)> a_func) {
+void cos_sim::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

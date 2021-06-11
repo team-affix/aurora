@@ -19,7 +19,7 @@ ntm_content_addresser::ntm_content_addresser(size_t a_memory_height, size_t a_me
 	internal_normalize = new normalize(memory_height);
 }
 
-void ntm_content_addresser::pmt_wise(function<void(ptr<param>&)> a_func) {
+void ntm_content_addresser::param_recur(function<void(ptr<param>&)> a_func) {
 
 }
 
@@ -63,11 +63,11 @@ void ntm_content_addresser::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_content_addresser::recur(function<void(model*)> a_func) {
+void ntm_content_addresser::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_similarity->recur(a_func);
-	internal_sparsify->recur(a_func);
-	internal_normalize->recur(a_func);
+	internal_similarity->model_recur(a_func);
+	internal_sparsify->model_recur(a_func);
+	internal_normalize->model_recur(a_func);
 }
 
 void ntm_content_addresser::compile() {

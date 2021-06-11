@@ -23,9 +23,9 @@ sequential::sequential(vector<Model> a_models) {
 	models = a_models;
 }
 
-void sequential::pmt_wise(function<void(ptr<param>&)> a_func) {
+void sequential::param_recur(function<void(ptr<param>&)> a_func) {
 	for (int i = 0; i < models.size(); i++)
-		models[i]->pmt_wise(a_func);
+		models[i]->param_recur(a_func);
 }
 
 model* sequential::clone() {
@@ -59,10 +59,10 @@ void sequential::signal(tensor& a_y_des) {
 	models.back()->signal(a_y_des);
 }
 
-void sequential::recur(function<void(model*)> a_func) {
+void sequential::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 	for (int i = 0; i < models.size(); i++)
-		models[i]->recur(a_func);
+		models[i]->model_recur(a_func);
 }
 
 void sequential::compile() {

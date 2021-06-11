@@ -11,8 +11,8 @@ sync::sync(Model a_model_template) {
 	this->model_template = a_model_template;
 }
 
-void sync::pmt_wise(function<void(ptr<param>&)> a_func) {
-	model_template->pmt_wise(a_func);
+void sync::param_recur(function<void(ptr<param>&)> a_func) {
+	model_template->param_recur(a_func);
 }
 
 model* sync::clone() {
@@ -44,9 +44,9 @@ void sync::signal(tensor& a_y_des) {
 		unrolled[i]->signal(a_y_des[i]);
 }
 
-void sync::recur(function<void(model*)> a_func) {
+void sync::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	model_template->recur(a_func);
+	model_template->model_recur(a_func);
 }
 
 void sync::compile() {
