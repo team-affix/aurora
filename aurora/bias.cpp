@@ -11,11 +11,11 @@ bias::bias() {
 
 }
 
-bias::bias(function<void(ptr<param>&)> a_func) {
+bias::bias(function<void(Param&)> a_func) {
 	a_func(pmt);
 }
 
-void bias::param_recur(function<void(ptr<param>&)> a_func) {
+void bias::param_recur(function<void(Param&)> a_func) {
 	a_func(pmt);
 }
 
@@ -25,7 +25,7 @@ model* bias::clone() {
 	return result;
 }
 
-model* bias::clone(function<void(ptr<param>&)> a_func) {
+model* bias::clone(function<void(Param&)> a_func) {
 	bias* result = new bias();
 	result->pmt = pmt->clone();
 	a_func(result->pmt);

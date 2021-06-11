@@ -136,7 +136,7 @@ void tnn_xor_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(25);
 
-	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
 		pl.push_back((param_mom*)pmt.get());
 	});
@@ -309,7 +309,7 @@ void tnn_multithread_test() {
 
 	const int numClones = 16;
 
-	sync s = sync(pseudo::tnn({ 2, 25, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	sync s = sync(pseudo::tnn({ 2, 25, 1 }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param_sgd_mt(urd(re), 0.0002, 0);
 		pl.push_back((param_sgd_mt*)pmt.get());
 	}));
@@ -376,7 +376,7 @@ void sync_xor_test() {
 	default_random_engine re(25);
 
 	vector<param_sgd*> pl = vector<param_sgd*>();
-	Sync s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sync s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param_sgd(urd(re), 0.02, 0);
 		pl.push_back((param_sgd*)pmt.get());
 	}));
@@ -462,7 +462,7 @@ void encoder_test() {
 
 	vector<param_sgd*> pl = vector<param_sgd*>();
 	std::cout << "INSTANTIATING MODEL" << std::endl;
-	Sequential s = pseudo::tnn({ x_order_1_len, h_1_len, h_2_len, h_3_len, encoded_len, h_3_len, h_2_len, h_1_len, x_order_1_len }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s = pseudo::tnn({ x_order_1_len, h_1_len, h_2_len, h_3_len, encoded_len, h_3_len, h_2_len, h_1_len, x_order_1_len }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param_sgd();
 		pl.push_back((param_sgd*)pmt.get());
 	});
@@ -579,7 +579,7 @@ void lstm_test() {
 
 	vector<param_sgd*> pv;
 
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_sgd(urd(re), 0.02, 0);
 		pv.push_back((param_sgd*)pmt.get());
 	};
@@ -645,7 +645,7 @@ void input_gd() {
 	};
 
 	vector<param_mom*> pv_0;
-	Sync s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sync s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_0.push_back((param_mom*)pmt.get());
 	}));
@@ -654,7 +654,7 @@ void input_gd() {
 	const int x_1_height = 20;
 	tensor x_1 = tensor::new_2d(x_1_height, pv_0.size(), urd, re);
 	vector<param_mom*> pv_1;
-	Sequential s_1 = pseudo::tnn({ pv_0.size(), pv_0.size() * 2, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s_1 = pseudo::tnn({ pv_0.size(), pv_0.size() * 2, 1 }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_1.push_back((param_mom*)pmt.get());
 	});
@@ -767,7 +767,7 @@ void loss_map() {
 	};
 
 	vector<param_mom*> pv_0;
-	Sync s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sync s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_0.push_back((param_mom*)pmt.get());
 		}));
@@ -776,7 +776,7 @@ void loss_map() {
 	const int x_1_height = 50;
 	tensor x_1 = tensor::new_2d(x_1_height, 1, urd, re);
 	vector<param_mom*> pv_1;
-	Sequential s_1 = pseudo::tnn({ 1, pv_0.size(), pv_0.size() }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s_1 = pseudo::tnn({ 1, pv_0.size(), pv_0.size() }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_1.push_back((param_mom*)pmt.get());
 	});
@@ -871,7 +871,7 @@ void zil_trader() {
 #pragma endregion
 #pragma region PARAMS
 	vector<param*> pv;
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param(pmt_urd(re));
 		pv.push_back((param*)pmt.get());
 	};
@@ -1112,7 +1112,7 @@ void task_encoder() {
 	reset_sets();
 
 	vector<param_mom*> pv;
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_mom(0, 0, 0, 0, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	};
@@ -1196,7 +1196,7 @@ void genome_test() {
 		{0},
 	};
 	vector<param*> pv;
-	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](Param& pmt) {
 		pmt = new param(pmt_urd(re));
 		pv.push_back(pmt.get());
 	});
@@ -1261,7 +1261,7 @@ void pablo_guesser() {
 	default_random_engine re(25);
 
 	vector<param_mom*> pv;
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_mom(urd(re), 0.0002, 0, 0, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	};
@@ -1382,7 +1382,7 @@ void test_mm() {
 
 	vector<param*> pv;
 
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param(urd(re));
 		pv.push_back(pmt.get());
 	};
@@ -1444,13 +1444,13 @@ void test_srtt() {
 	std::normal_distribution<double> pmt_nd(0, 0.1);
 
 	vector<param*> pv_0;
-	auto pmt_0_init = [&](ptr<param>& pmt) {
+	auto pmt_0_init = [&](Param& pmt) {
 		pmt = new param(pmt_nd(re));
 		pv_0.push_back(pmt.get());
 	};
 
 	vector<param*> pv_1;
-	auto pmt_1_init = [&](ptr<param>& pmt) {
+	auto pmt_1_init = [&](Param& pmt) {
 		pmt = new param(pmt_nd(re));
 		pv_1.push_back(pmt.get());
 	};
@@ -1536,7 +1536,7 @@ void self_aware() {
 
 	vector<param*> pv;
 
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param(pmt_urd(aurora::static_vals::aurora_random_engine));
 		pv.push_back(pmt.get());
 	};
@@ -1669,7 +1669,7 @@ void proc_generator() {
 
 	vector<param_mom*> pv;
 
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_mom(pmt_urd(re), 0.002, 0, 0, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	};
@@ -1725,7 +1725,7 @@ void cnl_test() {
 	uniform_real_distribution<double> pmt_urd(-1, 1);
 
 	vector<param_mom*> pv;
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_mom(pmt_urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	};
@@ -1796,7 +1796,7 @@ void auto_encoder() {
 	default_random_engine re(27);
 
 	vector<param_mom*> pv;
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_mom(pmt_urd(re), 0.0002 / NUM_TRAINING_SETS, 0, 0, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	};
@@ -1914,7 +1914,7 @@ void att_lstm_test() {
 
 	vector<param_sgd*> pv;
 
-	auto pmt_init = [&](ptr<param>& pmt) {
+	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_sgd(urd(re), 0.02, 0);
 		pv.push_back((param_sgd*)pmt.get());
 	};

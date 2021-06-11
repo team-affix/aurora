@@ -11,7 +11,7 @@ layer::layer() {
 
 }
 
-layer::layer(size_t a_a, Model a_model_template, function<void(ptr<param>&)> a_func) {
+layer::layer(size_t a_a, Model a_model_template, function<void(Param&)> a_func) {
 	for (size_t i = 0; i < a_a; i++)
 		models.push_back(a_model_template->clone(a_func));
 }
@@ -25,7 +25,7 @@ layer::layer(initializer_list<Model> a_il) {
 	std::copy(a_il.begin(), a_il.end(), back_inserter(models));
 }
 
-void layer::param_recur(function<void(ptr<param>&)> a_func) {
+void layer::param_recur(function<void(Param&)> a_func) {
 	for (int i = 0; i < models.size(); i++)
 		models[i]->param_recur(a_func);
 }
@@ -37,7 +37,7 @@ model* layer::clone() {
 	return result;
 }
 
-model* layer::clone(function<void(ptr<param>&)> a_func) {
+model* layer::clone(function<void(Param&)> a_func) {
 	layer* result = new layer();
 	for (size_t i = 0; i < models.size(); i++)
 		result->models.push_back(models[i]->clone(a_func));

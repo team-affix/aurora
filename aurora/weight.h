@@ -9,13 +9,13 @@ namespace aurora {
 	namespace models {
 		class weight : public model {
 		public:
-			ptr<param> pmt = new param();
+			Param pmt = new param();
 
 		public:
 			MODEL_FIELDS
 			virtual ~weight();
 			weight();
-			weight(function<void(ptr<param>&)> a_func);
+			weight(function<void(Param&)> a_func);
 
 		};
 		typedef ptr<weight> Weight;

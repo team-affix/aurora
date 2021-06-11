@@ -19,7 +19,7 @@ ntm_content_addresser::ntm_content_addresser(size_t a_memory_height, size_t a_me
 	internal_normalize = new normalize(memory_height);
 }
 
-void ntm_content_addresser::param_recur(function<void(ptr<param>&)> a_func) {
+void ntm_content_addresser::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -33,7 +33,7 @@ model* ntm_content_addresser::clone() {
 	return result;
 }
 
-model* ntm_content_addresser::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_content_addresser::clone(function<void(Param&)> a_func) {
 	ntm_content_addresser* result = new ntm_content_addresser();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

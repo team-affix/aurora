@@ -12,7 +12,7 @@ cnl::cnl() {
 
 }
 
-cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, function<void(ptr<param>&)> a_func) {
+cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, function<void(Param&)> a_func) {
 	this->filter_height = a_filter_height;
 	this->filter_width = a_filter_width;
 	this->stride_len = a_stride_len;
@@ -30,7 +30,7 @@ cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_he
 	prep(a_input_max_height, a_input_max_width);
 }
 
-void cnl::param_recur(function<void(ptr<param>&)> a_func) {
+void cnl::param_recur(function<void(Param&)> a_func) {
 	filter_template->param_recur(a_func);
 }
 
@@ -39,7 +39,7 @@ model* cnl::clone() {
 	return result;
 }
 
-model* cnl::clone(function<void(ptr<param>&)> a_func) {
+model* cnl::clone(function<void(Param&)> a_func) {
 	cnl* result = new cnl(input_max_height, input_max_width, filter_height, filter_width, stride_len, filter_template->clone(a_func));
 	return result;
 }

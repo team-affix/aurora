@@ -15,7 +15,7 @@ cos_sim::cos_sim(size_t a_units) {
 	units = a_units;
 }
 
-void cos_sim::param_recur(function<void(ptr<param>&)> a_func) {
+void cos_sim::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -29,7 +29,7 @@ model* cos_sim::clone() {
 	return result;
 }
 
-model* cos_sim::clone(function<void(ptr<param>&)> a_func) {
+model* cos_sim::clone(function<void(Param&)> a_func) {
 	cos_sim* result = new cos_sim();
 	result->units = units;
 	result->magnitude_0 = magnitude_0;

@@ -11,7 +11,7 @@ sync::sync(Model a_model_template) {
 	this->model_template = a_model_template;
 }
 
-void sync::param_recur(function<void(ptr<param>&)> a_func) {
+void sync::param_recur(function<void(Param&)> a_func) {
 	model_template->param_recur(a_func);
 }
 
@@ -22,7 +22,7 @@ model* sync::clone() {
 	return result;
 }
 
-model* sync::clone(function<void(ptr<param>&)> a_func) {
+model* sync::clone(function<void(Param&)> a_func) {
 	sync* result = new sync(model_template->clone(a_func));
 	result->prep(prepared.size());
 	result->unroll(unrolled.size());

@@ -17,7 +17,7 @@ tanh::tanh(double a_a, double a_b, double a_c) {
 	c = a_c;
 }
 
-void tanh::param_recur(function<void(ptr<param>&)> a_func) {
+void tanh::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -25,7 +25,7 @@ model* tanh::clone() {
 	return new tanh();
 }
 
-model* tanh::clone(function<void(ptr<param>&)> a_func) {
+model* tanh::clone(function<void(Param&)> a_func) {
 	return new tanh();
 }
 

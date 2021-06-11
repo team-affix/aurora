@@ -11,14 +11,14 @@ ntm_reader::ntm_reader() {
 
 }
 
-ntm_reader::ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims, function<void(ptr<param>&)> a_func) {
+ntm_reader::ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims, function<void(Param&)> a_func) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
 	internal_head = new ntm_rh(a_memory_width, a_head_hidden_dims, a_valid_shifts.size(), a_func);
 	internal_addresser = new ntm_addresser(a_memory_height, a_memory_width, a_valid_shifts);
 }
 
-void ntm_reader::param_recur(function<void(ptr<param>&)> a_func) {
+void ntm_reader::param_recur(function<void(Param&)> a_func) {
 	internal_head->param_recur(a_func);
 	internal_addresser->param_recur(a_func);
 }
@@ -32,7 +32,7 @@ model* ntm_reader::clone() {
 	return result;
 }
 
-model* ntm_reader::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_reader::clone(function<void(Param&)> a_func) {
 	ntm_reader* result = new ntm_reader();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

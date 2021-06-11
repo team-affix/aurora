@@ -12,7 +12,7 @@ model::model() {
 
 }
 
-model::model(function<void(ptr<param>&)> a_func) {
+model::model(function<void(Param&)> a_func) {
 	
 }
 
@@ -32,7 +32,7 @@ void model::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 
-void model::param_recur(function<void(ptr<param>&)> a_func) {
+void model::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -40,7 +40,7 @@ model* model::clone() {
 	return new model();
 }
 
-model* model::clone(function<void(ptr<param>&)> a_func) {
+model* model::clone(function<void(Param&)> a_func) {
 	return new model();
 }
 

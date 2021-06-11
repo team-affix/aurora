@@ -28,7 +28,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~ntm_reader();
 			ntm_reader();
-			ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims, function<void(ptr<param>&)> a_func);
+			ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims, function<void(Param&)> a_func);
 
 		};
 		typedef ptr<ntm_reader> Ntm_reader;

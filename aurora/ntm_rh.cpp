@@ -13,7 +13,7 @@ ntm_rh::ntm_rh() {
 
 }
 
-ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units, function<void(ptr<param>&)> a_func) {
+ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units, function<void(Param&)> a_func) {
 	units = a_units;
 	shift_units = a_shift_units;
 
@@ -61,7 +61,7 @@ ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 	gamma_model = pseudo::tnn(gamma_dims, gamma_neurons, a_func);
 }
 
-void ntm_rh::param_recur(function<void(ptr<param>&)> a_func) {
+void ntm_rh::param_recur(function<void(Param&)> a_func) {
 	key_model->param_recur(a_func);
 	beta_model->param_recur(a_func);
 	g_model->param_recur(a_func);
@@ -82,7 +82,7 @@ model* ntm_rh::clone() {
 	return result;
 }
 
-model* ntm_rh::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_rh::clone(function<void(Param&)> a_func) {
 	ntm_rh* result = new ntm_rh();
 	result->units = units;
 	result->shift_units = shift_units;

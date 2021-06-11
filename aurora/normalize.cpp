@@ -15,7 +15,7 @@ normalize::normalize(size_t a_units) {
 	units = a_units;
 }
 
-void normalize::param_recur(function<void(ptr<param>&)> a_func) {
+void normalize::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -25,7 +25,7 @@ model* normalize::clone() {
 	return result;
 }
 
-model* normalize::clone(function<void(ptr<param>&)> a_func) {
+model* normalize::clone(function<void(Param&)> a_func) {
 	normalize* result = new normalize();
 	result->units = units;
 	return result;

@@ -11,7 +11,7 @@ sigmoid::sigmoid() {
 
 }
 
-void sigmoid::param_recur(function<void(ptr<param>&)> a_func) {
+void sigmoid::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -19,7 +19,7 @@ model* sigmoid::clone() {
 	return new sigmoid();
 }
 
-model* sigmoid::clone(function<void(ptr<param>&)> a_func) {
+model* sigmoid::clone(function<void(Param&)> a_func) {
 	return new sigmoid();
 }
 

@@ -11,7 +11,7 @@ att_lstm_ts::att_lstm_ts() {
 
 }
 
-att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func) {
+att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(Param&)> a_func) {
 	this->units = a_units;
 	vector<size_t> l_dims;
 	l_dims.push_back(2 * a_units);
@@ -26,7 +26,7 @@ att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(
 	models = new sync(model_template);
 }
 
-void att_lstm_ts::param_recur(function<void(ptr<param>&)> a_func) {
+void att_lstm_ts::param_recur(function<void(Param&)> a_func) {
 	model_template->param_recur(a_func);
 }
 
@@ -40,7 +40,7 @@ model* att_lstm_ts::clone() {
 	return result;
 }
 
-model* att_lstm_ts::clone(function<void(ptr<param>&)> a_func) {
+model* att_lstm_ts::clone(function<void(Param&)> a_func) {
 	att_lstm_ts* result = new att_lstm_ts();
 	result->units = units;
 	result->htx = htx.clone();

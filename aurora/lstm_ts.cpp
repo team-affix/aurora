@@ -13,7 +13,7 @@ lstm_ts::lstm_ts() {
 
 }
 
-lstm_ts::lstm_ts(size_t a_units, function<void(ptr<param>&)> a_func) {
+lstm_ts::lstm_ts(size_t a_units, function<void(Param&)> a_func) {
 	this->units = a_units;
 	this->forget_gate = new layer(units, pseudo::nsm(), a_func);
 	this->limit_gate = new layer(units, pseudo::nsm(), a_func);
@@ -31,7 +31,7 @@ lstm_ts::lstm_ts(size_t a_units, Layer a_forget_gate, Layer a_limit_gate, Layer 
 	this->tanh_gate = a_tanh_gate;
 }
 
-void lstm_ts::param_recur(function<void(ptr<param>&)> a_func) {
+void lstm_ts::param_recur(function<void(Param&)> a_func) {
 	forget_gate->param_recur(a_func);
 	limit_gate->param_recur(a_func);
 	input_gate->param_recur(a_func);
@@ -43,7 +43,7 @@ model* lstm_ts::clone() {
 	return new lstm_ts(units, (layer*)forget_gate->clone(), (layer*)limit_gate->clone(), (layer*)input_gate->clone(), (layer*)output_gate->clone(), (layer*)tanh_gate->clone());
 }
 
-model* lstm_ts::clone(function<void(ptr<param>&)> a_func) {
+model* lstm_ts::clone(function<void(Param&)> a_func) {
 	return new lstm_ts(units, (layer*)forget_gate->clone(a_func), (layer*)limit_gate->clone(a_func), (layer*)input_gate->clone(a_func), (layer*)output_gate->clone(a_func), (layer*)tanh_gate->clone(a_func));
 }
 

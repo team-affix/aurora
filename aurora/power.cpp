@@ -15,7 +15,7 @@ power::power(size_t a_units) {
 	units = a_units;
 }
 
-void power::param_recur(function<void(ptr<param>&)> a_func) {
+void power::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -25,7 +25,7 @@ model* power::clone() {
 	return result;
 }
 
-model* power::clone(function<void(ptr<param>&)> a_func) {
+model* power::clone(function<void(Param&)> a_func) {
 	power* result = new power();
 	result->units = units;
 	return result;

@@ -16,7 +16,7 @@ shift::shift(size_t a_units, vector<int> a_valid_shifts) {
 	valid_shifts = a_valid_shifts;
 }
 
-void shift::param_recur(function<void(ptr<param>&)> a_func) {
+void shift::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -27,7 +27,7 @@ model* shift::clone() {
 	return result;
 }
 
-model* shift::clone(function<void(ptr<param>&)> a_func) {
+model* shift::clone(function<void(Param&)> a_func) {
 	shift* result = new shift();
 	result->units = units;
 	result->valid_shifts = valid_shifts;

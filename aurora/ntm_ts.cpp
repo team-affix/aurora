@@ -18,7 +18,7 @@ ntm_ts::ntm_ts(
 	size_t a_num_writers,
 	vector<int> a_valid_shifts,
 	vector<size_t> a_head_hidden_dims,
-	function<void(ptr<param>&)> a_func) {
+	function<void(Param&)> a_func) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
 
@@ -29,7 +29,7 @@ ntm_ts::ntm_ts(
 
 }
 
-void ntm_ts::param_recur(function<void(ptr<param>&)> a_func) {
+void ntm_ts::param_recur(function<void(Param&)> a_func) {
 	for (int i = 0; i < internal_readers.size(); i++)
 		internal_readers[i]->param_recur(a_func);
 	for (int i = 0; i < internal_writers.size(); i++)
@@ -47,7 +47,7 @@ model* ntm_ts::clone() {
 	return result;
 }
 
-model* ntm_ts::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_ts::clone(function<void(Param&)> a_func) {
 	ntm_ts* result = new ntm_ts();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

@@ -11,11 +11,11 @@ weight::weight() {
 
 }
 
-weight::weight(function<void(ptr<param>&)> a_func) {
+weight::weight(function<void(Param&)> a_func) {
 	a_func(pmt);
 }
 
-void weight::param_recur(function<void(ptr<param>&)> a_func) {
+void weight::param_recur(function<void(Param&)> a_func) {
 	a_func(pmt);
 }
 
@@ -25,7 +25,7 @@ model* weight::clone() {
 	return result;
 }
 
-model* weight::clone(function<void(ptr<param>&)> a_func) {
+model* weight::clone(function<void(Param&)> a_func) {
 	weight* result = new weight();
 	result->pmt = pmt->clone();
 	a_func(result->pmt);

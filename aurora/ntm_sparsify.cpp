@@ -15,7 +15,7 @@ ntm_sparsify::ntm_sparsify(size_t a_memory_height) {
 	memory_height = a_memory_height;
 }
 
-void ntm_sparsify::param_recur(function<void(ptr<param>&)> a_func) {
+void ntm_sparsify::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -25,7 +25,7 @@ model* ntm_sparsify::clone() {
 	return result;
 }
 
-model* ntm_sparsify::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_sparsify::clone(function<void(Param&)> a_func) {
 	ntm_sparsify* result = new ntm_sparsify();
 	result->memory_height = memory_height;
 	return result;

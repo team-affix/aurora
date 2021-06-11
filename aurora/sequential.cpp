@@ -23,7 +23,7 @@ sequential::sequential(vector<Model> a_models) {
 	models = a_models;
 }
 
-void sequential::param_recur(function<void(ptr<param>&)> a_func) {
+void sequential::param_recur(function<void(Param&)> a_func) {
 	for (int i = 0; i < models.size(); i++)
 		models[i]->param_recur(a_func);
 }
@@ -36,7 +36,7 @@ model* sequential::clone() {
 	return result;
 }
 
-model* sequential::clone(function<void(ptr<param>&)> a_func) {
+model* sequential::clone(function<void(Param&)> a_func) {
 	sequential* result = new sequential();
 	result->models.resize(models.size());
 	for (int i = 0; i < models.size(); i++)

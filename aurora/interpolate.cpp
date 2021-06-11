@@ -15,7 +15,7 @@ interpolate::interpolate(size_t a_units) {
 	units = a_units;
 }
 
-void interpolate::param_recur(function<void(ptr<param>&)> a_func) {
+void interpolate::param_recur(function<void(Param&)> a_func) {
 
 }
 
@@ -25,7 +25,7 @@ model* interpolate::clone() {
 	return result;
 }
 
-model* interpolate::clone(function<void(ptr<param>&)> a_func) {
+model* interpolate::clone(function<void(Param&)> a_func) {
 	interpolate* result = new interpolate();
 	result->units = units;
 	return result;

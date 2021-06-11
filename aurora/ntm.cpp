@@ -18,7 +18,7 @@ ntm::ntm(
 	size_t a_num_writers,
 	vector<int> a_valid_shifts,
 	vector<size_t> a_head_hidden_dims,
-	function<void(ptr<param>&)> a_func) {
+	function<void(Param&)> a_func) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
 	
@@ -35,7 +35,7 @@ ntm::ntm(
 
 }
 
-void ntm::param_recur(function<void(ptr<param>&)> a_func) {
+void ntm::param_recur(function<void(Param&)> a_func) {
 	internal_lstm->param_recur(a_func);
 	ntm_ts_template->param_recur(a_func);
 }
@@ -51,7 +51,7 @@ model* ntm::clone() {
 	return result;
 }
 
-model* ntm::clone(function<void(ptr<param>&)> a_func) {
+model* ntm::clone(function<void(Param&)> a_func) {
 	ntm* result = new ntm();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

@@ -11,12 +11,12 @@ lstm::lstm() {
 
 }
 
-lstm::lstm(size_t a_units, function<void(ptr<param>&)> a_func) {
+lstm::lstm(size_t a_units, function<void(Param&)> a_func) {
 	this->units = a_units;
 	lstm_ts_template = new lstm_ts(units, a_func);
 }
 
-void lstm::param_recur(function<void(ptr<param>&)> a_func) {
+void lstm::param_recur(function<void(Param&)> a_func) {
 	lstm_ts_template->param_recur(a_func);
 }
 
@@ -29,7 +29,7 @@ model* lstm::clone() {
 	return result;
 }
 
-model* lstm::clone(function<void(ptr<param>&)> a_func) {
+model* lstm::clone(function<void(Param&)> a_func) {
 	lstm* result = new lstm();
 	result->units = units;
 	result->lstm_ts_template = (lstm_ts*)lstm_ts_template->clone(a_func);
