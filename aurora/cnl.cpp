@@ -34,12 +34,7 @@ void cnl::param_recur(function<void(Param&)> a_func) {
 	filter_template->param_recur(a_func);
 }
 
-model* cnl::clone() {
-	cnl* result = new cnl(input_max_height, input_max_width, filter_height, filter_width, stride_len, filter_template->clone());
-	return result;
-}
-
-model* cnl::clone(function<void(Param&)> a_func) {
+model* cnl::clone(function<Param(Param&)> a_func) {
 	cnl* result = new cnl(input_max_height, input_max_width, filter_height, filter_width, stride_len, filter_template->clone(a_func));
 	return result;
 }

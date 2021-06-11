@@ -36,11 +36,7 @@ void model::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* model::clone() {
-	return new model();
-}
-
-model* model::clone(function<void(Param&)> a_func) {
+model* model::clone(function<Param(Param&)> a_func) {
 	return new model();
 }
 

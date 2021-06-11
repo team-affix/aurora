@@ -19,13 +19,7 @@ void normalize::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* normalize::clone() {
-	normalize* result = new normalize();
-	result->units = units;
-	return result;
-}
-
-model* normalize::clone(function<void(Param&)> a_func) {
+model* normalize::clone(function<Param(Param&)> a_func) {
 	normalize* result = new normalize();
 	result->units = units;
 	return result;

@@ -19,17 +19,7 @@ void cos_sim::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* cos_sim::clone() {
-	cos_sim* result = new cos_sim();
-	result->units = units;
-	result->magnitude_0 = magnitude_0;
-	result->magnitude_1 = magnitude_1;
-	result->magnitude_product = magnitude_product;
-	result->dot_product = dot_product;
-	return result;
-}
-
-model* cos_sim::clone(function<void(Param&)> a_func) {
+model* cos_sim::clone(function<Param(Param&)> a_func) {
 	cos_sim* result = new cos_sim();
 	result->units = units;
 	result->magnitude_0 = magnitude_0;

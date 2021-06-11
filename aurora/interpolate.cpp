@@ -19,13 +19,7 @@ void interpolate::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* interpolate::clone() {
-	interpolate* result = new interpolate();
-	result->units = units;
-	return result;
-}
-
-model* interpolate::clone(function<void(Param&)> a_func) {
+model* interpolate::clone(function<Param(Param&)> a_func) {
 	interpolate* result = new interpolate();
 	result->units = units;
 	return result;

@@ -20,16 +20,7 @@ void lstm::param_recur(function<void(Param&)> a_func) {
 	lstm_ts_template->param_recur(a_func);
 }
 
-model* lstm::clone() {
-	lstm* result = new lstm();
-	result->units = units;
-	result->lstm_ts_template = (lstm_ts*)lstm_ts_template->clone();
-	result->prep(prepared.size());
-	result->unroll(unrolled.size());
-	return result;
-}
-
-model* lstm::clone(function<void(Param&)> a_func) {
+model* lstm::clone(function<Param(Param&)> a_func) {
 	lstm* result = new lstm();
 	result->units = units;
 	result->lstm_ts_template = (lstm_ts*)lstm_ts_template->clone(a_func);

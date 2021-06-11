@@ -3,8 +3,10 @@
 
 #define MODEL_FIELDS \
 virtual void param_recur(function<void(Param&)> a_func); \
-virtual model* clone(); \
-virtual model* clone(function<void(Param&)> a_func); \
+virtual model* clone() { \
+	return clone([](Param& pmt) { return pmt; }); \
+} \
+virtual model* clone(function<Param(Param&)> a_func); \
 virtual void fwd(); \
 virtual void bwd(); \
 virtual void signal(tensor& a_y_des); \

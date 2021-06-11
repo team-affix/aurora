@@ -19,13 +19,7 @@ void power::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* power::clone() {
-	power* result = new power();
-	result->units = units;
-	return result;
-}
-
-model* power::clone(function<void(Param&)> a_func) {
+model* power::clone(function<Param(Param&)> a_func) {
 	power* result = new power();
 	result->units = units;
 	return result;

@@ -15,11 +15,7 @@ void leaky_relu::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* leaky_relu::clone() {
-	return new leaky_relu(m.val());
-}
-
-model* leaky_relu::clone(function<void(Param&)> a_func) {
+model* leaky_relu::clone(function<Param(Param&)> a_func) {
 	return new leaky_relu(m.val());
 }
 

@@ -30,17 +30,7 @@ void att_lstm_ts::param_recur(function<void(Param&)> a_func) {
 	model_template->param_recur(a_func);
 }
 
-model* att_lstm_ts::clone() {
-	att_lstm_ts* result = new att_lstm_ts();
-	result->units = units;
-	result->htx = htx.clone();
-	result->htx_grad = htx_grad.clone();
-	result->model_template = model_template->clone();
-	result->models = (sync*)models->clone();
-	return result;
-}
-
-model* att_lstm_ts::clone(function<void(Param&)> a_func) {
+model* att_lstm_ts::clone(function<Param(Param&)> a_func) {
 	att_lstm_ts* result = new att_lstm_ts();
 	result->units = units;
 	result->htx = htx.clone();

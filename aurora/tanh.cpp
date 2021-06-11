@@ -21,11 +21,7 @@ void tanh::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* tanh::clone() {
-	return new tanh();
-}
-
-model* tanh::clone(function<void(Param&)> a_func) {
+model* tanh::clone(function<Param(Param&)> a_func) {
 	return new tanh();
 }
 

@@ -40,18 +40,7 @@ void ntm::param_recur(function<void(Param&)> a_func) {
 	ntm_ts_template->param_recur(a_func);
 }
 
-model* ntm::clone() {
-	ntm* result = new ntm();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->internal_lstm = (lstm*)internal_lstm->clone();
-	result->ntm_ts_template = (ntm_ts*)ntm_ts_template->clone();
-	result->prep(prepared.size());
-	result->unroll(prepared.size());
-	return result;
-}
-
-model* ntm::clone(function<void(Param&)> a_func) {
+model* ntm::clone(function<Param(Param&)> a_func) {
 	ntm* result = new ntm();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

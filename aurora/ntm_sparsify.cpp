@@ -19,13 +19,7 @@ void ntm_sparsify::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* ntm_sparsify::clone() {
-	ntm_sparsify* result = new ntm_sparsify();
-	result->memory_height = memory_height;
-	return result;
-}
-
-model* ntm_sparsify::clone(function<void(Param&)> a_func) {
+model* ntm_sparsify::clone(function<Param(Param&)> a_func) {
 	ntm_sparsify* result = new ntm_sparsify();
 	result->memory_height = memory_height;
 	return result;

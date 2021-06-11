@@ -24,17 +24,7 @@ void ntm_addresser::param_recur(function<void(Param&)> a_func) {
 	internal_location_addresser->param_recur(a_func);
 }
 
-model* ntm_addresser::clone() {
-	ntm_addresser* result = new ntm_addresser();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->shift_units = shift_units;
-	result->internal_content_addresser = (ntm_content_addresser*)internal_content_addresser->clone();
-	result->internal_location_addresser = (ntm_location_addresser*)internal_location_addresser->clone();
-	return result;
-}
-
-model* ntm_addresser::clone(function<void(Param&)> a_func) {
+model* ntm_addresser::clone(function<Param(Param&)> a_func) {
 	ntm_addresser* result = new ntm_addresser();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

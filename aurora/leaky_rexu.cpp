@@ -19,13 +19,7 @@ void leaky_rexu::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* leaky_rexu::clone() {
-	leaky_rexu* result = new leaky_rexu();
-	result->k = k;
-	return result;
-}
-
-model* leaky_rexu::clone(function<void(Param&)> a_func) {
+model* leaky_rexu::clone(function<Param(Param&)> a_func) {
 	leaky_rexu* result = new leaky_rexu();
 	result->k = k;
 	return result;

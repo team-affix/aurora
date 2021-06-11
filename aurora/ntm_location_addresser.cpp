@@ -27,18 +27,7 @@ void ntm_location_addresser::param_recur(function<void(Param&)> a_func) {
 	internal_normalize->param_recur(a_func);
 }
 
-model* ntm_location_addresser::clone() {
-	ntm_location_addresser* result = new ntm_location_addresser();
-	result->memory_height = memory_height;
-	result->shift_units = shift_units;
-	result->internal_interpolate = (interpolate*)internal_interpolate->clone();
-	result->internal_shift = (shift*)internal_shift->clone();
-	result->internal_power = (power*)internal_power->clone();
-	result->internal_normalize = (normalize*)internal_normalize->clone();
-	return result;
-}
-
-model* ntm_location_addresser::clone(function<void(Param&)> a_func) {
+model* ntm_location_addresser::clone(function<Param(Param&)> a_func) {
 	ntm_location_addresser* result = new ntm_location_addresser();
 	result->memory_height = memory_height;
 	result->shift_units = shift_units;

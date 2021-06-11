@@ -23,16 +23,7 @@ void weight_junction::param_recur(function<void(Param&)> a_func) {
 		weight_sets[i]->param_recur(a_func);
 }
 
-model* weight_junction::clone() {
-	weight_junction* result = new weight_junction();
-	result->a = a;
-	result->b = b;
-	for (int i = 0; i < weight_sets.size(); i++)
-		result->weight_sets.push_back((weight_set*)weight_sets[i]->clone());
-	return result;
-}
-
-model* weight_junction::clone(function<void(Param&)> a_func) {
+model* weight_junction::clone(function<Param(Param&)> a_func) {
 	weight_junction* result = new weight_junction();
 	result->a = a;
 	result->b = b;

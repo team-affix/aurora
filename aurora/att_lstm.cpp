@@ -22,15 +22,7 @@ void att_lstm::param_recur(function<void(Param&)> a_func) {
 	internal_lstm->param_recur(a_func);
 }
 
-model* att_lstm::clone() {
-	att_lstm* result = new att_lstm();
-	result->units = units;
-	result->models = (sync*)models->clone();
-	result->internal_lstm = (lstm*)internal_lstm->clone();
-	return result;
-}
-
-model* att_lstm::clone(function<void(Param&)> a_func) {
+model* att_lstm::clone(function<Param(Param&)> a_func) {
 	att_lstm* result = new att_lstm();
 	result->units = units;
 	result->models = (sync*)models->clone(a_func);

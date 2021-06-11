@@ -23,16 +23,7 @@ void ntm_reader::param_recur(function<void(Param&)> a_func) {
 	internal_addresser->param_recur(a_func);
 }
 
-model* ntm_reader::clone() {
-	ntm_reader* result = new ntm_reader();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->internal_head = (ntm_rh*)internal_head->clone();
-	result->internal_addresser = (ntm_addresser*)internal_addresser->clone();
-	return result;
-}
-
-model* ntm_reader::clone(function<void(Param&)> a_func) {
+model* ntm_reader::clone(function<Param(Param&)> a_func) {
 	ntm_reader* result = new ntm_reader();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

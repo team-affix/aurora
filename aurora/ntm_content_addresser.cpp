@@ -23,17 +23,7 @@ void ntm_content_addresser::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* ntm_content_addresser::clone() {
-	ntm_content_addresser* result = new ntm_content_addresser();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->internal_similarity = (sync*)internal_similarity->clone();
-	result->internal_sparsify = (ntm_sparsify*)internal_sparsify->clone();
-	result->internal_normalize = (normalize*)internal_normalize->clone();
-	return result;
-}
-
-model* ntm_content_addresser::clone(function<void(Param&)> a_func) {
+model* ntm_content_addresser::clone(function<Param(Param&)> a_func) {
 	ntm_content_addresser* result = new ntm_content_addresser();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

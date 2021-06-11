@@ -20,14 +20,7 @@ void shift::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* shift::clone() {
-	shift* result = new shift();
-	result->units = units;
-	result->valid_shifts = valid_shifts;
-	return result;
-}
-
-model* shift::clone(function<void(Param&)> a_func) {
+model* shift::clone(function<Param(Param&)> a_func) {
 	shift* result = new shift();
 	result->units = units;
 	result->valid_shifts = valid_shifts;

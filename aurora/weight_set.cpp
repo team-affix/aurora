@@ -22,15 +22,7 @@ void weight_set::param_recur(function<void(Param&)> a_func) {
 		weights[i]->param_recur(a_func);
 }
 
-model* weight_set::clone() {
-	weight_set* result = new weight_set();
-	result->a = a;
-	for (int i = 0; i < a; i++)
-		result->weights.push_back((weight*)weights[i]->clone());
-	return result;
-}
-
-model* weight_set::clone(function<void(Param&)> a_func) {
+model* weight_set::clone(function<Param(Param&)> a_func) {
 	weight_set* result = new weight_set();
 	result->a = a;
 	for (int i = 0; i < a; i++)

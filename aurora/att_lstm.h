@@ -14,7 +14,7 @@ namespace aurora {
 	namespace models {
 		class att_lstm : public model {
 		public:
-			size_t units;
+			size_t units = 0;
 
 		public:
 			Sync models;

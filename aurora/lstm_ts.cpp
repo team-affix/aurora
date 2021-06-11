@@ -39,11 +39,7 @@ void lstm_ts::param_recur(function<void(Param&)> a_func) {
 	tanh_gate->param_recur(a_func);
 }
 
-model* lstm_ts::clone() {
-	return new lstm_ts(units, (layer*)forget_gate->clone(), (layer*)limit_gate->clone(), (layer*)input_gate->clone(), (layer*)output_gate->clone(), (layer*)tanh_gate->clone());
-}
-
-model* lstm_ts::clone(function<void(Param&)> a_func) {
+model* lstm_ts::clone(function<Param(Param&)> a_func) {
 	return new lstm_ts(units, (layer*)forget_gate->clone(a_func), (layer*)limit_gate->clone(a_func), (layer*)input_gate->clone(a_func), (layer*)output_gate->clone(a_func), (layer*)tanh_gate->clone(a_func));
 }
 

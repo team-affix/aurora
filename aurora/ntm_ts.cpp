@@ -36,18 +36,7 @@ void ntm_ts::param_recur(function<void(Param&)> a_func) {
 		internal_writers[i]->param_recur(a_func);
 }
 
-model* ntm_ts::clone() {
-	ntm_ts* result = new ntm_ts();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	for (int i = 0; i < internal_readers.size(); i++)
-		result->internal_readers.push_back((ntm_reader*)internal_readers[i]->clone());
-	for (int i = 0; i < internal_writers.size(); i++)
-		result->internal_writers.push_back((ntm_writer*)internal_writers[i]->clone());
-	return result;
-}
-
-model* ntm_ts::clone(function<void(Param&)> a_func) {
+model* ntm_ts::clone(function<Param(Param&)> a_func) {
 	ntm_ts* result = new ntm_ts();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;

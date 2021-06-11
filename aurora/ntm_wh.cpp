@@ -37,16 +37,7 @@ void ntm_wh::param_recur(function<void(Param&)> a_func) {
 	e_model->param_recur(a_func);
 }
 
-model* ntm_wh::clone() {
-	ntm_wh* result = new ntm_wh();
-	result->units = units;
-	result->internal_rh = (ntm_rh*)internal_rh->clone();
-	result->a_model = a_model->clone();
-	result->e_model = e_model->clone();
-	return result;
-}
-
-model* ntm_wh::clone(function<void(Param&)> a_func) {
+model* ntm_wh::clone(function<Param(Param&)> a_func) {
 	ntm_wh* result = new ntm_wh();
 	result->units = units;
 	result->internal_rh = (ntm_rh*)internal_rh->clone(a_func);

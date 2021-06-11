@@ -69,20 +69,7 @@ void ntm_rh::param_recur(function<void(Param&)> a_func) {
 	gamma_model->param_recur(a_func);
 }
 
-model* ntm_rh::clone() {
-	ntm_rh* result = new ntm_rh();
-	result->units = units;
-	result->shift_units = shift_units;
-	result->y_units = y_units;
-	result->key_model = key_model->clone();
-	result->beta_model = beta_model->clone();
-	result->g_model = g_model->clone();
-	result->s_model = s_model->clone();
-	result->gamma_model = gamma_model->clone();
-	return result;
-}
-
-model* ntm_rh::clone(function<void(Param&)> a_func) {
+model* ntm_rh::clone(function<Param(Param&)> a_func) {
 	ntm_rh* result = new ntm_rh();
 	result->units = units;
 	result->shift_units = shift_units;
