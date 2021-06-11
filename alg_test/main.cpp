@@ -17,7 +17,6 @@ using namespace aurora::maths;
 using namespace aurora::models;
 using namespace aurora::params;
 using namespace aurora::evolution;
-using namespace aurora::beautify;
 using std::default_random_engine;
 using std::uniform_real_distribution;
 using std::uniform_int_distribution;
@@ -137,7 +136,7 @@ void tnn_xor_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(25);
 
-	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
 		pl.push_back((param_mom*)pmt.get());
 	});
@@ -227,7 +226,7 @@ void tnn_test() {
 	vector<param_mom*> pl = vector<param_mom*>();
 	uniform_real_distribution<double> urd(-1, 1);
 
-	ptr<sequential> s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), INIT_PMT(param_mom(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9),
+	Sequential s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3), INIT_PMT(param_mom(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9),
 		pl));
 	s->compile();
 
@@ -377,13 +376,13 @@ void sync_xor_test() {
 	default_random_engine re(25);
 
 	vector<param_sgd*> pl = vector<param_sgd*>();
-	ptr<sync> s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sync s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_sgd(urd(re), 0.02, 0);
 		pl.push_back((param_sgd*)pmt.get());
 	}));
 	s_prev->prep(4);
 
-	ptr<sync> s = (sync*)s_prev->clone();
+	Sync s = (sync*)s_prev->clone();
 	
 	s->compile();
 
@@ -463,7 +462,7 @@ void encoder_test() {
 
 	vector<param_sgd*> pl = vector<param_sgd*>();
 	std::cout << "INSTANTIATING MODEL" << std::endl;
-	ptr<sequential> s = pseudo::tnn({ x_order_1_len, h_1_len, h_2_len, h_3_len, encoded_len, h_3_len, h_2_len, h_1_len, x_order_1_len }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s = pseudo::tnn({ x_order_1_len, h_1_len, h_2_len, h_3_len, encoded_len, h_3_len, h_2_len, h_1_len, x_order_1_len }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_sgd();
 		pl.push_back((param_sgd*)pmt.get());
 	});
@@ -589,9 +588,9 @@ void lstm_test() {
 	lstm* l = new lstm(lstm_units, pmt_init);
 	sync* s1 = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), pmt_init));
 
-	ptr<sync> s0_ptr = s0;
+	Sync s0_ptr = s0;
 	ptr<lstm> l0_ptr = l;
-	ptr<sync> s1_ptr = s1;
+	Sync s1_ptr = s1;
 
 	sequential s = sequential({ s0, l, s1 });
 
@@ -646,7 +645,7 @@ void input_gd() {
 	};
 
 	vector<param_mom*> pv_0;
-	ptr<sync> s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sync s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_0.push_back((param_mom*)pmt.get());
 	}));
@@ -655,7 +654,7 @@ void input_gd() {
 	const int x_1_height = 20;
 	tensor x_1 = tensor::new_2d(x_1_height, pv_0.size(), urd, re);
 	vector<param_mom*> pv_1;
-	ptr<sequential> s_1 = pseudo::tnn({ pv_0.size(), pv_0.size() * 2, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s_1 = pseudo::tnn({ pv_0.size(), pv_0.size() * 2, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_1.push_back((param_mom*)pmt.get());
 	});
@@ -768,7 +767,7 @@ void loss_map() {
 	};
 
 	vector<param_mom*> pv_0;
-	ptr<sync> s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sync s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_0.push_back((param_mom*)pmt.get());
 		}));
@@ -777,7 +776,7 @@ void loss_map() {
 	const int x_1_height = 50;
 	tensor x_1 = tensor::new_2d(x_1_height, 1, urd, re);
 	vector<param_mom*> pv_1;
-	ptr<sequential> s_1 = pseudo::tnn({ 1, pv_0.size(), pv_0.size() }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s_1 = pseudo::tnn({ 1, pv_0.size(), pv_0.size() }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param_mom(urd(re), learn_rate, 0, 0, beta);
 		pv_1.push_back((param_mom*)pmt.get());
 	});
@@ -880,9 +879,9 @@ void zil_trader() {
 #pragma region MODEL
 
 	const size_t lstm_units = 20;
-	ptr<sync> sync_in = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
+	Sync sync_in = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
 	ptr<lstm> lstm_mid = new lstm(lstm_units, pmt_init);
-	ptr<sync> sync_out = new sync(pseudo::tnn({ lstm_units, 2 }, { pseudo::nlr(0.3), pseudo::nsm() }, pmt_init));
+	Sync sync_out = new sync(pseudo::tnn({ lstm_units, 2 }, { pseudo::nlr(0.3), pseudo::nsm() }, pmt_init));
 	sequential s = { sync_in.get(), lstm_mid.get(), sync_out.get() };
 
 	sync_in->prep(episode_size);
@@ -1120,11 +1119,11 @@ void task_encoder() {
 
 	const size_t lstm_units = 25;
 
-	ptr<sync> s_in = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
+	Sync s_in = new sync(pseudo::tnn({ 1, lstm_units }, pseudo::nlr(0.3), pmt_init));
 	ptr<lstm> l_1 = new lstm(lstm_units, pmt_init);
 	ptr<lstm> l_2 = new lstm(lstm_units, pmt_init);
 	ptr<lstm> l_3 = new lstm(lstm_units, pmt_init);
-	ptr<sync> s_out = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), pmt_init));
+	Sync s_out = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), pmt_init));
 	sequential s = { s_in.get(), l_1.get(), l_2.get(), l_3.get(), s_out.get() };
 
 	double state_structure = 0.001 / (double)pv.size();
@@ -1197,7 +1196,7 @@ void genome_test() {
 		{0},
 	};
 	vector<param*> pv;
-	ptr<sequential> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
+	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), [&](ptr<param>& pmt) {
 		pmt = new param(pmt_urd(re));
 		pv.push_back(pmt.get());
 	});
@@ -1269,10 +1268,10 @@ void pablo_guesser() {
 
 	const int LSTM_UNITS = 35;
 
-	ptr<sync> s_in = new sync(pseudo::tnn({ 1, LSTM_UNITS }, pseudo::nlr(0.3), pmt_init));
+	Sync s_in = new sync(pseudo::tnn({ 1, LSTM_UNITS }, pseudo::nlr(0.3), pmt_init));
 	ptr<lstm> l_0 = new lstm(LSTM_UNITS, pmt_init);
 	ptr<lstm> l_1 = new lstm(LSTM_UNITS, pmt_init);
-	ptr<sync> s_out = new sync(pseudo::tnn({ LSTM_UNITS, 1 }, pseudo::nlr(0.3), pmt_init));
+	Sync s_out = new sync(pseudo::tnn({ LSTM_UNITS, 1 }, pseudo::nlr(0.3), pmt_init));
 	sequential seq { s_in.get(), l_0.get(), l_1.get(), s_out.get() };
 
 	s_in->prep(x.width());
@@ -1388,7 +1387,7 @@ void test_mm() {
 		pv.push_back(pmt.get());
 	};
 
-	ptr<model> s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pmt_init);
+	Model s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3), pmt_init);
 	s->compile();
 
 	const double GAMMA = 0.002;
@@ -1456,8 +1455,8 @@ void test_srtt() {
 		pv_1.push_back(pmt.get());
 	};
 
-	ptr<model> m_0 = pseudo::tnn({ 1, 10, 1 }, pseudo::nlr(0.3), pmt_0_init);
-	ptr<model> m_1 = pseudo::tnn({ 2, 64, pv_0.size() }, pseudo::nth(), pmt_1_init);
+	Model m_0 = pseudo::tnn({ 1, 10, 1 }, pseudo::nlr(0.3), pmt_0_init);
+	Model m_1 = pseudo::tnn({ 2, 64, pv_0.size() }, pseudo::nth(), pmt_1_init);
 
 	m_0->compile();
 	m_1->compile();
@@ -1542,7 +1541,7 @@ void self_aware() {
 		pv.push_back(pmt.get());
 	};
 
-	ptr<model> m = pseudo::tnn({ 2, 5, 2 }, pseudo::nlr(0.3), pmt_init);
+	Model m = pseudo::tnn({ 2, 5, 2 }, pseudo::nlr(0.3), pmt_init);
 	m->compile();
 
 	tensor pmt_link = tensor::new_1d(pv.size());
@@ -1675,8 +1674,8 @@ void proc_generator() {
 		pv.push_back((param_mom*)pmt.get());
 	};
 
-	ptr<sequential> compressor = pseudo::tnn({ 54, 30, 5, 30, 54 }, pseudo::nlr(0.3), pmt_init);
-	ptr<model> second_half = new sequential(vector<ptr<model>>(compressor->models.begin() + 4, compressor->models.end()));
+	Sequential compressor = pseudo::tnn({ 54, 30, 5, 30, 54 }, pseudo::nlr(0.3), pmt_init);
+	Model second_half = new sequential(vector<Model>(compressor->models.begin() + 4, compressor->models.end()));
 	compressor->compile();
 	second_half->compile();
 
@@ -1737,7 +1736,7 @@ void cnl_test() {
 	ptr<layer> l2 = new layer(c2->y_strides(), new layer(c2->x_strides(), pseudo::nth(), pmt_init));
 	ptr<cnl> c3 = new cnl(c2->y_strides(), c2->x_strides(), 2, 2, 1, pmt_init);
 
-	ptr<sequential> s = new sequential {
+	Sequential s = new sequential {
 		c1.get(),
 		l1.get(),
 		c2.get(),
@@ -1924,9 +1923,9 @@ void att_lstm_test() {
 	att_lstm* l = new att_lstm(lstm_units, {lstm_units}, pmt_init);
 	sync* s1 = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3), pmt_init));
 
-	ptr<sync> s0_ptr = s0;
+	Sync s0_ptr = s0;
 	ptr<att_lstm> l0_ptr = l;
-	ptr<sync> s1_ptr = s1;
+	Sync s1_ptr = s1;
 
 	sequential s = sequential({ s0, l, s1 });
 
@@ -2583,7 +2582,7 @@ void ntm_reader_test() {
 	auto pmt_init = INIT_PMT(
 		param_sgd(pmt_urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv);
 
-	ptr<ntm_reader> p = new ntm_reader(memory_height, memory_width, valid_shifts, {memory_width, memory_width + 5}, pmt_init);
+	Ntm_reader p = new ntm_reader(memory_height, memory_width, valid_shifts, {memory_width, memory_width + 5}, pmt_init);
 	p->compile();
 
 	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
@@ -2687,9 +2686,9 @@ void ntm_test() {
 
 	auto pmt_init = INIT_PMT(param_mom(pmt_urd(dre), 0.002, 0, 0, 0.9), pv);
 
-	ptr<sync> s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3), pmt_init));
+	Sync s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3), pmt_init));
 
-	ptr<ntm> p = new ntm(
+	Ntm p = new ntm(
 		memory_height,
 		memory_width,
 		num_readers,
@@ -2698,9 +2697,9 @@ void ntm_test() {
 		head_hidden_dims,
 		pmt_init);
 
-	ptr<sync> s_out = new sync(pseudo::tnn({ memory_width, 1 }, pseudo::nlr(0.3), pmt_init));
+	Sync s_out = new sync(pseudo::tnn({ memory_width, 1 }, pseudo::nlr(0.3), pmt_init));
 
-	ptr<sequential> s = new sequential { s_in.get(), p.get(), s_out.get() };
+	Sequential s = new sequential { s_in.get(), p.get(), s_out.get() };
 
 	const size_t num_ts = 4;
 

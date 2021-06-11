@@ -11,15 +11,15 @@ sequential::sequential() {
 
 }
 
-sequential::sequential(initializer_list<ptr<model>> a_il) {
+sequential::sequential(initializer_list<Model> a_il) {
 	models.resize(a_il.size());
 	for (int i = 0; i < a_il.size(); i++) {
-		const ptr<model>* elem = a_il.begin() + i;
+		const Model* elem = a_il.begin() + i;
 		models[i] = *elem;
 	}
 }
 
-sequential::sequential(vector<ptr<model>> a_models) {
+sequential::sequential(vector<Model> a_models) {
 	models = a_models;
 }
 

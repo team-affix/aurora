@@ -16,5 +16,6 @@ namespace aurora {
 			leaky_relu(double a_m);
 
 		};
+		typedef ptr<leaky_relu> Leaky_relu;
 	}
 }

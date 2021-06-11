@@ -17,8 +17,8 @@ namespace aurora {
 			size_t units;
 
 		public:
-			ptr<sync> models;
-			ptr<lstm> internal_lstm;
+			Sync models;
+			Lstm internal_lstm;
 
 		public:
 			ATTENTION_FIELDS
@@ -28,5 +28,6 @@ namespace aurora {
 
 
 		};
+		typedef ptr<att_lstm> Att_lstm;
 	}
 }

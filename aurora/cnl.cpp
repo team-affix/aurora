@@ -21,7 +21,7 @@ cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_he
 	prep(a_input_max_height, a_input_max_width);
 }
 
-cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, ptr<model> a_filter_template) {
+cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, Model a_filter_template) {
 	this->filter_height = a_filter_height;
 	this->filter_width = a_filter_width;
 	this->stride_len = a_stride_len;
@@ -100,7 +100,7 @@ void cnl::compile() {
 		sync* row = (sync*)filters->prepared[i].get();
 		for (int j = 0; j < x_strides(input_max_width); j++) {
 			int x_start = j * stride_len;
-			ptr<model>& filter = row->prepared[j];
+			Model& filter = row->prepared[j];
 			tensor filter_range_x = x.range_2d(y_start, x_start, filter_height, filter_width).unroll();
 			tensor filter_range_x_grad = x_grad.range_2d(y_start, x_start, filter_height, filter_width).unroll();
 			tensor filter_range_y = y.range_2d(i, j, 1, 1).unroll();

@@ -18,5 +18,6 @@ namespace aurora {
 			weight(function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<weight> Weight;
 	}
 }

@@ -24,5 +24,6 @@ namespace aurora {
 			interpolate(size_t a_units);
 
 		};
+		typedef ptr<interpolate> Interpolate;
 	}
 }

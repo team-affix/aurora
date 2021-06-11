@@ -22,7 +22,7 @@ lstm_ts::lstm_ts(size_t a_units, function<void(ptr<param>&)> a_func) {
 	this->tanh_gate = new layer(units, pseudo::nth(), a_func);
 }
 
-lstm_ts::lstm_ts(size_t a_units, ptr<layer> a_forget_gate, ptr<layer> a_limit_gate, ptr<layer> a_input_gate, ptr<layer> a_output_gate, ptr<layer> a_tanh_gate) {
+lstm_ts::lstm_ts(size_t a_units, Layer a_forget_gate, Layer a_limit_gate, Layer a_input_gate, Layer a_output_gate, Layer a_tanh_gate) {
 	this->units = a_units;
 	this->forget_gate = a_forget_gate;
 	this->limit_gate = a_limit_gate;

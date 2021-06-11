@@ -18,7 +18,7 @@ att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(
 	l_dims.insert(l_dims.end(), a_h_dims.begin(), a_h_dims.end());
 	l_dims.push_back(1);
 	// INITIALIZE NEURONS IN TNN
-	vector<ptr<model>> neurons = vector<ptr<model>>(l_dims.size());
+	vector<Model> neurons = vector<Model>(l_dims.size());
 	for (int i = 0; i < l_dims.size() - 1; i++)
 		neurons[i] = pseudo::nlr(0.3);
 	neurons.push_back(pseudo::nsm());

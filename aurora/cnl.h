@@ -19,15 +19,15 @@ namespace aurora {
 			size_t input_max_height;
 			size_t input_max_width;
 			size_t stride_len;
-			ptr<model> filter_template;
-			ptr<sync> filters;
+			Model filter_template;
+			Sync filters;
 
 		public:
 			ATTENTION_FIELDS
 			virtual ~cnl();
 			cnl();
 			cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, function<void(ptr<param>&)> a_func);
-			cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, ptr<model> a_filter_template);
+			cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, Model a_filter_template);
 
 			size_t x_strides(size_t a_width);
 			size_t x_strides();
@@ -35,5 +35,6 @@ namespace aurora {
 			size_t y_strides();
 
 		};
+		typedef ptr<cnl> Cnl;
 	}
 }

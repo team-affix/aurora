@@ -11,17 +11,17 @@ layer::layer() {
 
 }
 
-layer::layer(size_t a_a, ptr<model> a_model_template, function<void(ptr<param>&)> a_func) {
+layer::layer(size_t a_a, Model a_model_template, function<void(ptr<param>&)> a_func) {
 	for (size_t i = 0; i < a_a; i++)
 		models.push_back(a_model_template->clone(a_func));
 }
 
-layer::layer(size_t a_a, ptr<model> a_model_template) {
+layer::layer(size_t a_a, Model a_model_template) {
 	for (size_t i = 0; i < a_a; i++)
 		models.push_back(a_model_template->clone());
 }
 
-layer::layer(initializer_list<ptr<model>> a_il) {
+layer::layer(initializer_list<Model> a_il) {
 	std::copy(a_il.begin(), a_il.end(), back_inserter(models));
 }
 

@@ -13,5 +13,6 @@ namespace aurora {
 			sigmoid();
 
 		};
+		typedef ptr<sigmoid> Sigmoid;
 	}
 }

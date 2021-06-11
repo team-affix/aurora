@@ -27,7 +27,6 @@
     <ClInclude Include="beautify.h" />
     <ClInclude Include="beautify_init_pmt.h" />
     <ClInclude Include="bias.h" />
-    <ClInclude Include="beautify_models.h" />
     <ClInclude Include="cnl.h" />
     <ClInclude Include="evolution.h" />
     <ClInclude Include="leaky_rexu.h" />

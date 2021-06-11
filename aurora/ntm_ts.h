@@ -34,8 +34,8 @@ namespace aurora {
 			tensor write_wy_grad;
 
 		public:
-			vector<ptr<ntm_reader>> internal_readers;
-			vector<ptr<ntm_writer>> internal_writers;
+			vector<Ntm_reader> internal_readers;
+			vector<Ntm_writer> internal_writers;
 
 		public:
 			MODEL_FIELDS
@@ -51,5 +51,6 @@ namespace aurora {
 				function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<ntm_ts> Ntm_ts;
 	}
 }

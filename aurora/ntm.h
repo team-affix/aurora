@@ -29,10 +29,10 @@ namespace aurora {
 			tensor write_wy_grad;
 
 		public:
-			ptr<lstm> internal_lstm;
-			ptr<ntm_ts> ntm_ts_template;
-			vector<ptr<ntm_ts>> prepared;
-			vector<ptr<ntm_ts>> unrolled;
+			Lstm internal_lstm;
+			Ntm_ts ntm_ts_template;
+			vector<Ntm_ts> prepared;
+			vector<Ntm_ts> unrolled;
 
 		public:
 			RECURRENT_FIELDS
@@ -48,5 +48,6 @@ namespace aurora {
 				function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<ntm> Ntm;
 	}
 }

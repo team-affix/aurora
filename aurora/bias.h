@@ -17,5 +17,6 @@ namespace aurora {
 			bias(function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<bias> Bias;
 	}
 }

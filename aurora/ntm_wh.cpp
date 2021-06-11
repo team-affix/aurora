@@ -19,7 +19,7 @@ ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 	dims.insert(dims.begin(), a_units);
 	dims.push_back(a_units);
 
-	vector<ptr<model>> e_neurons;
+	vector<Model> e_neurons;
 
 	for (int i = 0; i < dims.size() - 1; i++) {
 		e_neurons.push_back(pseudo::nth());

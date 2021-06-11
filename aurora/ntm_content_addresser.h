@@ -22,9 +22,9 @@ namespace aurora {
 			tensor beta_grad;
 
 		public:
-			ptr<sync> internal_similarity;
-			ptr<ntm_sparsify> internal_sparsify;
-			ptr<normalize> internal_normalize;
+			Sync internal_similarity;
+			Ntm_sparsify internal_sparsify;
+			Normalize internal_normalize;
 
 		public:
 			MODEL_FIELDS
@@ -33,5 +33,6 @@ namespace aurora {
 			ntm_content_addresser(size_t a_memory_height, size_t a_memory_width);
 
 		};
+		typedef ptr<ntm_content_addresser> Ntm_content_addresser;
 	}
 }

@@ -31,8 +31,8 @@ namespace aurora {
 			tensor gamma_grad;
 
 		public:
-			ptr<ntm_content_addresser> internal_content_addresser;
-			ptr<ntm_location_addresser> internal_location_addresser;
+			Ntm_content_addresser internal_content_addresser;
+			Ntm_location_addresser internal_location_addresser;
 
 		public:
 			MODEL_FIELDS
@@ -41,5 +41,6 @@ namespace aurora {
 			ntm_addresser(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts);
 
 		};
+		typedef ptr<ntm_addresser> Ntm_addresser;
 	}
 }

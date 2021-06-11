@@ -32,10 +32,10 @@ namespace aurora {
 			tensor gamma_grad;
 
 		public:
-			ptr<interpolate> internal_interpolate;
-			ptr<shift> internal_shift;
-			ptr<power> internal_power;
-			ptr<normalize> internal_normalize;
+			Interpolate internal_interpolate;
+			Shift internal_shift;
+			Power internal_power;
+			Normalize internal_normalize;
 
 		public:
 			MODEL_FIELDS
@@ -44,5 +44,6 @@ namespace aurora {
 			ntm_location_addresser(size_t a_memory_height, vector<int> a_valid_shifts);
 
 		};
+		typedef ptr<ntm_location_addresser> Ntm_location_addresser;
 	}
 }

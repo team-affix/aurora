@@ -10,7 +10,7 @@ namespace aurora {
 		class weight_set : public model {
 		public:
 			size_t a;
-			vector<ptr<weight>> weights;
+			vector<Weight> weights;
 
 		public:
 			MODEL_FIELDS
@@ -19,5 +19,6 @@ namespace aurora {
 			weight_set(size_t a_a, function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<weight_set> Weight_set;
 	}
 }

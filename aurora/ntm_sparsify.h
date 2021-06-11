@@ -21,5 +21,6 @@ namespace aurora {
 			ntm_sparsify(size_t a_memory_height);
 
 		};
+		typedef ptr<ntm_sparsify> Ntm_sparsify;
 	}
 }

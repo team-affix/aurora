@@ -37,10 +37,10 @@ ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 	vector<size_t> gamma_dims = dims;
 	gamma_dims.push_back(1);
 
-	vector<ptr<model>> beta_neurons;
-	vector<ptr<model>> g_neurons;
-	vector<ptr<model>> s_neurons;
-	vector<ptr<model>> gamma_neurons;
+	vector<Model> beta_neurons;
+	vector<Model> g_neurons;
+	vector<Model> s_neurons;
+	vector<Model> gamma_neurons;
 
 	// DO NOT LOOP THROUGH OUTPUT LAYER
 	for (int i = 0; i < dims.size(); i++) {

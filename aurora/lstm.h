@@ -25,9 +25,9 @@ namespace aurora {
 			tensor hty_grad;
 
 		public:
-			ptr<lstm_ts> lstm_ts_template;
-			vector<ptr<lstm_ts>> prepared;
-			vector<ptr<lstm_ts>> unrolled;
+			Lstm_ts lstm_ts_template;
+			vector<Lstm_ts> prepared;
+			vector<Lstm_ts> unrolled;
 
 		public:
 			RECURRENT_FIELDS
@@ -36,5 +36,6 @@ namespace aurora {
 			lstm(size_t a_units, function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<lstm> Lstm;
 	}
 }

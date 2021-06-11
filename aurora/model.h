@@ -33,5 +33,6 @@ namespace aurora {
 			model(function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<model> Model;
 	}
 }

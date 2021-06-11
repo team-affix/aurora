@@ -18,8 +18,8 @@ namespace aurora {
 			tensor htx_grad;
 
 		public:
-			ptr<model> model_template;
-			ptr<sync> models;
+			Model model_template;
+			Sync models;
 
 		public:
 			RECURRENT_FIELDS
@@ -28,5 +28,6 @@ namespace aurora {
 			att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<att_lstm_ts> Att_lstm_ts;
 	}
 }

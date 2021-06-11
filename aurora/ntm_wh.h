@@ -17,9 +17,9 @@ namespace aurora {
 			tensor e_grad;
 
 		public:
-			ptr<ntm_rh> internal_rh;
-			ptr<model> a_model;
-			ptr<model> e_model;
+			Ntm_rh internal_rh;
+			Model a_model;
+			Model e_model;
 
 		public:
 			MODEL_FIELDS
@@ -28,5 +28,6 @@ namespace aurora {
 			ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units, function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<ntm_wh> Ntm_wh;
 	}
 }

@@ -7,7 +7,7 @@ sync::~sync() {
 
 }
 
-sync::sync(ptr<model> a_model_template) {
+sync::sync(Model a_model_template) {
 	this->model_template = a_model_template;
 }
 
