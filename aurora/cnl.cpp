@@ -52,28 +52,9 @@ void cnl::bwd() {
 	filters->bwd();
 }
 
-tensor& cnl::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& cnl::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void cnl::signal(tensor& a_y_des) {
 	y_des.pop(a_y_des);
 	filters->signal(y_des_reshaped);
-}
-
-void cnl::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void cnl::recur(function<void(model*)> a_func) {

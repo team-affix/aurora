@@ -44,27 +44,8 @@ void ntm_sparsify::bwd() {
 	}
 }
 
-tensor& ntm_sparsify::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_sparsify::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void ntm_sparsify::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
-}
-
-void ntm_sparsify::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void ntm_sparsify::recur(function<void(model*)> a_func) {

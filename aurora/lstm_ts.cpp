@@ -84,27 +84,8 @@ void lstm_ts::bwd() {
 	comp_0.add_1d(comp_1, htx_grad);
 }
 
-tensor& lstm_ts::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& lstm_ts::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void lstm_ts::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
-}
-
-void lstm_ts::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void lstm_ts::recur(function<void(model*)> a_func) {

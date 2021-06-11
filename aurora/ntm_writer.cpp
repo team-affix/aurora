@@ -74,27 +74,8 @@ void ntm_writer::bwd() {
 	internal_head->bwd();
 }
 
-tensor& ntm_writer::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_writer::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void ntm_writer::signal(tensor& a_y_des) {
 	y.sub_2d(a_y_des, y_grad);
-}
-
-void ntm_writer::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void ntm_writer::recur(function<void(model*)> a_func) {

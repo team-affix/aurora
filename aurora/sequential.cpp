@@ -55,27 +55,8 @@ void sequential::bwd() {
 	}
 }
 
-tensor& sequential::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& sequential::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void sequential::signal(tensor& a_y_des) {
 	models.back()->signal(a_y_des);
-}
-
-void sequential::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void sequential::recur(function<void(model*)> a_func) {

@@ -59,27 +59,8 @@ void ntm_content_addresser::bwd() {
 		key_grad.add_1d(internal_similarity->x_grad[i][0], key_grad);
 }
 
-tensor& ntm_content_addresser::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_content_addresser::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void ntm_content_addresser::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
-}
-
-void ntm_content_addresser::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void ntm_content_addresser::recur(function<void(model*)> a_func) {

@@ -71,27 +71,8 @@ void ntm_wh::bwd() {
 	x_grad.add_1d(e_model->x_grad, x_grad);
 }
 
-tensor& ntm_wh::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_wh::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void ntm_wh::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
-}
-
-void ntm_wh::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void ntm_wh::recur(function<void(model*)> a_func) {

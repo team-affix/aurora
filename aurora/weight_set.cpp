@@ -51,27 +51,8 @@ void weight_set::bwd() {
 	}
 }
 
-tensor& weight_set::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& weight_set::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void weight_set::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
-}
-
-void weight_set::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void weight_set::recur(function<void(model*)> a_func) {

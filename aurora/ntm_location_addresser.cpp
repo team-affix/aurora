@@ -64,27 +64,8 @@ void ntm_location_addresser::bwd() {
 	internal_interpolate->bwd();
 }
 
-tensor& ntm_location_addresser::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_location_addresser::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void ntm_location_addresser::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
-}
-
-void ntm_location_addresser::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void ntm_location_addresser::recur(function<void(model*)> a_func) {

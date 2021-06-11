@@ -82,27 +82,8 @@ void att_lstm_ts::bwd() {
 	}
 }
 
-tensor& att_lstm_ts::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& att_lstm_ts::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void att_lstm_ts::signal(tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
-}
-
-void att_lstm_ts::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void att_lstm_ts::recur(function<void(model*)> a_func) {

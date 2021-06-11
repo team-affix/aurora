@@ -62,27 +62,8 @@ void cos_sim::bwd() {
 	}
 }
 
-tensor& cos_sim::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& cos_sim::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void cos_sim::signal(tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
-}
-
-void cos_sim::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void cos_sim::recur(function<void(model*)> a_func) {

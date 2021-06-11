@@ -45,27 +45,8 @@ void leaky_rexu::bwd() {
 		x_grad.val() = y_grad;
 }
 
-tensor& leaky_rexu::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& leaky_rexu::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
 void leaky_rexu::signal(tensor& a_y_des) {
 	y_grad.val() = y - a_y_des;
-}
-
-void leaky_rexu::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
 }
 
 void leaky_rexu::recur(function<void(model*)> a_func) {

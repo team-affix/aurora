@@ -2780,7 +2780,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_test();
+	tnn_xor_test();
 
 	return 0;
 
