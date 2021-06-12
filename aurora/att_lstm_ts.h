@@ -25,7 +25,7 @@ namespace aurora {
 			RECURRENT_FIELDS
 			virtual ~att_lstm_ts();
 			att_lstm_ts();
-			att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(Param&)> a_func);
+			att_lstm_ts(size_t a_units, vector<size_t> a_h_dims);
 
 		};
 		typedef ptr<att_lstm_ts> Att_lstm_ts;

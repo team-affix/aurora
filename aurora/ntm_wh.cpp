@@ -12,7 +12,7 @@ ntm_wh::ntm_wh() {
 
 }
 
-ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units, function<void(Param&)> a_func) {
+ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units) {
 	units = a_units;
 
 	vector<size_t> dims = a_head_h_dims;
@@ -26,9 +26,9 @@ ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 	}
 	e_neurons.push_back(pseudo::nsm());
 
-	internal_rh = new ntm_rh(a_units, a_head_h_dims, a_shift_units, a_func);
-	a_model = pseudo::tnn(dims, pseudo::nlr(0.3), a_func);
-	e_model = pseudo::tnn(dims, e_neurons, a_func);
+	internal_rh = new ntm_rh(a_units, a_head_h_dims, a_shift_units);
+	a_model = pseudo::tnn(dims, pseudo::nlr(0.3));
+	e_model = pseudo::tnn(dims, e_neurons);
 }
 
 void ntm_wh::param_recur(function<void(Param&)> a_func) {

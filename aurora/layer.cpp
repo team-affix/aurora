@@ -11,11 +11,9 @@ layer::layer() {
 
 }
 
-layer::layer(size_t a_a, Model a_model_template, function<void(Param&)> a_func) {
-	for (size_t i = 0; i < a_a; i++) {
+layer::layer(size_t a_a, Model a_model_template) {
+	for (size_t i = 0; i < a_a; i++)
 		models.push_back(a_model_template->clone());
-		models[i]->param_recur(a_func);
-	}
 }
 
 layer::layer(size_t a_a, Model a_model_template) {

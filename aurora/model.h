@@ -31,7 +31,6 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~model();
 			model();
-			model(function<void(Param&)> a_func);
 
 		};
 		typedef ptr<model> Model;

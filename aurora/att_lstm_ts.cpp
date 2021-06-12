@@ -11,7 +11,7 @@ att_lstm_ts::att_lstm_ts() {
 
 }
 
-att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(Param&)> a_func) {
+att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims) {
 	this->units = a_units;
 	vector<size_t> l_dims;
 	l_dims.push_back(2 * a_units);
@@ -22,7 +22,7 @@ att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(
 	for (int i = 0; i < l_dims.size() - 1; i++)
 		neurons[i] = pseudo::nlr(0.3);
 	neurons.push_back(pseudo::nsm());
-	model_template = pseudo::tnn(l_dims, neurons, a_func);
+	model_template = pseudo::tnn(l_dims, neurons);
 	models = new sync(model_template);
 }
 

@@ -11,10 +11,10 @@ att_lstm::att_lstm() {
 
 }
 
-att_lstm::att_lstm(size_t a_units, vector<size_t> a_h_dims, function<void(Param&)> a_func) {
+att_lstm::att_lstm(size_t a_units, vector<size_t> a_h_dims) {
 	this->units = a_units;
-	models = new sync(new att_lstm_ts(a_units, a_h_dims, a_func));
-	internal_lstm = new lstm(a_units, a_func);
+	models = new sync(new att_lstm_ts(a_units, a_h_dims));
+	internal_lstm = new lstm(a_units);
 }
 
 void att_lstm::param_recur(function<void(Param&)> a_func) {

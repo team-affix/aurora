@@ -12,11 +12,11 @@ cnl::cnl() {
 
 }
 
-cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, function<void(Param&)> a_func) {
+cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len) {
 	this->filter_height = a_filter_height;
 	this->filter_width = a_filter_width;
 	this->stride_len = a_stride_len;
-	filter_template = new weight_junction(filter_height * filter_width, 1, a_func);
+	filter_template = new weight_junction(filter_height * filter_width, 1);
 	filters = new sync(new sync(filter_template));
 	prep(a_input_max_height, a_input_max_width);
 }

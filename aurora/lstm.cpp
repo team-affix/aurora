@@ -11,9 +11,9 @@ lstm::lstm() {
 
 }
 
-lstm::lstm(size_t a_units, function<void(Param&)> a_func) {
+lstm::lstm(size_t a_units) {
 	this->units = a_units;
-	lstm_ts_template = new lstm_ts(units, a_func);
+	lstm_ts_template = new lstm_ts(units);
 }
 
 void lstm::param_recur(function<void(Param&)> a_func) {

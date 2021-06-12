@@ -11,10 +11,6 @@ weight::weight() {
 
 }
 
-weight::weight(function<void(Param&)> a_func) {
-	a_func(pmt);
-}
-
 void weight::param_recur(function<void(Param&)> a_func) {
 	a_func(pmt);
 }

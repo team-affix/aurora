@@ -17,15 +17,14 @@ ntm_ts::ntm_ts(
 	size_t a_num_readers,
 	size_t a_num_writers,
 	vector<int> a_valid_shifts,
-	vector<size_t> a_head_hidden_dims,
-	function<void(Param&)> a_func) {
+	vector<size_t> a_head_hidden_dims) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
 
 	for (int i = 0; i < a_num_readers; i++)
-		internal_readers.push_back(new ntm_reader(a_memory_height, a_memory_width, a_valid_shifts, a_head_hidden_dims, a_func));
+		internal_readers.push_back(new ntm_reader(a_memory_height, a_memory_width, a_valid_shifts, a_head_hidden_dims));
 	for (int i = 0; i < a_num_writers; i++)
-		internal_writers.push_back(new ntm_writer(a_memory_height, a_memory_width, a_valid_shifts, a_head_hidden_dims, a_func));
+		internal_writers.push_back(new ntm_writer(a_memory_height, a_memory_width, a_valid_shifts, a_head_hidden_dims));
 
 }
 

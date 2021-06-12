@@ -13,13 +13,13 @@ lstm_ts::lstm_ts() {
 
 }
 
-lstm_ts::lstm_ts(size_t a_units, function<void(Param&)> a_func) {
+lstm_ts::lstm_ts(size_t a_units) {
 	this->units = a_units;
-	this->forget_gate = new layer(units, pseudo::nsm(), a_func);
-	this->limit_gate = new layer(units, pseudo::nsm(), a_func);
-	this->input_gate = new layer(units, pseudo::nth(), a_func);
-	this->output_gate = new layer(units, pseudo::nsm(), a_func);
-	this->tanh_gate = new layer(units, pseudo::nth(), a_func);
+	this->forget_gate = new layer(units, pseudo::nsm());
+	this->limit_gate = new layer(units, pseudo::nsm());
+	this->input_gate = new layer(units, pseudo::nth());
+	this->output_gate = new layer(units, pseudo::nsm());
+	this->tanh_gate = new layer(units, pseudo::nth());
 }
 
 lstm_ts::lstm_ts(size_t a_units, Layer a_forget_gate, Layer a_limit_gate, Layer a_input_gate, Layer a_output_gate, Layer a_tanh_gate) {

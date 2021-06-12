@@ -24,7 +24,7 @@ namespace aurora {
 			ATTENTION_FIELDS
 			virtual ~att_lstm();
 			att_lstm();
-			att_lstm(size_t a_units, vector<size_t> a_h_dims, function<void(Param&)> a_func);
+			att_lstm(size_t a_units, vector<size_t> a_h_dims);
 
 
 		};

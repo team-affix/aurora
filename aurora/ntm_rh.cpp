@@ -13,7 +13,7 @@ ntm_rh::ntm_rh() {
 
 }
 
-ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units, function<void(Param&)> a_func) {
+ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units) {
 	units = a_units;
 	shift_units = a_shift_units;
 
@@ -54,11 +54,11 @@ ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 	s_neurons.push_back(pseudo::nsm());
 	gamma_neurons.push_back(pseudo::nlrexu(2));
 
-	key_model = pseudo::tnn(key_dims, pseudo::nlr(0.3), a_func);
-	beta_model = pseudo::tnn(beta_dims, beta_neurons, a_func);
-	g_model = pseudo::tnn(g_dims, g_neurons, a_func);
-	s_model = new sequential{ pseudo::tnn(s_dims, s_neurons, a_func), new normalize(a_shift_units) };
-	gamma_model = pseudo::tnn(gamma_dims, gamma_neurons, a_func);
+	key_model = pseudo::tnn(key_dims, pseudo::nlr(0.3));
+	beta_model = pseudo::tnn(beta_dims, beta_neurons);
+	g_model = pseudo::tnn(g_dims, g_neurons);
+	s_model = new sequential{ pseudo::tnn(s_dims, s_neurons), new normalize(a_shift_units) };
+	gamma_model = pseudo::tnn(gamma_dims, gamma_neurons);
 }
 
 void ntm_rh::param_recur(function<void(Param&)> a_func) {

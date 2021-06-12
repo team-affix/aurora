@@ -12,10 +12,6 @@ model::model() {
 
 }
 
-model::model(function<void(Param&)> a_func) {
-	
-}
-
 void model::fwd() {
 
 }

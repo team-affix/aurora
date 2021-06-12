@@ -7,40 +7,40 @@ using namespace aurora;
 using models::layer;
 using models::weight_junction;
 
-sequential* pseudo::tnn(vector<size_t> a_dims, Model a_neuron_template, function<void(Param&)> a_func) {
+sequential* pseudo::tnn(vector<size_t> a_dims, Model a_neuron_template) {
 	sequential* result = new sequential();
 	for (int i = 0; i < a_dims.size() - 1; i++) {
-		result->models.push_back(new layer(a_dims[i], a_neuron_template, a_func));
-		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1], a_func));
+		result->models.push_back(new layer(a_dims[i], a_neuron_template));
+		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
 	}
-	result->models.push_back(new layer(a_dims.back(), a_neuron_template, a_func));
+	result->models.push_back(new layer(a_dims.back(), a_neuron_template));
 	return result;
 }
 
-sequential* pseudo::tnn(vector<size_t> a_dims, vector<Model> a_neuron_templates, function<void(Param&)> a_func) {
+sequential* pseudo::tnn(vector<size_t> a_dims, vector<Model> a_neuron_templates) {
 	sequential* result = new sequential();
 	for (int i = 0; i < a_dims.size() - 1; i++) {
-		result->models.push_back(new layer(a_dims[i], a_neuron_templates[i], a_func));
-		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1], a_func));
+		result->models.push_back(new layer(a_dims[i], a_neuron_templates[i]));
+		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
 	}
-	result->models.push_back(new layer(a_dims.back(), a_neuron_templates.back(), a_func));
+	result->models.push_back(new layer(a_dims.back(), a_neuron_templates.back()));
 	return result;
 }
 
-sequential* pseudo::tnn_no_output(vector<size_t> a_dims, Model a_neuron_template, function<void(Param&)> a_func) {
+sequential* pseudo::tnn_no_output(vector<size_t> a_dims, Model a_neuron_template) {
 	sequential* result = new sequential();
 	for (int i = 0; i < a_dims.size() - 1; i++) {
-		result->models.push_back(new layer(a_dims[i], a_neuron_template, a_func));
-		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1], a_func));
+		result->models.push_back(new layer(a_dims[i], a_neuron_template));
+		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
 	}
 	return result;
 }
 
-sequential* pseudo::tnn_no_output(vector<size_t> a_dims, vector<Model> a_neuron_templates, function<void(Param&)> a_func) {
+sequential* pseudo::tnn_no_output(vector<size_t> a_dims, vector<Model> a_neuron_templates) {
 	sequential* result = new sequential();
 	for (int i = 0; i < a_dims.size() - 1; i++) {
-		result->models.push_back(new layer(a_dims[i], a_neuron_templates[i], a_func));
-		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1], a_func));
+		result->models.push_back(new layer(a_dims[i], a_neuron_templates[i]));
+		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
 	}
 	return result;
 }

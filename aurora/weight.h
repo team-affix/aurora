@@ -15,7 +15,6 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~weight();
 			weight();
-			weight(function<void(Param&)> a_func);
 
 		};
 		typedef ptr<weight> Weight;

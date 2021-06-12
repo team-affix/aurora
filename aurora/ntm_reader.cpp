@@ -11,10 +11,10 @@ ntm_reader::ntm_reader() {
 
 }
 
-ntm_reader::ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims, function<void(Param&)> a_func) {
+ntm_reader::ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
-	internal_head = new ntm_rh(a_memory_width, a_head_hidden_dims, a_valid_shifts.size(), a_func);
+	internal_head = new ntm_rh(a_memory_width, a_head_hidden_dims, a_valid_shifts.size());
 	internal_addresser = new ntm_addresser(a_memory_height, a_memory_width, a_valid_shifts);
 }
 

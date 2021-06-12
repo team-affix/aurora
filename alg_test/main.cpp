@@ -2270,7 +2270,7 @@ void power_test() {
 }
 
 void ntm_location_addresser_test() {
-
+	
 	size_t memory_height = 10;
 	vector<int> valid_shifts = { -1, 0, 1 };
 

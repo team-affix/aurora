@@ -17,12 +17,11 @@ ntm::ntm(
 	size_t a_num_readers,
 	size_t a_num_writers,
 	vector<int> a_valid_shifts,
-	vector<size_t> a_head_hidden_dims,
-	function<void(Param&)> a_func) {
+	vector<size_t> a_head_hidden_dims) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
 	
-	internal_lstm = new lstm(a_memory_width, a_func);
+	internal_lstm = new lstm(a_memory_width);
 
 	ntm_ts_template = new ntm_ts(
 		a_memory_height,
@@ -30,8 +29,7 @@ ntm::ntm(
 		a_num_readers,
 		a_num_writers,
 		a_valid_shifts,
-		a_head_hidden_dims,
-		a_func);
+		a_head_hidden_dims);
 
 }
 

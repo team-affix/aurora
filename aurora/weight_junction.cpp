@@ -11,11 +11,11 @@ weight_junction::weight_junction() {
 
 }
 
-weight_junction::weight_junction(size_t a_a, size_t a_b, function<void(Param&)> a_func) {
+weight_junction::weight_junction(size_t a_a, size_t a_b) {
 	this->a = a_a;
 	this->b = a_b;
 	for (int i = 0; i < a_a; i++)
-		weight_sets.push_back(new weight_set(a_b, a_func));
+		weight_sets.push_back(new weight_set(a_b));
 }
 
 void weight_junction::param_recur(function<void(Param&)> a_func) {

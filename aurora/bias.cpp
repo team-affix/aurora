@@ -11,10 +11,6 @@ bias::bias() {
 
 }
 
-bias::bias(function<void(Param&)> a_func) {
-	a_func(pmt);
-}
-
 void bias::param_recur(function<void(Param&)> a_func) {
 	a_func(pmt);
 }

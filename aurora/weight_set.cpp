@@ -11,10 +11,10 @@ weight_set::weight_set() {
 
 }
 
-weight_set::weight_set(size_t a_a, function<void(Param&)> a_func) {
+weight_set::weight_set(size_t a_a) {
 	this->a = a_a;
 	for (int i = 0; i < a_a; i++)
-		weights.push_back(new weight(a_func));
+		weights.push_back(new weight());
 }
 
 void weight_set::param_recur(function<void(Param&)> a_func) {

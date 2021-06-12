@@ -47,8 +47,7 @@ namespace aurora {
 				size_t a_num_readers,
 				size_t a_num_writers,
 				vector<int> a_valid_shifts,
-				vector<size_t> a_head_hidden_dims,
-				function<void(Param&)> a_func);
+				vector<size_t> a_head_hidden_dims);
 
 		};
 		typedef ptr<ntm_ts> Ntm_ts;
