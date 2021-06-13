@@ -42,7 +42,7 @@ model* ntm::clone(function<Param(Param&)> a_func) {
 	ntm* result = new ntm();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;
-	result->internal_lstm = (lstm*)internal_lstm->clone();
+	result->internal_lstm = (lstm*)internal_lstm->clone(a_func);
 	result->ntm_ts_template = (ntm_ts*)ntm_ts_template->clone(a_func);
 	result->prep(prepared.size());
 	result->unroll(prepared.size());

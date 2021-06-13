@@ -11,9 +11,9 @@ using std::vector;
 
 namespace aurora {
 	namespace pseudo {
-		sequential* tnn(vector<size_t> a_dims, Model a_neuron_template);
-		sequential* tnn(vector<size_t> a_dims, vector<Model> a_neuron_templates);
-		sequential* tnn_no_output(vector<size_t> a_dims, Model a_neuron_template);
-		sequential* tnn_no_output(vector<size_t> a_dims, vector<Model> a_neuron_templates);
+		sequential* tnn(vector<size_t> a_dims, ptr<model> a_neuron_template);
+		sequential* tnn(vector<size_t> a_dims, vector<ptr<model>> a_neuron_templates);
+		sequential* tnn_no_output(vector<size_t> a_dims, ptr<model> a_neuron_template);
+		sequential* tnn_no_output(vector<size_t> a_dims, vector<ptr<model>> a_neuron_templates);
 	}
 }
