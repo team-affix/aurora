@@ -24,8 +24,6 @@
     <ClInclude Include="aurora.h" />
     <ClInclude Include="basic.h" />
     <ClInclude Include="basic_constructors.h" />
-    <ClInclude Include="beautify.h" />
-    <ClInclude Include="beautify_init_pmt.h" />
     <ClInclude Include="bias.h" />
     <ClInclude Include="cnl.h" />
     <ClInclude Include="evolution.h" />

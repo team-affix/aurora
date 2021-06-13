@@ -52,9 +52,6 @@
     <Filter Include="Source Files\initialization">
       <UniqueIdentifier>{5622ddb5-b859-49d9-b138-f86041955205}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\beautify">
-      <UniqueIdentifier>{6cf917ab-4897-4442-875b-3bfafdb8a65d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\beautify">
       <UniqueIdentifier>{72ee6c20-80d2-4327-909e-c3a2578c5170}</UniqueIdentifier>
     </Filter>
@@ -173,12 +170,6 @@
     </ClInclude>
     <ClInclude Include="initialization.h">
       <Filter>Header Files\initialization</Filter>
-    </ClInclude>
-    <ClInclude Include="beautify.h">
-      <Filter>Header Files\beautify</Filter>
-    </ClInclude>
-    <ClInclude Include="beautify_init_pmt.h">
-      <Filter>Header Files\beautify</Filter>
     </ClInclude>
     <ClInclude Include="basic_constructors.h">
       <Filter>Header Files\basic</Filter>

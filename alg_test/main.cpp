@@ -227,9 +227,9 @@ void tnn_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 
 	Sequential s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3));
-	s->param_recur(INIT_PMT(param_mom(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9), pl));
+	s->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9), pl));
 	s->compile();
-
+	
 	for (int epoch = 0; epoch < 1000000; epoch++) {
 
 		if (epoch % 10000 == 0) {
@@ -1867,7 +1867,7 @@ void att_lstm_ts_test() {
 	uniform_real_distribution<double> pmt_urd(-1, 1);
 
 	vector<param_mom*> pv;
-	auto pmt_init = INIT_PMT(param_mom(pmt_urd(static_vals::aurora_random_engine), 0.02, 0, 0, 0.9), pv);
+	auto pmt_init = PARAM_INIT(param_mom(pmt_urd(static_vals::aurora_random_engine), 0.02, 0, 0, 0.9), pv);
 
 	ptr<att_lstm_ts> a = new att_lstm_ts(2, { 3 });
 	a->param_recur(pmt_init);
@@ -2450,7 +2450,7 @@ void ntm_rh_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 
 	ntm_rh nrh = ntm_rh(5, { 6, 7 }, 3);
-	nrh.param_recur(INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv));
+	nrh.param_recur(PARAM_INIT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv));
 	nrh.compile();
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
@@ -2528,7 +2528,7 @@ void ntm_wh_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 
 	ntm_wh nwh = ntm_wh(5, { 6, 7 }, 3);
-	nwh.param_recur(INIT_PMT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
+	nwh.param_recur(PARAM_INIT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
 	nwh.compile();
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
@@ -2598,7 +2598,7 @@ void ntm_reader_test() {
 	uniform_real_distribution<double> mem_urd(-10, 10);
 
 	vector<param_sgd*> pv;
-	auto pmt_init = INIT_PMT(
+	auto pmt_init = PARAM_INIT(
 		param_sgd(pmt_urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv);
 
 	Ntm_reader p = new ntm_reader(memory_height, memory_width, valid_shifts, {memory_width, memory_width + 5});
@@ -2645,7 +2645,7 @@ void ntm_writer_test() {
 	default_random_engine dre(27);
 
 	vector<param_mom*> pv;
-	auto pmt_init = INIT_PMT(
+	auto pmt_init = PARAM_INIT(
 		param_mom(pmt_urd(dre), 0.00002, 0, 0, 0.9), pv);
 
 	ptr<ntm_writer> p = new ntm_writer(memory_height, memory_width, valid_shifts, { memory_width });
@@ -2705,7 +2705,7 @@ void ntm_test() {
 
 	vector<param_mom*> pv;
 
-	auto pmt_init = INIT_PMT(param_mom(pmt_urd(dre), 0.002, 0, 0, 0.9), pv);
+	auto pmt_init = PARAM_INIT(param_mom(pmt_urd(dre), 0.002, 0, 0, 0.9), pv);
 
 	Sync s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3)));
 
@@ -2801,7 +2801,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_test();
+	tnn_xor_test();
 
 	return 0;
 
