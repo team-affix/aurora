@@ -15,8 +15,8 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~layer();
 			layer();
-			layer(size_t a_a, Model a_model_template);
-			layer(initializer_list<Model> a_il);
+			layer(size_t a_num_models, Model a_model_template);
+			layer(vector<ptr<model>> a_models);
 
 		};
 		typedef ptr<layer> Layer;
