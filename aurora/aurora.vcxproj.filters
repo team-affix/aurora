@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\data">
-      <UniqueIdentifier>{25874f64-1755-49fe-b839-1c240fbb685b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\pseudo">
       <UniqueIdentifier>{998375a9-2650-488e-a537-5d225d9d4faa}</UniqueIdentifier>
     </Filter>
@@ -51,9 +48,6 @@
     </Filter>
     <Filter Include="Source Files\initialization">
       <UniqueIdentifier>{5622ddb5-b859-49d9-b138-f86041955205}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\beautify">
-      <UniqueIdentifier>{72ee6c20-80d2-4327-909e-c3a2578c5170}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\maths">
       <UniqueIdentifier>{5ac1cccd-5d6d-4d98-8573-b04c39103662}</UniqueIdentifier>
