@@ -2797,13 +2797,17 @@ void ntm_test() {
 
 }
 
-
+void t_test() {
+	tensor t = tensor::new_2d(10, 10);
+	while(true)
+		t.pop(tensor::new_2d(10, 10));
+}
 
 int main() {
 
 	srand(time(NULL));
 	
-	ntm_test();
+	t_test();
 
 	return 0;
 
