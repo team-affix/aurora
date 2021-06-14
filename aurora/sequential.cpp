@@ -11,12 +11,9 @@ sequential::sequential() {
 
 }
 
-sequential::sequential(initializer_list<Model> a_il) {
-	models.resize(a_il.size());
-	for (int i = 0; i < a_il.size(); i++) {
-		const Model* elem = a_il.begin() + i;
-		models[i] = *elem;
-	}
+sequential::sequential(initializer_list<Model> a_models) {
+	for (initializer_list<Model>::iterator i = a_models.begin(); i != a_models.end(); i++)
+		models.push_back(*i);
 }
 
 sequential::sequential(vector<Model> a_models) {

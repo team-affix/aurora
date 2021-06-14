@@ -20,7 +20,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~sequential();
 			sequential();
-			sequential(initializer_list<Model> a_il);
+			sequential(initializer_list<Model> a_models);
 			sequential(vector<Model> a_models);
 
 		};

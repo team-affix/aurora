@@ -16,7 +16,8 @@ namespace aurora {
 			virtual ~layer();
 			layer();
 			layer(size_t a_num_models, Model a_model_template);
-			layer(vector<ptr<model>> a_models);
+			layer(initializer_list<Model> a_models);
+			layer(vector<Model> a_models);
 
 		};
 		typedef ptr<layer> Layer;

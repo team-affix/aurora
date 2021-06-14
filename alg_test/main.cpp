@@ -2797,11 +2797,13 @@ void ntm_test() {
 
 }
 
+
+
 int main() {
 
 	srand(time(NULL));
 	
-	tnn_xor_test();
+	ntm_test();
 
 	return 0;
 

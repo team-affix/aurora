@@ -16,7 +16,12 @@ layer::layer(size_t a_num_models, Model a_model_template) {
 		models.push_back(a_model_template->clone());
 }
 
-layer::layer(vector<ptr<model>> a_models) {
+layer::layer(initializer_list<Model> a_models) {
+	for (initializer_list<Model>::iterator i = a_models.begin(); i != a_models.end(); i++)
+		models.push_back(*i);
+}
+
+layer::layer(vector<Model> a_models) {
 	models = a_models;
 }
 
