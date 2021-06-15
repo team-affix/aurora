@@ -145,16 +145,18 @@ void tnn_xor_test() {
 
 	printf("");
 
+	const size_t checkpoint_interval = 10000;
+
 	for (int epoch = 0; epoch < 1000000; epoch++) {
 
-		if (epoch % 10000 == 0) {
+		if (epoch % checkpoint_interval == 0) {
 			printf("\033[%d;%dH", 0, 0);
 			std::cout << epoch << std::endl;
 		}
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
 			s->cycle(x[tsIndex], y[tsIndex]);
-			if (epoch % 10000 == 0)
+			if (epoch % checkpoint_interval == 0)
 				std::cout << x[tsIndex].to_string() << " " << s->y.to_string() << std::endl;
 		}
 
@@ -2784,7 +2786,7 @@ void ntm_test() {
 			cost += s->y_grad.abs_2d().sum_2d().sum_1d();
 
 			if (epoch % checkpoint_interval == 0)
-				std::cout << s->y.to_string() << std::endl;// << p->unrolled[0]->internal_readers[0]->internal_addresser->gamma[0] << std::endl;
+				std::cout << s->y.to_string() << std::endl;
 		}
 
 
@@ -2799,15 +2801,17 @@ void ntm_test() {
 
 void t_test() {
 	tensor t = tensor::new_2d(10, 10);
-	while(true)
+	while (true) {
+		Sleep(10);
 		t.pop(tensor::new_2d(10, 10));
+	}
 }
 
 int main() {
 
 	srand(time(NULL));
 	
-	t_test();
+	tnn_xor_test();
 
 	return 0;
 
