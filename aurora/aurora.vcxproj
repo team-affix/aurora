@@ -22,15 +22,16 @@
     <ClInclude Include="att_lstm.h" />
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
+    <ClInclude Include="basic_tnn.h" />
+    <ClInclude Include="basic_model.h" />
+    <ClInclude Include="session.h" />
     <ClInclude Include="basic.h" />
-    <ClInclude Include="basic_constructors.h" />
     <ClInclude Include="bias.h" />
     <ClInclude Include="cnl.h" />
     <ClInclude Include="evolution.h" />
     <ClInclude Include="leaky_rexu.h" />
     <ClInclude Include="generation.h" />
     <ClInclude Include="genome.h" />
-    <ClInclude Include="initialization.h" />
     <ClInclude Include="interpolate.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="leaky_relu.h" />
@@ -61,7 +62,7 @@
     <ClInclude Include="shift.h" />
     <ClInclude Include="static_vals.h" />
     <ClInclude Include="sequential.h" />
-    <ClInclude Include="session.h" />
+    <ClInclude Include="supervised_session.h" />
     <ClInclude Include="sigmoid.h" />
     <ClInclude Include="sync.h" />
     <ClInclude Include="tanh.h" />
@@ -78,6 +79,8 @@
   <ItemGroup>
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
+    <ClCompile Include="basic_model.cpp" />
+    <ClCompile Include="basic_tnn.cpp" />
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="cnl.cpp" />
     <ClCompile Include="cos_sim.cpp" />
@@ -102,14 +105,12 @@
     <ClCompile Include="ntm_wh.cpp" />
     <ClCompile Include="ntm_writer.cpp" />
     <ClCompile Include="param.cpp" />
-    <ClCompile Include="param_init.cpp" />
     <ClCompile Include="param_mom.cpp" />
     <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="param_sgd_mt.cpp" />
     <ClCompile Include="power.cpp" />
     <ClCompile Include="sequential.cpp" />
-    <ClCompile Include="session.cpp" />
     <ClCompile Include="shift.cpp" />
     <ClCompile Include="sigmoid.cpp" />
     <ClCompile Include="static_vals.cpp" />

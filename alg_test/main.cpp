@@ -123,7 +123,6 @@ void tnn_xor_test() {
 		{1, 0},
 		{1, 1},
 	};
-
 	tensor y = {
 		{0},
 		{1},
@@ -167,6 +166,49 @@ void tnn_xor_test() {
 	for (param_mom* pmt : pl) {
 		std::cout << pmt->state() << std::endl;
 	}
+}
+
+void basic_tnn_xor_test() {
+	
+	basic_model m = basic::tnn({ 2, 5, 1 });
+	Model& s = m.m_model;
+	
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+
+	const size_t checkpoint_interval = 10000;
+
+	for (int epoch = 0; epoch < 1000000; epoch++) {
+
+		if (epoch % checkpoint_interval == 0) {
+			printf("\033[%d;%dH", 0, 0);
+			std::cout << epoch << std::endl;
+		}
+
+		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
+			s->cycle(x[tsIndex], y[tsIndex]);
+			if (epoch % checkpoint_interval == 0)
+				std::cout << x[tsIndex].to_string() << " " << s->y.to_string() << std::endl;
+		}
+
+		m.update();
+
+	}
+
+	for (param*& pmt : m.m_params) {
+		std::cout << pmt->state() << std::endl;
+	}
+
 }
 
 void tanh_test() {
@@ -229,7 +271,7 @@ void tnn_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 
 	Sequential s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3));
-	s->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9), pl));
+	s->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::random_engine), 0.0002, 0, 0, 0.9), pl));
 	s->compile();
 	
 	for (int epoch = 0; epoch < 1000000; epoch++) {
@@ -1550,7 +1592,7 @@ void self_aware() {
 	vector<param*> pv;
 
 	auto pmt_init = [&](Param& pmt) {
-		pmt = new param(pmt_urd(aurora::static_vals::aurora_random_engine));
+		pmt = new param(pmt_urd(aurora::static_vals::random_engine));
 		pv.push_back(pmt.get());
 	};
 
@@ -1578,7 +1620,7 @@ void self_aware() {
 		pmt_link[(int)order_1_param_index].val() = order_1_param_state.val();
 		double cost = 0;
 		for (int ts = 0; ts < 10; ts++) {
-			double x = pmt_x_0(aurora::static_vals::aurora_random_engine);
+			double x = pmt_x_0(aurora::static_vals::random_engine);
 			double y = x + 3;
 			order_0_x.val() = x;
 			order_1_x.val() = 0;
@@ -1742,7 +1784,7 @@ void cnl_test() {
 
 	vector<param_mom*> pv;
 	auto pmt_init = [&](Param& pmt) {
-		pmt = new param_mom(pmt_urd(aurora::static_vals::aurora_random_engine), 0.0002, 0, 0, 0.9);
+		pmt = new param_mom(pmt_urd(aurora::static_vals::random_engine), 0.0002, 0, 0, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	};
 	
@@ -1869,7 +1911,7 @@ void att_lstm_ts_test() {
 	uniform_real_distribution<double> pmt_urd(-1, 1);
 
 	vector<param_mom*> pv;
-	auto pmt_init = PARAM_INIT(param_mom(pmt_urd(static_vals::aurora_random_engine), 0.02, 0, 0, 0.9), pv);
+	auto pmt_init = PARAM_INIT(param_mom(pmt_urd(static_vals::random_engine), 0.02, 0, 0, 0.9), pv);
 
 	ptr<att_lstm_ts> a = new att_lstm_ts(2, { 3 });
 	a->param_recur(pmt_init);
@@ -2028,7 +2070,7 @@ void cos_sim_test() {
 	p->compile();
 
 	uniform_real_distribution<double> urd(-100, 100);
-	p->x.pop(tensor::new_2d(2, units, urd, aurora::static_vals::aurora_random_engine));
+	p->x.pop(tensor::new_2d(2, units, urd, aurora::static_vals::random_engine));
 
 	tensor desired = 1;
 
@@ -2059,11 +2101,11 @@ void ntm_sparsify_test() {
 
 	uniform_real_distribution<double> urd(0, 1);
 
-	p->x.pop(tensor::new_1d(memory_height, urd, aurora::static_vals::aurora_random_engine));
+	p->x.pop(tensor::new_1d(memory_height, urd, aurora::static_vals::random_engine));
 		
 	double beta_des = 3;
 
-	tensor x = tensor::new_1d(memory_height, urd, aurora::static_vals::aurora_random_engine);
+	tensor x = tensor::new_1d(memory_height, urd, aurora::static_vals::random_engine);
 	tensor y = tensor::new_1d(memory_height);
 	for (int i = 0; i < x.size(); i++)
 		y[i].val() = exp(beta_des * x[i]);
@@ -2095,7 +2137,7 @@ void normalize_test() {
 
 	uniform_real_distribution<double> urd(-10, 10);
 
-	p->x.pop(tensor::new_1d(units, urd, aurora::static_vals::aurora_random_engine));
+	p->x.pop(tensor::new_1d(units, urd, aurora::static_vals::random_engine));
 	tensor y = { 0.5, 0.1, 0.1, 0.1, 0.2 };
 
 	tensor lr_tensor = tensor::new_1d(units, 0.02);
@@ -2125,9 +2167,9 @@ void ntm_content_addresser_test() {
 
 	uniform_real_distribution<double> urd(-1, 1);
 
-	p->key.pop(tensor::new_1d(memory_width, urd, aurora::static_vals::aurora_random_engine));
-	p->beta.pop(tensor::new_1d(1, urd, aurora::static_vals::aurora_random_engine));
-	p->x.pop(tensor::new_2d(memory_height, memory_width, urd, aurora::static_vals::aurora_random_engine));
+	p->key.pop(tensor::new_1d(memory_width, urd, aurora::static_vals::random_engine));
+	p->beta.pop(tensor::new_1d(1, urd, aurora::static_vals::random_engine));
+	p->x.pop(tensor::new_2d(memory_height, memory_width, urd, aurora::static_vals::random_engine));
 
 	tensor y = tensor::new_1d(memory_height);
 
@@ -2182,7 +2224,7 @@ void interpolate_test() {
 
 	const double amount_des = 0.7;
 
-	tensor x = tensor::new_2d(2, units, urd, aurora::static_vals::aurora_random_engine);
+	tensor x = tensor::new_2d(2, units, urd, aurora::static_vals::random_engine);
 	tensor y = tensor::new_1d(units);
 	for (int i = 0; i < units; i++) {
 		y[i].val() = amount_des * x[0][i] + (1 - amount_des) * x[1][i];
@@ -2230,7 +2272,7 @@ void shift_test() {
 
 	tensor amount_des = { 0.3, 0.5, 0.9 };
 
-	tensor x = tensor::new_1d(units, urd, aurora::static_vals::aurora_random_engine);
+	tensor x = tensor::new_1d(units, urd, aurora::static_vals::random_engine);
 	tensor y = tensor::new_1d(units);
 	for (int i = 0; i < units; i++)
 		for (int j = 0; j < valid_shifts.size(); j++) {
@@ -2267,7 +2309,7 @@ void power_test() {
 
 	const double amount_des = 3;
 
-	tensor x = tensor::new_1d(units, urd, aurora::static_vals::aurora_random_engine);
+	tensor x = tensor::new_1d(units, urd, aurora::static_vals::random_engine);
 	tensor y = tensor::new_1d(units);
 	for (int i = 0; i < units; i++)
 		y[i].val() = pow(x[i], amount_des);
@@ -2309,9 +2351,9 @@ void ntm_location_addresser_test() {
 
 	uniform_real_distribution<double> urd(0, 1);
 
-	p->g.pop(tensor::new_1d(1, urd, aurora::static_vals::aurora_random_engine));
-	p->s.pop(tensor::new_1d(valid_shifts.size(), urd, aurora::static_vals::aurora_random_engine));
-	p->gamma.pop(tensor::new_1d(1, urd, aurora::static_vals::aurora_random_engine));
+	p->g.pop(tensor::new_1d(1, urd, aurora::static_vals::random_engine));
+	p->s.pop(tensor::new_1d(valid_shifts.size(), urd, aurora::static_vals::random_engine));
+	p->gamma.pop(tensor::new_1d(1, urd, aurora::static_vals::random_engine));
 
 	tensor x = tensor::new_1d(memory_height, 0.1);
 	x[2].val() = 0.8;
@@ -2373,12 +2415,12 @@ void ntm_addresser_test() {
 	p->wx.pop(tensor::new_1d(memory_height));
 	p->wx[prev_selected_index].val() = 1;
 
-	p->x.pop(tensor::new_2d(memory_height, memory_width, urd, aurora::static_vals::aurora_random_engine));
-	p->key.pop(tensor::new_1d(memory_width, urd, aurora::static_vals::aurora_random_engine));
-	p->beta.pop(tensor::new_1d(1, urd, aurora::static_vals::aurora_random_engine));
-	p->gamma.pop(tensor::new_1d(1, pos_urd, aurora::static_vals::aurora_random_engine));
-	l_g_sm->x.pop(tensor::new_1d(1, sm_urd, aurora::static_vals::aurora_random_engine));
-	l_s_sm->x.pop(tensor::new_1d(valid_shifts.size(), sm_urd, aurora::static_vals::aurora_random_engine));
+	p->x.pop(tensor::new_2d(memory_height, memory_width, urd, aurora::static_vals::random_engine));
+	p->key.pop(tensor::new_1d(memory_width, urd, aurora::static_vals::random_engine));
+	p->beta.pop(tensor::new_1d(1, urd, aurora::static_vals::random_engine));
+	p->gamma.pop(tensor::new_1d(1, pos_urd, aurora::static_vals::random_engine));
+	l_g_sm->x.pop(tensor::new_1d(1, sm_urd, aurora::static_vals::random_engine));
+	l_s_sm->x.pop(tensor::new_1d(valid_shifts.size(), sm_urd, aurora::static_vals::random_engine));
 
 	l_g_sm->y.group_join(p->g);
 	l_g_sm->y_grad.group_join(p->g_grad);
@@ -2452,7 +2494,7 @@ void ntm_rh_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 
 	ntm_rh nrh = ntm_rh(5, { 6, 7 }, 3);
-	nrh.param_recur(PARAM_INIT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv));
+	nrh.param_recur(PARAM_INIT(param_sgd(urd(aurora::static_vals::random_engine), 0.002, 0), pv));
 	nrh.compile();
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
@@ -2530,7 +2572,7 @@ void ntm_wh_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 
 	ntm_wh nwh = ntm_wh(5, { 6, 7 }, 3);
-	nwh.param_recur(PARAM_INIT(param_sgd(urd(aurora::static_vals::aurora_random_engine), 0.0002, 0), pv));
+	nwh.param_recur(PARAM_INIT(param_sgd(urd(aurora::static_vals::random_engine), 0.0002, 0), pv));
 	nwh.compile();
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
@@ -2601,13 +2643,13 @@ void ntm_reader_test() {
 
 	vector<param_sgd*> pv;
 	auto pmt_init = PARAM_INIT(
-		param_sgd(pmt_urd(aurora::static_vals::aurora_random_engine), 0.002, 0), pv);
+		param_sgd(pmt_urd(aurora::static_vals::random_engine), 0.002, 0), pv);
 
 	Ntm_reader p = new ntm_reader(memory_height, memory_width, valid_shifts, {memory_width, memory_width + 5});
 	p->param_recur(pmt_init);
 	p->compile();
 
-	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
+	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::random_engine));
 	//p->wx[1].val() = 1;
 
 	const size_t selected_index = 1;
@@ -2654,7 +2696,7 @@ void ntm_writer_test() {
 	p->param_recur(pmt_init);
 	p->compile();
 
-	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::aurora_random_engine));
+	p->mx.pop(tensor::new_2d(memory_height, memory_width, mem_urd, aurora::static_vals::random_engine));
 	p->wx[4].val() = 0.4;
 	p->wx[3].val() = 0.6;
 
@@ -2811,7 +2853,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	tnn_xor_test();
+	basic_tnn_xor_test();
 
 	return 0;
 

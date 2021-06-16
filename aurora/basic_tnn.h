@@ -1,18 +1,15 @@
 #pragma once
 #include "pch.h"
+#include "pseudo.h"
 #include "basic_model.h"
+#include "sequential.h"
 
 using aurora::basic::basic_model;
-using aurora::params::param;
-using aurora::models::Model;
+using aurora::models::Sequential;
 using std::vector;
 
 namespace aurora {
 	namespace basic {
-		class session {
-		protected:
-			basic_model m_model_info;
-			
-		};
+		basic_model tnn(vector<size_t> a_dims);
 	}
 }

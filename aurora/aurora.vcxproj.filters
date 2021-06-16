@@ -37,23 +37,17 @@
     <Filter Include="Source Files\evolution">
       <UniqueIdentifier>{2ef80bf2-9414-431e-bd4d-e2d45716f849}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\basic">
-      <UniqueIdentifier>{7889e4fe-cfe3-4110-bf91-9ba4fa9493c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\basic">
       <UniqueIdentifier>{1744551b-3818-4897-ad87-df82e773d2d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\initialization">
-      <UniqueIdentifier>{a3703a07-8605-40fc-b6cc-13627620fef8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\initialization">
-      <UniqueIdentifier>{5622ddb5-b859-49d9-b138-f86041955205}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\maths">
       <UniqueIdentifier>{5ac1cccd-5d6d-4d98-8573-b04c39103662}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\maths">
       <UniqueIdentifier>{33ee9bc0-3a64-4cd4-99ec-5bdc80b7ec7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\basic">
+      <UniqueIdentifier>{7889e4fe-cfe3-4110-bf91-9ba4fa9493c1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -150,7 +144,7 @@
     <ClInclude Include="tnn.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="session.h">
+    <ClInclude Include="supervised_session.h">
       <Filter>Header Files\basic</Filter>
     </ClInclude>
     <ClInclude Include="static_vals.h">
@@ -158,15 +152,6 @@
     </ClInclude>
     <ClInclude Include="cnl.h">
       <Filter>Header Files\models</Filter>
-    </ClInclude>
-    <ClInclude Include="param_init.h">
-      <Filter>Header Files\initialization</Filter>
-    </ClInclude>
-    <ClInclude Include="initialization.h">
-      <Filter>Header Files\initialization</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_constructors.h">
-      <Filter>Header Files\basic</Filter>
     </ClInclude>
     <ClInclude Include="att_lstm.h">
       <Filter>Header Files\models</Filter>
@@ -221,6 +206,18 @@
     </ClInclude>
     <ClInclude Include="ntm.h">
       <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="session.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_model.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="param_init.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_tnn.h">
+      <Filter>Header Files\basic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -293,17 +290,11 @@
     <ClCompile Include="tnn.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
-    <ClCompile Include="session.cpp">
-      <Filter>Source Files\basic</Filter>
-    </ClCompile>
     <ClCompile Include="static_vals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cnl.cpp">
       <Filter>Source Files\models</Filter>
-    </ClCompile>
-    <ClCompile Include="param_init.cpp">
-      <Filter>Source Files\initialization</Filter>
     </ClCompile>
     <ClCompile Include="att_lstm.cpp">
       <Filter>Source Files\models</Filter>
@@ -358,6 +349,12 @@
     </ClCompile>
     <ClCompile Include="ntm.cpp">
       <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_tnn.cpp">
+      <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_model.cpp">
+      <Filter>Source Files\basic</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
