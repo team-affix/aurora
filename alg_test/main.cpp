@@ -2853,7 +2853,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	basic_tnn_xor_test();
+	tnn_xor_test();
 
 	return 0;
 

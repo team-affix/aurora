@@ -2,15 +2,17 @@
 #include "pch.h"
 #include "data.h"
 #include "model.h"
+#include "recurrent.h"
 #include "lstm_ts.h"
 
 using affix_base::data::ptr;
 using aurora::models::model;
+using aurora::models::recurrent;
 using aurora::models::lstm_ts;
 
 namespace aurora {
 	namespace models {
-		class lstm : public model {
+		class lstm : public recurrent {
 		public:
 			size_t units;
 

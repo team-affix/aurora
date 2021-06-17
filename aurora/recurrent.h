@@ -13,5 +13,6 @@ namespace aurora {
 			recurrent();
 			
 		};
+		typedef ptr<recurrent> Recurrent;
 	}
 }

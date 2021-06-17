@@ -9,7 +9,7 @@ using aurora::models::sync;
 
 namespace aurora {
 	namespace models {
-		class att_lstm_ts : public model {
+		class att_lstm_ts : public recurrent {
 		public:
 			size_t units;
 

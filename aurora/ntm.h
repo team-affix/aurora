@@ -7,7 +7,7 @@ using aurora::models::model;
 
 namespace aurora {
 	namespace models {
-		class ntm : public model {
+		class ntm : public recurrent {
 		public:
 			size_t memory_height = 0;
 			size_t memory_width = 0;

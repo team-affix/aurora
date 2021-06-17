@@ -1,13 +1,15 @@
 #pragma once
 #include "pch.h"
 #include "model.h"
+#include "recurrent.h"
 
 using aurora::models::model;
+using aurora::models::recurrent;
 using std::vector;
 
 namespace aurora {
 	namespace models {
-		class sync : public model {
+		class sync : public recurrent {
 		public:
 			Model model_template;
 			vector<Model> prepared;
