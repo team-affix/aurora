@@ -219,6 +219,9 @@
     <ClInclude Include="basic_tnn.h">
       <Filter>Header Files\basic</Filter>
     </ClInclude>
+    <ClInclude Include="recurrent.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -355,6 +358,9 @@
     </ClCompile>
     <ClCompile Include="basic_model.cpp">
       <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="recurrent.cpp">
+      <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
