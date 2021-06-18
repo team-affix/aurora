@@ -12,17 +12,16 @@ using std::uniform_real_distribution;
 namespace aurora {
 	namespace pseudo {
 
-
-		#define PARAM_INIT(right_side, param_vector) \
+		#define PARAM_INIT(right_side, param_vec) \
 		[&](Param& pmt) { \
 		auto l_pmt = new right_side; \
 		pmt = l_pmt; \
-		param_vector.push_back(l_pmt); \
+		param_vec.push_back(l_pmt); \
 		}
 
-		#define PARAM_DUMP(param_vector) \
+		#define PARAM_DUMP(param_vec) \
 		[&](Param& pmt) { \
-		param_vector.push_back(pmt.get()); \
+		param_vec.push_back(pmt.get()); \
 		}
 
 		#define PARAM_COUNT(incrementer) \

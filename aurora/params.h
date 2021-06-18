@@ -5,3 +5,4 @@
 #include "param_mom.h"
 #include "param_sgd_mt.h"
 #include "param_mom_mt.h"
+#include "param_vector.h"

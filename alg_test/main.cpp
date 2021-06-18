@@ -170,8 +170,8 @@ void tnn_xor_test() {
 
 void basic_tnn_xor_test() {
 	
-	basic_model m = basic::tnn({ 2, 5, 1 });
-	Model& s = m.m_model;
+	param_vector pv;
+	Model s = basic::tnn({ 2, 5, 1 }, pv);
 	
 	tensor x = {
 		{0, 0},
@@ -201,11 +201,11 @@ void basic_tnn_xor_test() {
 				std::cout << x[tsIndex].to_string() << " " << s->y.to_string() << std::endl;
 		}
 
-		m.update();
+		pv.update();
 
 	}
 
-	for (param*& pmt : m.m_params) {
+	for (Param& pmt : pv) {
 		std::cout << pmt->state() << std::endl;
 	}
 
@@ -2747,7 +2747,7 @@ void ntm_test() {
 	uniform_real_distribution<double> mem_urd(-1, 1);
 	default_random_engine dre(27);
 
-	vector<param_mom*> pv;
+	vector<Param> pv;
 
 	auto pmt_init = PARAM_INIT(param_mom(pmt_urd(dre), 0.002, 0, 0, 0.9), pv);
 
@@ -2877,9 +2877,8 @@ void stacked_recurrent_test() {
 
 	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_sgd(urd(re), 0.02, 0);
-		pv.push_back((param_sgd*)pmt.get());
+		pv.push_back(pmt);
 	};
-
 	Stacked_recurrent s = new stacked_recurrent({
 		new sync(pseudo::tnn({ 2, lstm_units }, pseudo::nlr(0.3))),
 		new lstm(lstm_units),
@@ -2912,7 +2911,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	stacked_recurrent_test();
+	lstm_test();
 
 	return 0;
 

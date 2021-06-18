@@ -4,19 +4,21 @@
 
 using namespace aurora;
 
-basic_model basic::tnn(vector<size_t> a_dims) {
+Model basic::tnn(vector<size_t> a_dims, param_vector& a_param_vec) {
 
-	basic_model result;
-	result.m_model = pseudo::tnn(a_dims, pseudo::nlr(0.3));
+	Model result = pseudo::tnn(a_dims, pseudo::nlr(0.3));
 
 	size_t param_count = 0;
-	result.m_model->param_recur(PARAM_COUNT(param_count));
+	result ->param_recur(PARAM_COUNT(param_count));
 
 	uniform_real_distribution<double> urd(-1.0 / (double)param_count, 1.0 / (double)param_count);
 
-	result.m_model->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::random_engine), 0.02, 0, 0, 0.9), result.m_params));
+	double learn_rate = 0.2 / (double)param_count;
+	double beta = 0.9;
 
-	result.m_model->compile();
+	result->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
+
+	result->compile();
 
 	return result;
 	

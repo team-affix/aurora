@@ -22,8 +22,9 @@
     <ClInclude Include="att_lstm.h" />
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
+    <ClInclude Include="basic_lstm.h" />
     <ClInclude Include="basic_tnn.h" />
-    <ClInclude Include="basic_model.h" />
+    <ClInclude Include="param_vector.h" />
     <ClInclude Include="recurrent.h" />
     <ClInclude Include="session.h" />
     <ClInclude Include="basic.h" />
@@ -81,7 +82,6 @@
   <ItemGroup>
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
-    <ClCompile Include="basic_model.cpp" />
     <ClCompile Include="basic_tnn.cpp" />
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="cnl.cpp" />
@@ -111,6 +111,7 @@
     <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="param_sgd_mt.cpp" />
+    <ClCompile Include="param_vector.cpp" />
     <ClCompile Include="power.cpp" />
     <ClCompile Include="recurrent.cpp" />
     <ClCompile Include="sequential.cpp" />

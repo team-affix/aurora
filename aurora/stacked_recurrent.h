@@ -19,6 +19,7 @@ namespace aurora {
 			virtual ~stacked_recurrent();
 			stacked_recurrent();
 			stacked_recurrent(vector<Recurrent> a_models);
+			stacked_recurrent(size_t a_height, Recurrent a_model_template);
 
 		};
 		typedef ptr<stacked_recurrent> Stacked_recurrent;

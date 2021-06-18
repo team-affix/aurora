@@ -15,6 +15,11 @@ stacked_recurrent::stacked_recurrent(vector<Recurrent> a_models) {
 	models = a_models;
 }
 
+stacked_recurrent::stacked_recurrent(size_t a_height, Recurrent a_model_template) {
+	for (int i = 0; i < a_height; i++)
+		models.push_back((recurrent*)a_model_template->clone());
+}
+
 void stacked_recurrent::param_recur(function<void(Param&)> a_func) {
 	for (int i = 0; i < models.size(); i++)
 		models[i]->param_recur(a_func);

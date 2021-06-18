@@ -11,8 +11,8 @@ layer::layer() {
 
 }
 
-layer::layer(size_t a_num_models, Model a_model_template) {
-	for (size_t i = 0; i < a_num_models; i++)
+layer::layer(size_t a_height, Model a_model_template) {
+	for (size_t i = 0; i < a_height; i++)
 		models.push_back(a_model_template->clone());
 }
 
