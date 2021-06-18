@@ -222,6 +222,9 @@
     <ClInclude Include="recurrent.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="stacked_recurrent.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -360,6 +363,9 @@
       <Filter>Source Files\basic</Filter>
     </ClCompile>
     <ClCompile Include="recurrent.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="stacked_recurrent.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>

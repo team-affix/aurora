@@ -61,6 +61,7 @@
     <ClInclude Include="power.h" />
     <ClInclude Include="pseudo.h" />
     <ClInclude Include="shift.h" />
+    <ClInclude Include="stacked_recurrent.h" />
     <ClInclude Include="static_vals.h" />
     <ClInclude Include="sequential.h" />
     <ClInclude Include="supervised_session.h" />
@@ -115,6 +116,7 @@
     <ClCompile Include="sequential.cpp" />
     <ClCompile Include="shift.cpp" />
     <ClCompile Include="sigmoid.cpp" />
+    <ClCompile Include="stacked_recurrent.cpp" />
     <ClCompile Include="static_vals.cpp" />
     <ClCompile Include="sync.cpp" />
     <ClCompile Include="tanh.cpp" />

@@ -2841,19 +2841,78 @@ void ntm_test() {
 
 }
 
-void t_test() {
-	tensor t = tensor::new_2d(10, 10);
-	while (true) {
-		Sleep(10);
-		t.pop(tensor::new_2d(10, 10));
+void stacked_recurrent_test() {
+	tensor x0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor x1 = {
+		{0, 1},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	tensor y1 = {
+		{1},
+		{1},
+		{1},
+		{1},
+	};
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
+	const int lstm_units = 5;
+
+	vector<param_sgd*> pv;
+
+	auto pmt_init = [&](Param& pmt) {
+		pmt = new param_sgd(urd(re), 0.02, 0);
+		pv.push_back((param_sgd*)pmt.get());
+	};
+
+	Stacked_recurrent s = new stacked_recurrent({
+		new sync(pseudo::tnn({ 2, lstm_units }, pseudo::nlr(0.3))),
+		new lstm(lstm_units),
+		new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3)))
+	});
+	s->param_recur(pmt_init);
+
+	s->prep(4);
+	s->compile();
+	s->unroll(4);
+
+	const int checkpoint_interval = 10000;
+
+	for (int epoch = 0; true; epoch++) {
+		s->cycle(x0, y0);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S0: " << s->y.to_string() << std::endl;
+		s->cycle(x1, y1);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S1: " << s->y.to_string() << std::endl;
+		for (param_sgd* pmt : pv) {
+			pmt->state() -= pmt->learn_rate() * pmt->gradient();
+			pmt->gradient() = 0;
+		}
 	}
+
 }
 
 int main() {
 
 	srand(time(NULL));
 	
-	tnn_xor_test();
+	stacked_recurrent_test();
 
 	return 0;
 
