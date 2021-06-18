@@ -22,7 +22,6 @@
     <ClInclude Include="att_lstm.h" />
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
-    <ClInclude Include="basic_lstm.h" />
     <ClInclude Include="basic_tnn.h" />
     <ClInclude Include="param_vector.h" />
     <ClInclude Include="recurrent.h" />
