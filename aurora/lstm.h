@@ -14,7 +14,7 @@ namespace aurora {
 	namespace models {
 		class lstm : public recurrent {
 		public:
-			size_t units;
+			size_t units = 0;
 
 		public:
 			tensor ctx;

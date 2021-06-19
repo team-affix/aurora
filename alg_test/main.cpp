@@ -2957,6 +2957,19 @@ void lstm_compiled_test() {
 
 }
 
+void test_test() {
+
+	param* p = new param();
+	Param p1 = p;
+	Param p2 = new param();
+	std::cout << p2.m_prev << std::endl;
+	std::cout << p2.m_next << std::endl;
+
+	test_test();
+
+
+}
+
 int main() {
 
 	srand(time(NULL));
