@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ntm_reader.h"
+#include <iostream>
 
 using aurora::models::ntm_reader;
 

@@ -213,9 +213,6 @@
     <ClInclude Include="param_init.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="basic_tnn.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
     <ClInclude Include="recurrent.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
@@ -224,6 +221,15 @@
     </ClInclude>
     <ClInclude Include="param_vector.h">
       <Filter>Header Files\params</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_hyperparams.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_tnn.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_lstm_mdim.h">
+      <Filter>Header Files\basic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -356,9 +362,6 @@
     <ClCompile Include="ntm.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
-    <ClCompile Include="basic_tnn.cpp">
-      <Filter>Source Files\basic</Filter>
-    </ClCompile>
     <ClCompile Include="recurrent.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
@@ -367,6 +370,15 @@
     </ClCompile>
     <ClCompile Include="param_vector.cpp">
       <Filter>Source Files\params</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_hyperparams.cpp">
+      <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_lstm_mdim.cpp">
+      <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_tnn.cpp">
+      <Filter>Source Files\basic</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

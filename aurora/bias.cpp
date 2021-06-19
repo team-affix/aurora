@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "bias.h"
+#include <iostream>
 
 using aurora::models::bias;
 
@@ -12,7 +13,9 @@ bias::bias() {
 }
 
 void bias::param_recur(function<void(Param&)> a_func) {
+	std::cout << "bias_start" << std::endl;
 	a_func(pmt);
+	std::cout << "bias_end" << std::endl;
 }
 
 model* bias::clone(function<Param(Param&)> a_func) {

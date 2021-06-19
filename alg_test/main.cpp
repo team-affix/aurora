@@ -168,7 +168,7 @@ void tnn_xor_test() {
 	}
 }
 
-void basic_tnn_xor_test() {
+void tnn_compiled_xor_test() {
 	
 	param_vector pv;
 	Model s = basic::tnn({ 2, 5, 1 }, pv);
@@ -2736,7 +2736,7 @@ void ntm_writer_test() {
 void ntm_test() {
 
 	size_t memory_height = 5;
-	size_t memory_width = 5;
+	size_t memory_width = 2;
 	size_t num_readers = 1;
 	size_t num_writers = 1;
 	vector<int> valid_shifts = { -1, 0, 1 };
@@ -2747,9 +2747,12 @@ void ntm_test() {
 	uniform_real_distribution<double> mem_urd(-1, 1);
 	default_random_engine dre(27);
 
-	vector<Param> pv;
+	vector<param*> pv;
 
-	auto pmt_init = PARAM_INIT(param_mom(pmt_urd(dre), 0.002, 0, 0, 0.9), pv);
+	auto pmt_init = [&](Param& pmt) {
+		pmt = new param_mom(pmt_urd(dre), 0.02, 0, 0, 0.9);
+		pv.push_back(pmt);
+	};
 
 	Sync s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3)));
 
@@ -2763,7 +2766,7 @@ void ntm_test() {
 
 	Sync s_out = new sync(pseudo::tnn({ memory_width, 1 }, pseudo::nlr(0.3)));
 
-	Sequential s = new sequential { s_in.get(), p.get(), s_out.get() };
+	Sequential s = new sequential { s_in, p, s_out };
 	s->param_recur(pmt_init);
 
 	const size_t num_ts = 4;
@@ -2831,8 +2834,7 @@ void ntm_test() {
 				std::cout << s->y.to_string() << std::endl;
 		}
 
-
-		for (param_mom* pmt : pv)
+		for (param* pmt : pv)
 			pmt->update();
 
 		if (epoch % checkpoint_interval == 0)
@@ -2907,11 +2909,59 @@ void stacked_recurrent_test() {
 
 }
 
+void lstm_compiled_test() {
+
+	param_vector pv;
+	Stacked_recurrent s = basic::basic_lstm_mdim(2, 10, 1, 4, pv);
+	s->unroll(4);
+
+	tensor x0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor x1 = {
+		{0, 1},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	tensor y1 = {
+		{1},
+		{1},
+		{1},
+		{1},
+	};
+
+	const int checkpoint_interval = 10000;
+
+	for (int epoch = 0; true; epoch++) {
+		s->cycle(x0, y0);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S0: " << s->y.to_string() << std::endl;
+		s->cycle(x1, y1);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S1: " << s->y.to_string() << std::endl;
+		pv.update();
+	}
+
+
+
+}
+
 int main() {
 
 	srand(time(NULL));
 	
-	lstm_test();
+	ntm_test();
 
 	return 0;
 

@@ -14,9 +14,8 @@ namespace aurora {
 
 		#define PARAM_INIT(right_side, param_vec) \
 		[&](Param& pmt) { \
-		auto l_pmt = new right_side; \
-		pmt = l_pmt; \
-		param_vec.push_back(l_pmt); \
+		pmt = new right_side; \
+		param_vec.push_back(pmt); \
 		}
 
 		#define PARAM_DUMP(param_vec) \
