@@ -28,7 +28,7 @@ tensor& tensor::group_tail() {
 
 size_t tensor::group_size() {
 	size_t result = 0;
-	group_model_recur([&](tensor* elem) { result += 1; });
+	group_recur([&](tensor* elem) { result += 1; });
 	return result;
 }
 
@@ -527,7 +527,7 @@ tensor tensor::cat(tensor a_other) {
 }
 
 void tensor::link(tensor& a_other) {
-	group_model_recur([&](tensor* elem) {
+	group_recur([&](tensor* elem) {
 		elem->val_ptr.link(a_other.val_ptr);
 		elem->resize(a_other.size());
 		for (int i = 0; i < a_other.size(); i++)
@@ -560,7 +560,7 @@ void tensor::group_recur_bwd(function<void(tensor*)> a_func) {
 	a_func(this);
 }
 
-void tensor::group_model_recur(function<void(tensor*)> a_func) {
+void tensor::group_recur(function<void(tensor*)> a_func) {
 	if (group_prev_ptr != nullptr)
 		group_prev_ptr->group_recur_bwd(a_func);
 	if (group_next_ptr != nullptr)
@@ -570,7 +570,7 @@ void tensor::group_model_recur(function<void(tensor*)> a_func) {
 
 bool tensor::group_contains(tensor* a_ptr) {
 	bool result = false;
-	group_model_recur([&](tensor* tens) {
+	group_recur([&](tensor* tens) {
 		if (tens == a_ptr)
 			result = true;
 	});
@@ -587,7 +587,7 @@ void tensor::group_remove(tensor& a_other) {
 
 void tensor::group_join(tensor& a_other) {
 	link(a_other); // LINKS ENTIRE GROUP TO a_other's GROUP
-	group_model_recur([&](tensor* elem) {
+	group_recur([&](tensor* elem) {
 		// PREVENT ADDING NODES TO SAME GROUP TWICE
 		if (!a_other.group_contains(elem)) {
 			tensor& l_group_tail = a_other.group_tail();
@@ -608,7 +608,7 @@ void tensor::group_leave() {
 }
 
 void tensor::group_disband() {
-	group_model_recur([](tensor* elem) { elem->group_leave(); });
+	group_recur([](tensor* elem) { elem->group_leave(); });
 }
 
 void tensor::group_add_all_ranks(tensor& a_other) {
@@ -621,7 +621,7 @@ void tensor::group_remove_all_ranks(tensor& a_other) {
 
 void tensor::group_join_all_ranks(tensor& a_other) {
 	link(a_other); // LINKS ENTIRE GROUP TO a_other's GROUP
-	group_model_recur([&](tensor* elem) {
+	group_recur([&](tensor* elem) {
 
 		for (int i = 0; i < size(); i++)
 			at(i).group_join_all_ranks(a_other.at(i));

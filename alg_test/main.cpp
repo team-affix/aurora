@@ -623,7 +623,7 @@ void lstm_test() {
 
 	auto pmt_init = [&](Param& pmt) {
 		pmt = new param_sgd(urd(re), 0.02, 0);
-		pv.push_back((param_sgd*)pmt.get());
+		pv.push_back(pmt);
 	};
 
 	sync* s0 = new sync(pseudo::tnn({ 2, lstm_units }, pseudo::nlr(0.3)));
@@ -649,7 +649,7 @@ void lstm_test() {
 
 	const int checkpoint_interval = 10000;
 
-	for (int epoch = 0; true; epoch++) {
+	for (int epoch = 0; epoch < 1000; epoch++) {
 		s.cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S0: " << s.y.to_string() << std::endl;
@@ -2736,7 +2736,7 @@ void ntm_writer_test() {
 void ntm_test() {
 
 	size_t memory_height = 5;
-	size_t memory_width = 2;
+	size_t memory_width = 5;
 	size_t num_readers = 1;
 	size_t num_writers = 1;
 	vector<int> valid_shifts = { -1, 0, 1 };
@@ -2747,12 +2747,9 @@ void ntm_test() {
 	uniform_real_distribution<double> mem_urd(-1, 1);
 	default_random_engine dre(27);
 
-	vector<param*> pv;
+	vector<Param> pv;
 
-	auto pmt_init = [&](Param& pmt) {
-		pmt = new param_mom(pmt_urd(dre), 0.02, 0, 0, 0.9);
-		pv.push_back(pmt);
-	};
+	auto pmt_init = PARAM_INIT(param_mom(pmt_urd(dre), 0.002, 0, 0, 0.9), pv);
 
 	Sync s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3)));
 
@@ -2766,7 +2763,7 @@ void ntm_test() {
 
 	Sync s_out = new sync(pseudo::tnn({ memory_width, 1 }, pseudo::nlr(0.3)));
 
-	Sequential s = new sequential { s_in, p, s_out };
+	Sequential s = new sequential { s_in.get(), p.get(), s_out.get() };
 	s->param_recur(pmt_init);
 
 	const size_t num_ts = 4;
@@ -2943,7 +2940,7 @@ void lstm_compiled_test() {
 
 	const int checkpoint_interval = 10000;
 
-	for (int epoch = 0; true; epoch++) {
+	for (int epoch = 0; epoch < 1; epoch++) {
 		s->cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S0: " << s->y.to_string() << std::endl;
@@ -2953,8 +2950,6 @@ void lstm_compiled_test() {
 		pv.update();
 	}
 
-
-
 }
 
 void test_test() {
@@ -2962,8 +2957,6 @@ void test_test() {
 	param* p = new param();
 	Param p1 = p;
 	Param p2 = new param();
-	std::cout << p2.m_prev << std::endl;
-	std::cout << p2.m_next << std::endl;
 
 	test_test();
 
@@ -2974,7 +2967,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_test();
+	lstm_test();
 
 	return 0;
 
