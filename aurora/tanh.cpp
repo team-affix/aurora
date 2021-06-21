@@ -33,7 +33,7 @@ void tanh::bwd() {
 	x_grad.val() = y_grad.val() * a / pow(cosh(b * x.val()), 2) * b;
 }
 
-void tanh::signal(tensor& a_y_des) {
+void tanh::signal(const tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 

@@ -72,7 +72,7 @@ void att_lstm_ts::bwd() {
 	}
 }
 
-void att_lstm_ts::signal(tensor& a_y_des) {
+void att_lstm_ts::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

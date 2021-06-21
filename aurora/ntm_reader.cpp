@@ -54,7 +54,7 @@ void ntm_reader::bwd() {
 	internal_head->bwd();
 }
 
-void ntm_reader::signal(tensor& a_y_des) {
+void ntm_reader::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

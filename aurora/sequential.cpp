@@ -44,7 +44,7 @@ void sequential::bwd() {
 	}
 }
 
-void sequential::signal(tensor& a_y_des) {
+void sequential::signal(const tensor& a_y_des) {
 	models.back()->signal(a_y_des);
 }
 

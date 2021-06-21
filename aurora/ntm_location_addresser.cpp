@@ -53,7 +53,7 @@ void ntm_location_addresser::bwd() {
 	internal_interpolate->bwd();
 }
 
-void ntm_location_addresser::signal(tensor& a_y_des) {
+void ntm_location_addresser::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

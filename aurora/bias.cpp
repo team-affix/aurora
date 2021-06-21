@@ -31,7 +31,7 @@ void bias::bwd() {
 	pmt_sgd->accum_grad(y_grad.val());
 }
 
-void bias::signal(tensor& a_y_des) {
+void bias::signal(const tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 

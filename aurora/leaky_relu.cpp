@@ -33,7 +33,7 @@ void leaky_relu::bwd() {
 		x_grad.val() = y_grad.val() * m.val();
 }
 
-void leaky_relu::signal(tensor& a_y_des) {
+void leaky_relu::signal(const tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 

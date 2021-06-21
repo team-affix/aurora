@@ -66,7 +66,7 @@ void ntm_writer::bwd() {
 	internal_head->bwd();
 }
 
-void ntm_writer::signal(tensor& a_y_des) {
+void ntm_writer::signal(const tensor& a_y_des) {
 	y.sub_2d(a_y_des, y_grad);
 }
 

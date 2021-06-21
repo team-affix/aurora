@@ -28,7 +28,7 @@ void recurrent::bwd() {
 
 }
 
-void recurrent::signal(tensor& a_y_des) {
+void recurrent::signal(const tensor& a_y_des) {
 	
 }
 

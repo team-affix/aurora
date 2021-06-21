@@ -47,7 +47,7 @@ void shift::bwd() {
 		}
 }
 
-void shift::signal(tensor& a_y_des) {
+void shift::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

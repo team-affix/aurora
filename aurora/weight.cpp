@@ -31,7 +31,7 @@ void weight::bwd() {
 	x_grad.val() = y_grad.val() * pmt->state();
 }
 
-void weight::signal(tensor& a_y_des) {
+void weight::signal(const tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 

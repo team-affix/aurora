@@ -43,7 +43,7 @@ void interpolate::bwd() {
 	}
 }
 
-void interpolate::signal(tensor& a_y_des) {
+void interpolate::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

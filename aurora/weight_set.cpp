@@ -43,7 +43,7 @@ void weight_set::bwd() {
 	}
 }
 
-void weight_set::signal(tensor& a_y_des) {
+void weight_set::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

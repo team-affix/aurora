@@ -49,7 +49,7 @@ void att_lstm::bwd() {
 	}
 }
 
-void att_lstm::signal(tensor& a_y_des) {
+void att_lstm::signal(const tensor& a_y_des) {
 	internal_lstm->signal(a_y_des);
 }
 

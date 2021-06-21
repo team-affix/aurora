@@ -104,7 +104,7 @@ void ntm_rh::bwd() {
 	x_grad.add_1d(gamma_model->x_grad, x_grad);
 }
 
-void ntm_rh::signal(tensor& a_y_des) {
+void ntm_rh::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

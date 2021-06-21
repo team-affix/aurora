@@ -27,7 +27,7 @@ void sigmoid::bwd() {
 	x_grad.val() = y_grad.val() * y.val() * (1 - y.val());
 }
 
-void sigmoid::signal(tensor& a_y_des) {
+void sigmoid::signal(const tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 

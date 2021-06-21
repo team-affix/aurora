@@ -32,7 +32,7 @@ void sync::bwd() {
 		unrolled[i]->bwd();
 }
 
-void sync::signal(tensor& a_y_des) {
+void sync::signal(const tensor& a_y_des) {
 	for (int i = 0; i < unrolled.size(); i++)
 		unrolled[i]->signal(a_y_des[i]);
 }

@@ -64,7 +64,7 @@ void ntm::bwd() {
 	}
 }
 
-void ntm::signal(tensor& a_y_des) {
+void ntm::signal(const tensor& a_y_des) {
 	y.sub_2d(a_y_des, y_grad);
 }
 

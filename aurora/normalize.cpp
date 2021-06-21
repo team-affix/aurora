@@ -42,7 +42,7 @@ void normalize::bwd() {
 	}
 }
 
-void normalize::signal(tensor& a_y_des) {
+void normalize::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

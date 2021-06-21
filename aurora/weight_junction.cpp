@@ -45,7 +45,7 @@ void weight_junction::bwd() {
 		weight_sets[i]->bwd();
 }
 
-void weight_junction::signal(tensor& a_y_des) {
+void weight_junction::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
@@ -56,10 +56,10 @@ void weight_junction::model_recur(function<void(model*)> a_func) {
 }
 
 void weight_junction::compile() {
-	x.resize(a);
-	x_grad.resize(a);
-	y.resize(b);
-	y_grad.resize(b);
+	x = tensor::new_1d(a);
+	x_grad = tensor::new_1d(a);
+	y = tensor::new_1d(b);
+	y_grad = tensor::new_1d(b);
 	for (int i = 0; i < weight_sets.size(); i++) {
 		weight_sets[i]->compile();
 		weight_sets[i]->x.group_add(x[i]);

@@ -52,7 +52,7 @@ void cos_sim::bwd() {
 	}
 }
 
-void cos_sim::signal(tensor& a_y_des) {
+void cos_sim::signal(const tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 

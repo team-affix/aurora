@@ -578,8 +578,6 @@ void encoder_test() {
 			
 		for (param_sgd* pmt : pl) {
 			int rcv = 1;
-			/*if (random(0, 20) == 0)
-				rcv = 30;*/
 			pmt->state() -= rcv * pmt->learn_rate() * pmt->gradient();
 			pmt->gradient() = 0;
 		}
@@ -649,7 +647,7 @@ void lstm_test() {
 
 	const int checkpoint_interval = 10000;
 
-	for (int epoch = 0; epoch < 1000; epoch++) {
+	for (int epoch = 0; epoch < 100000; epoch++) {
 		s.cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S0: " << s.y.to_string() << std::endl;
@@ -2763,7 +2761,7 @@ void ntm_test() {
 
 	Sync s_out = new sync(pseudo::tnn({ memory_width, 1 }, pseudo::nlr(0.3)));
 
-	Sequential s = new sequential { s_in.get(), p.get(), s_out.get() };
+	Sequential s = new sequential({ s_in, p, s_out });
 	s->param_recur(pmt_init);
 
 	const size_t num_ts = 4;
@@ -2819,7 +2817,7 @@ void ntm_test() {
 
 	const size_t checkpoint_interval = 1000;
 
-	for (int epoch = 0; true; epoch++) {
+	for (int epoch = 0; epoch < 100000; epoch++) {
 
 		double cost = 0;
 
@@ -2967,7 +2965,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	lstm_test();
+	ntm_test();
 
 	return 0;
 

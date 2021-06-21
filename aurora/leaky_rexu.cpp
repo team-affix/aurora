@@ -39,7 +39,7 @@ void leaky_rexu::bwd() {
 		x_grad.val() = y_grad;
 }
 
-void leaky_rexu::signal(tensor& a_y_des) {
+void leaky_rexu::signal(const tensor& a_y_des) {
 	y_grad.val() = y - a_y_des;
 }
 

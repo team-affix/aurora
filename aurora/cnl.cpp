@@ -47,7 +47,7 @@ void cnl::bwd() {
 	filters->bwd();
 }
 
-void cnl::signal(tensor& a_y_des) {
+void cnl::signal(const tensor& a_y_des) {
 	y_des.pop(a_y_des);
 	filters->signal(y_des_reshaped);
 }

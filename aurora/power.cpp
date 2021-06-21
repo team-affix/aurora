@@ -42,7 +42,7 @@ void power::bwd() {
 	}
 }
 
-void power::signal(tensor& a_y_des) {
+void power::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

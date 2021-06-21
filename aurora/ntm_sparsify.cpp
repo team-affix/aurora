@@ -38,7 +38,7 @@ void ntm_sparsify::bwd() {
 	}
 }
 
-void ntm_sparsify::signal(tensor& a_y_des) {
+void ntm_sparsify::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

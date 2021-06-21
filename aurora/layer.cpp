@@ -47,7 +47,7 @@ void layer::bwd() {
 		models[i]->bwd();
 }
 
-void layer::signal(tensor& a_y_des) {
+void layer::signal(const tensor& a_y_des) {
 	for (size_t i = 0; i < models.size(); i++)
 		models[i]->signal(a_y_des[i]);
 }

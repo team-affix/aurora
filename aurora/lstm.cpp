@@ -39,7 +39,7 @@ void lstm::bwd() {
 		unrolled[i]->bwd();
 }
 
-void lstm::signal(tensor& a_y_des) {
+void lstm::signal(const tensor& a_y_des) {
 	for (int i = 0; i < unrolled.size(); i++)
 		unrolled[i]->signal(a_y_des[i]);
 }

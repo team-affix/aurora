@@ -44,7 +44,7 @@ void ntm_addresser::bwd() {
 	internal_content_addresser->bwd();
 }
 
-void ntm_addresser::signal(tensor& a_y_des) {
+void ntm_addresser::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

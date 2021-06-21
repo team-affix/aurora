@@ -20,7 +20,7 @@ void model::bwd() {
 
 }
 
-void model::signal(tensor& a_y_des) {
+void model::signal(const tensor& a_y_des) {
 	
 }
 

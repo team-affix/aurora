@@ -44,7 +44,7 @@ void stacked_recurrent::bwd() {
 		models[i]->bwd();
 }
 
-void stacked_recurrent::signal(tensor& a_y_des) {
+void stacked_recurrent::signal(const tensor& a_y_des) {
 	models.back()->signal(a_y_des);
 }
 

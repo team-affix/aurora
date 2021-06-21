@@ -9,20 +9,20 @@ virtual model* clone() { \
 virtual model* clone(function<Param(Param&)> a_func); \
 virtual void fwd(); \
 virtual void bwd(); \
-virtual void signal(tensor& a_y_des); \
+virtual void signal(const tensor& a_y_des); \
 virtual void model_recur(function<void(model*)> a_func); \
 virtual void compile(); \
-virtual tensor& fwd(tensor& a_x) { \
+virtual tensor& fwd(const tensor& a_x) { \
 	x.pop(a_x); \
 	fwd(); \
 	return y; \
 } \
-virtual tensor& bwd(tensor& a_y_grad) { \
+virtual tensor& bwd(const tensor& a_y_grad) { \
 	y_grad.pop(a_y_grad); \
 	bwd(); \
 	return x_grad; \
 } \
-virtual void cycle(tensor& a_x, tensor& a_y_des) { \
+virtual void cycle(const tensor& a_x, const tensor& a_y_des) { \
 	x.pop(a_x); \
 	fwd(); \
 	signal(a_y_des); \

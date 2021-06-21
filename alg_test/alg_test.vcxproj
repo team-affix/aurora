@@ -93,8 +93,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile />
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+      <ProgramDatabaseFile>Yes</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -127,8 +127,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile />
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+      <ProgramDatabaseFile>Yes</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

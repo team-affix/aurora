@@ -62,7 +62,7 @@ void ntm_wh::bwd() {
 	x_grad.add_1d(e_model->x_grad, x_grad);
 }
 
-void ntm_wh::signal(tensor& a_y_des) {
+void ntm_wh::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
@@ -82,6 +82,7 @@ void ntm_wh::compile() {
 	a_grad = tensor::new_1d(units);
 	e = tensor::new_1d(units);
 	e_grad = tensor::new_1d(units);
+
 	internal_rh->compile();
 	a_model->compile();
 	e_model->compile();

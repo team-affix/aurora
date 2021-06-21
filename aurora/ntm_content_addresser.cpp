@@ -49,7 +49,7 @@ void ntm_content_addresser::bwd() {
 		key_grad.add_1d(internal_similarity->x_grad[i][0], key_grad);
 }
 
-void ntm_content_addresser::signal(tensor& a_y_des) {
+void ntm_content_addresser::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 

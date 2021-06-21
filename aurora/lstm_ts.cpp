@@ -80,7 +80,7 @@ void lstm_ts::bwd() {
 	comp_0.add_1d(comp_1, htx_grad);
 }
 
-void lstm_ts::signal(tensor& a_y_des) {
+void lstm_ts::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
