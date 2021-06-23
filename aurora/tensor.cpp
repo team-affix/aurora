@@ -591,7 +591,7 @@ void tensor::group_join(tensor& a_other) {
 			tensor& l_group_tail = a_other.group_tail();
 			l_group_tail.group_next_ptr = elem;
 			elem->group_prev_ptr = &l_group_tail;
-			elem->group_next_ptr = nullptr;
+			elem->group_next_ptr = nullptr;	
 		}
 	});
 }
@@ -618,21 +618,21 @@ void tensor::group_remove_all_ranks(tensor& a_other) {
 }
 
 void tensor::group_join_all_ranks(tensor& a_other) {
-	link(a_other); // LINKS ENTIRE GROUP TO a_other's GROUP
 	group_recur([&](tensor* elem) {
+
+		group_join(a_other);
 
 		for (int i = 0; i < size(); i++)
 			at(i).group_join_all_ranks(a_other.at(i));
 
-		group_join(a_other);
 		
 		// PREVENT ADDING NODES TO SAME GROUP TWICE
-		if (!a_other.group_contains(elem)) {
+		/*if (!a_other.group_contains(elem)) {
 			tensor& l_group_tail = a_other.group_tail();
 			l_group_tail.group_next_ptr = elem;
 			elem->group_prev_ptr = &l_group_tail;
 			elem->group_next_ptr = nullptr;
-		}
+		}*/
 
 	});
 }
