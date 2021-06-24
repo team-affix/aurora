@@ -2968,7 +2968,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	new_ptr_test();
+	tnn_xor_test();
 
 	return 0;
 
