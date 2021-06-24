@@ -87,7 +87,7 @@ namespace aurora {
 		public:
 			void abs_1d(tensor& a_output);
 			void abs_2d(tensor& a_output);
-			void sum_1d(tensor& a_output);
+			void sum_1d(double& a_output);
 			void sum_2d(tensor& a_output);
 			void tanh_1d(tensor& a_output);
 			void tanh_2d(tensor& a_output);
@@ -98,13 +98,13 @@ namespace aurora {
 		public:
 			tensor abs_1d();
 			tensor abs_2d();
-			tensor sum_1d();
+			double sum_1d();
 			tensor sum_2d();
 			tensor tanh_1d();
 			tensor tanh_2d();
-			tensor mag_1d();
-			tensor max();
-			tensor min();
+			double mag_1d();
+			double max();
+			double min();
 			int arg_max();
 			int arg_min();
 
@@ -114,7 +114,7 @@ namespace aurora {
 			void mul_1d(const tensor& a_other, tensor& a_output);
 			void div_1d(const tensor& a_other, tensor& a_output);
 			void pow_1d(const tensor& a_other, tensor& a_output);
-			void dot_1d(const tensor& a_other, tensor& a_output);
+			void dot_1d(const tensor& a_other, double& a_output);
 			void add_2d(const tensor& a_other, tensor& a_output);
 			void sub_2d(const tensor& a_other, tensor& a_output);
 			void mul_2d(const tensor& a_other, tensor& a_output);
@@ -129,7 +129,7 @@ namespace aurora {
 			tensor mul_1d(const tensor& a_other);
 			tensor div_1d(const tensor& a_other);
 			tensor pow_1d(const tensor& a_other);
-			tensor dot_1d(const tensor& a_other);
+			double dot_1d(const tensor& a_other);
 			tensor add_2d(const tensor& a_other);
 			tensor sub_2d(const tensor& a_other);
 			tensor mul_2d(const tensor& a_other);

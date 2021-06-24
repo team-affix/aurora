@@ -127,9 +127,9 @@ void tensor::abs_2d(tensor& a_output) {
 		at(i).abs_1d(a_output.at(i));
 }
 
-void tensor::sum_1d(tensor& a_output) {
+void tensor::sum_1d(double& a_output) {
 	for (int i = 0; i < vec().size(); i++)
-		a_output.val() += vec().at(i).val();
+		a_output += vec().at(i).val();
 }
 
 void tensor::sum_2d(tensor& a_output) {
@@ -148,7 +148,7 @@ void tensor::tanh_2d(tensor& a_output) {
 		at(i).tanh_1d(a_output.at(i));
 }
 
-tensor tensor::mag_1d() {
+double tensor::mag_1d() {
 	double sum = 0;
 	for (int i = 0; i < size(); i++)
 		sum += pow(at(i), 2);
@@ -185,8 +185,8 @@ tensor tensor::abs_2d() {
 	return result;
 }
 
-tensor tensor::sum_1d() {
-	tensor result = 0;
+double tensor::sum_1d() {
+	double result = 0;
 	sum_1d(result);
 	return result;
 }
@@ -262,7 +262,7 @@ size_t tensor::height() const {
 	return size();
 }
 
-tensor tensor::max() {
+double tensor::max() {
 	double result = -INFINITY;
 	for (int i = 0; i < size(); i++)
 		if (at(i) > result)
@@ -270,7 +270,7 @@ tensor tensor::max() {
 	return result;
 }
 
-tensor tensor::min() {
+double tensor::min() {
 	double result = INFINITY;
 	for (int i = 0; i < size(); i++)
 		if (at(i) < result)
@@ -418,17 +418,17 @@ void tensor::pow_1d(const tensor& a_other, tensor& a_output) {
 		a_output[i].val() = pow(at(i).val(), a_other.at(i).val());
 }
 
-tensor tensor::dot_1d(const tensor& a_other) {
-	tensor result;
+double tensor::dot_1d(const tensor& a_other) {
+	double result;
 	dot_1d(a_other, result);
 	return result;
 }
 
-void tensor::dot_1d(const tensor& a_other, tensor& a_output) {
+void tensor::dot_1d(const tensor& a_other, double& a_output) {
 	assert(vec().size() == a_other.vec().size());
-	a_output.val() = (double)0;
+	a_output = (double)0;
 	for (int i = 0; i < vec().size(); i++)
-		a_output.val() += vec().at(i).val() * a_other.vec().at(i).val();
+		a_output += vec().at(i).val() * a_other.vec().at(i).val();
 }
 
 tensor tensor::add_2d(const tensor& a_other) {

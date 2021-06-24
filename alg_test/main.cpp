@@ -557,7 +557,7 @@ void encoder_test() {
 			int ts_index = random(0, x_order_2_len);
 			s->cycle(train_x[ts_index], train_x[ts_index]);
 			if(epoch % checkpoint_interval == 0)
-				epoch_cost += s->y_grad.abs_1d().sum_1d().val();
+				epoch_cost += s->y_grad.abs_1d().sum_1d();
 		}
 
 		checkpoint_cost += epoch_cost;
@@ -758,7 +758,7 @@ void input_gd() {
 		double epoch_cost = 0;
 		for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
 			s_1->cycle(x_1[tsIndex], y_1[tsIndex]);
-			epoch_cost += s_1->y_grad.abs_1d().sum_1d().val() / x_1.size();
+			epoch_cost += s_1->y_grad.abs_1d().sum_1d() / x_1.size();
 		}
 
 		if (epoch % checkpoint_interval == 0)
@@ -788,7 +788,7 @@ void input_gd() {
 		}
 
 		if (epoch % checkpoint_interval == 0 && cost_low)
-			std::cout << "TEST COST: " << get_tsy_1(deviant_input).sum_1d().val() << std::endl;
+			std::cout << "TEST COST: " << get_tsy_1(deviant_input).sum_1d() << std::endl;
 
 		update_params(pv_1);
 	}
@@ -875,7 +875,7 @@ void loss_map() {
 		double epoch_cost = 0;
 		for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
 			s_1->cycle(x_1[tsIndex], y_1[tsIndex]);
-			epoch_cost += s_1->y_grad.abs_1d().sum_1d().val() / x_1.size();
+			epoch_cost += s_1->y_grad.abs_1d().sum_1d() / x_1.size();
 		}
 
 		if (epoch % checkpoint_interval == 0)
@@ -900,7 +900,7 @@ void loss_map() {
 		}
 
 		if (epoch % checkpoint_interval == 0 && cost_low) {
-			prev_test_cost = get_tsx_1(s_1->fwd(deviant_x)).abs_1d().sum_1d().val();
+			prev_test_cost = get_tsx_1(s_1->fwd(deviant_x)).abs_1d().sum_1d();
 			std::cout << "TEST COST: " << prev_test_cost << std::endl;
 
 		}
@@ -2935,7 +2935,7 @@ void lstm_compiled_test() {
 
 	const int checkpoint_interval = 10000;
 
-	for (int epoch = 0; epoch < 1; epoch++) {
+	for (int epoch = 0; epoch < 100000; epoch++) {
 		s->cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S0: " << s->y.to_string() << std::endl;
@@ -2962,7 +2962,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_test();
+	lstm_compiled_test();
 
 	return 0;
 
