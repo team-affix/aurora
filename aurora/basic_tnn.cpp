@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "basic_tnn.h"
 #include "static_vals.h"
-#include "basic_hyperparams.h"
+#include "basic_tnn_hyperparams.h"
 
 using namespace aurora;
-using aurora::basic::basic_hyperparams;
+using aurora::basic::basic_tnn_hyperparams;
 
 Sequential basic::tnn(vector<size_t> a_dims, param_vector& a_param_vec) {
 
@@ -17,7 +17,7 @@ Sequential basic::tnn(vector<size_t> a_dims, param_vector& a_param_vec) {
 	double beta = 0;
 	uniform_real_distribution<double> urd;
 
-	basic_hyperparams(param_count, learn_rate, beta, urd);
+	basic_tnn_hyperparams(param_count, learn_rate, beta, urd);
 
 	result->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
 

@@ -2901,7 +2901,7 @@ void stacked_recurrent_test() {
 
 }
 
-void lstm_compiled_test() {
+void lstm_mdim_test() {
 
 	param_vector pv;
 	Stacked_recurrent s = basic::basic_lstm_mdim(2, 10, 1, 4, pv);
@@ -2964,11 +2964,68 @@ void new_ptr_test() {
 	Lstm l = s;
 }
 
+void ntm_mdim_test() {
+
+	param_vector param_vec;
+	Stacked_recurrent s = basic::ntm_mdim(2, 5, 1, 2, 1, 4, param_vec);
+	s->unroll(4);
+
+	tensor x = {
+		{
+			{0, 0},
+			{0, 1},
+			{1, 0},
+			{1, 1}
+		},
+		{
+			{1, 0},
+			{0, 1},
+			{1, 0},
+			{1, 1}
+		},
+	};
+	tensor y = {
+		{
+			{0},
+			{1},
+			{1},
+			{0}
+		},
+		{
+			{1},
+			{1},
+			{1},
+			{1}
+		},
+	};
+
+	const size_t checkpoint_interval = 1000;
+
+	for (int epoch = 0; epoch < 100000; epoch++) {
+
+		double cost = 0;
+
+		for (int ts = 0; ts < x.size(); ts++) {
+			s->cycle(x[ts], y[ts]);
+			cost += s->y_grad.abs_2d().sum_2d().sum_1d();
+
+			if (epoch % checkpoint_interval == 0)
+				std::cout << s->y.to_string() << std::endl;
+		}
+
+		param_vec.update();
+
+		if (epoch % checkpoint_interval == 0)
+			std::cout << cost << std::endl << std::endl;
+	}
+
+}
+
 int main() {
 
 	srand(time(NULL));
 	
-	tnn_xor_test();
+	ntm_mdim_test();
 
 	return 0;
 

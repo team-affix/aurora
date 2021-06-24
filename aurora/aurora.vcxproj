@@ -22,8 +22,11 @@
     <ClInclude Include="att_lstm.h" />
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
-    <ClInclude Include="basic_hyperparams.h" />
+    <ClInclude Include="basic_lstm_hyperparams.h" />
+    <ClInclude Include="basic_ntm_hyperparams.h" />
+    <ClInclude Include="basic_tnn_hyperparams.h" />
     <ClInclude Include="basic_lstm_mdim.h" />
+    <ClInclude Include="basic_ntm_mdim.h" />
     <ClInclude Include="basic_tnn.h" />
     <ClInclude Include="param_vector.h" />
     <ClInclude Include="recurrent.h" />
@@ -83,8 +86,11 @@
   <ItemGroup>
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
-    <ClCompile Include="basic_hyperparams.cpp" />
+    <ClCompile Include="basic_lstm_hyperparams.cpp" />
+    <ClCompile Include="basic_ntm_hyperparams.cpp" />
+    <ClCompile Include="basic_tnn_hyperparams.cpp" />
     <ClCompile Include="basic_lstm_mdim.cpp" />
+    <ClCompile Include="basic_ntm_mdim.cpp" />
     <ClCompile Include="basic_tnn.cpp" />
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="cnl.cpp" />

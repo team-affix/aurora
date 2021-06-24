@@ -222,13 +222,22 @@
     <ClInclude Include="param_vector.h">
       <Filter>Header Files\params</Filter>
     </ClInclude>
-    <ClInclude Include="basic_hyperparams.h">
+    <ClInclude Include="basic_tnn_hyperparams.h">
       <Filter>Header Files\basic</Filter>
     </ClInclude>
     <ClInclude Include="basic_tnn.h">
       <Filter>Header Files\basic</Filter>
     </ClInclude>
     <ClInclude Include="basic_lstm_mdim.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_ntm_mdim.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_ntm_hyperparams.h">
+      <Filter>Header Files\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_lstm_hyperparams.h">
       <Filter>Header Files\basic</Filter>
     </ClInclude>
   </ItemGroup>
@@ -371,13 +380,22 @@
     <ClCompile Include="param_vector.cpp">
       <Filter>Source Files\params</Filter>
     </ClCompile>
-    <ClCompile Include="basic_hyperparams.cpp">
+    <ClCompile Include="basic_tnn_hyperparams.cpp">
       <Filter>Source Files\basic</Filter>
     </ClCompile>
     <ClCompile Include="basic_lstm_mdim.cpp">
       <Filter>Source Files\basic</Filter>
     </ClCompile>
     <ClCompile Include="basic_tnn.cpp">
+      <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_ntm_mdim.cpp">
+      <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_ntm_hyperparams.cpp">
+      <Filter>Source Files\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_lstm_hyperparams.cpp">
       <Filter>Source Files\basic</Filter>
     </ClCompile>
   </ItemGroup>
