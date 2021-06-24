@@ -20,7 +20,7 @@ namespace aurora {
 		class tensor {
 		public:
 			ptr<double> val_ptr = new double(0);
-			vector<tensor> vec_ptr;
+			ptr<vector<tensor>> vec_ptr = new vector<tensor>();
 			
 		public:
 			tensor* group_prev_ptr = nullptr;
@@ -40,9 +40,9 @@ namespace aurora {
 		public:
 			virtual ~tensor();
 			tensor();
-			tensor(double a_val);
-			tensor(vector<tensor> a_vec);
-			tensor(initializer_list<tensor> a_il);
+			tensor(const double& a_val);
+			tensor(const vector<tensor>& a_vec);
+			tensor(const initializer_list<tensor>& a_il);
 
 		public:
 			void set(const tensor& a_other);

@@ -13,11 +13,11 @@ double tensor::val() const {
 }
 
 vector<tensor>& tensor::vec() {
-	return vec_ptr;
+	return vec_ptr.val();
 }
 
 const vector<tensor>& tensor::vec() const {
-	return vec_ptr;
+	return vec_ptr.val();
 }
 
 tensor& tensor::group_head() {
@@ -48,15 +48,15 @@ tensor::tensor() {
 
 }
 
-tensor::tensor(double a_val) {
+tensor::tensor(const double& a_val) {
 	this->val() = a_val;
 }
 
-tensor::tensor(vector<tensor> a_vec) {
+tensor::tensor(const vector<tensor>& a_vec) {
 	std::copy(a_vec.begin(), a_vec.end(), back_inserter(vec()));
 }
 
-tensor::tensor(initializer_list<tensor> a_il) {
+tensor::tensor(const initializer_list<tensor>& a_il) {
 	std::copy(a_il.begin(), a_il.end(), back_inserter(vec()));
 }
 
@@ -591,7 +591,7 @@ void tensor::group_join(tensor& a_other) {
 			tensor& l_group_tail = a_other.group_tail();
 			l_group_tail.group_next_ptr = elem;
 			elem->group_prev_ptr = &l_group_tail;
-			elem->group_next_ptr = nullptr;	
+			elem->group_next_ptr = nullptr;
 		}
 	});
 }
@@ -619,21 +619,9 @@ void tensor::group_remove_all_ranks(tensor& a_other) {
 
 void tensor::group_join_all_ranks(tensor& a_other) {
 	group_recur([&](tensor* elem) {
-
 		group_join(a_other);
-
 		for (int i = 0; i < size(); i++)
 			at(i).group_join_all_ranks(a_other.at(i));
-
-		
-		// PREVENT ADDING NODES TO SAME GROUP TWICE
-		/*if (!a_other.group_contains(elem)) {
-			tensor& l_group_tail = a_other.group_tail();
-			l_group_tail.group_next_ptr = elem;
-			elem->group_prev_ptr = &l_group_tail;
-			elem->group_next_ptr = nullptr;
-		}*/
-
 	});
 }
 

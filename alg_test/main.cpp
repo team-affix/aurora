@@ -113,6 +113,15 @@ void tensor_test() {
 
 	}
 
+	tensor vec_3;
+	tensor vec_4 = tensor::new_1d(2);
+	{
+		tensor t1 = tensor::new_1d(1);
+		tensor t2 = tensor::new_1d(1);
+		vec_3 = t1.cat(t2);
+	}
+	vec_3.group_join_all_ranks(vec_4);
+
 }
 
 void tnn_xor_test() {
