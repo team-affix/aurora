@@ -2958,11 +2958,17 @@ void test_test() {
 
 }
 
+void new_ptr_test() {
+	param_vector p;
+	Sequential s = basic::tnn({ 1, 5, 1 }, p);
+	Lstm l = s;
+}
+
 int main() {
 
 	srand(time(NULL));
 	
-	lstm_compiled_test();
+	new_ptr_test();
 
 	return 0;
 

@@ -6,9 +6,9 @@
 using namespace aurora;
 using aurora::basic::basic_hyperparams;
 
-Model basic::tnn(vector<size_t> a_dims, param_vector& a_param_vec) {
+Sequential basic::tnn(vector<size_t> a_dims, param_vector& a_param_vec) {
 
-	Model result = pseudo::tnn(a_dims, pseudo::nlr(0.3));
+	Sequential result = pseudo::tnn(a_dims, pseudo::nlr(0.3));
 
 	size_t param_count = 0;
 	result->param_recur(PARAM_COUNT(param_count));
