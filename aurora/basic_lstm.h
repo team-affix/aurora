@@ -14,6 +14,8 @@ using aurora::models::lstm;
 
 namespace aurora {
 	namespace basic {
-		Stacked_recurrent basic_lstm_mdim(size_t a_x_units, size_t a_h_units, size_t a_y_units, size_t a_max_timesteps, param_vector& a_param_vec);
+		Lstm lstm_compiled(size_t a_units, size_t a_max_timesteps, param_vector& a_param_vec);
+		Stacked_recurrent lstm_mdim(size_t a_x_units, size_t a_h_units, size_t a_y_units, param_vector& a_param_vec);
+		Stacked_recurrent lstm_mdim_compiled(size_t a_x_units, size_t a_h_units, size_t a_y_units, size_t a_max_timesteps, param_vector& a_param_vec);
 	}
 }

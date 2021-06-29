@@ -9,6 +9,6 @@ using std::vector;
 
 namespace aurora {
 	namespace basic {
-		Sequential tnn(vector<size_t> a_dims, param_vector& a_param_vec);
+		Sequential tnn_compiled(vector<size_t> a_dims, param_vector& a_param_vec);
 	}
 }

@@ -180,7 +180,7 @@ void tnn_xor_test() {
 void tnn_compiled_xor_test() {
 	
 	param_vector pv;
-	Model s = basic::tnn({ 2, 5, 1 }, pv);
+	Model s = basic::tnn_compiled({ 2, 5, 1 }, pv);
 	
 	tensor x = {
 		{0, 0},
@@ -1489,6 +1489,76 @@ void test_mm() {
 			for (int i = 0; i < pmm.size(); i++) {
 				pmm[i].gamma() = 0.002 * std::tanh(cost);
 			}
+
+		if (epoch % 10000 == 0) {
+			std::cout << "REWARD: " << reward << ", COST: " << 1 / reward << std::endl;
+		}
+	}
+
+}
+
+void test_param_rcv() {
+
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+		{1, 2},
+		{3, 4}
+	};
+
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0},
+		{5},
+		{12},
+	};
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(35);
+
+	vector<Param_rcv> pv;
+
+	Model s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3));
+
+	const double GAMMA = 0.002;
+	const double BETA = 0.9;
+
+	s->param_recur(PARAM_INIT(param_rcv(urd(re), GAMMA, BETA), pv));
+	s->compile();
+
+	std::normal_distribution<double> nd(0, 1);
+
+	auto get_rcv = [&]() {
+		return nd(re);
+	};
+
+	auto get_reward = [&]() {
+		double cost = 0;
+		for (int ts = 0; ts < x.size(); ts++) {
+			s->fwd(x[ts]);
+			s->signal(y[ts]);
+			cost += s->y_grad.abs_1d().sum_1d();
+		}
+		return 1 / cost;
+	};
+
+	for (int epoch = 0; true; epoch++) {
+		for (Param_rcv& pmt : pv)
+			pmt->update(nd(re));
+
+		double reward = get_reward();
+		double cost = 1 / reward;
+
+		for (Param_rcv& pmt : pv)
+			pmt->reward(reward);
+
+		if (epoch % 10000 == 0)
+			for (Param_rcv& pmt : pv)
+				pmt->learn_rate() = GAMMA * std::tanh(cost);
 
 		if (epoch % 10000 == 0) {
 			std::cout << "REWARD: " << reward << ", COST: " << 1 / reward << std::endl;
@@ -2904,7 +2974,7 @@ void stacked_recurrent_test() {
 void lstm_mdim_test() {
 
 	param_vector pv;
-	Stacked_recurrent s = basic::basic_lstm_mdim(2, 10, 1, 4, pv);
+	Stacked_recurrent s = basic::lstm_mdim_compiled(2, 10, 1, 4, pv);
 	s->unroll(4);
 
 	tensor x0 = {
@@ -2960,14 +3030,14 @@ void test_test() {
 
 void new_ptr_test() {
 	param_vector p;
-	Sequential s = basic::tnn({ 1, 5, 1 }, p);
+	Sequential s = basic::tnn_compiled({ 1, 5, 1 }, p);
 	Lstm l = s;
 }
 
 void ntm_mdim_test() {
 
 	param_vector param_vec;
-	Stacked_recurrent s = basic::ntm_mdim(2, 5, 1, 2, 1, 4, param_vec);
+	Stacked_recurrent s = basic::ntm_mdim_compiled(2, 1, 5, 5, 1, 1, { -1, 0, 1 }, { 5, 10 }, 4, param_vec);
 	s->unroll(4);
 
 	tensor x = {
@@ -3005,18 +3075,18 @@ void ntm_mdim_test() {
 
 		double cost = 0;
 
-		for (int ts = 0; ts < x.size(); ts++) {
+		const size_t MINI_BATCH_SIZE = 4;
+
+		for (int mb_ts = 0; mb_ts < MINI_BATCH_SIZE; mb_ts++) {
+			size_t ts = random(0, x.size());
 			s->cycle(x[ts], y[ts]);
 			cost += s->y_grad.abs_2d().sum_2d().sum_1d();
-
-			if (epoch % checkpoint_interval == 0)
-				std::cout << s->y.to_string() << std::endl;
 		}
 
 		param_vec.update();
 
 		if (epoch % checkpoint_interval == 0)
-			std::cout << cost << std::endl << std::endl;
+			std::cout << cost << std::endl;
 	}
 
 }
@@ -3025,7 +3095,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	ntm_mdim_test();
+	test_param_rcv();
 
 	return 0;
 

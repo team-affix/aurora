@@ -25,9 +25,10 @@
     <ClInclude Include="basic_lstm_hyperparams.h" />
     <ClInclude Include="basic_ntm_hyperparams.h" />
     <ClInclude Include="basic_tnn_hyperparams.h" />
-    <ClInclude Include="basic_lstm_mdim.h" />
-    <ClInclude Include="basic_ntm_mdim.h" />
+    <ClInclude Include="basic_lstm.h" />
+    <ClInclude Include="basic_ntm.h" />
     <ClInclude Include="basic_tnn.h" />
+    <ClInclude Include="param_rcv.h" />
     <ClInclude Include="param_vector.h" />
     <ClInclude Include="recurrent.h" />
     <ClInclude Include="session.h" />
@@ -89,8 +90,8 @@
     <ClCompile Include="basic_lstm_hyperparams.cpp" />
     <ClCompile Include="basic_ntm_hyperparams.cpp" />
     <ClCompile Include="basic_tnn_hyperparams.cpp" />
-    <ClCompile Include="basic_lstm_mdim.cpp" />
-    <ClCompile Include="basic_ntm_mdim.cpp" />
+    <ClCompile Include="basic_lstm.cpp" />
+    <ClCompile Include="basic_ntm.cpp" />
     <ClCompile Include="basic_tnn.cpp" />
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="cnl.cpp" />
@@ -118,6 +119,7 @@
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_mom.cpp" />
     <ClCompile Include="param_mom_mt.cpp" />
+    <ClCompile Include="param_rcv.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="param_sgd_mt.cpp" />
     <ClCompile Include="param_vector.cpp" />

@@ -3,7 +3,7 @@
 
 using namespace aurora;
 
-void basic::basic_lstm_hyperparams(size_t a_param_count, double& a_learn_rate, double& a_beta, uniform_real_distribution<double>& a_param_urd) {
+void basic::lstm_hyperparams(size_t a_param_count, double& a_learn_rate, double& a_beta, uniform_real_distribution<double>& a_param_urd) {
 
 	a_learn_rate = 1.0 / (double)a_param_count;
 	a_beta = 0.9;
