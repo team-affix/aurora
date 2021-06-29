@@ -66,13 +66,13 @@ void param_rcv::update(const double& a_c) {
 void param_rcv::reward(const double& a_reward) {
 	dreward() = a_reward - reward();
 	reward() = a_reward;
-	double slope = (dreward() * dstate());
+	double slope = (dreward() / dstate());
 	momentum() = beta() * momentum() + alpha() * sign(slope);
 }
 
 void param_rcv::dreward(const double& a_dreward) {
 	dreward() = a_dreward;
 	reward() += a_dreward;
-	double slope = (dreward() * dstate());
+	double slope = (dreward() / dstate());
 	momentum() = beta() * momentum() + alpha() * sign(slope);
 }
