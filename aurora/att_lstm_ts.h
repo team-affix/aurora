@@ -2,7 +2,8 @@
 #include "pch.h"
 #include "model.h"
 #include "sync.h"
-#include "pseudo.h"
+#include "pseudo_tnn.h"
+#include "neuron.h"
 
 using aurora::models::model;
 using aurora::models::sync;

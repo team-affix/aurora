@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <windows.h>
 #include <fstream>
+#define L(call) [&]{call;}
 
 using namespace aurora;
 using namespace affix_base::data;
@@ -180,7 +181,7 @@ void tnn_xor_test() {
 void tnn_compiled_xor_test() {
 	
 	param_vector pv;
-	Model s = basic::tnn_compiled({ 2, 5, 1 }, pv);
+	Model s = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
 	
 	tensor x = {
 		{0, 0},
@@ -431,6 +432,7 @@ void sync_xor_test() {
 	
 	vector<param_sgd*> pl = vector<param_sgd*>();
 	Sync s_prev = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3)));
+	s_prev->param_recur(PARAM_INIT(param_sgd(urd(re), 0.02, 0), pl));
 	s_prev->prep(4);
 
 	Sync s = (sync*)s_prev->clone();
@@ -1507,7 +1509,6 @@ void test_param_rcv() {
 		{1, 2},
 		{3, 4}
 	};
-
 	tensor y = {
 		{0},
 		{1},
@@ -2124,12 +2125,12 @@ void dio_test() {
 
 	double index = 0;
 	double precision = 1;
-	double learn_rate = 0.01;
+	double learn_rate = 0.1;
 
 	for (int epoch = 0; true; epoch++) {
 		double index_grad = get_index_grad(precision, index);
 		index -= learn_rate * index_grad;
-		precision += 0.0000001;
+		precision += 0.000001;
 		if (epoch % 10000 == 0) {
 			std::cout << "INDEX: " << index << std::endl;
 			std::cout << "PREDICT: " << predicted << std::endl;
@@ -2754,6 +2755,7 @@ void ntm_reader_test() {
 
 }
 
+// BLOWS UP, EXPECTED
 void ntm_writer_test() {
 
 	size_t memory_height = 5;
@@ -2974,7 +2976,7 @@ void stacked_recurrent_test() {
 void lstm_mdim_test() {
 
 	param_vector pv;
-	Stacked_recurrent s = basic::lstm_mdim_compiled(2, 10, 1, 4, pv);
+	Stacked_recurrent s = pseudo::lstm_mdim_compiled(2, 10, 1, 4, pv);
 	s->unroll(4);
 
 	tensor x0 = {
@@ -3017,6 +3019,54 @@ void lstm_mdim_test() {
 
 }
 
+void lstm_stacked_mdim_test() {
+
+	param_vector pv;
+	Stacked_recurrent s = pseudo::lstm_stacked_mdim_compiled(2, 10, 1, 1, 4, pv);
+	s->unroll(4);
+
+	tensor x0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor x1 = {
+		{0, 1},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+
+	tensor y0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	tensor y1 = {
+		{1},
+		{1},
+		{1},
+		{1},
+	};
+
+	const int checkpoint_interval = 10000;
+
+	for (int epoch = 0; epoch < 100000; epoch++) {
+		s->cycle(x0, y0);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S0: " << s->y.to_string() << std::endl;
+		s->cycle(x1, y1);
+		if (epoch % checkpoint_interval == 0)
+			std::cout << "S1: " << s->y.to_string() << std::endl;
+		pv.update();
+	}
+
+
+
+}
+
 void test_test() {
 
 	param* p = new param();
@@ -3030,14 +3080,14 @@ void test_test() {
 
 void new_ptr_test() {
 	param_vector p;
-	Sequential s = basic::tnn_compiled({ 1, 5, 1 }, p);
+	Sequential s = pseudo::tnn_compiled({ 1, 5, 1 }, p);
 	Lstm l = s;
 }
 
 void ntm_mdim_test() {
 
 	param_vector param_vec;
-	Stacked_recurrent s = basic::ntm_mdim_compiled(2, 1, 5, 5, 1, 1, { -1, 0, 1 }, { 5, 10 }, 4, param_vec);
+	Stacked_recurrent s = pseudo::ntm_mdim_compiled(2, 1, 10, 5, 1, 1, { -1, 0, 1 }, { 5, 10 }, 4, param_vec);
 	s->unroll(4);
 
 	tensor x = {
@@ -3091,11 +3141,68 @@ void ntm_mdim_test() {
 
 }
 
+void transfer_learn() {
+
+	uniform_real_distribution<double> urd(-1, 1);
+
+	tensor x0 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor y0 = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+	tensor x1 = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1}
+	};
+	tensor y1 = {
+		{0},
+		{0},
+		{0},
+		{1}
+	};
+
+	param_vector pv;
+	Sync s = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3)));
+	s->param_recur(PARAM_INIT(param_mom(urd(static_vals::random_engine), 0.02, 0, 0, 0.9), pv));
+	s->prep(4);
+	s->compile();
+	s->unroll(4);
+
+	const size_t MAX_EPOCHS = 1000;
+	const size_t CHECKPOINT = 100;
+
+	for (int epoch = 0; epoch < MAX_EPOCHS; epoch++) {
+		s->cycle(x0, y0);
+		pv.update();
+		if (epoch % CHECKPOINT == 0)
+			std::cout << s->y_grad.abs_2d().sum_2d().sum_1d() << std::endl;
+	}
+
+	std::cout << "TRANSFER" << std::endl;
+
+	for (int epoch = 0; epoch < MAX_EPOCHS; epoch++) {
+		s->cycle(x1, y1);
+		pv.update();
+		if (epoch % CHECKPOINT == 0)
+			std::cout << s->y_grad.abs_2d().sum_2d().sum_1d() << std::endl;
+	}
+
+}
+
 int main() {
 
 	srand(time(NULL));
 	
-	test_param_rcv();
+	lstm_test();
 
 	return 0;
 

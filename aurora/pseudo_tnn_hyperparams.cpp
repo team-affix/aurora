@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "basic_tnn_hyperparams.h"
+#include "pseudo_tnn_hyperparams.h"
 
 using namespace aurora;
 
-void basic::tnn_hyperparams(
+void pseudo::tnn_hyperparams(
 	size_t a_param_count,
 	double& a_learn_rate,
 	double& a_beta,

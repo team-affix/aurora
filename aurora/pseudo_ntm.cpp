@@ -1,9 +1,13 @@
 #include "pch.h"
-#include "basic_ntm.h"
+#include "pseudo_ntm.h"
 #include "ntm.h"
 #include "sync.h"
-#include "basic_ntm_hyperparams.h"
+#include "pseudo_ntm_hyperparams.h"
 #include "static_vals.h"
+#include "param_init.h"
+#include "lstm.h"
+#include "pseudo_tnn.h"
+#include "neuron.h"
 
 using aurora::models::stacked_recurrent;
 using aurora::models::ntm;
@@ -12,7 +16,7 @@ using aurora::models::sync;
 using aurora::models::Sync;
 using namespace aurora;
 
-Ntm basic::ntm_compiled(
+Ntm pseudo::ntm_compiled(
 	size_t a_memory_height,
 	size_t a_memory_width,
 	size_t a_num_readers,
@@ -31,7 +35,7 @@ Ntm basic::ntm_compiled(
 	size_t param_count = 0;
 	result->param_recur(PARAM_COUNT(param_count));
 
-	ntm_hyperparams(param_count, a_memory_height, a_memory_width, a_num_readers, a_num_writers, learn_rate, beta, param_urd);
+	ntm_hyperparams(param_count, learn_rate, beta, param_urd);
 
 	result->param_recur(PARAM_INIT(param_mom(param_urd(static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
 
@@ -41,7 +45,7 @@ Ntm basic::ntm_compiled(
 	return result;
 }
 
-Stacked_recurrent basic::ntm_mdim(
+Stacked_recurrent pseudo::ntm_mdim(
 	size_t a_x_units,
 	size_t a_y_units,
 	size_t a_memory_height,
@@ -65,7 +69,7 @@ Stacked_recurrent basic::ntm_mdim(
 	size_t param_count = 0;
 	result->param_recur(PARAM_COUNT(param_count));
 
-	ntm_hyperparams(param_count, a_memory_height, a_memory_width, a_num_readers, a_num_writers, learn_rate, beta, param_urd);
+	ntm_hyperparams(param_count, learn_rate, beta, param_urd);
 
 	result->param_recur(PARAM_INIT(param_mom(param_urd(static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
 
@@ -73,7 +77,7 @@ Stacked_recurrent basic::ntm_mdim(
 
 }
 
-Stacked_recurrent basic::ntm_mdim_compiled(
+Stacked_recurrent pseudo::ntm_mdim_compiled(
 	size_t a_x_units,
 	size_t a_y_units,
 	size_t a_memory_height,

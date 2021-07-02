@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "model.h"
 #include "layer.h"
-#include "pseudo.h"
+#include "pseudo_tnn.h"
 
 using aurora::models::model;
 

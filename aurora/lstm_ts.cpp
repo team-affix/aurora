@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "lstm_ts.h"
+#include "pseudo_tnn.h"
+#include "neuron.h"
 
 using aurora::models::lstm_ts;
 using aurora::models::layer;

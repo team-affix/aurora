@@ -4,7 +4,7 @@
 using std::uniform_real_distribution;
 
 namespace aurora {
-	namespace basic {
+	namespace pseudo {
 		void tnn_hyperparams(
 			size_t a_param_count,
 			double& a_learn_rate,

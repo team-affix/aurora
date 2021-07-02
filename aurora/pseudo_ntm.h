@@ -10,7 +10,7 @@ using aurora::params::param_vector;
 using aurora::models::Ntm;
 
 namespace aurora {
-	namespace basic {
+	namespace pseudo {
 		Ntm ntm_compiled(
 			size_t a_memory_height,
 			size_t a_memory_width,
@@ -20,6 +20,7 @@ namespace aurora {
 			vector<size_t> a_head_hidden_dims,
 			size_t a_max_timesteps,
 			param_vector& a_param_vec);
+
 		Stacked_recurrent ntm_mdim(
 			size_t a_x_units,
 			size_t a_y_units,
@@ -30,6 +31,7 @@ namespace aurora {
 			vector<int> a_valid_shifts,
 			vector<size_t> a_head_hidden_dims,
 			param_vector& a_param_vec);
+
 		Stacked_recurrent ntm_mdim_compiled(
 			size_t a_x_units,
 			size_t a_y_units,
@@ -41,5 +43,6 @@ namespace aurora {
 			vector<size_t> a_head_hidden_dims,
 			size_t a_max_timesteps,
 			param_vector& a_param_vec);
+
 	}
 }

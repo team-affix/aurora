@@ -37,17 +37,11 @@
     <Filter Include="Source Files\evolution">
       <UniqueIdentifier>{2ef80bf2-9414-431e-bd4d-e2d45716f849}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\basic">
-      <UniqueIdentifier>{1744551b-3818-4897-ad87-df82e773d2d9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\maths">
       <UniqueIdentifier>{5ac1cccd-5d6d-4d98-8573-b04c39103662}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\maths">
       <UniqueIdentifier>{33ee9bc0-3a64-4cd4-99ec-5bdc80b7ec7d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\basic">
-      <UniqueIdentifier>{7889e4fe-cfe3-4110-bf91-9ba4fa9493c1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,15 +132,6 @@
     <ClInclude Include="evolution.h">
       <Filter>Header Files\evolution</Filter>
     </ClInclude>
-    <ClInclude Include="basic.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
-    <ClInclude Include="tnn.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
-    <ClInclude Include="supervised_session.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
     <ClInclude Include="static_vals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -207,9 +192,6 @@
     <ClInclude Include="ntm.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="session.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
     <ClInclude Include="param_init.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
@@ -222,26 +204,26 @@
     <ClInclude Include="param_vector.h">
       <Filter>Header Files\params</Filter>
     </ClInclude>
-    <ClInclude Include="basic_tnn_hyperparams.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_tnn.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_ntm_hyperparams.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_lstm_hyperparams.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_lstm.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_ntm.h">
-      <Filter>Header Files\basic</Filter>
-    </ClInclude>
     <ClInclude Include="param_rcv.h">
       <Filter>Header Files\params</Filter>
+    </ClInclude>
+    <ClInclude Include="pseudo_lstm.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="pseudo_lstm_hyperparams.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="pseudo_ntm.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="pseudo_tnn.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="pseudo_ntm_hyperparams.h">
+      <Filter>Header Files\pseudo</Filter>
+    </ClInclude>
+    <ClInclude Include="pseudo_tnn_hyperparams.h">
+      <Filter>Header Files\pseudo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -310,9 +292,6 @@
     </ClCompile>
     <ClCompile Include="generation.cpp">
       <Filter>Source Files\evolution</Filter>
-    </ClCompile>
-    <ClCompile Include="tnn.cpp">
-      <Filter>Source Files\pseudo</Filter>
     </ClCompile>
     <ClCompile Include="static_vals.cpp">
       <Filter>Source Files</Filter>
@@ -383,26 +362,26 @@
     <ClCompile Include="param_vector.cpp">
       <Filter>Source Files\params</Filter>
     </ClCompile>
-    <ClCompile Include="basic_tnn_hyperparams.cpp">
-      <Filter>Source Files\basic</Filter>
-    </ClCompile>
-    <ClCompile Include="basic_tnn.cpp">
-      <Filter>Source Files\basic</Filter>
-    </ClCompile>
-    <ClCompile Include="basic_ntm_hyperparams.cpp">
-      <Filter>Source Files\basic</Filter>
-    </ClCompile>
-    <ClCompile Include="basic_lstm_hyperparams.cpp">
-      <Filter>Source Files\basic</Filter>
-    </ClCompile>
-    <ClCompile Include="basic_lstm.cpp">
-      <Filter>Source Files\basic</Filter>
-    </ClCompile>
-    <ClCompile Include="basic_ntm.cpp">
-      <Filter>Source Files\basic</Filter>
-    </ClCompile>
     <ClCompile Include="param_rcv.cpp">
       <Filter>Source Files\params</Filter>
+    </ClCompile>
+    <ClCompile Include="pseudo_lstm.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="pseudo_lstm_hyperparams.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="pseudo_ntm.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="pseudo_ntm_hyperparams.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="pseudo_tnn.cpp">
+      <Filter>Source Files\pseudo</Filter>
+    </ClCompile>
+    <ClCompile Include="pseudo_tnn_hyperparams.cpp">
+      <Filter>Source Files\pseudo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

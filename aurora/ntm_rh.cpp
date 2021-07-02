@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ntm_rh.h"
-#include "pseudo.h"
+#include "pseudo_tnn.h"
+#include "neuron.h"
 #include "normalize.h"
 
 using aurora::models::ntm_rh;
