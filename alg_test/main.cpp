@@ -3200,7 +3200,7 @@ void transfer_learn() {
 
 void ae_test() {
 
-	const size_t MID_LEN = 100;
+	const size_t MID_LEN = 30;
 	const size_t H_LEN = MID_LEN * 4;
 	const size_t OUT_LEN = MID_LEN * 8 + 1;
 	const size_t MID_BYTES = MID_LEN * 8;
@@ -3219,7 +3219,7 @@ void ae_test() {
 	function<tensor()> new_set = [&] {
 		tensor result = tensor::new_1d(OUT_LEN);
 		for (int i = 0; i < OUT_LEN; i++)
-			result[i].val() = random(0, 256);
+			result[i].val() = (double)random(0, 256) / 255;
 		return result;
 	};
 
@@ -3228,7 +3228,7 @@ void ae_test() {
 	for (int i = 0; i < TEST_SETS; i++)
 		test[i] = new_set();
 
-	const size_t CHECKPOINT = 1000;
+	const size_t CHECKPOINT = 10;
 
 	for (int epoch = 0; true; epoch++) {
 		double cost = 0;
@@ -3244,11 +3244,32 @@ void ae_test() {
 	 
 }
 
+void ptr_test() {
+
+	ptr<int> p1;
+	{
+		ptr<int> p2 = new int(10);
+		p1 = p2;
+	}
+	ptr<int> p3 = p1;
+
+}
+
+void tensor_noncompiled_test() {
+	tensor t1 = tensor::new_2d(10, 10);
+	tensor t2;
+	for (int i = 0; true; i++) {
+		if (i % 1000000 == 0)
+			printf("");
+		t2 = t1;
+	}
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	ae_test();
+	tnn_xor_test();
 
 	return 0;
 
