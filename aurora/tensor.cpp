@@ -527,7 +527,8 @@ tensor tensor::cat(tensor& a_other) {
 void tensor::link(tensor& a_other) {
 	group_recur([&](tensor* elem) {
 		elem->val_ptr.link(a_other.val_ptr);
-		elem->resize(a_other.size());
+		if (elem->size() != a_other.size())
+			elem->resize(a_other.size());
 		for (int i = 0; i < a_other.size(); i++)
 			elem->at(i).link(a_other.at(i));
 	});

@@ -3198,11 +3198,57 @@ void transfer_learn() {
 
 }
 
+void ae_test() {
+
+	const size_t MID_LEN = 100;
+	const size_t H_LEN = MID_LEN * 4;
+	const size_t OUT_LEN = MID_LEN * 8 + 1;
+	const size_t MID_BYTES = MID_LEN * 8;
+	const size_t OUT_BYTES = OUT_LEN;
+
+	std::normal_distribution<double> nd(0, 1);
+	param_vector pv;
+	Sequential s = pseudo::tnn_compiled({ OUT_LEN, H_LEN, MID_LEN, H_LEN, OUT_LEN }, pv);
+
+	const size_t TRAIN_SETS = 1000;
+	const size_t TEST_SETS = 1000;
+
+	tensor train = tensor::new_1d(TRAIN_SETS);
+	tensor test = tensor::new_1d(TEST_SETS);
+
+	function<tensor()> new_set = [&] {
+		tensor result = tensor::new_1d(OUT_LEN);
+		for (int i = 0; i < OUT_LEN; i++)
+			result[i].val() = random(0, 256);
+		return result;
+	};
+
+	for (int i = 0; i < TRAIN_SETS; i++)
+		train[i] = new_set();
+	for (int i = 0; i < TEST_SETS; i++)
+		test[i] = new_set();
+
+	const size_t CHECKPOINT = 1000;
+
+	for (int epoch = 0; true; epoch++) {
+		double cost = 0;
+		for (int ts = 0; ts < train.size(); ts++) {
+			s->cycle(train[ts], train[ts]);
+			if (epoch % CHECKPOINT == 0)
+				cost += s->y_grad.abs_1d().sum_1d();
+		}
+		pv.update();
+		if (epoch % CHECKPOINT == 0)
+			std::cout << cost << std::endl;
+	}
+	 
+}
+
 int main() {
 
 	srand(time(NULL));
-	
-	lstm_mdim_test();
+
+	ae_test();
 
 	return 0;
 
