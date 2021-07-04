@@ -2976,7 +2976,7 @@ void stacked_recurrent_test() {
 void lstm_mdim_test() {
 
 	param_vector pv;
-	Stacked_recurrent s = pseudo::lstm_mdim_compiled(2, 10, 1, 4, pv);
+	Stacked_recurrent s = pseudo::lstm_mdim_compiled(2, 5, 1, 4, pv);
 	s->unroll(4);
 
 	tensor x0 = {
@@ -3202,7 +3202,7 @@ int main() {
 
 	srand(time(NULL));
 	
-	lstm_test();
+	lstm_mdim_test();
 
 	return 0;
 
