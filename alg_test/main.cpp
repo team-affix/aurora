@@ -3272,7 +3272,7 @@ int main() {
 
 	srand(time(NULL));
 
-	ae_test();
+	tnn_xor_test();
 
 	return 0;
 
