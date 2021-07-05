@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alg_test", "alg_test\alg_te
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "helper", "helper\helper.vcxproj", "{02831D3E-FBC8-4E04-9847-5D304D578B1F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "affix-base", "..\affix-base\affix-base\affix-base.vcxproj", "{7B4BFEE2-AC81-40CE-A365-529CFC1111B3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "affix-base", "affix-base\affix-base\affix-base.vcxproj", "{7B4BFEE2-AC81-40CE-A365-529CFC1111B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

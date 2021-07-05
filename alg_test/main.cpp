@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <windows.h>
 #include <fstream>
+#include "ptr.h"
 #define L(call) [&]{call;}
 
 using namespace aurora;
@@ -2886,7 +2887,7 @@ void ntm_test() {
 
 	const size_t checkpoint_interval = 1000;
 
-	for (int epoch = 0; epoch < 100000; epoch++) {
+	for (int epoch = 0; epoch < 30000; epoch++) {
 
 		double cost = 0;
 
@@ -3268,11 +3269,18 @@ void tensor_noncompiled_test() {
 	}
 }
 
+void major_tests() {
+	tnn_xor_test();
+	lstm_test();
+	ntm_test();
+	lstm_mdim_test();
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	tnn_xor_test();
+	major_tests();
 
 	return 0;
 

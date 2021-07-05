@@ -135,7 +135,7 @@
     <ClCompile Include="weight_set.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\affix-base\affix-base\affix-base.vcxproj">
+    <ProjectReference Include="..\affix-base\affix-base\affix-base.vcxproj">
       <Project>{7b4bfee2-ac81-40ce-a365-529cfc1111b3}</Project>
     </ProjectReference>
   </ItemGroup>
@@ -215,7 +215,8 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(AFFIX_BASE)\affix-base</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -261,7 +262,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(AFFIX_BASE)\affix-base</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
