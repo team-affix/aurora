@@ -10,6 +10,6 @@ Universal Function Approximation / Modeling
 
 Intended for users, people who do not wish to modify the framework out of it's stock state.
 
-** For those who wish to modify the framework, please FORK this repo. **
+__For those who wish to modify the framework, please FORK this repo.__
 
 Framework comes in the form of HEADER(s) / LIB(s), so prepare to link.
