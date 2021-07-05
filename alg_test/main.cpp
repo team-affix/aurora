@@ -3201,14 +3201,17 @@ void transfer_learn() {
 void ae_test() {
 
 	const size_t MID_LEN = 30;
-	const size_t H_LEN = MID_LEN * 4;
+	const size_t H_LEN = MID_LEN * 2;
 	const size_t OUT_LEN = MID_LEN * 8 + 1;
 	const size_t MID_BYTES = MID_LEN * 8;
 	const size_t OUT_BYTES = OUT_LEN;
 
-	std::normal_distribution<double> nd(0, 1);
+	default_random_engine re(25);
+	std::normal_distribution<double> nd(0, 0.1);
 	param_vector pv;
-	Sequential s = pseudo::tnn_compiled({ OUT_LEN, H_LEN, MID_LEN, H_LEN, OUT_LEN }, pv);
+	Sequential s = pseudo::tnn({ OUT_LEN, H_LEN, MID_LEN, H_LEN, OUT_LEN }, pseudo::nth());
+	s->param_recur(PARAM_INIT(param_mom(nd(re), 0.0002, 0, 0, 0.9), pv));
+	s->compile();
 
 	const size_t TRAIN_SETS = 1000;
 	const size_t TEST_SETS = 1000;
@@ -3269,7 +3272,7 @@ int main() {
 
 	srand(time(NULL));
 
-	tnn_xor_test();
+	ae_test();
 
 	return 0;
 

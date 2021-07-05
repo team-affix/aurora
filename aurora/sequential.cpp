@@ -39,9 +39,8 @@ void sequential::fwd() {
 }
 
 void sequential::bwd() {
-	for (int i = models.size() - 1; i >= 0; i--) {
+	for (int i = models.size() - 1; i >= 0; i--)
 		models[i]->bwd();
-	}
 }
 
 void sequential::signal(const tensor& a_y_des) {
