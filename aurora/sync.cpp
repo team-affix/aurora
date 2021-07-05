@@ -7,22 +7,15 @@ sync::~sync() {
 
 }
 
-sync::sync(ptr<model> a_model_template) {
+sync::sync(Model a_model_template) {
 	this->model_template = a_model_template;
 }
 
-void sync::pmt_wise(function<void(ptr<param>&)> a_func) {
-	model_template->pmt_wise(a_func);
+void sync::param_recur(function<void(Param&)> a_func) {
+	model_template->param_recur(a_func);
 }
 
-model* sync::clone() {
-	sync* result = new sync(model_template->clone());
-	result->prep(prepared.size());
-	result->unroll(unrolled.size());
-	return result;
-}
-
-model* sync::clone(function<void(ptr<param>&)> a_func) {
+model* sync::clone(function<Param(Param&)> a_func) {
 	sync* result = new sync(model_template->clone(a_func));
 	result->prep(prepared.size());
 	result->unroll(unrolled.size());
@@ -39,33 +32,14 @@ void sync::bwd() {
 		unrolled[i]->bwd();
 }
 
-tensor& sync::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& sync::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void sync::signal(tensor& a_y_des) {
+void sync::signal(const tensor& a_y_des) {
 	for (int i = 0; i < unrolled.size(); i++)
 		unrolled[i]->signal(a_y_des[i]);
 }
 
-void sync::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void sync::recur(function<void(model*)> a_func) {
+void sync::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	model_template->recur(a_func);
+	model_template->model_recur(a_func);
 }
 
 void sync::compile() {

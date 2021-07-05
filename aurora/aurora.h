@@ -7,5 +7,3 @@
 #include "pseudo.h"
 #include "evolution.h"
 #include "static_vals.h"
-#include "initialization.h"
-#include "beautify.h"

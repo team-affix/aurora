@@ -17,37 +17,25 @@ ntm_ts::ntm_ts(
 	size_t a_num_readers,
 	size_t a_num_writers,
 	vector<int> a_valid_shifts,
-	vector<size_t> a_head_hidden_dims,
-	function<void(ptr<param>&)> a_func) {
+	vector<size_t> a_head_hidden_dims) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
 
 	for (int i = 0; i < a_num_readers; i++)
-		internal_readers.push_back(new ntm_reader(a_memory_height, a_memory_width, a_valid_shifts, a_head_hidden_dims, a_func));
+		internal_readers.push_back(new ntm_reader(a_memory_height, a_memory_width, a_valid_shifts, a_head_hidden_dims));
 	for (int i = 0; i < a_num_writers; i++)
-		internal_writers.push_back(new ntm_writer(a_memory_height, a_memory_width, a_valid_shifts, a_head_hidden_dims, a_func));
+		internal_writers.push_back(new ntm_writer(a_memory_height, a_memory_width, a_valid_shifts, a_head_hidden_dims));
 
 }
 
-void ntm_ts::pmt_wise(function<void(ptr<param>&)> a_func) {
+void ntm_ts::param_recur(function<void(Param&)> a_func) {
 	for (int i = 0; i < internal_readers.size(); i++)
-		internal_readers[i]->pmt_wise(a_func);
+		internal_readers[i]->param_recur(a_func);
 	for (int i = 0; i < internal_writers.size(); i++)
-		internal_writers[i]->pmt_wise(a_func);
+		internal_writers[i]->param_recur(a_func);
 }
 
-model* ntm_ts::clone() {
-	ntm_ts* result = new ntm_ts();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	for (int i = 0; i < internal_readers.size(); i++)
-		result->internal_readers.push_back((ntm_reader*)internal_readers[i]->clone());
-	for (int i = 0; i < internal_writers.size(); i++)
-		result->internal_writers.push_back((ntm_writer*)internal_writers[i]->clone());
-	return result;
-}
-
-model* ntm_ts::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_ts::clone(function<Param(Param&)> a_func) {
 	ntm_ts* result = new ntm_ts();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;
@@ -83,35 +71,16 @@ void ntm_ts::bwd() {
 	}
 }
 
-tensor& ntm_ts::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_ts::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm_ts::signal(tensor& a_y_des) {
+void ntm_ts::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_ts::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm_ts::recur(function<void(model*)> a_func) {
+void ntm_ts::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 	for (int i = 0; i < internal_readers.size(); i++)
-		internal_readers[i]->recur(a_func);
+		internal_readers[i]->model_recur(a_func);
 	for (int i = 0; i < internal_writers.size(); i++)
-		internal_writers[i]->recur(a_func);
+		internal_writers[i]->model_recur(a_func);
 }
 
 void ntm_ts::compile() {

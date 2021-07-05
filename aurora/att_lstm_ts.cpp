@@ -11,36 +11,26 @@ att_lstm_ts::att_lstm_ts() {
 
 }
 
-att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func) {
+att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims) {
 	this->units = a_units;
 	vector<size_t> l_dims;
 	l_dims.push_back(2 * a_units);
 	l_dims.insert(l_dims.end(), a_h_dims.begin(), a_h_dims.end());
 	l_dims.push_back(1);
 	// INITIALIZE NEURONS IN TNN
-	vector<ptr<model>> neurons = vector<ptr<model>>(l_dims.size());
+	vector<Model> neurons = vector<Model>(l_dims.size());
 	for (int i = 0; i < l_dims.size() - 1; i++)
 		neurons[i] = pseudo::nlr(0.3);
 	neurons.push_back(pseudo::nsm());
-	model_template = pseudo::tnn(l_dims, neurons, a_func);
+	model_template = pseudo::tnn(l_dims, neurons);
 	models = new sync(model_template);
 }
 
-void att_lstm_ts::pmt_wise(function<void(ptr<param>&)> a_func) {
-	model_template->pmt_wise(a_func);
+void att_lstm_ts::param_recur(function<void(Param&)> a_func) {
+	model_template->param_recur(a_func);
 }
 
-model* att_lstm_ts::clone() {
-	att_lstm_ts* result = new att_lstm_ts();
-	result->units = units;
-	result->htx = htx.clone();
-	result->htx_grad = htx_grad.clone();
-	result->model_template = model_template->clone();
-	result->models = (sync*)models->clone();
-	return result;
-}
-
-model* att_lstm_ts::clone(function<void(ptr<param>&)> a_func) {
+model* att_lstm_ts::clone(function<Param(Param&)> a_func) {
 	att_lstm_ts* result = new att_lstm_ts();
 	result->units = units;
 	result->htx = htx.clone();
@@ -82,31 +72,12 @@ void att_lstm_ts::bwd() {
 	}
 }
 
-tensor& att_lstm_ts::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& att_lstm_ts::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void att_lstm_ts::signal(tensor& a_y_des) {
+void att_lstm_ts::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void att_lstm_ts::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void att_lstm_ts::recur(function<void(model*)> a_func) {
-	model_template->recur(a_func);
+void att_lstm_ts::model_recur(function<void(model*)> a_func) {
+	model_template->model_recur(a_func);
 }
 
 void att_lstm_ts::compile() {

@@ -11,26 +11,18 @@ att_lstm::att_lstm() {
 
 }
 
-att_lstm::att_lstm(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func) {
+att_lstm::att_lstm(size_t a_units, vector<size_t> a_h_dims) {
 	this->units = a_units;
-	models = new sync(new att_lstm_ts(a_units, a_h_dims, a_func));
-	internal_lstm = new lstm(a_units, a_func);
+	models = new sync(new att_lstm_ts(a_units, a_h_dims));
+	internal_lstm = new lstm(a_units);
 }
 
-void att_lstm::pmt_wise(function<void(ptr<param>&)> a_func) {
-	models->pmt_wise(a_func);
-	internal_lstm->pmt_wise(a_func);
+void att_lstm::param_recur(function<void(Param&)> a_func) {
+	models->param_recur(a_func);
+	internal_lstm->param_recur(a_func);
 }
 
-model* att_lstm::clone() {
-	att_lstm* result = new att_lstm();
-	result->units = units;
-	result->models = (sync*)models->clone();
-	result->internal_lstm = (lstm*)internal_lstm->clone();
-	return result;
-}
-
-model* att_lstm::clone(function<void(ptr<param>&)> a_func) {
+model* att_lstm::clone(function<Param(Param&)> a_func) {
 	att_lstm* result = new att_lstm();
 	result->units = units;
 	result->models = (sync*)models->clone(a_func);
@@ -57,32 +49,13 @@ void att_lstm::bwd() {
 	}
 }
 
-tensor& att_lstm::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& att_lstm::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void att_lstm::signal(tensor& a_y_des) {
+void att_lstm::signal(const tensor& a_y_des) {
 	internal_lstm->signal(a_y_des);
 }
 
-void att_lstm::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void att_lstm::recur(function<void(model*)> a_func) {
-	models->recur(a_func);
-	internal_lstm->recur(a_func);
+void att_lstm::model_recur(function<void(model*)> a_func) {
+	models->model_recur(a_func);
+	internal_lstm->model_recur(a_func);
 }
 
 void att_lstm::compile() {

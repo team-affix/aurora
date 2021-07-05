@@ -16,18 +16,11 @@ shift::shift(size_t a_units, vector<int> a_valid_shifts) {
 	valid_shifts = a_valid_shifts;
 }
 
-void shift::pmt_wise(function<void(ptr<param>&)> a_func) {
+void shift::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* shift::clone() {
-	shift* result = new shift();
-	result->units = units;
-	result->valid_shifts = valid_shifts;
-	return result;
-}
-
-model* shift::clone(function<void(ptr<param>&)> a_func) {
+model* shift::clone(function<Param(Param&)> a_func) {
 	shift* result = new shift();
 	result->units = units;
 	result->valid_shifts = valid_shifts;
@@ -54,30 +47,11 @@ void shift::bwd() {
 		}
 }
 
-tensor& shift::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& shift::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void shift::signal(tensor& a_y_des) {
+void shift::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void shift::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void shift::recur(function<void(model*)> a_func) {
+void shift::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

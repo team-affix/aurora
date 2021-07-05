@@ -11,24 +11,13 @@ weight::weight() {
 
 }
 
-weight::weight(function<void(ptr<param>&)> a_func) {
+void weight::param_recur(function<void(Param&)> a_func) {
 	a_func(pmt);
 }
 
-void weight::pmt_wise(function<void(ptr<param>&)> a_func) {
-	a_func(pmt);
-}
-
-model* weight::clone() {
+model* weight::clone(function<Param(Param&)> a_func) {
 	weight* result = new weight();
-	result->pmt = pmt;
-	return result;
-}
-
-model* weight::clone(function<void(ptr<param>&)> a_func) {
-	weight* result = new weight();
-	result->pmt = pmt->clone();
-	a_func(result->pmt);
+	result->pmt = a_func(pmt);
 	return result;
 }
 
@@ -42,30 +31,11 @@ void weight::bwd() {
 	x_grad.val() = y_grad.val() * pmt->state();
 }
 
-tensor& weight::fwd(tensor& a_x) {
-	x.val() = a_x.val();
-	fwd();
-	return y;
-}
-
-tensor& weight::bwd(tensor& a_y_grad) {
-	y_grad.val() = a_y_grad.val();
-	bwd();
-	return x_grad;
-}
-
-void weight::signal(tensor& a_y_des) {
+void weight::signal(const tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void weight::cycle(tensor& a_x, tensor& a_y_des) {
-	x.val() = a_x.val();
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void weight::recur(function<void(model*)> a_func) {
+void weight::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

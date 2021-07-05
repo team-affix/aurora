@@ -11,33 +11,26 @@ layer::layer() {
 
 }
 
-layer::layer(size_t a_a, ptr<model> a_model_template, function<void(ptr<param>&)> a_func) {
-	for (size_t i = 0; i < a_a; i++)
-		models.push_back(a_model_template->clone(a_func));
+layer::layer(size_t a_height, Model a_model_template) {
+	for (size_t i = 0; i < a_height; i++)
+		models.push_back(a_model_template->clone([](Param& pmt) { return pmt->clone(); }));
 }
 
-layer::layer(size_t a_a, ptr<model> a_model_template) {
-	for (size_t i = 0; i < a_a; i++)
-		models.push_back(a_model_template->clone());
+layer::layer(initializer_list<Model> a_models) {
+	for (initializer_list<Model>::iterator i = a_models.begin(); i != a_models.end(); i++)
+		models.push_back(*i);
 }
 
-layer::layer(initializer_list<ptr<model>> a_il) {
-	std::copy(a_il.begin(), a_il.end(), back_inserter(models));
+layer::layer(vector<Model> a_models) {
+	models = a_models;
 }
 
-void layer::pmt_wise(function<void(ptr<param>&)> a_func) {
+void layer::param_recur(function<void(Param&)> a_func) {
 	for (int i = 0; i < models.size(); i++)
-		models[i]->pmt_wise(a_func);
+		models[i]->param_recur(a_func);
 }
 
-model* layer::clone() {
-	layer* result = new layer();
-	for (size_t i = 0; i < models.size(); i++)
-		result->models.push_back(models[i]->clone());
-	return result;
-}
-
-model* layer::clone(function<void(ptr<param>&)> a_func) {
+model* layer::clone(function<Param(Param&)> a_func) {
 	layer* result = new layer();
 	for (size_t i = 0; i < models.size(); i++)
 		result->models.push_back(models[i]->clone(a_func));
@@ -54,34 +47,15 @@ void layer::bwd() {
 		models[i]->bwd();
 }
 
-tensor& layer::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& layer::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void layer::signal(tensor& a_y_des) {
+void layer::signal(const tensor& a_y_des) {
 	for (size_t i = 0; i < models.size(); i++)
 		models[i]->signal(a_y_des[i]);
 }
 
-void layer::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void layer::recur(function<void(model*)> a_func) {
+void layer::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 	for (size_t i = 0; i < models.size(); i++)
-		models[i]->recur(a_func);
+		models[i]->model_recur(a_func);
 }
 
 void layer::compile() {

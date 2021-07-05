@@ -11,26 +11,18 @@ weight_set::weight_set() {
 
 }
 
-weight_set::weight_set(size_t a_a, function<void(ptr<param>&)> a_func) {
+weight_set::weight_set(size_t a_a) {
 	this->a = a_a;
 	for (int i = 0; i < a_a; i++)
-		weights.push_back(new weight(a_func));
+		weights.push_back(new weight());
 }
 
-void weight_set::pmt_wise(function<void(ptr<param>&)> a_func) {
+void weight_set::param_recur(function<void(Param&)> a_func) {
 	for (int i = 0; i < weights.size(); i++)
-		weights[i]->pmt_wise(a_func);
+		weights[i]->param_recur(a_func);
 }
 
-model* weight_set::clone() {
-	weight_set* result = new weight_set();
-	result->a = a;
-	for (int i = 0; i < a; i++)
-		result->weights.push_back((weight*)weights[i]->clone());
-	return result;
-}
-
-model* weight_set::clone(function<void(ptr<param>&)> a_func) {
+model* weight_set::clone(function<Param(Param&)> a_func) {
 	weight_set* result = new weight_set();
 	result->a = a;
 	for (int i = 0; i < a; i++)
@@ -51,33 +43,14 @@ void weight_set::bwd() {
 	}
 }
 
-tensor& weight_set::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& weight_set::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void weight_set::signal(tensor& a_y_des) {
+void weight_set::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void weight_set::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void weight_set::recur(function<void(model*)> a_func) {
+void weight_set::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 	for (int i = 0; i < weights.size(); i++)
-		weights[i]->recur(a_func);
+		weights[i]->model_recur(a_func);
 }
 
 void weight_set::compile() {

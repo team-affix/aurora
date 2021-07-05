@@ -19,22 +19,12 @@ ntm_addresser::ntm_addresser(size_t a_memory_height, size_t a_memory_width, vect
 	internal_location_addresser = new ntm_location_addresser(a_memory_height, a_valid_shifts);
 }
 
-void ntm_addresser::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_content_addresser->pmt_wise(a_func);
-	internal_location_addresser->pmt_wise(a_func);
+void ntm_addresser::param_recur(function<void(Param&)> a_func) {
+	internal_content_addresser->param_recur(a_func);
+	internal_location_addresser->param_recur(a_func);
 }
 
-model* ntm_addresser::clone() {
-	ntm_addresser* result = new ntm_addresser();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->shift_units = shift_units;
-	result->internal_content_addresser = (ntm_content_addresser*)internal_content_addresser->clone();
-	result->internal_location_addresser = (ntm_location_addresser*)internal_location_addresser->clone();
-	return result;
-}
-
-model* ntm_addresser::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_addresser::clone(function<Param(Param&)> a_func) {
 	ntm_addresser* result = new ntm_addresser();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;
@@ -54,33 +44,14 @@ void ntm_addresser::bwd() {
 	internal_content_addresser->bwd();
 }
 
-tensor& ntm_addresser::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_addresser::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm_addresser::signal(tensor& a_y_des) {
+void ntm_addresser::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_addresser::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm_addresser::recur(function<void(model*)> a_func) {
+void ntm_addresser::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_content_addresser->recur(a_func);
-	internal_location_addresser->recur(a_func);
+	internal_content_addresser->model_recur(a_func);
+	internal_location_addresser->model_recur(a_func);
 }
 
 void ntm_addresser::compile() {

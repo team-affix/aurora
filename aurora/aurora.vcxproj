@@ -22,18 +22,21 @@
     <ClInclude Include="att_lstm.h" />
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
-    <ClInclude Include="basic.h" />
-    <ClInclude Include="basic_constructors.h" />
-    <ClInclude Include="beautify.h" />
-    <ClInclude Include="beautify_init_pmt.h" />
+    <ClInclude Include="pseudo_lstm_hyperparams.h" />
+    <ClInclude Include="pseudo_ntm_hyperparams.h" />
+    <ClInclude Include="pseudo_tnn_hyperparams.h" />
+    <ClInclude Include="pseudo_lstm.h" />
+    <ClInclude Include="pseudo_ntm.h" />
+    <ClInclude Include="pseudo_tnn.h" />
+    <ClInclude Include="param_rcv.h" />
+    <ClInclude Include="param_vector.h" />
+    <ClInclude Include="recurrent.h" />
     <ClInclude Include="bias.h" />
-    <ClInclude Include="beautify_models.h" />
     <ClInclude Include="cnl.h" />
     <ClInclude Include="evolution.h" />
     <ClInclude Include="leaky_rexu.h" />
     <ClInclude Include="generation.h" />
     <ClInclude Include="genome.h" />
-    <ClInclude Include="initialization.h" />
     <ClInclude Include="interpolate.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="leaky_relu.h" />
@@ -62,9 +65,9 @@
     <ClInclude Include="power.h" />
     <ClInclude Include="pseudo.h" />
     <ClInclude Include="shift.h" />
+    <ClInclude Include="stacked_recurrent.h" />
     <ClInclude Include="static_vals.h" />
     <ClInclude Include="sequential.h" />
-    <ClInclude Include="session.h" />
     <ClInclude Include="sigmoid.h" />
     <ClInclude Include="sync.h" />
     <ClInclude Include="tanh.h" />
@@ -73,7 +76,6 @@
     <ClInclude Include="param.h" />
     <ClInclude Include="param_mom.h" />
     <ClInclude Include="param_sgd.h" />
-    <ClInclude Include="tnn.h" />
     <ClInclude Include="weight.h" />
     <ClInclude Include="weight_junction.h" />
     <ClInclude Include="weight_set.h" />
@@ -81,6 +83,12 @@
   <ItemGroup>
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
+    <ClCompile Include="pseudo_lstm_hyperparams.cpp" />
+    <ClCompile Include="pseudo_ntm_hyperparams.cpp" />
+    <ClCompile Include="pseudo_tnn_hyperparams.cpp" />
+    <ClCompile Include="pseudo_lstm.cpp" />
+    <ClCompile Include="pseudo_ntm.cpp" />
+    <ClCompile Include="pseudo_tnn.cpp" />
     <ClCompile Include="bias.cpp" />
     <ClCompile Include="cnl.cpp" />
     <ClCompile Include="cos_sim.cpp" />
@@ -105,28 +113,29 @@
     <ClCompile Include="ntm_wh.cpp" />
     <ClCompile Include="ntm_writer.cpp" />
     <ClCompile Include="param.cpp" />
-    <ClCompile Include="param_init.cpp" />
     <ClCompile Include="param_mom.cpp" />
     <ClCompile Include="param_mom_mt.cpp" />
+    <ClCompile Include="param_rcv.cpp" />
     <ClCompile Include="param_sgd.cpp" />
     <ClCompile Include="param_sgd_mt.cpp" />
+    <ClCompile Include="param_vector.cpp" />
     <ClCompile Include="power.cpp" />
+    <ClCompile Include="recurrent.cpp" />
     <ClCompile Include="sequential.cpp" />
-    <ClCompile Include="session.cpp" />
     <ClCompile Include="shift.cpp" />
     <ClCompile Include="sigmoid.cpp" />
+    <ClCompile Include="stacked_recurrent.cpp" />
     <ClCompile Include="static_vals.cpp" />
     <ClCompile Include="sync.cpp" />
     <ClCompile Include="tanh.cpp" />
     <ClCompile Include="tensor.cpp" />
     <ClCompile Include="model.cpp" />
-    <ClCompile Include="tnn.cpp" />
     <ClCompile Include="weight.cpp" />
     <ClCompile Include="weight_junction.cpp" />
     <ClCompile Include="weight_set.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\affix-base\affix-base\affix-base.vcxproj">
+    <ProjectReference Include="..\affix-base\affix-base\affix-base.vcxproj">
       <Project>{7b4bfee2-ac81-40ce-a365-529cfc1111b3}</Project>
     </ProjectReference>
   </ItemGroup>
@@ -206,12 +215,16 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(AFFIX_BASE)\affix-base</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>build-info\post-build-increment.exe build-info\revision.txt</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -249,12 +262,16 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(AFFIX_BASE)\affix-base</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>build-info\post-build-increment.exe build-info\revision.txt</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

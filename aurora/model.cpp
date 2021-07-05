@@ -12,10 +12,6 @@ model::model() {
 
 }
 
-model::model(function<void(ptr<param>&)> a_func) {
-	
-}
-
 void model::fwd() {
 
 }
@@ -24,40 +20,19 @@ void model::bwd() {
 
 }
 
-tensor& model::fwd(tensor& a_x) {
-	x.set(a_x);
-	fwd();
-	return y;
-}
-
-tensor& model::bwd(tensor& a_y_grad) {
-	y_grad.set(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-
-void model::signal(tensor& a_y_des) {
+void model::signal(const tensor& a_y_des) {
 	
 }
 
-void model::cycle(tensor& a_x, tensor& a_y_des) {
-
-}
-
-void model::recur(function<void(model*)> a_func) {
+void model::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 
-void model::pmt_wise(function<void(ptr<param>&)> a_func) {
+void model::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* model::clone() {
-	return new model();
-}
-
-model* model::clone(function<void(ptr<param>&)> a_func) {
+model* model::clone(function<Param(Param&)> a_func) {
 	return new model();
 }
 

@@ -11,15 +11,11 @@ MODEL::MODEL() {
 
 }
 
-void MODEL::pmt_wise(function<void(ptr<param>&)> a_func) {
+void MODEL::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* MODEL::clone() {
-
-}
-
-model* MODEL::clone(function<void(ptr<param>&)> a_func) {
+model* MODEL::clone(function<Param(Param&)> a_func) {
 
 }
 
@@ -31,23 +27,11 @@ void MODEL::bwd() {
 
 }
 
-tensor& MODEL::fwd(tensor& a_x) {
-
-}
-
-tensor& MODEL::bwd(tensor& a_y_grad) {
-
-}
-
 void MODEL::signal(tensor& a_y_des) {
 
 }
 
-void MODEL::cycle(tensor& a_x, tensor& a_y_des) {
-
-}
-
-void MODEL::recur(function<void(model*)> a_func) {
+void MODEL::model_recur(function<void(model*)> a_func) {
 
 }
 

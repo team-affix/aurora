@@ -15,17 +15,11 @@ normalize::normalize(size_t a_units) {
 	units = a_units;
 }
 
-void normalize::pmt_wise(function<void(ptr<param>&)> a_func) {
+void normalize::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* normalize::clone() {
-	normalize* result = new normalize();
-	result->units = units;
-	return result;
-}
-
-model* normalize::clone(function<void(ptr<param>&)> a_func) {
+model* normalize::clone(function<Param(Param&)> a_func) {
 	normalize* result = new normalize();
 	result->units = units;
 	return result;
@@ -48,30 +42,11 @@ void normalize::bwd() {
 	}
 }
 
-tensor& normalize::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& normalize::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void normalize::signal(tensor& a_y_des) {
+void normalize::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void normalize::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void normalize::recur(function<void(model*)> a_func) {
+void normalize::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

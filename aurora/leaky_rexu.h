@@ -16,6 +16,8 @@ namespace aurora {
 			virtual ~leaky_rexu();
 			leaky_rexu();
 			leaky_rexu(double a_k);
+
 		};
+		typedef ptr<leaky_rexu> Leaky_rexu;
 	}
 }

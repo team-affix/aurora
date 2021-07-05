@@ -7,7 +7,7 @@ using aurora::models::model;
 
 namespace aurora {
 	namespace models {
-		class ntm : public model {
+		class ntm : public recurrent {
 		public:
 			size_t memory_height = 0;
 			size_t memory_width = 0;
@@ -29,10 +29,10 @@ namespace aurora {
 			tensor write_wy_grad;
 
 		public:
-			ptr<lstm> internal_lstm;
-			ptr<ntm_ts> ntm_ts_template;
-			vector<ptr<ntm_ts>> prepared;
-			vector<ptr<ntm_ts>> unrolled;
+			Lstm internal_lstm;
+			Ntm_ts ntm_ts_template;
+			vector<Ntm_ts> prepared;
+			vector<Ntm_ts> unrolled;
 
 		public:
 			RECURRENT_FIELDS
@@ -44,9 +44,9 @@ namespace aurora {
 				size_t a_num_readers,
 				size_t a_num_writers,
 				vector<int> a_valid_shifts,
-				vector<size_t> a_head_hidden_dims,
-				function<void(ptr<param>&)> a_func);
+				vector<size_t> a_head_hidden_dims);
 
 		};
+		typedef ptr<ntm> Ntm;
 	}
 }

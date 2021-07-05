@@ -15,17 +15,11 @@ ntm_sparsify::ntm_sparsify(size_t a_memory_height) {
 	memory_height = a_memory_height;
 }
 
-void ntm_sparsify::pmt_wise(function<void(ptr<param>&)> a_func) {
+void ntm_sparsify::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* ntm_sparsify::clone() {
-	ntm_sparsify* result = new ntm_sparsify();
-	result->memory_height = memory_height;
-	return result;
-}
-
-model* ntm_sparsify::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_sparsify::clone(function<Param(Param&)> a_func) {
 	ntm_sparsify* result = new ntm_sparsify();
 	result->memory_height = memory_height;
 	return result;
@@ -44,30 +38,11 @@ void ntm_sparsify::bwd() {
 	}
 }
 
-tensor& ntm_sparsify::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_sparsify::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm_sparsify::signal(tensor& a_y_des) {
+void ntm_sparsify::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_sparsify::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm_sparsify::recur(function<void(model*)> a_func) {
+void ntm_sparsify::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

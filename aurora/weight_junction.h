@@ -13,14 +13,15 @@ namespace aurora {
 		public:
 			size_t a;
 			size_t b;
-			vector<ptr<weight_set>> weight_sets;
+			vector<Weight_set> weight_sets;
 
 		public:
 			MODEL_FIELDS
 			virtual ~weight_junction();
 			weight_junction();
-			weight_junction(size_t a_a, size_t a_b, function<void(ptr<param>&)> a_func);
+			weight_junction(size_t a_a, size_t a_b);
 
 		};
+		typedef ptr<weight_junction> Weight_junction;
 	}
 }

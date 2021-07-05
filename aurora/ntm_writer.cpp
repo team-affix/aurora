@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ntm_writer.h"
+#include <iostream>
 
 using aurora::models::ntm_writer;
 
@@ -11,28 +12,19 @@ ntm_writer::ntm_writer() {
 
 }
 
-ntm_writer::ntm_writer(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims, function<void(ptr<param>&)> a_func) {
+ntm_writer::ntm_writer(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
-	internal_head = new ntm_wh(a_memory_width, a_head_hidden_dims, a_valid_shifts.size(), a_func);
+	internal_head = new ntm_wh(a_memory_width, a_head_hidden_dims, a_valid_shifts.size());
 	internal_addresser = new ntm_addresser(a_memory_height, a_memory_width, a_valid_shifts);
 }
 
-void ntm_writer::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_head->pmt_wise(a_func);
-	internal_addresser->pmt_wise(a_func);
+void ntm_writer::param_recur(function<void(Param&)> a_func) {
+	internal_head->param_recur(a_func);
+	internal_addresser->param_recur(a_func);
 }
 
-model* ntm_writer::clone() {
-	ntm_writer* result = new ntm_writer();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->internal_head = (ntm_wh*)internal_head->clone();
-	result->internal_addresser = (ntm_addresser*)internal_addresser->clone();
-	return result;
-}
-
-model* ntm_writer::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_writer::clone(function<Param(Param&)> a_func) {
 	ntm_writer* result = new ntm_writer();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;
@@ -74,33 +66,14 @@ void ntm_writer::bwd() {
 	internal_head->bwd();
 }
 
-tensor& ntm_writer::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_writer::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm_writer::signal(tensor& a_y_des) {
+void ntm_writer::signal(const tensor& a_y_des) {
 	y.sub_2d(a_y_des, y_grad);
 }
 
-void ntm_writer::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm_writer::recur(function<void(model*)> a_func) {
+void ntm_writer::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_head->recur(a_func);
-	internal_addresser->recur(a_func);
+	internal_head->model_recur(a_func);
+	internal_addresser->model_recur(a_func);
 }
 
 void ntm_writer::compile() {

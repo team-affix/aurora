@@ -15,21 +15,11 @@ cos_sim::cos_sim(size_t a_units) {
 	units = a_units;
 }
 
-void cos_sim::pmt_wise(function<void(ptr<param>&)> a_func) {
+void cos_sim::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* cos_sim::clone() {
-	cos_sim* result = new cos_sim();
-	result->units = units;
-	result->magnitude_0 = magnitude_0;
-	result->magnitude_1 = magnitude_1;
-	result->magnitude_product = magnitude_product;
-	result->dot_product = dot_product;
-	return result;
-}
-
-model* cos_sim::clone(function<void(ptr<param>&)> a_func) {
+model* cos_sim::clone(function<Param(Param&)> a_func) {
 	cos_sim* result = new cos_sim();
 	result->units = units;
 	result->magnitude_0 = magnitude_0;
@@ -62,30 +52,11 @@ void cos_sim::bwd() {
 	}
 }
 
-tensor& cos_sim::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& cos_sim::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void cos_sim::signal(tensor& a_y_des) {
+void cos_sim::signal(const tensor& a_y_des) {
 	y_grad.val() = y.val() - a_y_des.val();
 }
 
-void cos_sim::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void cos_sim::recur(function<void(model*)> a_func) {
+void cos_sim::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

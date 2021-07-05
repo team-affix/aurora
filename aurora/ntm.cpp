@@ -17,12 +17,11 @@ ntm::ntm(
 	size_t a_num_readers,
 	size_t a_num_writers,
 	vector<int> a_valid_shifts,
-	vector<size_t> a_head_hidden_dims,
-	function<void(ptr<param>&)> a_func) {
+	vector<size_t> a_head_hidden_dims) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
 	
-	internal_lstm = new lstm(a_memory_width, a_func);
+	internal_lstm = new lstm(a_memory_width);
 
 	ntm_ts_template = new ntm_ts(
 		a_memory_height,
@@ -30,32 +29,20 @@ ntm::ntm(
 		a_num_readers,
 		a_num_writers,
 		a_valid_shifts,
-		a_head_hidden_dims,
-		a_func);
+		a_head_hidden_dims);
 
 }
 
-void ntm::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_lstm->pmt_wise(a_func);
-	ntm_ts_template->pmt_wise(a_func);
+void ntm::param_recur(function<void(Param&)> a_func) {
+	internal_lstm->param_recur(a_func);
+	ntm_ts_template->param_recur(a_func);
 }
 
-model* ntm::clone() {
+model* ntm::clone(function<Param(Param&)> a_func) {
 	ntm* result = new ntm();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;
-	result->internal_lstm = (lstm*)internal_lstm->clone();
-	result->ntm_ts_template = (ntm_ts*)ntm_ts_template->clone();
-	result->prep(prepared.size());
-	result->unroll(prepared.size());
-	return result;
-}
-
-model* ntm::clone(function<void(ptr<param>&)> a_func) {
-	ntm* result = new ntm();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->internal_lstm = (lstm*)internal_lstm->clone();
+	result->internal_lstm = (lstm*)internal_lstm->clone(a_func);
 	result->ntm_ts_template = (ntm_ts*)ntm_ts_template->clone(a_func);
 	result->prep(prepared.size());
 	result->unroll(prepared.size());
@@ -77,33 +64,14 @@ void ntm::bwd() {
 	}
 }
 
-tensor& ntm::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm::signal(tensor& a_y_des) {
+void ntm::signal(const tensor& a_y_des) {
 	y.sub_2d(a_y_des, y_grad);
 }
 
-void ntm::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm::recur(function<void(model*)> a_func) {
+void ntm::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_lstm->recur(a_func);
-	ntm_ts_template->recur(a_func);
+	internal_lstm->model_recur(a_func);
+	ntm_ts_template->model_recur(a_func);
 }
 
 void ntm::compile() {

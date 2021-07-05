@@ -2,14 +2,15 @@
 #include "pch.h"
 #include "model.h"
 #include "sync.h"
-#include "pseudo.h"
+#include "pseudo_tnn.h"
+#include "neuron.h"
 
 using aurora::models::model;
 using aurora::models::sync;
 
 namespace aurora {
 	namespace models {
-		class att_lstm_ts : public model {
+		class att_lstm_ts : public recurrent {
 		public:
 			size_t units;
 
@@ -18,15 +19,16 @@ namespace aurora {
 			tensor htx_grad;
 
 		public:
-			ptr<model> model_template;
-			ptr<sync> models;
+			Model model_template;
+			Sync models;
 
 		public:
 			RECURRENT_FIELDS
 			virtual ~att_lstm_ts();
 			att_lstm_ts();
-			att_lstm_ts(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func);
+			att_lstm_ts(size_t a_units, vector<size_t> a_h_dims);
 
 		};
+		typedef ptr<att_lstm_ts> Att_lstm_ts;
 	}
 }

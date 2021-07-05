@@ -28,5 +28,6 @@ namespace aurora {
 			virtual param* clone();
 
 		};
+		typedef ptr<param_mom_mt> Param_mom_mt;
 	}
 }

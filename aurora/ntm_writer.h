@@ -24,16 +24,16 @@ namespace aurora {
 			tensor wy_grad;
 
 		public:
-			ptr<ntm_wh> internal_head;
-			ptr<ntm_addresser> internal_addresser;
+			Ntm_wh internal_head;
+			Ntm_addresser internal_addresser;
 
 		public:
 			MODEL_FIELDS
 			virtual ~ntm_writer();
 			ntm_writer();
-			ntm_writer(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims, function<void(ptr<param>&)> a_func);
-
+			ntm_writer(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims);
 
 		};
+		typedef ptr<ntm_writer> Ntm_writer;
 	}
 }

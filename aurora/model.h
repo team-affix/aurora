@@ -13,6 +13,7 @@ using affix_base::data::ref;
 using std::function;
 using std::vector;
 using aurora::params::param;
+using aurora::params::Param;
 using aurora::params::param_sgd;
 using aurora::params::param_mom;
 using aurora::maths::tensor;
@@ -30,8 +31,8 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~model();
 			model();
-			model(function<void(ptr<param>&)> a_func);
 
 		};
+		typedef ptr<model> Model;
 	}
 }

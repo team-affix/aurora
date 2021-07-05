@@ -27,5 +27,6 @@ namespace aurora {
 			virtual param* clone();
 
 		};
+		typedef ptr<param> Param;
 	}
 }

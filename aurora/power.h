@@ -21,5 +21,6 @@ namespace aurora {
 			power(size_t a_units);
 
 		};
+		typedef ptr<power> Power;
 	}
 }

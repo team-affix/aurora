@@ -11,32 +11,21 @@ sequential::sequential() {
 
 }
 
-sequential::sequential(initializer_list<ptr<model>> a_il) {
-	models.resize(a_il.size());
-	for (int i = 0; i < a_il.size(); i++) {
-		const ptr<model>* elem = a_il.begin() + i;
-		models[i] = *elem;
-	}
+sequential::sequential(initializer_list<Model> a_models) {
+	for (initializer_list<Model>::iterator i = a_models.begin(); i != a_models.end(); i++)
+		models.push_back(*i);
 }
 
-sequential::sequential(vector<ptr<model>> a_models) {
+sequential::sequential(vector<Model> a_models) {
 	models = a_models;
 }
 
-void sequential::pmt_wise(function<void(ptr<param>&)> a_func) {
+void sequential::param_recur(function<void(Param&)> a_func) {
 	for (int i = 0; i < models.size(); i++)
-		models[i]->pmt_wise(a_func);
+		models[i]->param_recur(a_func);
 }
 
-model* sequential::clone() {
-	sequential* result = new sequential();
-	result->models.resize(models.size());
-	for (int i = 0; i < models.size(); i++)
-		result->models[i] = models[i]->clone();
-	return result;
-}
-
-model* sequential::clone(function<void(ptr<param>&)> a_func) {
+model* sequential::clone(function<Param(Param&)> a_func) {
 	sequential* result = new sequential();
 	result->models.resize(models.size());
 	for (int i = 0; i < models.size(); i++)
@@ -50,38 +39,18 @@ void sequential::fwd() {
 }
 
 void sequential::bwd() {
-	for (int i = models.size() - 1; i >= 0; i--) {
+	for (int i = models.size() - 1; i >= 0; i--)
 		models[i]->bwd();
-	}
 }
 
-tensor& sequential::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& sequential::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void sequential::signal(tensor& a_y_des) {
+void sequential::signal(const tensor& a_y_des) {
 	models.back()->signal(a_y_des);
 }
 
-void sequential::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void sequential::recur(function<void(model*)> a_func) {
+void sequential::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 	for (int i = 0; i < models.size(); i++)
-		models[i]->recur(a_func);
+		models[i]->model_recur(a_func);
 }
 
 void sequential::compile() {

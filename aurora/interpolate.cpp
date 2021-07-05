@@ -15,17 +15,11 @@ interpolate::interpolate(size_t a_units) {
 	units = a_units;
 }
 
-void interpolate::pmt_wise(function<void(ptr<param>&)> a_func) {
+void interpolate::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* interpolate::clone() {
-	interpolate* result = new interpolate();
-	result->units = units;
-	return result;
-}
-
-model* interpolate::clone(function<void(ptr<param>&)> a_func) {
+model* interpolate::clone(function<Param(Param&)> a_func) {
 	interpolate* result = new interpolate();
 	result->units = units;
 	return result;
@@ -49,30 +43,11 @@ void interpolate::bwd() {
 	}
 }
 
-tensor& interpolate::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& interpolate::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void interpolate::signal(tensor& a_y_des) {
+void interpolate::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void interpolate::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void interpolate::recur(function<void(model*)> a_func) {
+void interpolate::model_recur(function<void(model*)> a_func) {
 	a_func(this);
 }
 

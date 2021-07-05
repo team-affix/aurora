@@ -14,15 +14,16 @@ namespace aurora {
 	namespace models {
 		class sequential : public model {
 		public:
-			vector<ptr<model>> models;
+			vector<Model> models;
 
 		public:
 			MODEL_FIELDS
 			virtual ~sequential();
 			sequential();
-			sequential(initializer_list<ptr<model>> a_il);
-			sequential(vector<ptr<model>> a_models);
+			sequential(initializer_list<Model> a_models);
+			sequential(vector<Model> a_models);
 
 		};
+		typedef ptr<sequential> Sequential;
 	}
 }

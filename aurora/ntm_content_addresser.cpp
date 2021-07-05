@@ -19,21 +19,11 @@ ntm_content_addresser::ntm_content_addresser(size_t a_memory_height, size_t a_me
 	internal_normalize = new normalize(memory_height);
 }
 
-void ntm_content_addresser::pmt_wise(function<void(ptr<param>&)> a_func) {
+void ntm_content_addresser::param_recur(function<void(Param&)> a_func) {
 
 }
 
-model* ntm_content_addresser::clone() {
-	ntm_content_addresser* result = new ntm_content_addresser();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->internal_similarity = (sync*)internal_similarity->clone();
-	result->internal_sparsify = (ntm_sparsify*)internal_sparsify->clone();
-	result->internal_normalize = (normalize*)internal_normalize->clone();
-	return result;
-}
-
-model* ntm_content_addresser::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_content_addresser::clone(function<Param(Param&)> a_func) {
 	ntm_content_addresser* result = new ntm_content_addresser();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;
@@ -59,34 +49,15 @@ void ntm_content_addresser::bwd() {
 		key_grad.add_1d(internal_similarity->x_grad[i][0], key_grad);
 }
 
-tensor& ntm_content_addresser::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_content_addresser::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm_content_addresser::signal(tensor& a_y_des) {
+void ntm_content_addresser::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_content_addresser::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm_content_addresser::recur(function<void(model*)> a_func) {
+void ntm_content_addresser::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_similarity->recur(a_func);
-	internal_sparsify->recur(a_func);
-	internal_normalize->recur(a_func);
+	internal_similarity->model_recur(a_func);
+	internal_sparsify->model_recur(a_func);
+	internal_normalize->model_recur(a_func);
 }
 
 void ntm_content_addresser::compile() {

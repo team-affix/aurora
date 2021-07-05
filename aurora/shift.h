@@ -27,5 +27,6 @@ namespace aurora {
 			int positive_modulo(int i, int n);
 
 		};
+		typedef ptr<shift> Shift;
 	}
 }

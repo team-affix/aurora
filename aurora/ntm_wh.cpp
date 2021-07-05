@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ntm_wh.h"
-#include "pseudo.h"
+#include "pseudo_tnn.h"
+#include "neuron.h"
 
 using aurora::models::ntm_wh;
 
@@ -12,41 +13,32 @@ ntm_wh::ntm_wh() {
 
 }
 
-ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units, function<void(ptr<param>&)> a_func) {
+ntm_wh::ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units) {
 	units = a_units;
 
 	vector<size_t> dims = a_head_h_dims;
 	dims.insert(dims.begin(), a_units);
 	dims.push_back(a_units);
 
-	vector<ptr<model>> e_neurons;
+	vector<Model> e_neurons;
 
 	for (int i = 0; i < dims.size() - 1; i++) {
 		e_neurons.push_back(pseudo::nth());
 	}
 	e_neurons.push_back(pseudo::nsm());
 
-	internal_rh = new ntm_rh(a_units, a_head_h_dims, a_shift_units, a_func);
-	a_model = pseudo::tnn(dims, pseudo::nlr(0.3), a_func);
-	e_model = pseudo::tnn(dims, e_neurons, a_func);
+	internal_rh = new ntm_rh(a_units, a_head_h_dims, a_shift_units);
+	a_model = pseudo::tnn(dims, pseudo::nlr(0.3));
+	e_model = pseudo::tnn(dims, e_neurons);
 }
 
-void ntm_wh::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_rh->pmt_wise(a_func);
-	a_model->pmt_wise(a_func);
-	e_model->pmt_wise(a_func);
+void ntm_wh::param_recur(function<void(Param&)> a_func) {
+	internal_rh->param_recur(a_func);
+	a_model->param_recur(a_func);
+	e_model->param_recur(a_func);
 }
 
-model* ntm_wh::clone() {
-	ntm_wh* result = new ntm_wh();
-	result->units = units;
-	result->internal_rh = (ntm_rh*)internal_rh->clone();
-	result->a_model = a_model->clone();
-	result->e_model = e_model->clone();
-	return result;
-}
-
-model* ntm_wh::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_wh::clone(function<Param(Param&)> a_func) {
 	ntm_wh* result = new ntm_wh();
 	result->units = units;
 	result->internal_rh = (ntm_rh*)internal_rh->clone(a_func);
@@ -71,34 +63,15 @@ void ntm_wh::bwd() {
 	x_grad.add_1d(e_model->x_grad, x_grad);
 }
 
-tensor& ntm_wh::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_wh::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm_wh::signal(tensor& a_y_des) {
+void ntm_wh::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_wh::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm_wh::recur(function<void(model*)> a_func) {
+void ntm_wh::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_rh->recur(a_func);
-	a_model->recur(a_func);
-	e_model->recur(a_func);
+	internal_rh->model_recur(a_func);
+	a_model->model_recur(a_func);
+	e_model->model_recur(a_func);
 }
 
 void ntm_wh::compile() {
@@ -110,6 +83,7 @@ void ntm_wh::compile() {
 	a_grad = tensor::new_1d(units);
 	e = tensor::new_1d(units);
 	e_grad = tensor::new_1d(units);
+
 	internal_rh->compile();
 	a_model->compile();
 	e_model->compile();

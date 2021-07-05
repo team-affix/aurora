@@ -25,17 +25,19 @@ namespace aurora {
 			tensor gamma_grad;
 
 		public:
-			ptr<model> key_model;
-			ptr<model> beta_model;
-			ptr<model> g_model;
-			ptr<model> s_model;
-			ptr<model> gamma_model;
+			Model key_model;
+			Model beta_model;
+			Model g_model;
+			Model s_model;
+			Model gamma_model;
 
 		public:
 			MODEL_FIELDS
 			virtual ~ntm_rh();
 			ntm_rh();
-			ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units, function<void(ptr<param>&)> a_func);
+			ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units);
+
 		};
+		typedef ptr<ntm_rh> Ntm_rh;
 	}
 }

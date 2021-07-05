@@ -20,25 +20,14 @@ ntm_location_addresser::ntm_location_addresser(size_t a_memory_height, vector<in
 	internal_normalize = new normalize(a_memory_height);
 }
 
-void ntm_location_addresser::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_interpolate->pmt_wise(a_func);
-	internal_shift->pmt_wise(a_func);
-	internal_power->pmt_wise(a_func);
-	internal_normalize->pmt_wise(a_func);
+void ntm_location_addresser::param_recur(function<void(Param&)> a_func) {
+	internal_interpolate->param_recur(a_func);
+	internal_shift->param_recur(a_func);
+	internal_power->param_recur(a_func);
+	internal_normalize->param_recur(a_func);
 }
 
-model* ntm_location_addresser::clone() {
-	ntm_location_addresser* result = new ntm_location_addresser();
-	result->memory_height = memory_height;
-	result->shift_units = shift_units;
-	result->internal_interpolate = (interpolate*)internal_interpolate->clone();
-	result->internal_shift = (shift*)internal_shift->clone();
-	result->internal_power = (power*)internal_power->clone();
-	result->internal_normalize = (normalize*)internal_normalize->clone();
-	return result;
-}
-
-model* ntm_location_addresser::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_location_addresser::clone(function<Param(Param&)> a_func) {
 	ntm_location_addresser* result = new ntm_location_addresser();
 	result->memory_height = memory_height;
 	result->shift_units = shift_units;
@@ -64,35 +53,16 @@ void ntm_location_addresser::bwd() {
 	internal_interpolate->bwd();
 }
 
-tensor& ntm_location_addresser::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_location_addresser::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm_location_addresser::signal(tensor& a_y_des) {
+void ntm_location_addresser::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_location_addresser::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm_location_addresser::recur(function<void(model*)> a_func) {
+void ntm_location_addresser::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_interpolate->recur(a_func);
-	internal_shift->recur(a_func);
-	internal_power->recur(a_func);
-	internal_normalize->recur(a_func);
+	internal_interpolate->model_recur(a_func);
+	internal_shift->model_recur(a_func);
+	internal_power->model_recur(a_func);
+	internal_normalize->model_recur(a_func);
 }
 
 void ntm_location_addresser::compile() {

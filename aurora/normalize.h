@@ -23,5 +23,6 @@ namespace aurora {
 			normalize(size_t a_units);
 
 		};
+		typedef ptr<normalize> Normalize;
 	}
 }

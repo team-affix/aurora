@@ -11,25 +11,16 @@ lstm::lstm() {
 
 }
 
-lstm::lstm(size_t a_units, function<void(ptr<param>&)> a_func) {
+lstm::lstm(size_t a_units) {
 	this->units = a_units;
-	lstm_ts_template = new lstm_ts(units, a_func);
+	lstm_ts_template = new lstm_ts(units);
 }
 
-void lstm::pmt_wise(function<void(ptr<param>&)> a_func) {
-	lstm_ts_template->pmt_wise(a_func);
+void lstm::param_recur(function<void(Param&)> a_func) {
+	lstm_ts_template->param_recur(a_func);
 }
 
-model* lstm::clone() {
-	lstm* result = new lstm();
-	result->units = units;
-	result->lstm_ts_template = (lstm_ts*)lstm_ts_template->clone();
-	result->prep(prepared.size());
-	result->unroll(unrolled.size());
-	return result;
-}
-
-model* lstm::clone(function<void(ptr<param>&)> a_func) {
+model* lstm::clone(function<Param(Param&)> a_func) {
 	lstm* result = new lstm();
 	result->units = units;
 	result->lstm_ts_template = (lstm_ts*)lstm_ts_template->clone(a_func);
@@ -48,33 +39,14 @@ void lstm::bwd() {
 		unrolled[i]->bwd();
 }
 
-tensor& lstm::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& lstm::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void lstm::signal(tensor& a_y_des) {
+void lstm::signal(const tensor& a_y_des) {
 	for (int i = 0; i < unrolled.size(); i++)
 		unrolled[i]->signal(a_y_des[i]);
 }
 
-void lstm::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void lstm::recur(function<void(model*)> a_func) {
+void lstm::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	lstm_ts_template->recur(a_func);
+	lstm_ts_template->model_recur(a_func);
 }
 
 void lstm::compile() {

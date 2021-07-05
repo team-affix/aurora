@@ -14,19 +14,20 @@ namespace aurora {
 	namespace models {
 		class att_lstm : public model {
 		public:
-			size_t units;
+			size_t units = 0;
 
 		public:
-			ptr<sync> models;
-			ptr<lstm> internal_lstm;
+			Sync models;
+			Lstm internal_lstm;
 
 		public:
 			ATTENTION_FIELDS
 			virtual ~att_lstm();
 			att_lstm();
-			att_lstm(size_t a_units, vector<size_t> a_h_dims, function<void(ptr<param>&)> a_func);
+			att_lstm(size_t a_units, vector<size_t> a_h_dims);
 
 
 		};
+		typedef ptr<att_lstm> Att_lstm;
 	}
 }

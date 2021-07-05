@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ntm_reader.h"
+#include <iostream>
 
 using aurora::models::ntm_reader;
 
@@ -11,28 +12,19 @@ ntm_reader::ntm_reader() {
 
 }
 
-ntm_reader::ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims, function<void(ptr<param>&)> a_func) {
+ntm_reader::ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims) {
 	memory_height = a_memory_height;
 	memory_width = a_memory_width;
-	internal_head = new ntm_rh(a_memory_width, a_head_hidden_dims, a_valid_shifts.size(), a_func);
+	internal_head = new ntm_rh(a_memory_width, a_head_hidden_dims, a_valid_shifts.size());
 	internal_addresser = new ntm_addresser(a_memory_height, a_memory_width, a_valid_shifts);
 }
 
-void ntm_reader::pmt_wise(function<void(ptr<param>&)> a_func) {
-	internal_head->pmt_wise(a_func);
-	internal_addresser->pmt_wise(a_func);
+void ntm_reader::param_recur(function<void(Param&)> a_func) {
+	internal_head->param_recur(a_func);
+	internal_addresser->param_recur(a_func);
 }
 
-model* ntm_reader::clone() {
-	ntm_reader* result = new ntm_reader();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->internal_head = (ntm_rh*)internal_head->clone();
-	result->internal_addresser = (ntm_addresser*)internal_addresser->clone();
-	return result;
-}
-
-model* ntm_reader::clone(function<void(ptr<param>&)> a_func) {
+model* ntm_reader::clone(function<Param(Param&)> a_func) {
 	ntm_reader* result = new ntm_reader();
 	result->memory_height = memory_height;
 	result->memory_width = memory_width;
@@ -62,33 +54,14 @@ void ntm_reader::bwd() {
 	internal_head->bwd();
 }
 
-tensor& ntm_reader::fwd(tensor& a_x) {
-	x.pop(a_x);
-	fwd();
-	return y;
-}
-
-tensor& ntm_reader::bwd(tensor& a_y_grad) {
-	y_grad.pop(a_y_grad);
-	bwd();
-	return x_grad;
-}
-
-void ntm_reader::signal(tensor& a_y_des) {
+void ntm_reader::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void ntm_reader::cycle(tensor& a_x, tensor& a_y_des) {
-	x.pop(a_x);
-	fwd();
-	signal(a_y_des);
-	bwd();
-}
-
-void ntm_reader::recur(function<void(model*)> a_func) {
+void ntm_reader::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_head->recur(a_func);
-	internal_addresser->recur(a_func);
+	internal_head->model_recur(a_func);
+	internal_addresser->model_recur(a_func);
 }
 
 void ntm_reader::compile() {
