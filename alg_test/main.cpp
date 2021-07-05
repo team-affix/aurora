@@ -10,7 +10,6 @@
 #include <filesystem>
 #include <windows.h>
 #include <fstream>
-#include "ptr.h"
 #define L(call) [&]{call;}
 
 using namespace aurora;
