@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <windows.h>
 #include <fstream>
+#include <random>
 #define L(call) [&]{call;}
 
 using namespace aurora;
@@ -180,6 +181,8 @@ void tnn_xor_test() {
 
 void tnn_compiled_xor_test() {
 	
+	using aurora::params::param_vector;
+
 	param_vector pv;
 	Model s = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
 	
@@ -3275,11 +3278,54 @@ void major_tests() {
 	lstm_mdim_test();
 }
 
+std::uniform_real_distribution<> uniform_zero_to_one(0.0, 1.0);
+bool random_bool_with_prob(const double& prob)  // probability between 0.0 and 1.0
+{
+	return uniform_zero_to_one(aurora::static_vals::random_engine) >= prob;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+void drew_neural_net() {
+
+	param_vector pv;
+
+	Sequential neural_net = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
+
+	tensor x1 = { 69, 420 };
+	neural_net->x = x1;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main() {
 
 	srand(time(NULL));
 
-	major_tests();
+	drew_neural_net();
 
 	return 0;
 
