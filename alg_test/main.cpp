@@ -181,6 +181,8 @@ void tnn_xor_test() {
 
 void tnn_compiled_xor_test() {
 	
+	using aurora::params::param_vector;
+
 	param_vector pv;
 	Model s = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
 	
@@ -3282,45 +3284,48 @@ bool random_bool_with_prob(const double& prob)  // probability between 0.0 and 1
 	return uniform_zero_to_one(aurora::static_vals::random_engine) >= prob;
 }
 
-// Universal Space RL
-void usrl_test() {
+
+
+
+
+
+
+
+
+
+
+
+
+void drew_neural_net() {
 
 	param_vector pv;
-	Sequential s = pseudo::tnn({ 2, 5, 1 }, {pseudo::nlr(0.3), pseudo::nlr(0.3), pseudo::nsm()});
-	uniform_real_distribution<double> urd(-1, 1);
-	s->param_recur(PARAM_INIT(param(urd(aurora::static_vals::random_engine)), pv));
-	s->compile();
 
-	auto random_change = [&](double x) {
-		return x + 0.02 * urd(aurora::static_vals::random_engine);
-	};
+	Sequential neural_net = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
 
-	auto get_reward = [&](genome& gen) {
-		pv.pop(gen);
-		s->fwd();
-		const double& output = s->y[0];
-		std::cout << output << std::endl;
-		if (random_bool_with_prob(output)) {
-			return 1.0;
-		}
-		else {
-			return -1.0;
-		}
-	};
-
-	for (int epoch = 0; true; epoch++) {
-		genome parent = genome(pv, random_change);
-		generation gen = generation(parent.mutate(400), get_reward);
-		parent = gen.best();
-	}
+	tensor x1 = { 69, 420 };
+	neural_net->x = x1;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int main() {
 
 	srand(time(NULL));
 
-	usrl_test();
+	drew_neural_net();
 
 	return 0;
 
