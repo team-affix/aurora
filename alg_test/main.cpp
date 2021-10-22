@@ -3325,7 +3325,7 @@ int main() {
 
 	srand(time(NULL));
 
-	drew_neural_net();
+	ntm_test();
 
 	return 0;
 
