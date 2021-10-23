@@ -281,7 +281,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -303,7 +303,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -327,7 +327,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -350,7 +350,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -372,7 +372,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -395,7 +395,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -420,7 +420,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -444,7 +444,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
