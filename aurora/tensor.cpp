@@ -148,6 +148,22 @@ void tensor::tanh_2d(tensor& a_output) {
 		at(i).tanh_1d(a_output.at(i));
 }
 
+void tensor::norm_1d(tensor& a_output) {
+	double l_sum = abs_1d().sum_1d();
+	for (int i = 0; i < size(); i++) {
+		a_output[i].val() = at(i).val() / l_sum;
+	}
+}
+
+void tensor::norm_2d(tensor& a_output) {
+	double l_sum = abs_2d().sum_2d().sum_1d();
+	for (int i = 0; i < height(); i++) {
+		for (int j = 0; j < width(); j++) {
+			a_output[i][j].val() = at(i).at(j).val() / l_sum;
+		}
+	}
+}
+
 double tensor::mag_1d() {
 	double sum = 0;
 	for (int i = 0; i < size(); i++)
@@ -297,6 +313,18 @@ int tensor::arg_min() {
 			val = at(i);
 			result = i;
 		}
+	return result;
+}
+
+tensor tensor::norm_1d() {
+	tensor result = tensor::new_1d(size());
+	norm_1d(result);
+	return result;
+}
+
+tensor tensor::norm_2d() {
+	tensor result = tensor::new_2d(height(), width());
+	norm_2d(result);
 	return result;
 }
 

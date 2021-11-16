@@ -55,6 +55,26 @@ void pl_import_from_file(std::string file_name, vector<T*> a_pl) {
 	ifs.close();
 }
 
+void pl_export_to_file(std::string file_name, param_vector& a_pl) {
+	for (int i = 0; i < a_pl.size(); i++)
+		if (isnan(a_pl[i]->state()) || isinf(a_pl[i]->state())) {
+			std::cout << "ERROR: PARAM IS NAN OR INF" << std::endl;
+			return;
+		}
+	ofstream ofs(file_name);
+	for (int i = 0; i < a_pl.size(); i++)
+		ofs << a_pl[i]->state() << std::endl;
+	ofs.close();
+}
+
+void pl_import_from_file(std::string file_name, param_vector& a_pl) {
+	ifstream ifs(file_name);
+	double state = 0;
+	for (int i = 0; ifs >> state; i++)
+		a_pl[i]->state() = state;
+	ifs.close();
+}
+
 int num_lines(std::string file_name) {
 	int count = 0;
 	string line;
@@ -1023,35 +1043,35 @@ std::string& trim(std::string& str, const std::string& chars = "\t\n\v\f\r ")
 	return ltrim(rtrim(str, chars), chars);
 }
 
-tensor get_zil_data() {
-	string zil_csv_directory = "D:\\files\\files\\csv\\zil";
-	tensor raw;
-	for (const auto& entry : std::filesystem::directory_iterator(zil_csv_directory)) {
-		tensor csv = tensor::new_2d(num_lines(entry.path().u8string()), 2);
-		string line;
-		std::ifstream ifs(entry);
-		int row = 0;
-		while (std::getline(ifs, line)) {
-			std::istringstream s(line);
-			std::string field;
-			int col = 0;
-			while (getline(s, field, ',')) {
-				string trimmed = trim(field, "\"");
-				if (col == 1)
-					csv[row][col] = std::stod(trimmed);
-				else
-					csv[row][col] = std::stod(trimmed) / 1000 / 60;
-				col++;
-			}
-			row++;
-		}
-		raw.vec().push_back(csv);
-	}
-	return raw;
-}
+//tensor get_zil_data() {
+//	string zil_csv_directory = "D:\\files\\files\\csv\\zil";
+//	tensor raw;
+//	for (const auto& entry : std::filesystem::directory_iterator(zil_csv_directory)) {
+//		tensor csv = tensor::new_2d(num_lines(entry.path().u8string()), 2);
+//		string line;
+//		std::ifstream ifs(entry);
+//		int row = 0;
+//		while (std::getline(ifs, line)) {
+//			std::istringstream s(line);
+//			std::string field;
+//			int col = 0;
+//			while (getline(s, field, ',')) {
+//				string trimmed = trim(field, "\"");
+//				if (col == 1)
+//					csv[row][col] = std::stod(trimmed);
+//				else
+//					csv[row][col] = std::stod(trimmed) / 1000 / 60;
+//				col++;
+//			}
+//			row++;
+//		}
+//		raw.vec().push_back(csv);
+//	}
+//	return raw;
+//}
 
 void zil_mapper() {
-	tensor raw = get_zil_data();
+	/*tensor raw = get_zil_data();
 	tensor x;
 	tensor y;
 	const int num_from_each_csv = 10000;
@@ -1061,7 +1081,7 @@ void zil_mapper() {
 			int minutes_wait = rand() % 240;
 
 		}
-	}
+	}*/
 }
 
 struct composite_function {
@@ -3321,11 +3341,247 @@ void drew_neural_net() {
 
 
 
+
+
+
+
+void feed_forward_neural_net() {
+
+	tensor x = {
+		{ 0, 0 },
+		{ 0, 1 },
+		{ 1, 0 },
+		{ 1, 1 }
+	};
+
+	tensor y = {
+		{ 0 },
+		{ 1 },
+		{ 1 },
+		{ 0 }
+	};
+
+	param_vector pv;
+	Sequential neural_net = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
+	
+	const int CHECKPOINT = 10000;
+
+	for (int epoch = 0; epoch < 100000000; epoch++) {
+
+		double cost = 0;
+
+		for (int i = 0; i < x.size(); i++) {
+			neural_net->cycle(x[i], y[i]);
+			if (epoch % CHECKPOINT == 0)
+				cost += neural_net->y_grad.abs_1d().sum_1d();
+		}
+
+		pv.update();
+
+		if (epoch % CHECKPOINT == 0) {
+			std::cout << cost << std::endl;
+		}
+
+	}
+
+	//delete neural_net;
+
+}
+
+tensor get_random_integer_tensor_1d(int a_min, int a_max, size_t a_size) {
+	uniform_int_distribution<int> uid(a_min, a_max);
+	tensor result = tensor::new_1d(a_size);
+	for (int i = 0; i < a_size; i++) {
+		result[i] = uid(aurora::static_vals::random_engine);
+	}
+	return result;
+}
+
+tensor get_random_integer_tensor_2d(int a_min, int a_max, size_t a_height, size_t a_width) {
+	tensor result = tensor::new_1d(a_height);
+	for (int i = 0; i < a_height; i++) {
+		result[i] = get_random_integer_tensor_1d(a_min, a_max, a_width);
+	}
+	return result;
+}
+
+tensor get_rounded_1d(tensor a_x) {
+	tensor result = tensor::new_1d(a_x.size());
+	for (int i = 0; i < a_x.size(); i++) {
+		result[i] = round(a_x[i]);
+	}
+	return result;
+}
+
+void shuffle_tensor(tensor& a_x) {
+	tensor temp = tensor::new_1d(a_x.size());
+	vector<int> valid_dst(a_x.size());
+	for (int i = 0; i < a_x.size(); i++)
+		valid_dst[i] = i;
+	for (int i = 0; i < a_x.size(); i++) {
+		int selected_dst_index = rand() % valid_dst.size();
+		temp[valid_dst[selected_dst_index]] = a_x[i];
+		valid_dst.erase(valid_dst.begin() + selected_dst_index);
+	}
+	a_x.pop(temp);
+}
+
+void bit_compressor() {
+
+	const int DOUBLES_IN_COMPRESSED_STATE = 10;
+	const int BITS_IN_INPUT = DOUBLES_IN_COMPRESSED_STATE * 8 + 1;
+	const int H1_SIZE = DOUBLES_IN_COMPRESSED_STATE * 2;
+	const int H0_SIZE = DOUBLES_IN_COMPRESSED_STATE * 3;
+
+	const int TRAINING_DATA_SIZE = 10000;
+
+	tensor training_data = get_random_integer_tensor_2d(0, 1, TRAINING_DATA_SIZE, BITS_IN_INPUT);
+
+	uniform_real_distribution<double> urd(-1, 1);
+
+	param_vector pv;
+	Sequential seq = pseudo::tnn({ BITS_IN_INPUT, H0_SIZE, H1_SIZE, DOUBLES_IN_COMPRESSED_STATE, H1_SIZE, H0_SIZE, BITS_IN_INPUT }, {pseudo::nth(), pseudo::nth(), pseudo::nth(), pseudo::nth(), pseudo::nth(), pseudo::nth(), pseudo::nsm()});
+
+	const string file_name = "bit_compressor";
+
+	const double LEARN_RATE = 0.0002;
+	const bool IMPORT_FROM_FILE = true;
+
+	if (IMPORT_FROM_FILE) {
+		seq->param_recur(PARAM_INIT(param_mom(0, LEARN_RATE, 0, 0, 0.9), pv));
+		pl_import_from_file(file_name, pv);
+	}
+	else {
+		seq->param_recur(PARAM_INIT(param_mom(urd(static_vals::random_engine), LEARN_RATE, 0, 0, 0.9), pv));
+	}
+
+	seq->compile();
+
+	const int MINI_BATCH_SIZE = 10;
+	const int NUM_REPEATS = MINI_BATCH_SIZE;
+
+	const int CHECKPOINT = 10;
+	
+	for (int epoch = 0; epoch < 100000000; epoch++) {
+
+		double cost = 0;
+
+		tensor mini_batch_indices = get_random_integer_tensor_1d(0, training_data.size() - 1, MINI_BATCH_SIZE);
+
+		for (int repeat = 0; repeat < NUM_REPEATS; repeat++) {
+			shuffle_tensor(mini_batch_indices);
+			for (int i = 0; i < mini_batch_indices.size(); i++) {
+				tensor& training_example = training_data[mini_batch_indices[i]];
+				seq->cycle(training_example, training_example);
+				if (epoch % CHECKPOINT == 0)
+					cost += get_rounded_1d(seq->y).sub_1d(training_example).abs_1d().sum_1d();
+			}
+		}
+
+		pv.update();
+
+		if (epoch % CHECKPOINT == 0) {
+			std::cout << training_data[training_data.size() - 1].to_string() << std::endl << seq->y.to_string() << std::endl;
+			std::cout << cost / MINI_BATCH_SIZE << std::endl << std::endl;
+			pl_export_to_file(file_name, pv);
+		}
+
+	}
+
+}
+
+
+
+
+template<typename CONTAINER_TYPE>
+void append_params_to_file(const string& a_file_name, CONTAINER_TYPE a_param_container) {
+	ofstream ofs(a_file_name, std::ios::app | std::ios::out);
+	ofs.precision(16);
+	for (int i = 0; i < a_param_container.size(); i++) {
+		ofs << a_param_container[i]->state() << ",";
+	}
+	ofs << "\n";
+	ofs.close();
+}
+
+void tnn_xor_test_param_export() {
+
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1},
+	};
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0},
+	};
+
+	vector<param_mom*> pl = vector<param_mom*>();
+
+	uniform_real_distribution<double> urd(-1, 1);
+	default_random_engine re(25);
+
+	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3));
+	s->param_recur([&](Param& pmt) {
+		pmt = new param_mom(urd(re), 0.02, 0, 0, 0.9);
+		pl.push_back((param_mom*)pmt.get());
+	});
+	s->compile();
+
+	printf("");
+
+	const size_t checkpoint_interval = 10;
+	
+	// NORMALIZE PARAMETERS
+	tensor l_param_tensor = tensor::new_1d(pl.size());
+	
+	for (int i = 0; i < pl.size(); i++)
+		l_param_tensor[i].val() = pl[i]->state();
+
+	l_param_tensor.norm_1d(l_param_tensor);
+
+	for (int i = 0; i < l_param_tensor.size(); i++)
+		pl[i]->state() = l_param_tensor[i].val();
+
+	for (int epoch = 0; epoch < 1000000; epoch++) {
+
+		if (epoch % checkpoint_interval == 0) {
+			printf("\033[%d;%dH", 0, 0);
+			std::cout << epoch << std::endl;
+			append_params_to_file("tnn_xor_params_data.txt", pl);
+		}
+
+		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
+			s->cycle(x[tsIndex], y[tsIndex]);
+			if (epoch % checkpoint_interval == 0)
+				std::cout << x[tsIndex].to_string() << " " << s->y.to_string() << std::endl;
+		}
+
+		for (param_mom* pmt : pl) {
+			pmt->update();
+		}
+	}
+
+	for (param_mom* pmt : pl) {
+		std::cout << pmt->state() << std::endl;
+	}
+
+}
+
+
+
+
+
+
+
 int main() {
 
 	srand(time(NULL));
 
-	ntm_test();
+	tnn_xor_test_param_export();
 
 	return 0;
 
