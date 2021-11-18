@@ -3572,16 +3572,117 @@ void tnn_xor_test_param_export() {
 }
 
 
+int collapse_sp_onehot_index(const tensor& a_probability_tensor) {
+	tensor result = tensor::new_1d(a_probability_tensor.size());
+	double random_value = random_d(0, 1, static_vals::random_engine);
+	double bin_lower_bound = 0;
+	double bin_upper_bound = 0;
+	for (int i = 0; i < a_probability_tensor.size(); i++) {
+		bin_upper_bound += a_probability_tensor[i];
+		if (random_value >= bin_lower_bound && random_value <= bin_upper_bound) {
+			return i;
+		}
+		bin_lower_bound += a_probability_tensor[i];
+	}
+	return -1;
+}
+
+tensor collapse_sp(const tensor& a_probability_tensor) {
+	int selected_index = collapse_sp_onehot_index(a_probability_tensor);
+	tensor result = tensor::new_1d(a_probability_tensor.size());
+	result[selected_index].val() = 1;
+	return result;
+}
+
+double sign_of_d(double a_x) {
+	if (a_x >= 0) return 1;
+	else return -1;
+}
+
+double sech_d(double a_x) {
+	return 1.0 / cosh(a_x);
+}
+
+void spc_test() {
+	
+	tensor x = tensor::new_1d(3);
+	tensor x_error = tensor::new_1d(3);
+
+	Sequential s = new sequential({ new layer(x.size(), new sigmoid()), new normalize(x.size()) });
+	s->compile();
+
+	x.group_join(s->x);
+	x_error.group_join(s->x_grad);
+
+	tensor p = tensor::new_1d(x.size());
+	p.group_join(s->y);
+
+	tensor p_error = tensor::new_1d(x.size());
+	p_error.group_join(s->y_grad);
+
+	// starting x values (not probabilities, but will be converted to (+) values through sigmoid, and then normalized to make probabilities.)
+	x.pop({ 1, 2, 3 });
+
+	int selected_index = -1;
+
+	auto predict = [&] {
+		s->fwd();
+		selected_index = collapse_sp_onehot_index(p);
+		switch (selected_index) {
+		case 0:
+			return (double)0;
+		case 1:
+			return (double)4;
+		case 2:
+			return (double)50;
+		default:
+			return (double)0;
+		}
+	};
+
+	auto get_error = [&](double a_prediction) {
+		return abs(a_prediction - 4.0);
+	};
+
+	auto back_propagate = [&](double a_error) {
+		for (int i = 0; i < p_error.size(); i++) {
+			if (i == selected_index)
+				p_error[i].val() = sech_d(a_error);
+			else
+				p_error[i].val() = -sech_d(a_error);
+		}
+		s->bwd();
+	};
+	
+	// TRAINING OBJECTS
+	tensor learn_rate_tensor = tensor::new_1d(x.size(), 0.02);
+
+	tensor total_x_error = tensor::new_1d(x_error.size());
+
+	for (int i = 0; true; i++) {
+		for (int j = 0; j < 10; j++) {
+			double prediction = predict();
+			double error = get_error(prediction);
+			back_propagate(error);
+			total_x_error.add_1d(x_error, total_x_error);
+		}
+		tensor update_tensor = learn_rate_tensor.mul_1d(total_x_error);
+		x.add_1d(update_tensor, x);
+		if (i % 1000 == 0) {
+			std::cout << p.to_string() << std::endl;
+		}
+		total_x_error.clear();
+	}
 
 
-
+}
 
 
 int main() {
 
 	srand(time(NULL));
 
-	tnn_xor_test_param_export();
+	spc_test();
 
 	return 0;
 
