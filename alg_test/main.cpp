@@ -1580,7 +1580,7 @@ void test_param_rcv() {
 		for (Param_rcv& pmt : pv)
 			pmt->reward(reward);
 
-		if (epoch % 10000 == 0)
+		if (epoch % 1000 == 0)
 			for (Param_rcv& pmt : pv)
 				pmt->learn_rate() = GAMMA * std::tanh(cost);
 
@@ -3587,6 +3587,15 @@ int collapse_sp_onehot_index(const tensor& a_probability_tensor) {
 	return -1;
 }
 
+int collapse_zero_dimensional_sp(const double& a_probability_of_zero) {
+	if (random_bool_with_prob(a_probability_of_zero)) {
+		return 0;
+	}
+	else {
+		return 1;
+	}
+}
+
 tensor collapse_sp(const tensor& a_probability_tensor) {
 	int selected_index = collapse_sp_onehot_index(a_probability_tensor);
 	tensor result = tensor::new_1d(a_probability_tensor.size());
@@ -3594,7 +3603,7 @@ tensor collapse_sp(const tensor& a_probability_tensor) {
 	return result;
 }
 
-double sign_of_d(double a_x) {
+double sign_d(double a_x) {
 	if (a_x >= 0) return 1;
 	else return -1;
 }
@@ -3603,12 +3612,18 @@ double sech_d(double a_x) {
 	return 1.0 / cosh(a_x);
 }
 
-void spc_test() {
-	
-	tensor x = tensor::new_1d(3);
-	tensor x_error = tensor::new_1d(3);
+double sigmoid_d(double a_x) {
+	return 1.0 / (1.0 + exp(-a_x));
+}
 
-	Sequential s = new sequential({ new layer(x.size(), new sigmoid()), new normalize(x.size()) });
+void spc_raw_test() {
+	
+	const int SP_SIZE = 4;
+
+	tensor x = tensor::new_1d(SP_SIZE);
+	tensor x_error = tensor::new_1d(SP_SIZE);
+
+	Sequential s = new sequential({ new layer(SP_SIZE, new sigmoid()), new normalize(SP_SIZE) });
 	s->compile();
 
 	x.group_join(s->x);
@@ -3621,68 +3636,140 @@ void spc_test() {
 	p_error.group_join(s->y_grad);
 
 	// starting x values (not probabilities, but will be converted to (+) values through sigmoid, and then normalized to make probabilities.)
-	x.pop({ 1, 2, 3 });
+	uniform_real_distribution<double> x_urd(-3, 3);
+	x.pop(tensor::new_1d(SP_SIZE, x_urd, static_vals::random_engine));
 
-	int selected_index = -1;
+	uniform_real_distribution<double> v_urd(-10, 10);
 
-	auto predict = [&] {
+	tensor desired_output = tensor::new_1d(SP_SIZE);
+	desired_output[0].val() = 1;
+	
+	tensor predicted_output = tensor::new_1d(SP_SIZE);
+
+	auto fwd = [&] {
 		s->fwd();
-		selected_index = collapse_sp_onehot_index(p);
-		switch (selected_index) {
-		case 0:
-			return (double)0;
-		case 1:
-			return (double)4;
-		case 2:
-			return (double)50;
-		default:
-			return (double)0;
-		}
+		predicted_output = collapse_sp(p);
 	};
 
-	auto get_error = [&](double a_prediction) {
-		return abs(a_prediction - 4.0);
+	auto get_error = [&]() {
+		return predicted_output.sub_1d(desired_output);
 	};
 
-	auto back_propagate = [&](double a_error) {
+	auto bwd = [&](tensor a_error) {
 		for (int i = 0; i < p_error.size(); i++) {
-			if (i == selected_index)
-				p_error[i].val() = sech_d(a_error);
-			else
-				p_error[i].val() = -sech_d(a_error);
+			p_error[i].val() = a_error[i];
 		}
 		s->bwd();
 	};
 	
 	// TRAINING OBJECTS
-	tensor learn_rate_tensor = tensor::new_1d(x.size(), 0.02);
-
-	tensor total_x_error = tensor::new_1d(x_error.size());
+	tensor learn_rate_tensor = tensor::new_1d(x.size(), 0.2);
 
 	for (int i = 0; true; i++) {
-		for (int j = 0; j < 10; j++) {
-			double prediction = predict();
-			double error = get_error(prediction);
-			back_propagate(error);
-			total_x_error.add_1d(x_error, total_x_error);
-		}
-		tensor update_tensor = learn_rate_tensor.mul_1d(total_x_error);
-		x.add_1d(update_tensor, x);
+
+		fwd();
+		tensor error = get_error();
+		bwd(error);
+
+		tensor update_tensor = learn_rate_tensor.mul_1d(x_error);
+		x.sub_1d(update_tensor, x);
+
 		if (i % 1000 == 0) {
 			std::cout << p.to_string() << std::endl;
 		}
-		total_x_error.clear();
-	}
 
+	}
 
 }
 
+void binary_choice_test() {
+
+	const int SP_SIZE = 5;
+
+	tensor x = 0;
+	tensor x_error = 0;
+
+	Sigmoid s = new sigmoid();
+	s->compile();
+
+	x.group_join(s->x);
+	x_error.group_join(s->x_grad);
+
+	tensor p = 0;
+	p.group_join(s->y);
+
+	tensor p_error = 0;
+	p_error.group_join(s->y_grad);
+
+	x.pop(0.5);
+
+	double desired_output = 0;
+	double selected_output = 0;
+
+	auto predict = [&] {
+		s->fwd();
+		selected_output = collapse_zero_dimensional_sp(p);
+		return (double)selected_output;
+	};
+
+	auto get_error = [&](double a_prediction) {
+		return a_prediction - desired_output;
+	};
+
+	auto back_propagate = [&](double a_error) {
+		p_error.val() = a_error;
+		s->bwd();
+	};
+
+
+	for (int i = 0; true; i++) {
+
+		double prediction = predict();
+		double error = get_error(prediction);
+		back_propagate(error);
+
+		x.val() -= 0.02 * x_error.val();
+
+		if (i % 1000 == 0) {
+			std::cout << p.to_string() << std::endl;
+		}
+
+	}
+
+}
+
+void spc_model_test() {
+
+	const int SP_SIZE = 4;
+
+	Sequential s = new sequential({new layer(SP_SIZE, new sigmoid()), new normalize(SP_SIZE), new spc(SP_SIZE)});
+	s->compile();
+
+	tensor desired_output = tensor::new_1d(SP_SIZE);
+	desired_output[3].val() = 1;
+
+	tensor learn_rate_tensor = tensor::new_1d(SP_SIZE, 0.2);
+
+	for (int i = 0; true; i++) {
+
+		s->cycle(s->x, desired_output);
+
+		tensor update_tensor = learn_rate_tensor.mul_1d(s->x_grad);
+		s->x.sub_1d(update_tensor, s->x);
+
+		if (i % 1000 == 0) {
+			std::cout << ((spc*)s->models.back())->x.to_string() << std::endl;
+		}
+
+	}
+
+}
 
 int main() {
 
 	srand(time(NULL));
 
-	spc_test();
+	spc_model_test();
 
 	return 0;
 

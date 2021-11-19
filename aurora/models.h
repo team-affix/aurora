@@ -33,3 +33,4 @@
 #include "ntm_ts.h"
 #include "ntm.h"
 #include "stacked_recurrent.h"
+#include "spc.h"

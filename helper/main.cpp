@@ -4,7 +4,7 @@
 
 int main() {
 
-	std::cout << helper::model_impl("stacked_recurrent", helper::recurrent) << std::endl;
+	std::cout << helper::model_impl("spc", helper::model) << std::endl;
 
 	return 0;
 }
