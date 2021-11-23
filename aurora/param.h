@@ -12,7 +12,7 @@ namespace aurora {
 		class param_mom;
 		class param {
 		public:
-			ptr<double> state_ptr = new double(0);
+			ptr<double> m_state_ptr = new double(0);
 
 		public:
 			virtual ~param();

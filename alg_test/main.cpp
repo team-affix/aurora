@@ -739,7 +739,7 @@ void input_gd() {
 #pragma region TENSOR INSTANTIATE
 	tensor pv_0_states = tensor::new_1d(pv_0.size());
 	for (int i = 0; i < pv_0.size(); i++)
-		pv_0_states[i].val_ptr.link(pv_0[i]->state_ptr);
+		pv_0_states[i].val_ptr.link(pv_0[i]->m_state_ptr);
 	tensor deviant_input = tensor::new_1d(pv_0.size(), urd, re);
 	tensor deviant_output = { 0 };
 	tensor deviant_learn_rate_tensor = tensor::new_1d(pv_0.size(), learn_rate);
@@ -863,7 +863,7 @@ void loss_map() {
 #pragma region TENSOR INSTANTIATE
 	tensor pv_0_states = tensor::new_1d(pv_0.size());
 	for (int i = 0; i < pv_0.size(); i++)
-		pv_0_states[i].val_ptr.link(pv_0[i]->state_ptr);
+		pv_0_states[i].val_ptr.link(pv_0[i]->m_state_ptr);
 	tensor deviant_x = { 0 };
 #pragma endregion
 #pragma region COMPILE
@@ -1287,7 +1287,7 @@ void genome_test() {
 #pragma region LINK TENSOR
 	tensor pmt_link_tensor = tensor::new_1d(pv.size());
 	for (int i = 0; i < pmt_link_tensor.size(); i++)
-		pmt_link_tensor[i].val_ptr.link(pv[i]->state_ptr);
+		pmt_link_tensor[i].val_ptr.link(pv[i]->m_state_ptr);
 #pragma endregion
 #pragma region GET REWARD
 	auto get_reward = [&](genome& a_genome) {
@@ -1544,6 +1544,8 @@ void test_param_rcv() {
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(35);
 
+	uniform_real_distribution<double> lr_urd(1, 1.1);
+
 	vector<Param_rcv> pv;
 
 	Model s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3));
@@ -1556,37 +1558,29 @@ void test_param_rcv() {
 
 	std::normal_distribution<double> nd(0, 1);
 
-	auto get_rcv = [&]() {
-		return nd(re);
-	};
-
-	auto get_reward = [&]() {
+	auto get_loss = [&]() {
 		double cost = 0;
 		for (int ts = 0; ts < x.size(); ts++) {
 			s->fwd(x[ts]);
 			s->signal(y[ts]);
 			cost += s->y_grad.abs_1d().sum_1d();
 		}
-		return 1 / cost;
+		return cost;
 	};
 
 	for (int epoch = 0; true; epoch++) {
-		for (Param_rcv& pmt : pv)
-			pmt->update(nd(re));
 
-		double reward = get_reward();
-		double cost = 1 / reward;
+		double loss = get_loss();
 
 		for (Param_rcv& pmt : pv)
-			pmt->reward(reward);
+			pmt->update(loss);
 
-		if (epoch % 1000 == 0)
+		if (epoch % 1000 == 0) {
+			std::cout << loss << std::endl;
 			for (Param_rcv& pmt : pv)
-				pmt->learn_rate() = GAMMA * std::tanh(cost);
-
-		if (epoch % 10000 == 0) {
-			std::cout << "REWARD: " << reward << ", COST: " << 1 / reward << std::endl;
+				pmt->learn_rate() = std::tanh(loss) * GAMMA;
 		}
+
 	}
 
 }
@@ -1619,7 +1613,7 @@ void test_srtt() {
 
 	tensor order_0_states = tensor::new_1d(pv_0.size());
 	for (int i = 0; i < order_0_states.size(); i++)
-		order_0_states[i].val_ptr.link(pv_0[i]->state_ptr);
+		order_0_states[i].val_ptr.link(pv_0[i]->m_state_ptr);
 	tensor order_0_save = order_0_states.clone();
 
 	const double GAMMA = 0.00002;
@@ -1703,7 +1697,7 @@ void self_aware() {
 
 	tensor pmt_link = tensor::new_1d(pv.size());
 	for (int i = 0; i < pmt_link.size(); i++)
-		pmt_link[i].val_ptr.link(pv[i]->state_ptr);
+		pmt_link[i].val_ptr.link(pv[i]->m_state_ptr);
 
 	tensor order_0_x = m->x[0].link();
 	tensor order_0_y_hat = m->y[0].link();
@@ -3769,7 +3763,7 @@ int main() {
 
 	srand(time(NULL));
 
-	spc_model_test();
+	test_param_rcv();
 
 	return 0;
 

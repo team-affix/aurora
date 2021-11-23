@@ -20,7 +20,7 @@ param::param(double a_state) {
 }
 
 double& param::state() {
-	return state_ptr.val();
+	return m_state_ptr.val();
 }
 
 void param::update() {
