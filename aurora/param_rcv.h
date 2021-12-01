@@ -21,6 +21,8 @@ namespace aurora {
 			ptr<double> m_beta = new double(0);				// BETA
 			ptr<double> m_alpha = new double(0);			// 1 - BETA
 			ptr<double> m_running_average = new double(0);	// MOMENTUM
+			ptr<double> m_slope = new double(0);			// IRC
+			ptr<double> m_slope_rs = new double(0);			// ROOT-SQUARE OF ALL PARAMETERS' SLOPES
 
 		public:
 			virtual ~param_rcv();
@@ -32,6 +34,8 @@ namespace aurora {
 			const double& beta();
 			const double& alpha();
 			double& running_average();
+			double& slope();
+			double& slope_rs();
 
 		public:
 			double sign(const double& a_x);
@@ -40,7 +44,8 @@ namespace aurora {
 			void beta(const double& a_val);
 
 		public:
-			void update(const double& a_loss);
+			void signal(const double& a_loss);
+			void update();
 
 		};
 		typedef ptr<param_rcv> Param_rcv;

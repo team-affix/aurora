@@ -38,6 +38,14 @@ double& param_rcv::running_average() {
 	return m_running_average.val();
 }
 
+double& param_rcv::slope() {
+	return m_slope.val();
+}
+
+double& param_rcv::slope_rs() {
+	return m_slope_rs.val();
+}
+
 double param_rcv::sign(const double& a_x) {
 	if (a_x >= 0)
 		return 1.0;
@@ -51,17 +59,28 @@ void param_rcv::beta(const double& a_val) {
 	m_alpha.val() = 1.0 - a_val;
 }
 
-void param_rcv::update(const double& a_loss) {
+void param_rcv::signal(const double& a_loss) {
 
 	double dl = a_loss - m_l_prev.val();
 	double ds = state() - m_s_prev.val();
+	slope() = dl / ds;
+
+	// SAVE CURRENT VALUE OF LOSS
+	m_l_prev.val() = a_loss;
+
+}
+
+void param_rcv::update() {
+
+	// APPROXIMATE CURRENT ERROR RELATIVE TO OTHER PARAMETERS
+	double l_limit = 1.0 - (1.0 / cosh());
+	double 
 
 	// CALCULATE NEW DL/DS
 	running_average() = beta() * running_average() + alpha() * (dl / ds);
 	
-	// SAVE CURRENT VALUES OF LOSS AND STATE
+	// SAVE CURRENT VALUE STATE
 	m_s_prev.val() = state();
-	m_l_prev.val() = a_loss;
 
 	// UPDATE STATE
 	state() -= learn_rate() * m_rcv_urd(static_vals::random_engine) * sign(running_average());
