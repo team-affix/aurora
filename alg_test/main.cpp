@@ -11,6 +11,9 @@
 #include <windows.h>
 #include <fstream>
 #include <random>
+#include <map>
+#include "affix-base/sha.h"
+#include "affix-base/aes.h"
 #define L(call) [&]{call;}
 
 using namespace aurora;
@@ -1572,8 +1575,9 @@ void test_param_rcv() {
 
 		double loss = get_loss();
 
-		for (Param_rcv& pmt : pv)
-			pmt->update(loss);
+		// PARAM RCV IS BROKEN
+		/*for (Param_rcv& pmt : pv)
+			pmt->update(loss);*/
 
 		if (epoch % 1000 == 0) {
 			std::cout << loss << std::endl;
@@ -3759,11 +3763,108 @@ void spc_model_test() {
 
 }
 
+void increment_tensor_binary_representation(tensor& a_tensor, size_t a_pos = 0)
+{
+	if (a_pos == a_tensor.size())
+	{
+		return;
+	}
+
+	if (a_tensor[a_pos].val() == 1)
+	{
+		increment_tensor_binary_representation(a_tensor, a_pos + 1);
+		a_tensor[a_pos].val() = 0;
+	}
+	else
+	{
+		a_tensor[a_pos].val() = 1;
+	}
+}
+
+uint8_t ls_bits(uint8_t a_input, uint8_t a_num_bits)
+{
+	a_input &= (uint8_t)(std::pow(2, a_num_bits) - 1);
+	return a_input;
+}
+
+void populate_byte_vector(const tensor& a_tensor, vector<uint8_t>& a_vector)
+{
+	for (int i = 0; i < a_tensor.size(); i++)
+		a_vector[i] = a_tensor[i].val();
+}
+
+uint8_t chop_ls_bit(const uint8_t& a_input)
+{
+	return a_input & 0xFE;
+}
+
+uint8_t set_ls_bit(const uint8_t& a_input)
+{
+	return a_input | 0x01;
+}
+
+void bct()
+{
+	
+	using namespace affix_base::cryptography;
+
+	vector<uint8_t> l_input_0 = aes_generate_key();
+
+	for (int check = 0; true; check++)
+	{
+		vector<uint8_t> l_key = aes_generate_key();
+
+		vector<uint8_t> l_encrypt_0 = aes_encrypt(l_input_0, l_key);
+		vector<uint8_t> l_encrypt_1 = aes_encrypt(l_encrypt_0, l_key);
+	
+		// TEST RETRIEVING INFORMATION
+
+		uint8_t original_value = l_encrypt_1.back();
+
+		//std::cout << "Original value: " << (int)original_value << std::endl;
+
+		l_encrypt_1.back() = chop_ls_bit(l_encrypt_1.back());
+		try {
+			vector<uint8_t> l_decrypt_1 = aes_decrypt(l_encrypt_1, l_key);
+			vector<uint8_t> l_decrypt_0 = aes_decrypt(l_decrypt_1, l_key);
+			if (original_value != l_encrypt_1.back())
+			{
+				std::cout << "ERROR: MISMATCH OF DATA: " << (int)original_value << " != " << (int)l_encrypt_0.back();
+				return;
+			}
+		}
+		catch (...)
+		{
+		}
+
+		l_encrypt_1.back() = set_ls_bit(l_encrypt_1.back());
+		try {
+			vector<uint8_t> l_decrypt_1 = aes_decrypt(l_encrypt_1, l_key);
+			vector<uint8_t> l_decrypt_0 = aes_decrypt(l_decrypt_1, l_key);
+			if (original_value != l_encrypt_1.back())
+			{
+				std::cout << "ERROR: MISMATCH OF DATA: " << (int)original_value << " != " << (int)l_encrypt_0.back();
+				return;
+			}
+		}
+		catch (...)
+		{
+		}
+
+		if (check % 100 == 0)
+		{
+			l_input_0 = aes_generate_key();
+			std::cout << check << std::endl;
+		}
+
+	}
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	test_param_rcv();
+	bct();
 
 	return 0;
 
