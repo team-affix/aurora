@@ -1,14 +1,9 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "param.h"
 #include "param_sgd.h"
 #include "param_mom.h"
-
-using aurora::models::model;
-using std::vector;
-using std::initializer_list;
-using std::back_inserter;
 
 namespace aurora {
 	namespace models {

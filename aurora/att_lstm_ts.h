@@ -1,12 +1,9 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "sync.h"
 #include "pseudo_tnn.h"
 #include "neuron.h"
-
-using aurora::models::model;
-using aurora::models::sync;
 
 namespace aurora {
 	namespace models {
@@ -15,8 +12,8 @@ namespace aurora {
 			size_t units;
 
 		public:
-			tensor htx;
-			tensor htx_grad;
+			aurora::maths::tensor htx;
+			aurora::maths::tensor htx_grad;
 
 		public:
 			Model model_template;

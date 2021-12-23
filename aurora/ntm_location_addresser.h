@@ -1,16 +1,10 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "interpolate.h"
 #include "shift.h"
 #include "power.h"
 #include "normalize.h"
-
-using aurora::models::model;
-using aurora::models::interpolate;
-using aurora::models::shift;
-using aurora::models::power;
-using aurora::models::normalize;
 
 namespace aurora {
 	namespace models {

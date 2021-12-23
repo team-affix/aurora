@@ -1,11 +1,7 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "weight_set.h"
-
-using aurora::models::model;
-using aurora::models::weight_set;
-using std::vector;
 
 namespace aurora {
 	namespace models {

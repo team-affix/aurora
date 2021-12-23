@@ -1,9 +1,7 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "lstm.h"
 #include "ntm_ts.h"
-
-using aurora::models::model;
 
 namespace aurora {
 	namespace models {

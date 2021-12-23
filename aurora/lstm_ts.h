@@ -1,10 +1,8 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "layer.h"
 #include "pseudo_tnn.h"
-
-using aurora::models::model;
 
 namespace aurora {
 	namespace models {

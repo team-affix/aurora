@@ -1,10 +1,8 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "ntm_content_addresser.h"
 #include "ntm_location_addresser.h"
-
-using aurora::models::model;
 
 namespace aurora {
 	namespace models {

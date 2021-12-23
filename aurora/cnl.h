@@ -1,10 +1,7 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "sync.h"
-
-using aurora::models::model;
-using aurora::models::sync;
 
 namespace aurora {
 	namespace models {

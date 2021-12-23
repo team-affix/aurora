@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "tensor.h"
 
 using namespace aurora;
@@ -12,11 +12,11 @@ double tensor::val() const {
 	return val_ptr.val();
 }
 
-vector<tensor>& tensor::vec() {
+std::vector<tensor>& tensor::vec() {
 	return vec_ptr.val();
 }
 
-const vector<tensor>& tensor::vec() const {
+const std::vector<tensor>& tensor::vec() const {
 	return vec_ptr.val();
 }
 
@@ -52,11 +52,11 @@ tensor::tensor(const double& a_val) {
 	this->val() = a_val;
 }
 
-tensor::tensor(const vector<tensor>& a_vec) {
+tensor::tensor(const std::vector<tensor>& a_vec) {
 	std::copy(a_vec.begin(), a_vec.end(), back_inserter(vec()));
 }
 
-tensor::tensor(const initializer_list<tensor>& a_il) {
+tensor::tensor(const std::initializer_list<tensor>& a_il) {
 	std::copy(a_il.begin(), a_il.end(), back_inserter(vec()));
 }
 
@@ -90,7 +90,7 @@ tensor tensor::new_1d(size_t a_a, tensor a_val) {
 	return result;
 }
 
-tensor tensor::new_1d(size_t a_a, uniform_real_distribution<double>& a_urd, default_random_engine& a_re) {
+tensor tensor::new_1d(size_t a_a, std::uniform_real_distribution<double>& a_urd, std::default_random_engine& a_re) {
 	tensor result = new_1d(a_a);
 	for (int i = 0; i < a_a; i++)
 		result[i].val() = a_urd(a_re);
@@ -110,7 +110,7 @@ tensor tensor::new_2d(size_t a_a, size_t a_b, tensor a_val) {
 	return result;
 }
 
-tensor tensor::new_2d(size_t a_a, size_t a_b, uniform_real_distribution<double>& a_urd, default_random_engine& a_re) {
+tensor tensor::new_2d(size_t a_a, size_t a_b, std::uniform_real_distribution<double>& a_urd, std::default_random_engine& a_re) {
 	tensor result = new_1d(a_a);
 	for (int i = 0; i < a_a; i++)
 		result[i] = new_1d(a_b, a_urd, a_re);
@@ -568,26 +568,26 @@ void tensor::unlink() {
 		at(i).unlink();
 }
 
-void tensor::rank_model_recur(function<void(tensor*)> a_func) {
+void tensor::rank_model_recur(std::function<void(tensor*)> a_func) {
 	if (size() != 0)
 		for (int i = 0; i < size(); i++)
 			at(i).rank_model_recur(a_func);
 	a_func(this);
 }
 
-void tensor::group_recur_fwd(function<void(tensor*)> a_func) {
+void tensor::group_recur_fwd(std::function<void(tensor*)> a_func) {
 	if (group_next_ptr != nullptr)
 		group_next_ptr->group_recur_fwd(a_func);
 	a_func(this);
 }
 
-void tensor::group_recur_bwd(function<void(tensor*)> a_func) {
+void tensor::group_recur_bwd(std::function<void(tensor*)> a_func) {
 	if (group_prev_ptr != nullptr)
 		group_prev_ptr->group_recur_bwd(a_func);
 	a_func(this);
 }
 
-void tensor::group_recur(function<void(tensor*)> a_func) {
+void tensor::group_recur(std::function<void(tensor*)> a_func) {
 	if (group_prev_ptr != nullptr)
 		group_prev_ptr->group_recur_bwd(a_func);
 	if (group_next_ptr != nullptr)
@@ -680,10 +680,10 @@ tensor tensor::link() {
 	return result;
 }
 
-string tensor::to_string() {
+std::string tensor::to_string() {
 	if (vec().size() == 0)
 		return std::to_string(val());
-	string result = "[";
+	std::string result = "[";
 	for (int i = 0; i < vec().size() - 1; i++)
 		result += vec().at(i).to_string() + " ";
 	result += vec().at(vec().size() - 1).to_string() + "]";

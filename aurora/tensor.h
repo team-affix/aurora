@@ -1,26 +1,14 @@
 #pragma once
-#include "pch.h"
-#include "ptr.h"
-#include "ref.h"
-
-using affix_base::data::ptr;
-using affix_base::data::ref;
-using std::vector;
-using std::initializer_list;
-using std::back_inserter;
-using std::string;
-using std::stringstream;
-using std::function;
-using std::uniform_real_distribution;
-using std::default_random_engine;
+#include "affix-base/pch.h"
+#include "affix-base/ptr.h"
 
 namespace aurora {
 	namespace maths {
 
 		class tensor {
 		public:
-			ptr<double> val_ptr = new double(0);
-			ptr<vector<tensor>> vec_ptr = new vector<tensor>();
+			affix_base::data::ptr<double> val_ptr = new double(0);
+			affix_base::data::ptr<std::vector<tensor>> vec_ptr = new std::vector<tensor>();
 			
 		public:
 			tensor* group_prev_ptr = nullptr;
@@ -29,8 +17,8 @@ namespace aurora {
 		public:
 			double& val();
 			double val() const;
-			vector<tensor>& vec();
-			const vector<tensor>& vec() const;
+			std::vector<tensor>& vec();
+			const std::vector<tensor>& vec() const;
 
 		public:
 			tensor& group_head();
@@ -41,8 +29,8 @@ namespace aurora {
 			virtual ~tensor();
 			tensor();
 			tensor(const double& a_val);
-			tensor(const vector<tensor>& a_vec);
-			tensor(const initializer_list<tensor>& a_il);
+			tensor(const std::vector<tensor>& a_vec);
+			tensor(const std::initializer_list<tensor>& a_il);
 
 		public:
 			void set(const tensor& a_other);
@@ -54,10 +42,10 @@ namespace aurora {
 		public:
 			static tensor new_1d(size_t a_a);
 			static tensor new_1d(size_t a_a, tensor a_val);
-			static tensor new_1d(size_t a_a, uniform_real_distribution<double>& a_urd, default_random_engine& a_re);
+			static tensor new_1d(size_t a_a, std::uniform_real_distribution<double>& a_urd, std::default_random_engine& a_re);
 			static tensor new_2d(size_t a_a, size_t a_b);
 			static tensor new_2d(size_t a_a, size_t a_b, tensor a_val);
-			static tensor new_2d(size_t a_a, size_t a_b, uniform_real_distribution<double>& a_urd, default_random_engine& a_re);
+			static tensor new_2d(size_t a_a, size_t a_b, std::uniform_real_distribution<double>& a_urd, std::default_random_engine& a_re);
 
 		public:
 			tensor up_rank(size_t a_n);
@@ -148,12 +136,12 @@ namespace aurora {
 			void unlink();
 
 		public:
-			void rank_model_recur(function<void(tensor*)> a_func);
+			void rank_model_recur(std::function<void(tensor*)> a_func);
 
 		public:
-			void group_recur_fwd(function<void(tensor*)> a_func);
-			void group_recur_bwd(function<void(tensor*)> a_func);
-			void group_recur(function<void(tensor*)> a_func);
+			void group_recur_fwd(std::function<void(tensor*)> a_func);
+			void group_recur_bwd(std::function<void(tensor*)> a_func);
+			void group_recur(std::function<void(tensor*)> a_func);
 			bool group_contains(tensor* a_ptr);
 
 		public:
@@ -173,7 +161,7 @@ namespace aurora {
 			tensor link();
 
 		public:
-			string to_string();
+			std::string to_string();
 
 		public:
 			void clear();

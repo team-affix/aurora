@@ -1,11 +1,7 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "recurrent.h"
-
-using aurora::models::model;
-using aurora::models::recurrent;
-using std::vector;
 
 namespace aurora {
 	namespace models {

@@ -283,7 +283,8 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -306,7 +307,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -331,7 +332,8 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -354,7 +356,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -376,7 +378,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -400,7 +403,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -426,7 +429,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -450,7 +454,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/;../affix-base/;../affix-base/asio/asio/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
