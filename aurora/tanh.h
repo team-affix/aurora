@@ -17,6 +17,6 @@ namespace aurora {
 			tanh(double a_a, double a_b, double a_c);
 
 		};
-		typedef ptr<tanh> Tanh;
+		typedef affix_base::data::ptr<tanh> Tanh;
 	}
 }

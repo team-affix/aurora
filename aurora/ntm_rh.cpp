@@ -1,10 +1,16 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "ntm_rh.h"
 #include "pseudo_tnn.h"
 #include "neuron.h"
 #include "normalize.h"
 
 using aurora::models::ntm_rh;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
 
 ntm_rh::~ntm_rh() {
 

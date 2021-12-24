@@ -21,6 +21,6 @@ namespace aurora {
 			cos_sim(size_t a_units);
 
 		};
-		typedef ptr<cos_sim> Cos_sim;
+		typedef affix_base::data::ptr<cos_sim> Cos_sim;
 	}
 }

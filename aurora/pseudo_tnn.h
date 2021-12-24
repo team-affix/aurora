@@ -1,21 +1,15 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "sequential.h"
 #include "param_vector.h"
 #include "model.h"
 
-using aurora::models::Sequential;
-using aurora::models::sequential;
-using aurora::models::Model;
-using aurora::params::param_vector;
-using std::vector;
-
 namespace aurora {
 	namespace pseudo {
-		Sequential tnn(vector<size_t> a_dims, Model a_neuron_template);
-		Sequential tnn(vector<size_t> a_dims, vector<Model> a_neuron_templates);
-		Sequential tnn_no_output(vector<size_t> a_dims, Model a_neuron_template);
-		Sequential tnn_no_output(vector<size_t> a_dims, vector<Model> a_neuron_templates);
-		Sequential tnn_compiled(vector<size_t> a_dims, param_vector& a_param_vec);
+		aurora::models::Sequential tnn(std::vector<size_t> a_dims, aurora::models::Model a_neuron_template);
+		aurora::models::Sequential tnn(std::vector<size_t> a_dims, std::vector<aurora::models::Model> a_neuron_templates);
+		aurora::models::Sequential tnn_no_output(std::vector<size_t> a_dims, aurora::models::Model a_neuron_template);
+		aurora::models::Sequential tnn_no_output(std::vector<size_t> a_dims, std::vector<aurora::models::Model> a_neuron_templates);
+		aurora::models::Sequential tnn_compiled(std::vector<size_t> a_dims, aurora::params::param_vector& a_param_vec);
 	}
 }

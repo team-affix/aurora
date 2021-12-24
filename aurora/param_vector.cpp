@@ -1,8 +1,10 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param_vector.h"
 #include "tensor.h"
 
+using aurora::params::param;
 using aurora::params::param_vector;
+using aurora::maths::tensor;
 
 void param_vector::update() {
 	for (int i = 0; i < size(); i++)

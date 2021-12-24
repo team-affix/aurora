@@ -1,6 +1,7 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param_sgd_mt.h"
 
+using aurora::params::param;
 using aurora::params::param_sgd_mt;
 
 param_sgd_mt::~param_sgd_mt() {

@@ -11,6 +11,6 @@ namespace aurora {
 			recurrent();
 			
 		};
-		typedef ptr<recurrent> Recurrent;
+		typedef affix_base::data::ptr<recurrent> Recurrent;
 	}
 }

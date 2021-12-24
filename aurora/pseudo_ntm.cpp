@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "pseudo_ntm.h"
 #include "ntm.h"
 #include "sync.h"
@@ -15,6 +15,12 @@ using aurora::models::Ntm;
 using aurora::models::sync;
 using aurora::models::Sync;
 using namespace aurora;
+using std::vector;
+using aurora::maths::tensor;
+using aurora::params::param_vector;
+using std::uniform_real_distribution;
+using namespace aurora::params;
+using namespace aurora::models;
 
 Ntm pseudo::ntm_compiled(
 	size_t a_memory_height,
@@ -35,7 +41,7 @@ Ntm pseudo::ntm_compiled(
 	size_t param_count = 0;
 	result->param_recur(PARAM_COUNT(param_count));
 
-	ntm_hyperparams(param_count, learn_rate, beta, param_urd);
+	pseudo::ntm_hyperparams(param_count, learn_rate, beta, param_urd);
 
 	result->param_recur(PARAM_INIT(param_mom(param_urd(static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
 
@@ -69,7 +75,7 @@ Stacked_recurrent pseudo::ntm_mdim(
 	size_t param_count = 0;
 	result->param_recur(PARAM_COUNT(param_count));
 
-	ntm_hyperparams(param_count, learn_rate, beta, param_urd);
+	pseudo::ntm_hyperparams(param_count, learn_rate, beta, param_urd);
 
 	result->param_recur(PARAM_INIT(param_mom(param_urd(static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
 
@@ -89,7 +95,7 @@ Stacked_recurrent pseudo::ntm_mdim_compiled(
 	size_t a_max_timesteps,
 	param_vector& a_param_vec) {
 
-	Stacked_recurrent result = ntm_mdim(a_x_units, a_y_units, a_memory_height, a_memory_width, a_num_readers, a_num_writers, a_valid_shifts, a_head_hidden_dims, a_param_vec);
+	Stacked_recurrent result = pseudo::ntm_mdim(a_x_units, a_y_units, a_memory_height, a_memory_width, a_num_readers, a_num_writers, a_valid_shifts, a_head_hidden_dims, a_param_vec);
 
 	result->prep(a_max_timesteps);
 	result->compile();

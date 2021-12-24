@@ -12,8 +12,8 @@ namespace aurora {
 			vector<int> valid_shifts;
 
 		public:
-			tensor amount;
-			tensor amount_grad;
+			aurora::maths::tensor amount;
+			aurora::maths::tensor amount_grad;
 
 		public:
 			MODEL_FIELDS
@@ -25,6 +25,6 @@ namespace aurora {
 			int positive_modulo(int i, int n);
 
 		};
-		typedef ptr<shift> Shift;
+		typedef affix_base::data::ptr<shift> Shift;
 	}
 }

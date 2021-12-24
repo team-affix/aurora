@@ -1,7 +1,9 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "att_lstm_ts.h"
 
 using aurora::models::att_lstm_ts;
+using std::vector;
+using aurora::maths::tensor;
 
 att_lstm_ts::~att_lstm_ts() {
 
@@ -26,11 +28,11 @@ att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims) {
 	models = new sync(model_template);
 }
 
-void att_lstm_ts::param_recur(function<void(Param&)> a_func) {
+void att_lstm_ts::param_recur(std::function<void(aurora::params::Param&)> a_func) {
 	model_template->param_recur(a_func);
 }
 
-model* att_lstm_ts::clone(function<Param(Param&)> a_func) {
+aurora::models::model* att_lstm_ts::clone(std::function<aurora::params::Param(aurora::params::Param&)> a_func) {
 	att_lstm_ts* result = new att_lstm_ts();
 	result->units = units;
 	result->htx = htx.clone();
@@ -76,7 +78,7 @@ void att_lstm_ts::signal(const tensor& a_y_des) {
 	y.sub_1d(a_y_des, y_grad);
 }
 
-void att_lstm_ts::model_recur(function<void(model*)> a_func) {
+void att_lstm_ts::model_recur(std::function<void(model*)> a_func) {
 	model_template->model_recur(a_func);
 }
 

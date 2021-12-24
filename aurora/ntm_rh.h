@@ -11,16 +11,16 @@ namespace aurora {
 			size_t y_units = 0;
 
 		public:
-			tensor key;
-			tensor key_grad;
-			tensor beta;
-			tensor beta_grad;
-			tensor g;
-			tensor g_grad;
-			tensor s;
-			tensor s_grad;
-			tensor gamma;
-			tensor gamma_grad;
+			aurora::maths::tensor key;
+			aurora::maths::tensor key_grad;
+			aurora::maths::tensor beta;
+			aurora::maths::tensor beta_grad;
+			aurora::maths::tensor g;
+			aurora::maths::tensor g_grad;
+			aurora::maths::tensor s;
+			aurora::maths::tensor s_grad;
+			aurora::maths::tensor gamma;
+			aurora::maths::tensor gamma_grad;
 
 		public:
 			Model key_model;
@@ -36,6 +36,6 @@ namespace aurora {
 			ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units);
 
 		};
-		typedef ptr<ntm_rh> Ntm_rh;
+		typedef affix_base::data::ptr<ntm_rh> Ntm_rh;
 	}
 }

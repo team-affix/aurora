@@ -1,18 +1,15 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param_sgd.h"
-
-using aurora::params::param_sgd;
-using std::mutex;
 
 namespace aurora {
 	namespace params {
 		class param_sgd_mt : public param_sgd {
 		public:
-			ptr<double> gradient_ptr = new double(0);
+			affix_base::data::ptr<double> gradient_ptr = new double(0);
 
 		public:
-			mutex accum_grad_mutex;
+			std::mutex accum_grad_mutex;
 
 		public:
 			virtual ~param_sgd_mt();
@@ -26,6 +23,6 @@ namespace aurora {
 			virtual param* clone();
 
 		};
-		typedef ptr<param_sgd_mt> Param_sgd_mt;
+		typedef affix_base::data::ptr<param_sgd_mt> Param_sgd_mt;
 	}
 }

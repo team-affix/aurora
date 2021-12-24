@@ -7,7 +7,7 @@ namespace aurora {
 	namespace models {
 		class weight : public model {
 		public:
-			Param pmt = new param();
+			aurora::params::Param pmt = new aurora::params::param();
 
 		public:
 			MODEL_FIELDS
@@ -15,6 +15,6 @@ namespace aurora {
 			weight();
 
 		};
-		typedef ptr<weight> Weight;
+		typedef affix_base::data::ptr<weight> Weight;
 	}
 }

@@ -1,7 +1,13 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "power.h"
 
 using aurora::models::power;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
 
 power::~power() {
 

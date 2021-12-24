@@ -9,8 +9,8 @@ namespace aurora {
 			size_t units = 0;
 
 		public:
-			tensor amount;
-			tensor amount_grad;
+			aurora::maths::tensor amount;
+			aurora::maths::tensor amount_grad;
 
 		public:
 			MODEL_FIELDS
@@ -19,6 +19,6 @@ namespace aurora {
 			power(size_t a_units);
 
 		};
-		typedef ptr<power> Power;
+		typedef affix_base::data::ptr<power> Power;
 	}
 }

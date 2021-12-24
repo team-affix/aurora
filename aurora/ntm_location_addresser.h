@@ -14,16 +14,16 @@ namespace aurora {
 			size_t shift_units = 0;
 
 		public:
-			tensor wx;
-			tensor wx_grad;
-			tensor wy;
-			tensor wy_grad;
-			tensor g;
-			tensor g_grad;
-			tensor s;
-			tensor s_grad;
-			tensor gamma;
-			tensor gamma_grad;
+			aurora::maths::tensor wx;
+			aurora::maths::tensor wx_grad;
+			aurora::maths::tensor wy;
+			aurora::maths::tensor wy_grad;
+			aurora::maths::tensor g;
+			aurora::maths::tensor g_grad;
+			aurora::maths::tensor s;
+			aurora::maths::tensor s_grad;
+			aurora::maths::tensor gamma;
+			aurora::maths::tensor gamma_grad;
 
 		public:
 			Interpolate internal_interpolate;
@@ -38,6 +38,6 @@ namespace aurora {
 			ntm_location_addresser(size_t a_memory_height, vector<int> a_valid_shifts);
 
 		};
-		typedef ptr<ntm_location_addresser> Ntm_location_addresser;
+		typedef affix_base::data::ptr<ntm_location_addresser> Ntm_location_addresser;
 	}
 }

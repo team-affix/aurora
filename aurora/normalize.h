@@ -9,7 +9,7 @@ namespace aurora {
 			size_t units = 0;
 
 		public:
-			tensor x_abs;
+			aurora::maths::tensor x_abs;
 
 		public:
 			double sum = 0;
@@ -21,6 +21,6 @@ namespace aurora {
 			normalize(size_t a_units);
 
 		};
-		typedef ptr<normalize> Normalize;
+		typedef affix_base::data::ptr<normalize> Normalize;
 	}
 }

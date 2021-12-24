@@ -1,9 +1,15 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "ntm_wh.h"
 #include "pseudo_tnn.h"
 #include "neuron.h"
 
 using aurora::models::ntm_wh;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
 
 ntm_wh::~ntm_wh() {
 

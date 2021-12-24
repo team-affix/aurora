@@ -1,13 +1,13 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param_sgd.h"
 
 namespace aurora {
 	namespace params {
 		class param_mom : public param_sgd {
 		public:
-			ptr<double> momentum_ptr = new double(0);
-			ptr<double> beta_ptr = new double(0);
+			affix_base::data::ptr<double> momentum_ptr = new double(0);
+			affix_base::data::ptr<double> beta_ptr = new double(0);
 
 		public:
 			virtual ~param_mom();
@@ -23,6 +23,6 @@ namespace aurora {
 			virtual param* clone();
 
 		};
-		typedef ptr<param_mom> Param_mom;
+		typedef affix_base::data::ptr<param_mom> Param_mom;
 	}
 }

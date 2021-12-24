@@ -1,7 +1,13 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "lstm.h"
 
 using aurora::models::lstm;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
 
 lstm::~lstm() {
 

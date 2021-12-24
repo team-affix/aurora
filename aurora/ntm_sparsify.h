@@ -9,8 +9,8 @@ namespace aurora {
 			size_t memory_height = 0;
 
 		public:
-			tensor beta = 0;
-			tensor beta_grad = 0;
+			aurora::maths::tensor beta = 0;
+			aurora::maths::tensor beta_grad = 0;
 
 		public:
 			MODEL_FIELDS
@@ -19,6 +19,6 @@ namespace aurora {
 			ntm_sparsify(size_t a_memory_height);
 
 		};
-		typedef ptr<ntm_sparsify> Ntm_sparsify;
+		typedef affix_base::data::ptr<ntm_sparsify> Ntm_sparsify;
 	}
 }

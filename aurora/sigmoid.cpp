@@ -1,7 +1,14 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "sigmoid.h"
 
 using aurora::models::sigmoid;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
+using std::initializer_list;
 
 sigmoid::~sigmoid() {
 

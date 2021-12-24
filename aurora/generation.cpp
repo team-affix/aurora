@@ -1,6 +1,6 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "generation.h"
-#include "insertion_index.h"
+#include "affix-base/insertion_index.h"
 
 using namespace affix_base::sorting;
 using aurora::evolution::generation;
@@ -9,16 +9,16 @@ generation::generation() {
 
 }
 
-generation::generation(vector<genome> a_genomes, function<double(genome&)> a_get_reward) {
+generation::generation(vector<genome> a_genomes, std::function<double(genome&)> a_get_reward) {
 	this->genomes = a_genomes;
 	this->get_reward = a_get_reward;
 }
 
-genome& generation::best() {
+aurora::evolution::genome& generation::best() {
 	return genomes[sort().front()];
 }
 
-vector<genome> generation::best(size_t a_genomes) {
+vector<aurora::evolution::genome> generation::best(size_t a_genomes) {
 	vector<genome> result = vector<genome>(a_genomes);
 	vector<size_t> sorted = sort();
 	for (int i = 0; i < a_genomes; i++)
@@ -26,11 +26,11 @@ vector<genome> generation::best(size_t a_genomes) {
 	return result;
 }
 
-genome& generation::worst() {
+aurora::evolution::genome& generation::worst() {
 	return genomes[sort().back()];
 }
 
-vector<genome> generation::worst(size_t a_genomes) {
+vector<aurora::evolution::genome> generation::worst(size_t a_genomes) {
 	vector<genome> result = vector<genome>(a_genomes);
 	vector<size_t> sorted = sort();
 	for (int i = 0; i < a_genomes; i++)

@@ -17,6 +17,6 @@ namespace aurora {
 			sync(Model a_model_template);
 
 		};
-		typedef ptr<sync> Sync;
+		typedef affix_base::data::ptr<sync> Sync;
 	}
 }

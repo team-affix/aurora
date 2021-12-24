@@ -1,7 +1,11 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "interpolate.h"
 
 using aurora::models::interpolate;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::maths::tensor;
 
 interpolate::~interpolate() {
 

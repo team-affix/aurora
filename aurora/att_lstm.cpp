@@ -1,7 +1,8 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "att_lstm.h"
 
 using aurora::models::att_lstm;
+using aurora::maths::tensor;
 
 att_lstm::~att_lstm() {
 
@@ -11,18 +12,18 @@ att_lstm::att_lstm() {
 
 }
 
-att_lstm::att_lstm(size_t a_units, vector<size_t> a_h_dims) {
+att_lstm::att_lstm(size_t a_units, std::vector<size_t> a_h_dims) {
 	this->units = a_units;
 	models = new sync(new att_lstm_ts(a_units, a_h_dims));
 	internal_lstm = new lstm(a_units);
 }
 
-void att_lstm::param_recur(function<void(Param&)> a_func) {
+void att_lstm::param_recur(std::function<void(aurora::params::Param&)> a_func) {
 	models->param_recur(a_func);
 	internal_lstm->param_recur(a_func);
 }
 
-model* att_lstm::clone(function<Param(Param&)> a_func) {
+aurora::models::model* att_lstm::clone(std::function<aurora::params::Param(aurora::params::Param&)> a_func) {
 	att_lstm* result = new att_lstm();
 	result->units = units;
 	result->models = (sync*)models->clone(a_func);
@@ -49,11 +50,11 @@ void att_lstm::bwd() {
 	}
 }
 
-void att_lstm::signal(const tensor& a_y_des) {
+void att_lstm::signal(const aurora::maths::tensor& a_y_des) {
 	internal_lstm->signal(a_y_des);
 }
 
-void att_lstm::model_recur(function<void(model*)> a_func) {
+void att_lstm::model_recur(std::function<void(model*)> a_func) {
 	models->model_recur(a_func);
 	internal_lstm->model_recur(a_func);
 }

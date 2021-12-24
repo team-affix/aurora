@@ -12,14 +12,14 @@ namespace aurora {
 			size_t units = 0;
 
 		public:
-			tensor ctx;
-			tensor cty;
-			tensor htx;
-			tensor hty;
-			tensor ctx_grad;
-			tensor cty_grad;
-			tensor htx_grad;
-			tensor hty_grad;
+			aurora::maths::tensor ctx;
+			aurora::maths::tensor cty;
+			aurora::maths::tensor htx;
+			aurora::maths::tensor hty;
+			aurora::maths::tensor ctx_grad;
+			aurora::maths::tensor cty_grad;
+			aurora::maths::tensor htx_grad;
+			aurora::maths::tensor hty_grad;
 
 		public:
 			Lstm_ts lstm_ts_template;
@@ -33,6 +33,6 @@ namespace aurora {
 			lstm(size_t a_units);
 
 		};
-		typedef ptr<lstm> Lstm;
+		typedef affix_base::data::ptr<lstm> Lstm;
 	}
 }

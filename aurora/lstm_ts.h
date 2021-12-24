@@ -11,19 +11,19 @@ namespace aurora {
 			size_t units;
 
 		public:
-			tensor ctx;
-			tensor cty;
-			tensor htx;
-			tensor hty;
-			tensor ctx_grad;
-			tensor cty_grad;
-			tensor htx_grad;
-			tensor hty_grad;
+			aurora::maths::tensor ctx;
+			aurora::maths::tensor cty;
+			aurora::maths::tensor htx;
+			aurora::maths::tensor hty;
+			aurora::maths::tensor ctx_grad;
+			aurora::maths::tensor cty_grad;
+			aurora::maths::tensor htx_grad;
+			aurora::maths::tensor hty_grad;
 
 		public:
-			tensor gate_x;
-			tensor comp_0;
-			tensor comp_1;
+			aurora::maths::tensor gate_x;
+			aurora::maths::tensor comp_0;
+			aurora::maths::tensor comp_1;
 
 		public:
 			Layer forget_gate;
@@ -40,6 +40,6 @@ namespace aurora {
 			lstm_ts(size_t a_units, Layer a_forget_gate, Layer a_limit_gate, Layer a_input_gate, Layer a_output_gate, Layer a_tanh_gate);
 
 		};
-		typedef ptr<lstm_ts> Lstm_ts;
+		typedef affix_base::data::ptr<lstm_ts> Lstm_ts;
 	}
 }

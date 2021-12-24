@@ -17,6 +17,6 @@ namespace aurora {
 			weight_set(size_t a_a);
 
 		};
-		typedef ptr<weight_set> Weight_set;
+		typedef affix_base::data::ptr<weight_set> Weight_set;
 	}
 }

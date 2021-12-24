@@ -12,8 +12,8 @@ namespace aurora {
 			double amount_compliment = 0;
 
 		public:
-			tensor amount;
-			tensor amount_grad;
+			aurora::maths::tensor amount;
+			aurora::maths::tensor amount_grad;
 
 		public:
 			MODEL_FIELDS
@@ -22,6 +22,6 @@ namespace aurora {
 			interpolate(size_t a_units);
 
 		};
-		typedef ptr<interpolate> Interpolate;
+		typedef affix_base::data::ptr<interpolate> Interpolate;
 	}
 }

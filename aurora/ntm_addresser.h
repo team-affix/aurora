@@ -13,20 +13,20 @@ namespace aurora {
 			size_t shift_units = 0;
 
 		public:
-			tensor key;
-			tensor key_grad;
-			tensor beta;
-			tensor beta_grad;
-			tensor wx;
-			tensor wx_grad;
-			tensor wy;
-			tensor wy_grad;
-			tensor g;
-			tensor g_grad;
-			tensor s;
-			tensor s_grad;
-			tensor gamma;
-			tensor gamma_grad;
+			aurora::maths::tensor key;
+			aurora::maths::tensor key_grad;
+			aurora::maths::tensor beta;
+			aurora::maths::tensor beta_grad;
+			aurora::maths::tensor wx;
+			aurora::maths::tensor wx_grad;
+			aurora::maths::tensor wy;
+			aurora::maths::tensor wy_grad;
+			aurora::maths::tensor g;
+			aurora::maths::tensor g_grad;
+			aurora::maths::tensor s;
+			aurora::maths::tensor s_grad;
+			aurora::maths::tensor gamma;
+			aurora::maths::tensor gamma_grad;
 
 		public:
 			Ntm_content_addresser internal_content_addresser;
@@ -39,6 +39,6 @@ namespace aurora {
 			ntm_addresser(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts);
 
 		};
-		typedef ptr<ntm_addresser> Ntm_addresser;
+		typedef affix_base::data::ptr<ntm_addresser> Ntm_addresser;
 	}
 }

@@ -23,6 +23,6 @@ namespace aurora {
 			model();
 
 		};
-		typedef ptr<model> Model;
+		typedef affix_base::data::ptr<model> Model;
 	}
 }

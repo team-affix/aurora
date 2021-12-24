@@ -11,12 +11,12 @@ namespace aurora {
 			size_t memory_width = 0;
 
 		public:
-			tensor mx;
-			tensor mx_grad;
-			tensor wx;
-			tensor wx_grad;
-			tensor wy;
-			tensor wy_grad;
+			aurora::maths::tensor mx;
+			aurora::maths::tensor mx_grad;
+			aurora::maths::tensor wx;
+			aurora::maths::tensor wx_grad;
+			aurora::maths::tensor wy;
+			aurora::maths::tensor wy_grad;
 
 		public:
 			Ntm_rh internal_head;
@@ -29,6 +29,6 @@ namespace aurora {
 			ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims);
 
 		};
-		typedef ptr<ntm_reader> Ntm_reader;
+		typedef affix_base::data::ptr<ntm_reader> Ntm_reader;
 	}
 }

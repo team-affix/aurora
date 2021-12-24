@@ -1,6 +1,7 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param_mom_mt.h"
 
+using aurora::params::param;
 using aurora::params::param_mom_mt;
 
 param_mom_mt::~param_mom_mt() {

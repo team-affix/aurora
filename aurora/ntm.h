@@ -11,20 +11,20 @@ namespace aurora {
 			size_t memory_width = 0;
 
 		public:
-			tensor mx;
-			tensor mx_grad;
-			tensor my;
-			tensor my_grad;
+			aurora::maths::tensor mx;
+			aurora::maths::tensor mx_grad;
+			aurora::maths::tensor my;
+			aurora::maths::tensor my_grad;
 
 		public:
-			tensor read_wx;
-			tensor read_wx_grad;
-			tensor read_wy;
-			tensor read_wy_grad;
-			tensor write_wx;
-			tensor write_wx_grad;
-			tensor write_wy;
-			tensor write_wy_grad;
+			aurora::maths::tensor read_wx;
+			aurora::maths::tensor read_wx_grad;
+			aurora::maths::tensor read_wy;
+			aurora::maths::tensor read_wy_grad;
+			aurora::maths::tensor write_wx;
+			aurora::maths::tensor write_wx_grad;
+			aurora::maths::tensor write_wy;
+			aurora::maths::tensor write_wy_grad;
 
 		public:
 			Lstm internal_lstm;
@@ -45,6 +45,6 @@ namespace aurora {
 				vector<size_t> a_head_hidden_dims);
 
 		};
-		typedef ptr<ntm> Ntm;
+		typedef affix_base::data::ptr<ntm> Ntm;
 	}
 }

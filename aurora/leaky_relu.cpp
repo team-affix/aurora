@@ -1,7 +1,11 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "leaky_relu.h"
 
 using aurora::models::leaky_relu;
+using std::function;
+using aurora::models::model;
+using aurora::params::Param;
+using aurora::maths::tensor;
 
 leaky_relu::~leaky_relu() {
 

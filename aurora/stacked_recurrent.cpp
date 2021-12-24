@@ -1,7 +1,15 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "stacked_recurrent.h"
 
 using aurora::models::stacked_recurrent;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
+using std::initializer_list;
+using std::uniform_real_distribution;
 
 stacked_recurrent::~stacked_recurrent() {
 

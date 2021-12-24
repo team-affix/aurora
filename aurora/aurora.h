@@ -1,6 +1,6 @@
 #pragma once
-#include "pch.h"
-#include "affix_base.h"
+#include "affix-base/pch.h"
+#include "affix-base/affix_base.h"
 #include "maths.h"
 #include "models.h"
 #include "params.h"

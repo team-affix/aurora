@@ -10,16 +10,16 @@ namespace aurora {
 			size_t unrolled_size = 0;
 
 		public:
-			vector<Recurrent> models;
+			std::vector<Recurrent> models;
 
 		public:
 			RECURRENT_FIELDS
 			virtual ~stacked_recurrent();
 			stacked_recurrent();
-			stacked_recurrent(vector<Recurrent> a_models);
+			stacked_recurrent(std::vector<Recurrent> a_models);
 			stacked_recurrent(size_t a_height, Recurrent a_model_template);
 
 		};
-		typedef ptr<stacked_recurrent> Stacked_recurrent;
+		typedef affix_base::data::ptr<stacked_recurrent> Stacked_recurrent;
 	}
 }

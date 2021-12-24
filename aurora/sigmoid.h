@@ -11,6 +11,6 @@ namespace aurora {
 			sigmoid();
 
 		};
-		typedef ptr<sigmoid> Sigmoid;
+		typedef affix_base::data::ptr<sigmoid> Sigmoid;
 	}
 }

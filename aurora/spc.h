@@ -7,7 +7,7 @@ namespace aurora {
 	namespace models {
 		class spc : public model {
 		protected:
-			static uniform_real_distribution<double> m_urd;
+			static std::uniform_real_distribution<double> m_urd;
 
 		public:
 			size_t units = 0;
@@ -19,7 +19,7 @@ namespace aurora {
 			spc(size_t a_units);
 
 		protected:
-			int collapse(const tensor& a_probability_tensor);
+			int collapse(const aurora::maths::tensor& a_probability_tensor);
 
 		};
 	}

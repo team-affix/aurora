@@ -7,8 +7,8 @@ namespace aurora {
 	namespace models {
 		class cnl : public model {
 		private:
-			tensor y_des;
-			tensor y_des_reshaped;
+			aurora::maths::tensor y_des;
+			aurora::maths::tensor y_des_reshaped;
 
 		public:
 			size_t filter_height = 0;
@@ -32,6 +32,6 @@ namespace aurora {
 			size_t y_strides();
 
 		};
-		typedef ptr<cnl> Cnl;
+		typedef affix_base::data::ptr<cnl> Cnl;
 	}
 }

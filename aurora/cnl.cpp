@@ -1,8 +1,12 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "cnl.h"
 #include "weight_junction.h"
 
 using aurora::models::cnl;
+using std::function;
+using aurora::params::Param;
+using aurora::maths::tensor;
+using aurora::models::model;
 
 cnl::~cnl() {
 

@@ -18,6 +18,6 @@ namespace aurora {
 			weight_junction(size_t a_a, size_t a_b);
 
 		};
-		typedef ptr<weight_junction> Weight_junction;
+		typedef affix_base::data::ptr<weight_junction> Weight_junction;
 	}
 }

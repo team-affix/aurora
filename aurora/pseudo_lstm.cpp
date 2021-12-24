@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param_init.h"
 #include "pseudo_lstm.h"
 #include "pseudo_lstm_hyperparams.h"
@@ -7,6 +7,9 @@
 #include "neuron.h"
 
 using namespace aurora;
+using namespace aurora::models;
+using namespace aurora::params;
+using std::uniform_real_distribution;
 
 Lstm pseudo::lstm_compiled(size_t a_units, size_t a_max_timesteps, param_vector& a_param_vec) {
 

@@ -1,6 +1,7 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param_rcv.h"
 
+using aurora::params::param;
 using aurora::params::param_rcv;
 
 param_rcv::~param_rcv() {
@@ -75,4 +76,10 @@ void param_rcv::dreward(const double& a_dreward) {
 	reward() += a_dreward;
 	double slope = (dreward() / dstate());
 	momentum() = beta() * momentum() + alpha() * sign(slope);
+}
+
+param* param_rcv::clone()
+{
+	param_rcv* result = new param_rcv(state(), learn_rate(), beta());
+	return result;
 }

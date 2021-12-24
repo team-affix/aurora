@@ -15,10 +15,10 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~sequential();
 			sequential();
-			sequential(initializer_list<Model> a_models);
+			sequential(std::initializer_list<Model> a_models);
 			sequential(vector<Model> a_models);
 
 		};
-		typedef ptr<sequential> Sequential;
+		typedef affix_base::data::ptr<sequential> Sequential;
 	}
 }

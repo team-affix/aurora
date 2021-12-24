@@ -1,20 +1,16 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param_mom.h"
-
-using aurora::params::param_mom;
-using std::mutex;
-using std::lock_guard;
 
 namespace aurora {
 	namespace params {
 		class param_mom_mt : public param_mom {
 		public:
-			ptr<double> momentum_ptr = new double(0);
-			ptr<double> beta_ptr = new double(0);
+			affix_base::data::ptr<double> momentum_ptr = new double(0);
+			affix_base::data::ptr<double> beta_ptr = new double(0);
 
 		public:
-			mutex accum_grad_mtx;
+			std::mutex accum_grad_mtx;
 
 		public:
 			virtual ~param_mom_mt();
@@ -28,6 +24,6 @@ namespace aurora {
 			virtual param* clone();
 
 		};
-		typedef ptr<param_mom_mt> Param_mom_mt;
+		typedef affix_base::data::ptr<param_mom_mt> Param_mom_mt;
 	}
 }

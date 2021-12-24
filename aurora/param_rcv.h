@@ -1,20 +1,18 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param.h"
-
-using aurora::params::param;
 
 namespace aurora {
 	namespace params {
 		class param_rcv : public param {
 		public:
-			ptr<double> m_dstate = new double(0);
-			ptr<double> m_learn_rate = new double(0);
-			ptr<double> m_reward = new double(0);
-			ptr<double> m_dreward = new double(0);
-			ptr<double> m_beta = new double(0);
-			ptr<double> m_alpha = new double(0);
-			ptr<double> m_momentum = new double(0);
+			affix_base::data::ptr<double> m_dstate = new double(0);
+			affix_base::data::ptr<double> m_learn_rate = new double(0);
+			affix_base::data::ptr<double> m_reward = new double(0);
+			affix_base::data::ptr<double> m_dreward = new double(0);
+			affix_base::data::ptr<double> m_beta = new double(0);
+			affix_base::data::ptr<double> m_alpha = new double(0);
+			affix_base::data::ptr<double> m_momentum = new double(0);
 
 		public:
 			virtual ~param_rcv();
@@ -39,7 +37,10 @@ namespace aurora {
 			void reward(const double& a_reward);
 			void dreward(const double& a_dreward);
 
+		public:
+			virtual param* clone();
+
 		};
-		typedef ptr<param_rcv> Param_rcv;
+		typedef affix_base::data::ptr<param_rcv> Param_rcv;
 	}
 }

@@ -1,7 +1,14 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "layer.h"
 
 using aurora::models::layer;
+using std::initializer_list;
+using aurora::params::Param;
+using std::vector;
+using std::function;
+using aurora::models::model;
+using aurora::maths::tensor;
+
 
 layer::~layer() {
 

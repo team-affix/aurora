@@ -1,7 +1,13 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "ntm_location_addresser.h"
 
 using aurora::models::ntm_location_addresser;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
 
 ntm_location_addresser::~ntm_location_addresser() {
 

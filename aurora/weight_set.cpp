@@ -1,7 +1,15 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "weight_set.h"
 
 using aurora::models::weight_set;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
+using std::initializer_list;
+using std::uniform_real_distribution;
 
 weight_set::~weight_set() {
 

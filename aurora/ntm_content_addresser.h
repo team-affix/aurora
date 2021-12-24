@@ -14,10 +14,10 @@ namespace aurora {
 			size_t memory_width = 0;
 
 		public:
-			tensor key;
-			tensor key_grad;
-			tensor beta;
-			tensor beta_grad;
+			aurora::maths::tensor key;
+			aurora::maths::tensor key_grad;
+			aurora::maths::tensor beta;
+			aurora::maths::tensor beta_grad;
 
 		public:
 			Sync internal_similarity;
@@ -31,6 +31,6 @@ namespace aurora {
 			ntm_content_addresser(size_t a_memory_height, size_t a_memory_width);
 
 		};
-		typedef ptr<ntm_content_addresser> Ntm_content_addresser;
+		typedef affix_base::data::ptr<ntm_content_addresser> Ntm_content_addresser;
 	}
 }

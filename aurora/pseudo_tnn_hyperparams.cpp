@@ -1,7 +1,8 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "pseudo_tnn_hyperparams.h"
 
 using namespace aurora;
+using std::uniform_real_distribution;
 
 void pseudo::tnn_hyperparams(
 	size_t a_param_count,

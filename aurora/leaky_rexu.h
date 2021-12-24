@@ -16,6 +16,6 @@ namespace aurora {
 			leaky_rexu(double a_k);
 
 		};
-		typedef ptr<leaky_rexu> Leaky_rexu;
+		typedef affix_base::data::ptr<leaky_rexu> Leaky_rexu;
 	}
 }

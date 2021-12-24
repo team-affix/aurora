@@ -1,22 +1,18 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param.h"
 #include "tensor.h"
 
-using aurora::params::Param;
-using aurora::maths::tensor;
-
 namespace aurora {
 	namespace params {
-		class param_vector : public vector<Param> {
+		class param_vector : public std::vector<Param> {
 		public:
 			void update();
-			void pop(const tensor& a_states);
+			void pop(const aurora::maths::tensor& a_states);
 
 		public:
-			operator tensor();
+			operator aurora::maths::tensor();
 
 		};
 	}
 }
-

@@ -1,10 +1,6 @@
 #pragma once
-#include "pch.h"
-#include "ptr.h"
-
-using affix_base::data::ptr;
-using std::vector;
-using std::function;
+#include "affix-base/pch.h"
+#include "affix-base/ptr.h"
 
 namespace aurora {
 	namespace params {
@@ -12,7 +8,7 @@ namespace aurora {
 		class param_mom;
 		class param {
 		public:
-			ptr<double> state_ptr = new double(0);
+			affix_base::data::ptr<double> state_ptr = new double(0);
 
 		public:
 			virtual ~param();
@@ -27,6 +23,6 @@ namespace aurora {
 			virtual param* clone();
 
 		};
-		typedef ptr<param> Param;
+		typedef affix_base::data::ptr<param> Param;
 	}
 }

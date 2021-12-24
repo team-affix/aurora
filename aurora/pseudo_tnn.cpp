@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "pseudo_tnn.h"
 #include "static_vals.h"
 #include "layer.h"
@@ -11,6 +11,10 @@ using namespace aurora;
 using aurora::pseudo::tnn_hyperparams;
 using models::layer;
 using models::weight_junction;
+using namespace aurora::models;
+using std::vector;
+using namespace aurora::params;
+using std::uniform_real_distribution;
 
 Sequential pseudo::tnn(vector<size_t> a_dims, Model a_neuron_template) {
 	Sequential result = new sequential();

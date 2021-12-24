@@ -9,10 +9,10 @@ namespace aurora {
 			size_t units = 0;
 
 		public:
-			tensor a;
-			tensor a_grad;
-			tensor e;
-			tensor e_grad;
+			aurora::maths::tensor a;
+			aurora::maths::tensor a_grad;
+			aurora::maths::tensor e;
+			aurora::maths::tensor e_grad;
 
 		public:
 			Ntm_rh internal_rh;
@@ -26,6 +26,6 @@ namespace aurora {
 			ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units);
 
 		};
-		typedef ptr<ntm_wh> Ntm_wh;
+		typedef affix_base::data::ptr<ntm_wh> Ntm_wh;
 	}
 }

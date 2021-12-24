@@ -1,7 +1,11 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "cos_sim.h"
 
 using aurora::models::cos_sim;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::maths::tensor;
 
 cos_sim::~cos_sim() {
 

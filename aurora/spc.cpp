@@ -1,9 +1,17 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "spc.h"
 #include "static_vals.h"
 
 using aurora::models::model;
 using aurora::models::spc;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
+using std::initializer_list;
+using std::uniform_real_distribution;
 
 uniform_real_distribution<double> spc::m_urd(0, 1);
 
