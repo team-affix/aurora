@@ -8,7 +8,7 @@ namespace aurora {
 		class weight_set : public model {
 		public:
 			size_t a;
-			vector<Weight> weights;
+			std::vector<Weight> weights;
 
 		public:
 			MODEL_FIELDS

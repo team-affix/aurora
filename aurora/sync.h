@@ -8,8 +8,8 @@ namespace aurora {
 		class sync : public recurrent {
 		public:
 			Model model_template;
-			vector<Model> prepared;
-			vector<Model> unrolled;
+			std::vector<Model> prepared;
+			std::vector<Model> unrolled;
 
 		public:
 			RECURRENT_FIELDS

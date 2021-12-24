@@ -4,7 +4,7 @@
 
 namespace aurora {
 	namespace params {
-		class param_sgd : public param {
+		class param_sgd : public aurora::params::param {
 		public:
 			affix_base::data::ptr<double> learn_rate_ptr = new double(0);
 			affix_base::data::ptr<double> gradient_ptr = new double(0);

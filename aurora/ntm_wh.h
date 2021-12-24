@@ -23,7 +23,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~ntm_wh();
 			ntm_wh();
-			ntm_wh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_units);
+			ntm_wh(size_t a_units, std::vector<size_t> a_head_h_dims, size_t a_shift_units);
 
 		};
 		typedef affix_base::data::ptr<ntm_wh> Ntm_wh;

@@ -29,7 +29,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~ntm_writer();
 			ntm_writer();
-			ntm_writer(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims);
+			ntm_writer(size_t a_memory_height, size_t a_memory_width, std::vector<int> a_valid_shifts, std::vector<size_t> a_head_hidden_dims);
 
 		};
 		typedef affix_base::data::ptr<ntm_writer> Ntm_writer;

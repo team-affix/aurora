@@ -29,8 +29,8 @@ namespace aurora {
 		public:
 			Lstm internal_lstm;
 			Ntm_ts ntm_ts_template;
-			vector<Ntm_ts> prepared;
-			vector<Ntm_ts> unrolled;
+			std::vector<Ntm_ts> prepared;
+			std::vector<Ntm_ts> unrolled;
 
 		public:
 			RECURRENT_FIELDS
@@ -41,8 +41,8 @@ namespace aurora {
 				size_t a_memory_width,
 				size_t a_num_readers,
 				size_t a_num_writers,
-				vector<int> a_valid_shifts,
-				vector<size_t> a_head_hidden_dims);
+				std::vector<int> a_valid_shifts,
+				std::vector<size_t> a_head_hidden_dims);
 
 		};
 		typedef affix_base::data::ptr<ntm> Ntm;

@@ -32,8 +32,8 @@ namespace aurora {
 			aurora::maths::tensor write_wy_grad;
 
 		public:
-			vector<Ntm_reader> internal_readers;
-			vector<Ntm_writer> internal_writers;
+			std::vector<Ntm_reader> internal_readers;
+			std::vector<Ntm_writer> internal_writers;
 
 		public:
 			MODEL_FIELDS
@@ -44,8 +44,8 @@ namespace aurora {
 				size_t a_memory_width,
 				size_t a_num_readers,
 				size_t a_num_writers,
-				vector<int> a_valid_shifts,
-				vector<size_t> a_head_hidden_dims);
+				std::vector<int> a_valid_shifts,
+				std::vector<size_t> a_head_hidden_dims);
 
 		};
 		typedef affix_base::data::ptr<ntm_ts> Ntm_ts;

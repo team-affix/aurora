@@ -24,6 +24,11 @@ using std::uniform_real_distribution;
 using std::uniform_int_distribution;
 using std::ifstream;
 using std::ofstream;
+using std::vector;
+using std::string;
+using std::function;
+using affix_base::threading::persistent_thread;
+
 
 std::string pl_export(vector<param_sgd*>& a_pl) {
 	std::string result;
@@ -3769,7 +3774,7 @@ int main() {
 
 	srand(time(NULL));
 
-	spc_model_test();
+	major_tests();
 
 	return 0;
 

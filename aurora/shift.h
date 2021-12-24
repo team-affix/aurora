@@ -9,7 +9,7 @@ namespace aurora {
 			size_t units = 0;
 
 		public:
-			vector<int> valid_shifts;
+			std::vector<int> valid_shifts;
 
 		public:
 			aurora::maths::tensor amount;
@@ -19,7 +19,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~shift();
 			shift();
-			shift(size_t a_units, vector<int> a_valid_shifts);
+			shift(size_t a_units, std::vector<int> a_valid_shifts);
 
 		protected:
 			int positive_modulo(int i, int n);

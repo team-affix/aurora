@@ -6,7 +6,7 @@ namespace aurora {
 	namespace models {
 		class layer : public model {
 		public:
-			vector<Model> models;
+			std::vector<Model> models;
 
 		public:
 			MODEL_FIELDS
@@ -14,7 +14,7 @@ namespace aurora {
 			layer();
 			layer(size_t a_height, Model a_model_template);
 			layer(std::initializer_list<Model> a_models);
-			layer(vector<Model> a_models);
+			layer(std::vector<Model> a_models);
 
 		};
 		typedef affix_base::data::ptr<layer> Layer;

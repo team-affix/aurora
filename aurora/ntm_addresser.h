@@ -36,7 +36,7 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~ntm_addresser();
 			ntm_addresser();
-			ntm_addresser(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts);
+			ntm_addresser(size_t a_memory_height, size_t a_memory_width, std::vector<int> a_valid_shifts);
 
 		};
 		typedef affix_base::data::ptr<ntm_addresser> Ntm_addresser;

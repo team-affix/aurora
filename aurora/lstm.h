@@ -23,8 +23,8 @@ namespace aurora {
 
 		public:
 			Lstm_ts lstm_ts_template;
-			vector<Lstm_ts> prepared;
-			vector<Lstm_ts> unrolled;
+			std::vector<Lstm_ts> prepared;
+			std::vector<Lstm_ts> unrolled;
 
 		public:
 			RECURRENT_FIELDS

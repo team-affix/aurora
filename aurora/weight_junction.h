@@ -9,7 +9,7 @@ namespace aurora {
 		public:
 			size_t a;
 			size_t b;
-			vector<Weight_set> weight_sets;
+			std::vector<Weight_set> weight_sets;
 
 		public:
 			MODEL_FIELDS
