@@ -8,29 +8,29 @@ namespace aurora {
 	namespace models {
 		class lstm_ts : public model {
 		public:
-			size_t units;
+			size_t m_units;
 
 		public:
-			aurora::maths::tensor ctx;
-			aurora::maths::tensor cty;
-			aurora::maths::tensor htx;
-			aurora::maths::tensor hty;
-			aurora::maths::tensor ctx_grad;
-			aurora::maths::tensor cty_grad;
-			aurora::maths::tensor htx_grad;
-			aurora::maths::tensor hty_grad;
+			aurora::maths::tensor m_ctx;
+			aurora::maths::tensor m_cty;
+			aurora::maths::tensor m_htx;
+			aurora::maths::tensor m_hty;
+			aurora::maths::tensor m_ctx_grad;
+			aurora::maths::tensor m_cty_grad;
+			aurora::maths::tensor m_htx_grad;
+			aurora::maths::tensor m_hty_grad;
 
 		public:
-			aurora::maths::tensor gate_x;
-			aurora::maths::tensor comp_0;
-			aurora::maths::tensor comp_1;
+			aurora::maths::tensor m_gate_x;
+			aurora::maths::tensor m_comp_0;
+			aurora::maths::tensor m_comp_1;
 
 		public:
-			Layer forget_gate;
-			Layer limit_gate;
-			Layer input_gate;
-			Layer output_gate;
-			Layer tanh_gate;
+			Layer m_forget_gate;
+			Layer m_limit_gate;
+			Layer m_input_gate;
+			Layer m_output_gate;
+			Layer m_tanh_gate;
 
 		public:
 			MODEL_FIELDS

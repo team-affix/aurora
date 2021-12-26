@@ -5,33 +5,33 @@ using namespace aurora;
 using namespace maths;
 
 double& tensor::val() {
-	return val_ptr.val();
+	return m_val_ptr.val();
 }
 
 double tensor::val() const {
-	return val_ptr.val();
+	return m_val_ptr.val();
 }
 
 std::vector<tensor>& tensor::vec() {
-	return vec_ptr.val();
+	return m_vec_ptr.val();
 }
 
 const std::vector<tensor>& tensor::vec() const {
-	return vec_ptr.val();
+	return m_vec_ptr.val();
 }
 
 tensor& tensor::group_head() {
-	if (group_prev_ptr == nullptr)
+	if (m_group_prev_ptr == nullptr)
 		return *this;
 	else
-		return group_prev_ptr->group_head();
+		return m_group_prev_ptr->group_head();
 }
 
 tensor& tensor::group_tail() {
-	if (group_next_ptr == nullptr)
+	if (m_group_next_ptr == nullptr)
 		return *this;
 	else
-		return group_next_ptr->group_tail();
+		return m_group_next_ptr->group_tail();
 }
 
 size_t tensor::group_size() {
@@ -554,7 +554,7 @@ tensor tensor::cat(tensor& a_other) {
 
 void tensor::link(tensor& a_other) {
 	group_recur([&](tensor* elem) {
-		elem->val_ptr.link(a_other.val_ptr);
+		elem->m_val_ptr.link(a_other.m_val_ptr);
 		if (elem->size() != a_other.size())
 			elem->resize(a_other.size());
 		for (int i = 0; i < a_other.size(); i++)
@@ -563,7 +563,7 @@ void tensor::link(tensor& a_other) {
 }
 
 void tensor::unlink() {
-	val_ptr = nullptr;
+	m_val_ptr = nullptr;
 	for (int i = 0; i < size(); i++)
 		at(i).unlink();
 }
@@ -576,22 +576,22 @@ void tensor::rank_recur(const std::function<void(tensor*)>& a_func) {
 }
 
 void tensor::group_recur_fwd(const std::function<void(tensor*)>& a_func) {
-	if (group_next_ptr != nullptr)
-		group_next_ptr->group_recur_fwd(a_func);
+	if (m_group_next_ptr != nullptr)
+		m_group_next_ptr->group_recur_fwd(a_func);
 	a_func(this);
 }
 
 void tensor::group_recur_bwd(const std::function<void(tensor*)>& a_func) {
-	if (group_prev_ptr != nullptr)
-		group_prev_ptr->group_recur_bwd(a_func);
+	if (m_group_prev_ptr != nullptr)
+		m_group_prev_ptr->group_recur_bwd(a_func);
 	a_func(this);
 }
 
 void tensor::group_recur(const std::function<void(tensor*)>& a_func) {
-	if (group_prev_ptr != nullptr)
-		group_prev_ptr->group_recur_bwd(a_func);
-	if (group_next_ptr != nullptr)
-		group_next_ptr->group_recur_fwd(a_func);
+	if (m_group_prev_ptr != nullptr)
+		m_group_prev_ptr->group_recur_bwd(a_func);
+	if (m_group_next_ptr != nullptr)
+		m_group_next_ptr->group_recur_fwd(a_func);
 	a_func(this);
 }
 
@@ -618,20 +618,20 @@ void tensor::group_join(tensor& a_other) {
 		// PREVENT ADDING NODES TO SAME GROUP TWICE
 		if (!a_other.group_contains(elem)) {
 			tensor& l_group_tail = a_other.group_tail();
-			l_group_tail.group_next_ptr = elem;
-			elem->group_prev_ptr = &l_group_tail;
-			elem->group_next_ptr = nullptr;
+			l_group_tail.m_group_next_ptr = elem;
+			elem->m_group_prev_ptr = &l_group_tail;
+			elem->m_group_next_ptr = nullptr;
 		}
 	});
 }
 
 void tensor::group_leave() {
-	if (group_prev_ptr != nullptr)
-		group_prev_ptr->group_next_ptr = group_next_ptr;
-	if (group_next_ptr != nullptr)
-		group_next_ptr->group_prev_ptr = group_prev_ptr;
-	group_prev_ptr = nullptr;
-	group_next_ptr = nullptr;
+	if (m_group_prev_ptr != nullptr)
+		m_group_prev_ptr->m_group_next_ptr = m_group_next_ptr;
+	if (m_group_next_ptr != nullptr)
+		m_group_next_ptr->m_group_prev_ptr = m_group_prev_ptr;
+	m_group_prev_ptr = nullptr;
+	m_group_next_ptr = nullptr;
 }
 
 void tensor::group_disband() {

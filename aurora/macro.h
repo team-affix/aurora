@@ -13,17 +13,17 @@ virtual void signal(const aurora::maths::tensor& a_y_des); \
 virtual void model_recur(std::function<void(model*)> a_func); \
 virtual void compile(); \
 virtual aurora::maths::tensor& fwd(const aurora::maths::tensor& a_x) { \
-	x.pop(a_x); \
+	m_x.pop(a_x); \
 	fwd(); \
-	return y; \
+	return m_y; \
 } \
 virtual aurora::maths::tensor& bwd(const aurora::maths::tensor& a_y_grad) { \
-	y_grad.pop(a_y_grad); \
+	m_y_grad.pop(a_y_grad); \
 	bwd(); \
-	return x_grad; \
+	return m_x_grad; \
 } \
 virtual void cycle(const aurora::maths::tensor& a_x, const aurora::maths::tensor& a_y_des) { \
-	x.pop(a_x); \
+	m_x.pop(a_x); \
 	fwd(); \
 	signal(a_y_des); \
 	bwd(); \

@@ -21,11 +21,11 @@ param_sgd::param_sgd(double a_state, double a_learn_rate, double a_gradient) : p
 }
 
 double& param_sgd::learn_rate() {
-	return learn_rate_ptr.val();
+	return m_learn_rate_ptr.val();
 }
 
 double& param_sgd::gradient() {
-	return gradient_ptr.val();
+	return m_gradient_ptr.val();
 }
 
 void param_sgd::accum_grad(double a_grad) {

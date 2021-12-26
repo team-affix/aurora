@@ -9,14 +9,18 @@ namespace aurora {
 	namespace models {
 		class sequential : public model {
 		public:
-			std::vector<Model> models;
+			std::vector<Model> m_models;
 
 		public:
 			MODEL_FIELDS
 			virtual ~sequential();
 			sequential();
-			sequential(std::initializer_list<Model> a_models);
-			sequential(std::vector<Model> a_models);
+			sequential(
+				std::initializer_list<Model> a_models
+			);
+			sequential(
+				std::vector<Model> a_models
+			);
 
 		};
 		typedef affix_base::data::ptr<sequential> Sequential;

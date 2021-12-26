@@ -27,15 +27,15 @@ model* sigmoid::clone(function<Param(Param&)> a_func) {
 }
 
 void sigmoid::fwd() {
-	y.val() = (double)1 / ((double)1 + exp(-x.val()));
+	m_y.val() = (double)1 / ((double)1 + exp(-m_x.val()));
 }
 
 void sigmoid::bwd() {
-	x_grad.val() = y_grad.val() * y.val() * (1 - y.val());
+	m_x_grad.val() = m_y_grad.val() * m_y.val() * (1 - m_y.val());
 }
 
 void sigmoid::signal(const tensor& a_y_des) {
-	y_grad.val() = y.val() - a_y_des.val();
+	m_y_grad.val() = m_y.val() - a_y_des.val();
 }
 
 void sigmoid::model_recur(function<void(model*)> a_func) {

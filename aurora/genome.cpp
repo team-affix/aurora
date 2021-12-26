@@ -8,7 +8,7 @@ genome::genome() {
 }
 
 genome::genome(aurora::maths::tensor a_alleles, std::function<double(double)> a_random_change) : aurora::maths::tensor(a_alleles) {
-	this->random_change = a_random_change;
+	this->m_random_change = a_random_change;
 }
 
 genome::operator aurora::maths::tensor& () {
@@ -18,7 +18,7 @@ genome::operator aurora::maths::tensor& () {
 genome genome::mutate() {
 	genome result = clone();
 	for (int allele = 0; allele < result.size(); allele++)
-		result[allele].val() = random_change(at(allele));
+		result[allele].val() = m_random_change(at(allele));
 	return result;
 }
 
@@ -66,5 +66,5 @@ std::vector<genome> genome::merge(std::vector<genome> a_parents, size_t a_childr
 }
 
 genome genome::clone() {
-	return genome(tensor::clone(), random_change);
+	return genome(tensor::clone(), m_random_change);
 }

@@ -16,7 +16,7 @@ interpolate::interpolate() {
 }
 
 interpolate::interpolate(size_t a_units) {
-	units = a_units;
+	m_units = a_units;
 }
 
 void interpolate::param_recur(function<void(Param&)> a_func) {
@@ -25,30 +25,30 @@ void interpolate::param_recur(function<void(Param&)> a_func) {
 
 model* interpolate::clone(function<Param(Param&)> a_func) {
 	interpolate* result = new interpolate();
-	result->units = units;
+	result->m_units = m_units;
 	return result;
 }
 
 void interpolate::fwd() {
-	double& interpolate_amount = amount[0];
-	amount_compliment = 1.0 - interpolate_amount;
-	for (int i = 0; i < units; i++)
-		y[i].val() = x[1][i] * interpolate_amount + x[0][i] * amount_compliment;
+	double& interpolate_amount = m_amount[0];
+	m_amount_compliment = 1.0 - interpolate_amount;
+	for (int i = 0; i < m_units; i++)
+		m_y[i].val() = m_x[1][i] * interpolate_amount + m_x[0][i] * m_amount_compliment;
 }
 
 void interpolate::bwd() {
-	double& interpolate_amount = amount[0];
-	double& interpolate_amount_grad = amount_grad[0];
+	double& interpolate_amount = m_amount[0];
+	double& interpolate_amount_grad = m_amount_grad[0];
 	interpolate_amount_grad = 0;
-	for (int i = 0; i < units; i++) {
-		x_grad[1][i].val() = y_grad[i] * interpolate_amount;
-		x_grad[0][i].val() = y_grad[i] * amount_compliment;
-		interpolate_amount_grad += y_grad[i] * (x[1][i] - x[0][i]);
+	for (int i = 0; i < m_units; i++) {
+		m_x_grad[1][i].val() = m_y_grad[i] * interpolate_amount;
+		m_x_grad[0][i].val() = m_y_grad[i] * m_amount_compliment;
+		interpolate_amount_grad += m_y_grad[i] * (m_x[1][i] - m_x[0][i]);
 	}
 }
 
 void interpolate::signal(const tensor& a_y_des) {
-	y.sub_1d(a_y_des, y_grad);
+	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
 void interpolate::model_recur(function<void(model*)> a_func) {
@@ -56,10 +56,10 @@ void interpolate::model_recur(function<void(model*)> a_func) {
 }
 
 void interpolate::compile() {
-	x = tensor::new_2d(2, units);
-	x_grad = tensor::new_2d(2, units);
-	y = tensor::new_1d(units);
-	y_grad = tensor::new_1d(units);
-	amount = tensor::new_1d(1);
-	amount_grad = tensor::new_1d(1);
+	m_x = tensor::new_2d(2, m_units);
+	m_x_grad = tensor::new_2d(2, m_units);
+	m_y = tensor::new_1d(m_units);
+	m_y_grad = tensor::new_1d(m_units);
+	m_amount = tensor::new_1d(1);
+	m_amount_grad = tensor::new_1d(1);
 }

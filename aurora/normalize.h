@@ -6,13 +6,13 @@ namespace aurora {
 	namespace models {
 		class normalize : public model {
 		public:
-			size_t units = 0;
+			size_t m_units = 0;
 
 		public:
-			aurora::maths::tensor x_abs;
+			aurora::maths::tensor m_x_abs;
 
 		public:
-			double sum = 0;
+			double m_sum = 0;
 
 		public:
 			MODEL_FIELDS

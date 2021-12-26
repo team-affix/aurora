@@ -6,7 +6,7 @@ namespace aurora {
 	namespace models {
 		class bias : public model {
 		public:
-			aurora::params::Param pmt = new aurora::params::param();
+			aurora::params::Param m_param = new aurora::params::param();
 
 		public:
 			MODEL_FIELDS

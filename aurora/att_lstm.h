@@ -9,11 +9,11 @@ namespace aurora {
 	namespace models {
 		class att_lstm : public model {
 		public:
-			size_t units = 0;
+			size_t m_units = 0;
 
 		public:
-			Sync models;
-			Lstm internal_lstm;
+			Sync m_models;
+			Lstm m_internal_lstm;
 
 		public:
 			ATTENTION_FIELDS

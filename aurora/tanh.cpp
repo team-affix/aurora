@@ -20,9 +20,9 @@ tanh::tanh() {
 }
 
 tanh::tanh(double a_a, double a_b, double a_c) {
-	a = a_a;
-	b = a_b;
-	c = a_c;
+	m_a = a_a;
+	m_b = a_b;
+	m_c = a_c;
 }
 
 void tanh::param_recur(function<void(Param&)> a_func) {
@@ -34,15 +34,15 @@ model* tanh::clone(function<Param(Param&)> a_func) {
 }
 
 void tanh::fwd() {
-	y.val() = a * std::tanh(b * x.val()) + c;
+	m_y.val() = m_a * std::tanh(m_b * m_x.val()) + m_c;
 }
 
 void tanh::bwd() {
-	x_grad.val() = y_grad.val() * a / pow(cosh(b * x.val()), 2) * b;
+	m_x_grad.val() = m_y_grad.val() * m_a / pow(cosh(m_b * m_x.val()), 2) * m_b;
 }
 
 void tanh::signal(const tensor& a_y_des) {
-	y_grad.val() = y.val() - a_y_des.val();
+	m_y_grad.val() = m_y.val() - a_y_des.val();
 }
 
 void tanh::model_recur(function<void(model*)> a_func) {

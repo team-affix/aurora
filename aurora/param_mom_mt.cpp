@@ -17,9 +17,9 @@ param_mom_mt::param_mom_mt(double a_state, double a_learn_rate, double a_gradien
 }
 
 void param_mom_mt::accum_grad(double a_grad) {
-	accum_grad_mtx.lock();
+	m_accum_grad_mtx.lock();
 	gradient() += a_grad;
-	accum_grad_mtx.unlock();
+	m_accum_grad_mtx.unlock();
 }
 
 param* param_mom_mt::clone() {

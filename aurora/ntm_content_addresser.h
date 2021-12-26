@@ -10,25 +10,28 @@ namespace aurora {
 	namespace models {
 		class ntm_content_addresser : public model {
 		public:
-			size_t memory_height = 0;
-			size_t memory_width = 0;
+			size_t m_memory_height = 0;
+			size_t m_memory_width = 0;
 
 		public:
-			aurora::maths::tensor key;
-			aurora::maths::tensor key_grad;
-			aurora::maths::tensor beta;
-			aurora::maths::tensor beta_grad;
+			aurora::maths::tensor m_key;
+			aurora::maths::tensor m_key_grad;
+			aurora::maths::tensor m_beta;
+			aurora::maths::tensor m_beta_grad;
 
 		public:
-			Sync internal_similarity;
-			Ntm_sparsify internal_sparsify;
-			Normalize internal_normalize;
+			Sync m_internal_similarity;
+			Ntm_sparsify m_internal_sparsify;
+			Normalize m_internal_normalize;
 
 		public:
 			MODEL_FIELDS
 			virtual ~ntm_content_addresser();
 			ntm_content_addresser();
-			ntm_content_addresser(size_t a_memory_height, size_t a_memory_width);
+			ntm_content_addresser(
+				size_t a_memory_height, 
+				size_t a_memory_width
+			);
 
 		};
 		typedef affix_base::data::ptr<ntm_content_addresser> Ntm_content_addresser;

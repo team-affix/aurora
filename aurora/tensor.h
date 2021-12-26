@@ -7,12 +7,12 @@ namespace aurora {
 
 		class tensor {
 		public:
-			affix_base::data::ptr<double> val_ptr = new double(0);
-			affix_base::data::ptr<std::vector<tensor>> vec_ptr = new std::vector<tensor>();
+			affix_base::data::ptr<double> m_val_ptr = new double(0);
+			affix_base::data::ptr<std::vector<tensor>> m_vec_ptr = new std::vector<tensor>();
 			
 		public:
-			tensor* group_prev_ptr = nullptr;
-			tensor* group_next_ptr = nullptr;
+			tensor* m_group_prev_ptr = nullptr;
+			tensor* m_group_next_ptr = nullptr;
 
 		public:
 			double& val();

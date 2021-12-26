@@ -16,64 +16,64 @@ sync::~sync() {
 }
 
 sync::sync(Model a_model_template) {
-	this->model_template = a_model_template;
+	this->m_model_template = a_model_template;
 }
 
 void sync::param_recur(function<void(Param&)> a_func) {
-	model_template->param_recur(a_func);
+	m_model_template->param_recur(a_func);
 }
 
 model* sync::clone(function<Param(Param&)> a_func) {
-	sync* result = new sync(model_template->clone(a_func));
-	result->prep(prepared.size());
-	result->unroll(unrolled.size());
+	sync* result = new sync(m_model_template->clone(a_func));
+	result->prep(m_prepared.size());
+	result->unroll(m_unrolled.size());
 	return result;
 }
 
 void sync::fwd() {
-	for (int i = 0; i < unrolled.size(); i++)
-		unrolled[i]->fwd();
+	for (int i = 0; i < m_unrolled.size(); i++)
+		m_unrolled[i]->fwd();
 }
 
 void sync::bwd() {
-	for (int i = 0; i < unrolled.size(); i++)
-		unrolled[i]->bwd();
+	for (int i = 0; i < m_unrolled.size(); i++)
+		m_unrolled[i]->bwd();
 }
 
 void sync::signal(const tensor& a_y_des) {
-	for (int i = 0; i < unrolled.size(); i++)
-		unrolled[i]->signal(a_y_des[i]);
+	for (int i = 0; i < m_unrolled.size(); i++)
+		m_unrolled[i]->signal(a_y_des[i]);
 }
 
 void sync::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	model_template->model_recur(a_func);
+	m_model_template->model_recur(a_func);
 }
 
 void sync::compile() {
-	x.resize(prepared.size());
-	y.resize(prepared.size());
-	x_grad.resize(prepared.size());
-	y_grad.resize(prepared.size());
-	for (int i = 0; i < prepared.size(); i++) {
-		prepared[i]->compile();
-		x[i].group_join_all_ranks(prepared[i]->x);
-		y[i].group_join_all_ranks(prepared[i]->y);
-		x_grad[i].group_join_all_ranks(prepared[i]->x_grad);
-		y_grad[i].group_join_all_ranks(prepared[i]->y_grad);
+	m_x.resize(m_prepared.size());
+	m_y.resize(m_prepared.size());
+	m_x_grad.resize(m_prepared.size());
+	m_y_grad.resize(m_prepared.size());
+	for (int i = 0; i < m_prepared.size(); i++) {
+		m_prepared[i]->compile();
+		m_x[i].group_join_all_ranks(m_prepared[i]->m_x);
+		m_y[i].group_join_all_ranks(m_prepared[i]->m_y);
+		m_x_grad[i].group_join_all_ranks(m_prepared[i]->m_x_grad);
+		m_y_grad[i].group_join_all_ranks(m_prepared[i]->m_y_grad);
 	}
 }
 
 void sync::prep(size_t a_n) {
-	prepared.clear();
-	prepared.resize(a_n);
+	m_prepared.clear();
+	m_prepared.resize(a_n);
 	for (int i = 0; i < a_n; i++)
-		prepared.at(i) = model_template->clone();
+		m_prepared.at(i) = m_model_template->clone();
 }
 
 void sync::unroll(size_t a_n) {
-	unrolled.clear();
-	unrolled.resize(a_n);
+	m_unrolled.clear();
+	m_unrolled.resize(a_n);
 	for (int i = 0; i < a_n; i++)
-		unrolled.at(i) = prepared.at(i);
+		m_unrolled.at(i) = m_prepared.at(i);
 }

@@ -8,12 +8,14 @@ namespace aurora {
 		class param_mom;
 		class param {
 		public:
-			affix_base::data::ptr<double> state_ptr = new double(0);
+			affix_base::data::ptr<double> m_state_ptr = new double(0);
 
 		public:
 			virtual ~param();
 			param();
-			param(double a_state);
+			param(
+				double a_state
+			);
 
 		public:
 			virtual double& state();

@@ -9,15 +9,15 @@ namespace aurora {
 	namespace models {
 		class att_lstm_ts : public recurrent {
 		public:
-			size_t units;
+			size_t m_units;
 
 		public:
-			aurora::maths::tensor htx;
-			aurora::maths::tensor htx_grad;
+			aurora::maths::tensor m_htx;
+			aurora::maths::tensor m_htx_grad;
 
 		public:
-			Model model_template;
-			Sync models;
+			Model m_model_template;
+			Sync m_models;
 
 		public:
 			RECURRENT_FIELDS

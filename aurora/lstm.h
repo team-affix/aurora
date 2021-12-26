@@ -9,22 +9,22 @@ namespace aurora {
 	namespace models {
 		class lstm : public recurrent {
 		public:
-			size_t units = 0;
+			size_t m_units = 0;
 
 		public:
-			aurora::maths::tensor ctx;
-			aurora::maths::tensor cty;
-			aurora::maths::tensor htx;
-			aurora::maths::tensor hty;
-			aurora::maths::tensor ctx_grad;
-			aurora::maths::tensor cty_grad;
-			aurora::maths::tensor htx_grad;
-			aurora::maths::tensor hty_grad;
+			aurora::maths::tensor m_ctx;
+			aurora::maths::tensor m_cty;
+			aurora::maths::tensor m_htx;
+			aurora::maths::tensor m_hty;
+			aurora::maths::tensor m_ctx_grad;
+			aurora::maths::tensor m_cty_grad;
+			aurora::maths::tensor m_htx_grad;
+			aurora::maths::tensor m_hty_grad;
 
 		public:
-			Lstm_ts lstm_ts_template;
-			std::vector<Lstm_ts> prepared;
-			std::vector<Lstm_ts> unrolled;
+			Lstm_ts m_lstm_ts_template;
+			std::vector<Lstm_ts> m_prepared;
+			std::vector<Lstm_ts> m_unrolled;
 
 		public:
 			RECURRENT_FIELDS

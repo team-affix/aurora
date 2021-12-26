@@ -20,61 +20,61 @@ layer::layer() {
 
 layer::layer(size_t a_height, Model a_model_template) {
 	for (size_t i = 0; i < a_height; i++)
-		models.push_back(a_model_template->clone([](Param& pmt) { return pmt->clone(); }));
+		m_models.push_back(a_model_template->clone([](Param& pmt) { return pmt->clone(); }));
 }
 
 layer::layer(initializer_list<Model> a_models) {
 	for (initializer_list<Model>::iterator i = a_models.begin(); i != a_models.end(); i++)
-		models.push_back(*i);
+		m_models.push_back(*i);
 }
 
 layer::layer(vector<Model> a_models) {
-	models = a_models;
+	m_models = a_models;
 }
 
 void layer::param_recur(function<void(Param&)> a_func) {
-	for (int i = 0; i < models.size(); i++)
-		models[i]->param_recur(a_func);
+	for (int i = 0; i < m_models.size(); i++)
+		m_models[i]->param_recur(a_func);
 }
 
 model* layer::clone(function<Param(Param&)> a_func) {
 	layer* result = new layer();
-	for (size_t i = 0; i < models.size(); i++)
-		result->models.push_back(models[i]->clone(a_func));
+	for (size_t i = 0; i < m_models.size(); i++)
+		result->m_models.push_back(m_models[i]->clone(a_func));
 	return result;
 }
 
 void layer::fwd() {
-	for (size_t i = 0; i < models.size(); i++)
-		models[i]->fwd();
+	for (size_t i = 0; i < m_models.size(); i++)
+		m_models[i]->fwd();
 }
 
 void layer::bwd() {
-	for (size_t i = 0; i < models.size(); i++)
-		models[i]->bwd();
+	for (size_t i = 0; i < m_models.size(); i++)
+		m_models[i]->bwd();
 }
 
 void layer::signal(const tensor& a_y_des) {
-	for (size_t i = 0; i < models.size(); i++)
-		models[i]->signal(a_y_des[i]);
+	for (size_t i = 0; i < m_models.size(); i++)
+		m_models[i]->signal(a_y_des[i]);
 }
 
 void layer::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	for (size_t i = 0; i < models.size(); i++)
-		models[i]->model_recur(a_func);
+	for (size_t i = 0; i < m_models.size(); i++)
+		m_models[i]->model_recur(a_func);
 }
 
 void layer::compile() {
-	x.resize(models.size());
-	y.resize(models.size());
-	x_grad.resize(models.size());
-	y_grad.resize(models.size());
-	for (size_t i = 0; i < models.size(); i++) {
-		models[i]->compile();
-		models[i]->x.group_add(x[i]);
-		models[i]->x_grad.group_add(x_grad[i]);
-		models[i]->y.group_add(y[i]);
-		models[i]->y_grad.group_add(y_grad[i]);
+	m_x.resize(m_models.size());
+	m_y.resize(m_models.size());
+	m_x_grad.resize(m_models.size());
+	m_y_grad.resize(m_models.size());
+	for (size_t i = 0; i < m_models.size(); i++) {
+		m_models[i]->compile();
+		m_models[i]->m_x.group_add(m_x[i]);
+		m_models[i]->m_x_grad.group_add(m_x_grad[i]);
+		m_models[i]->m_y.group_add(m_y[i]);
+		m_models[i]->m_y_grad.group_add(m_y_grad[i]);
 	}
 }

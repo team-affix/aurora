@@ -19,28 +19,28 @@ using std::uniform_real_distribution;
 Sequential pseudo::tnn(vector<size_t> a_dims, Model a_neuron_template) {
 	Sequential result = new sequential();
 	for (int i = 0; i < a_dims.size() - 1; i++) {
-		result->models.push_back(new layer(a_dims[i], a_neuron_template));
-		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
+		result->m_models.push_back(new layer(a_dims[i], a_neuron_template));
+		result->m_models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
 	}
-	result->models.push_back(new layer(a_dims.back(), a_neuron_template));
+	result->m_models.push_back(new layer(a_dims.back(), a_neuron_template));
 	return result;
 }
 
 Sequential pseudo::tnn(vector<size_t> a_dims, vector<Model> a_neuron_templates) {
 	Sequential result = new sequential();
 	for (int i = 0; i < a_dims.size() - 1; i++) {
-		result->models.push_back(new layer(a_dims[i], a_neuron_templates[i]));
-		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
+		result->m_models.push_back(new layer(a_dims[i], a_neuron_templates[i]));
+		result->m_models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
 	}
-	result->models.push_back(new layer(a_dims.back(), a_neuron_templates.back()));
+	result->m_models.push_back(new layer(a_dims.back(), a_neuron_templates.back()));
 	return result;
 }
 
 Sequential pseudo::tnn_no_output(vector<size_t> a_dims, Model a_neuron_template) {
 	Sequential result = new sequential();
 	for (int i = 0; i < a_dims.size() - 1; i++) {
-		result->models.push_back(new layer(a_dims[i], a_neuron_template));
-		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
+		result->m_models.push_back(new layer(a_dims[i], a_neuron_template));
+		result->m_models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
 	}
 	return result;
 }
@@ -48,8 +48,8 @@ Sequential pseudo::tnn_no_output(vector<size_t> a_dims, Model a_neuron_template)
 Sequential pseudo::tnn_no_output(vector<size_t> a_dims, vector<Model> a_neuron_templates) {
 	Sequential result = new sequential();
 	for (int i = 0; i < a_dims.size() - 1; i++) {
-		result->models.push_back(new layer(a_dims[i], a_neuron_templates[i]));
-		result->models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
+		result->m_models.push_back(new layer(a_dims[i], a_neuron_templates[i]));
+		result->m_models.push_back(new weight_junction(a_dims[i], a_dims[i + 1]));
 	}
 	return result;
 }

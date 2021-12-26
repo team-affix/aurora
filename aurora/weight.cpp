@@ -20,27 +20,27 @@ weight::weight() {
 }
 
 void weight::param_recur(function<void(Param&)> a_func) {
-	a_func(pmt);
+	a_func(m_pmt);
 }
 
 model* weight::clone(function<Param(Param&)> a_func) {
 	weight* result = new weight();
-	result->pmt = a_func(pmt);
+	result->m_pmt = a_func(m_pmt);
 	return result;
 }
 
 void weight::fwd() {
-	y.val() = x.val() * pmt->state();
+	m_y.val() = m_x.val() * m_pmt->state();
 }
 
 void weight::bwd() {
-	param_sgd* pmt_sgd = (param_sgd*)pmt.get();
-	pmt_sgd->accum_grad(y_grad.val() * x.val());
-	x_grad.val() = y_grad.val() * pmt->state();
+	param_sgd* pmt_sgd = (param_sgd*)m_pmt.get();
+	pmt_sgd->accum_grad(m_y_grad.val() * m_x.val());
+	m_x_grad.val() = m_y_grad.val() * m_pmt->state();
 }
 
 void weight::signal(const tensor& a_y_des) {
-	y_grad.val() = y.val() - a_y_des.val();
+	m_y_grad.val() = m_y.val() - a_y_des.val();
 }
 
 void weight::model_recur(function<void(model*)> a_func) {

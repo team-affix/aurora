@@ -17,10 +17,16 @@ namespace aurora {
 		public:
 			virtual ~param_rcv();
 			param_rcv();
-			param_rcv(const double& a_state, const double& a_learn_rate, const double& a_beta);
+			param_rcv(
+				const double& a_state,
+				const double& a_learn_rate,
+				const double& a_beta
+			);
 
 		public:
-			double sign(const double& a_x);
+			double sign(
+				const double& a_x
+			);
 			double& dstate();
 			double& reward();
 			double& dreward();
@@ -30,12 +36,20 @@ namespace aurora {
 			const double& alpha();
 
 		public:
-			void beta(const double& a_val);
+			void beta(
+				const double& a_val
+			);
 
 		public:
-			void update(const double& a_c);
-			void reward(const double& a_reward);
-			void dreward(const double& a_dreward);
+			void update(
+				const double& a_c
+			);
+			void reward(
+				const double& a_reward
+			);
+			void dreward(
+				const double& a_dreward
+			);
 
 		public:
 			virtual param* clone();

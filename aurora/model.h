@@ -12,10 +12,10 @@ namespace aurora {
 	namespace models {
 		class model {
 		public:
-			aurora::maths::tensor x = 0;
-			aurora::maths::tensor y = 0;
-			aurora::maths::tensor x_grad = 0;
-			aurora::maths::tensor y_grad = 0;
+			aurora::maths::tensor m_x = 0;
+			aurora::maths::tensor m_y = 0;
+			aurora::maths::tensor m_x_grad = 0;
+			aurora::maths::tensor m_y_grad = 0;
 
 		public:
 			MODEL_FIELDS

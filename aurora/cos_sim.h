@@ -6,13 +6,13 @@ namespace aurora {
 	namespace models {
 		class cos_sim : public model {
 		public:
-			size_t units = 0;
+			size_t m_units = 0;
 
 		public:
-			double magnitude_0 = 0;
-			double magnitude_1 = 0;
-			double magnitude_product = 0;
-			double dot_product = 0;
+			double m_magnitude_0 = 0;
+			double m_magnitude_1 = 0;
+			double m_magnitude_product = 0;
+			double m_dot_product = 0;
 
 		public:
 			MODEL_FIELDS

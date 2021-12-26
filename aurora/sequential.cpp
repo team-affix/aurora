@@ -20,56 +20,56 @@ sequential::sequential() {
 
 sequential::sequential(initializer_list<Model> a_models) {
 	for (initializer_list<Model>::iterator i = a_models.begin(); i != a_models.end(); i++)
-		models.push_back(*i);
+		m_models.push_back(*i);
 }
 
 sequential::sequential(vector<Model> a_models) {
-	models = a_models;
+	m_models = a_models;
 }
 
 void sequential::param_recur(function<void(Param&)> a_func) {
-	for (int i = 0; i < models.size(); i++)
-		models[i]->param_recur(a_func);
+	for (int i = 0; i < m_models.size(); i++)
+		m_models[i]->param_recur(a_func);
 }
 
 model* sequential::clone(function<Param(Param&)> a_func) {
 	sequential* result = new sequential();
-	result->models.resize(models.size());
-	for (int i = 0; i < models.size(); i++)
-		result->models[i] = models[i]->clone(a_func);
+	result->m_models.resize(m_models.size());
+	for (int i = 0; i < m_models.size(); i++)
+		result->m_models[i] = m_models[i]->clone(a_func);
 	return result;
 }
 
 void sequential::fwd() {
-	for (int i = 0; i < models.size(); i++)
-		models[i]->fwd();
+	for (int i = 0; i < m_models.size(); i++)
+		m_models[i]->fwd();
 }
 
 void sequential::bwd() {
-	for (int i = models.size() - 1; i >= 0; i--)
-		models[i]->bwd();
+	for (int i = m_models.size() - 1; i >= 0; i--)
+		m_models[i]->bwd();
 }
 
 void sequential::signal(const tensor& a_y_des) {
-	models.back()->signal(a_y_des);
+	m_models.back()->signal(a_y_des);
 }
 
 void sequential::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	for (int i = 0; i < models.size(); i++)
-		models[i]->model_recur(a_func);
+	for (int i = 0; i < m_models.size(); i++)
+		m_models[i]->model_recur(a_func);
 }
 
 void sequential::compile() {
-	tensor* state = &x;
-	tensor* gradient = &x_grad;
-	for (int i = 0; i < models.size(); i++) {
-		models[i]->compile();
-		state->group_join_all_ranks(models[i]->x);
-		gradient->group_join_all_ranks(models[i]->x_grad);
-		state = &models[i]->y;
-		gradient = &models[i]->y_grad;
+	tensor* state = &m_x;
+	tensor* gradient = &m_x_grad;
+	for (int i = 0; i < m_models.size(); i++) {
+		m_models[i]->compile();
+		state->group_join_all_ranks(m_models[i]->m_x);
+		gradient->group_join_all_ranks(m_models[i]->m_x_grad);
+		state = &m_models[i]->m_y;
+		gradient = &m_models[i]->m_y_grad;
 	}
-	state->group_add_all_ranks(y);
-	gradient->group_add_all_ranks(y_grad);
+	state->group_add_all_ranks(m_y);
+	gradient->group_add_all_ranks(m_y_grad);
 }

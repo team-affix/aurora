@@ -10,32 +10,35 @@ namespace aurora {
 	namespace models {
 		class ntm_location_addresser : public model {
 		public:
-			size_t memory_height = 0;
-			size_t shift_units = 0;
+			size_t m_memory_height = 0;
+			size_t m_shift_units = 0;
 
 		public:
-			aurora::maths::tensor wx;
-			aurora::maths::tensor wx_grad;
-			aurora::maths::tensor wy;
-			aurora::maths::tensor wy_grad;
-			aurora::maths::tensor g;
-			aurora::maths::tensor g_grad;
-			aurora::maths::tensor s;
-			aurora::maths::tensor s_grad;
-			aurora::maths::tensor gamma;
-			aurora::maths::tensor gamma_grad;
+			aurora::maths::tensor m_wx;
+			aurora::maths::tensor m_wx_grad;
+			aurora::maths::tensor m_wy;
+			aurora::maths::tensor m_wy_grad;
+			aurora::maths::tensor m_g;
+			aurora::maths::tensor m_g_grad;
+			aurora::maths::tensor m_s;
+			aurora::maths::tensor m_s_grad;
+			aurora::maths::tensor m_gamma;
+			aurora::maths::tensor m_gamma_grad;
 
 		public:
-			Interpolate internal_interpolate;
-			Shift internal_shift;
-			Power internal_power;
-			Normalize internal_normalize;
+			Interpolate m_internal_interpolate;
+			Shift m_internal_shift;
+			Power m_internal_power;
+			Normalize m_internal_normalize;
 
 		public:
 			MODEL_FIELDS
 			virtual ~ntm_location_addresser();
 			ntm_location_addresser();
-			ntm_location_addresser(size_t a_memory_height, std::vector<int> a_valid_shifts);
+			ntm_location_addresser(
+				size_t a_memory_height, 
+				std::vector<int> a_valid_shifts
+			);
 
 		};
 		typedef affix_base::data::ptr<ntm_location_addresser> Ntm_location_addresser;

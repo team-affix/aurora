@@ -18,11 +18,11 @@ ntm_content_addresser::ntm_content_addresser() {
 }
 
 ntm_content_addresser::ntm_content_addresser(size_t a_memory_height, size_t a_memory_width) {
-	memory_height = a_memory_height;
-	memory_width = a_memory_width;
-	internal_similarity = new sync(new cos_sim(a_memory_width));
-	internal_sparsify = new ntm_sparsify(memory_height);
-	internal_normalize = new normalize(memory_height);
+	m_memory_height = a_memory_height;
+	m_memory_width = a_memory_width;
+	m_internal_similarity = new sync(new cos_sim(a_memory_width));
+	m_internal_sparsify = new ntm_sparsify(m_memory_height);
+	m_internal_normalize = new normalize(m_memory_height);
 }
 
 void ntm_content_addresser::param_recur(function<void(Param&)> a_func) {
@@ -31,74 +31,74 @@ void ntm_content_addresser::param_recur(function<void(Param&)> a_func) {
 
 model* ntm_content_addresser::clone(function<Param(Param&)> a_func) {
 	ntm_content_addresser* result = new ntm_content_addresser();
-	result->memory_height = memory_height;
-	result->memory_width = memory_width;
-	result->internal_similarity = (sync*)internal_similarity->clone(a_func);
-	result->internal_sparsify = (ntm_sparsify*)internal_sparsify->clone(a_func);
-	result->internal_normalize = (normalize*)internal_normalize->clone(a_func);
+	result->m_memory_height = m_memory_height;
+	result->m_memory_width = m_memory_width;
+	result->m_internal_similarity = (sync*)m_internal_similarity->clone(a_func);
+	result->m_internal_sparsify = (ntm_sparsify*)m_internal_sparsify->clone(a_func);
+	result->m_internal_normalize = (normalize*)m_internal_normalize->clone(a_func);
 	return result;
 }
 
 void ntm_content_addresser::fwd() {
-	internal_similarity->fwd();
-	internal_sparsify->fwd();
-	internal_normalize->fwd();
+	m_internal_similarity->fwd();
+	m_internal_sparsify->fwd();
+	m_internal_normalize->fwd();
 }
 
 void ntm_content_addresser::bwd() {
-	internal_normalize->bwd();
-	internal_sparsify->bwd();
-	internal_similarity->bwd();
+	m_internal_normalize->bwd();
+	m_internal_sparsify->bwd();
+	m_internal_similarity->bwd();
 
-	key_grad.clear();
-	for (int i = 0; i < memory_height; i++)
-		key_grad.add_1d(internal_similarity->x_grad[i][0], key_grad);
+	m_key_grad.clear();
+	for (int i = 0; i < m_memory_height; i++)
+		m_key_grad.add_1d(m_internal_similarity->m_x_grad[i][0], m_key_grad);
 }
 
 void ntm_content_addresser::signal(const tensor& a_y_des) {
-	y.sub_1d(a_y_des, y_grad);
+	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
 void ntm_content_addresser::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	internal_similarity->model_recur(a_func);
-	internal_sparsify->model_recur(a_func);
-	internal_normalize->model_recur(a_func);
+	m_internal_similarity->model_recur(a_func);
+	m_internal_sparsify->model_recur(a_func);
+	m_internal_normalize->model_recur(a_func);
 }
 
 void ntm_content_addresser::compile() {
-	x = tensor::new_2d(memory_height, memory_width);
-	x_grad = tensor::new_2d(memory_height, memory_width);
-	y = tensor::new_1d(memory_height);
-	y_grad = tensor::new_1d(memory_height);
-	key = tensor::new_1d(memory_width);
-	key_grad = tensor::new_1d(memory_width);
-	beta = tensor::new_1d(1);
-	beta_grad = tensor::new_1d(1);
+	m_x = tensor::new_2d(m_memory_height, m_memory_width);
+	m_x_grad = tensor::new_2d(m_memory_height, m_memory_width);
+	m_y = tensor::new_1d(m_memory_height);
+	m_y_grad = tensor::new_1d(m_memory_height);
+	m_key = tensor::new_1d(m_memory_width);
+	m_key_grad = tensor::new_1d(m_memory_width);
+	m_beta = tensor::new_1d(1);
+	m_beta_grad = tensor::new_1d(1);
 
-	internal_similarity->prep(memory_height);
-	internal_similarity->compile();
-	internal_similarity->unroll(memory_height);
+	m_internal_similarity->prep(m_memory_height);
+	m_internal_similarity->compile();
+	m_internal_similarity->unroll(m_memory_height);
 
-	internal_sparsify->compile();
-	internal_normalize->compile();
+	m_internal_sparsify->compile();
+	m_internal_normalize->compile();
 
-	for (int i = 0; i < memory_height; i++) {
-		key.group_join(internal_similarity->x[i][0]);
-		x[i].group_join(internal_similarity->x[i][1]);
-		x_grad[i].group_join(internal_similarity->x_grad[i][1]);
+	for (int i = 0; i < m_memory_height; i++) {
+		m_key.group_join(m_internal_similarity->m_x[i][0]);
+		m_x[i].group_join(m_internal_similarity->m_x[i][1]);
+		m_x_grad[i].group_join(m_internal_similarity->m_x_grad[i][1]);
 	}
 
-	internal_similarity->y.group_join(internal_sparsify->x);
-	internal_similarity->y_grad.group_join(internal_sparsify->x_grad);
+	m_internal_similarity->m_y.group_join(m_internal_sparsify->m_x);
+	m_internal_similarity->m_y_grad.group_join(m_internal_sparsify->m_x_grad);
 
-	internal_sparsify->y.group_join(internal_normalize->x);
-	internal_sparsify->y_grad.group_join(internal_normalize->x_grad);
+	m_internal_sparsify->m_y.group_join(m_internal_normalize->m_x);
+	m_internal_sparsify->m_y_grad.group_join(m_internal_normalize->m_x_grad);
 
-	internal_normalize->y.group_join(y);
-	internal_normalize->y_grad.group_join(y_grad);
+	m_internal_normalize->m_y.group_join(m_y);
+	m_internal_normalize->m_y_grad.group_join(m_y_grad);
 
-	beta.group_join(internal_sparsify->beta);
-	beta_grad.group_join(internal_sparsify->beta_grad);
+	m_beta.group_join(m_internal_sparsify->m_beta);
+	m_beta_grad.group_join(m_internal_sparsify->m_beta_grad);
 
 }

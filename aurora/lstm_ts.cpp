@@ -22,111 +22,111 @@ lstm_ts::lstm_ts() {
 }
 
 lstm_ts::lstm_ts(size_t a_units) {
-	this->units = a_units;
-	this->forget_gate = new layer(units, pseudo::nsm());
-	this->limit_gate = new layer(units, pseudo::nsm());
-	this->input_gate = new layer(units, pseudo::nth());
-	this->output_gate = new layer(units, pseudo::nsm());
-	this->tanh_gate = new layer(units, pseudo::nth());
+	this->m_units = a_units;
+	this->m_forget_gate = new layer(m_units, pseudo::nsm());
+	this->m_limit_gate = new layer(m_units, pseudo::nsm());
+	this->m_input_gate = new layer(m_units, pseudo::nth());
+	this->m_output_gate = new layer(m_units, pseudo::nsm());
+	this->m_tanh_gate = new layer(m_units, pseudo::nth());
 }
 
 lstm_ts::lstm_ts(size_t a_units, Layer a_forget_gate, Layer a_limit_gate, Layer a_input_gate, Layer a_output_gate, Layer a_tanh_gate) {
-	this->units = a_units;
-	this->forget_gate = a_forget_gate;
-	this->limit_gate = a_limit_gate;
-	this->input_gate = a_input_gate;
-	this->output_gate = a_output_gate;
-	this->tanh_gate = a_tanh_gate;
+	this->m_units = a_units;
+	this->m_forget_gate = a_forget_gate;
+	this->m_limit_gate = a_limit_gate;
+	this->m_input_gate = a_input_gate;
+	this->m_output_gate = a_output_gate;
+	this->m_tanh_gate = a_tanh_gate;
 }
 
 void lstm_ts::param_recur(function<void(Param&)> a_func) {
-	forget_gate->param_recur(a_func);
-	limit_gate->param_recur(a_func);
-	input_gate->param_recur(a_func);
-	output_gate->param_recur(a_func);
-	tanh_gate->param_recur(a_func);
+	m_forget_gate->param_recur(a_func);
+	m_limit_gate->param_recur(a_func);
+	m_input_gate->param_recur(a_func);
+	m_output_gate->param_recur(a_func);
+	m_tanh_gate->param_recur(a_func);
 }
 
 model* lstm_ts::clone(function<Param(Param&)> a_func) {
-	return new lstm_ts(units, (layer*)forget_gate->clone(a_func), (layer*)limit_gate->clone(a_func), (layer*)input_gate->clone(a_func), (layer*)output_gate->clone(a_func), (layer*)tanh_gate->clone(a_func));
+	return new lstm_ts(m_units, (layer*)m_forget_gate->clone(a_func), (layer*)m_limit_gate->clone(a_func), (layer*)m_input_gate->clone(a_func), (layer*)m_output_gate->clone(a_func), (layer*)m_tanh_gate->clone(a_func));
 }
 
 void lstm_ts::fwd() {
-	x.add_1d(htx, gate_x);
-	forget_gate->fwd();
-	limit_gate->fwd();
-	input_gate->fwd();
-	output_gate->fwd();
+	m_x.add_1d(m_htx, m_gate_x);
+	m_forget_gate->fwd();
+	m_limit_gate->fwd();
+	m_input_gate->fwd();
+	m_output_gate->fwd();
 
-	forget_gate->y.mul_1d(ctx, comp_0);
-	limit_gate->y.mul_1d(input_gate->y, comp_1);
-	comp_0.add_1d(comp_1, cty);
-	tanh_gate->fwd();
-	tanh_gate->y.mul_1d(output_gate->y, hty);
+	m_forget_gate->m_y.mul_1d(m_ctx, m_comp_0);
+	m_limit_gate->m_y.mul_1d(m_input_gate->m_y, m_comp_1);
+	m_comp_0.add_1d(m_comp_1, m_cty);
+	m_tanh_gate->fwd();
+	m_tanh_gate->m_y.mul_1d(m_output_gate->m_y, m_hty);
 }
 
 void lstm_ts::bwd() {
-	y_grad.add_1d(hty_grad, comp_0);
-	comp_0.mul_1d(tanh_gate->y, output_gate->y_grad);
-	comp_0.mul_1d(output_gate->y, tanh_gate->y_grad);
+	m_y_grad.add_1d(m_hty_grad, m_comp_0);
+	m_comp_0.mul_1d(m_tanh_gate->m_y, m_output_gate->m_y_grad);
+	m_comp_0.mul_1d(m_output_gate->m_y, m_tanh_gate->m_y_grad);
 	
-	tanh_gate->bwd();
+	m_tanh_gate->bwd();
 
-	tanh_gate->x_grad.add_1d(cty_grad, comp_0);
-	comp_0.mul_1d(input_gate->y, limit_gate->y_grad);
-	comp_0.mul_1d(limit_gate->y, input_gate->y_grad);
-	comp_0.mul_1d(ctx, forget_gate->y_grad);
-	comp_0.mul_1d(forget_gate->y, ctx_grad);
+	m_tanh_gate->m_x_grad.add_1d(m_cty_grad, m_comp_0);
+	m_comp_0.mul_1d(m_input_gate->m_y, m_limit_gate->m_y_grad);
+	m_comp_0.mul_1d(m_limit_gate->m_y, m_input_gate->m_y_grad);
+	m_comp_0.mul_1d(m_ctx, m_forget_gate->m_y_grad);
+	m_comp_0.mul_1d(m_forget_gate->m_y, m_ctx_grad);
 
-	output_gate->bwd();
-	input_gate->bwd();
-	limit_gate->bwd();
-	forget_gate->bwd();
+	m_output_gate->bwd();
+	m_input_gate->bwd();
+	m_limit_gate->bwd();
+	m_forget_gate->bwd();
 
-	forget_gate->x_grad.add_1d(limit_gate->x_grad, comp_0);
-	input_gate->x_grad.add_1d(output_gate->x_grad, comp_1);
-	comp_0.add_1d(comp_1, htx_grad);
+	m_forget_gate->m_x_grad.add_1d(m_limit_gate->m_x_grad, m_comp_0);
+	m_input_gate->m_x_grad.add_1d(m_output_gate->m_x_grad, m_comp_1);
+	m_comp_0.add_1d(m_comp_1, m_htx_grad);
 }
 
 void lstm_ts::signal(const tensor& a_y_des) {
-	y.sub_1d(a_y_des, y_grad);
+	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
 void lstm_ts::model_recur(function<void(model*)> a_func) {
 	a_func(this);
-	forget_gate->model_recur(a_func);
-	limit_gate->model_recur(a_func);
-	input_gate->model_recur(a_func);
-	output_gate->model_recur(a_func);
-	tanh_gate->model_recur(a_func);
+	m_forget_gate->model_recur(a_func);
+	m_limit_gate->model_recur(a_func);
+	m_input_gate->model_recur(a_func);
+	m_output_gate->model_recur(a_func);
+	m_tanh_gate->model_recur(a_func);
 }
 
 void lstm_ts::compile() {
-	this->x = tensor::new_1d(units);
-	this->y = tensor::new_1d(units);
-	this->x_grad = tensor::new_1d(units);
-	this->y_grad = tensor::new_1d(units);
-	this->ctx = tensor::new_1d(units);
-	this->cty = tensor::new_1d(units);
-	this->htx = tensor::new_1d(units);
-	this->hty = tensor::new_1d(units);
-	this->ctx_grad = tensor::new_1d(units);
-	this->cty_grad = tensor::new_1d(units);
-	this->htx_grad = tensor::new_1d(units);
-	this->hty_grad = tensor::new_1d(units);
-	this->gate_x = tensor::new_1d(units);
-	this->comp_0 = tensor::new_1d(units);
-	this->comp_1 = tensor::new_1d(units);
-	forget_gate->compile();
-	limit_gate->compile();
-	input_gate->compile();
-	output_gate->compile();
-	tanh_gate->compile();
-	gate_x.group_add(forget_gate->x);
-	gate_x.group_add(limit_gate->x);
-	gate_x.group_add(input_gate->x);
-	gate_x.group_add(output_gate->x);
-	cty.group_add(tanh_gate->x);
-	hty.group_add(y);
-	htx_grad.group_add(x_grad);
+	this->m_x = tensor::new_1d(m_units);
+	this->m_y = tensor::new_1d(m_units);
+	this->m_x_grad = tensor::new_1d(m_units);
+	this->m_y_grad = tensor::new_1d(m_units);
+	this->m_ctx = tensor::new_1d(m_units);
+	this->m_cty = tensor::new_1d(m_units);
+	this->m_htx = tensor::new_1d(m_units);
+	this->m_hty = tensor::new_1d(m_units);
+	this->m_ctx_grad = tensor::new_1d(m_units);
+	this->m_cty_grad = tensor::new_1d(m_units);
+	this->m_htx_grad = tensor::new_1d(m_units);
+	this->m_hty_grad = tensor::new_1d(m_units);
+	this->m_gate_x = tensor::new_1d(m_units);
+	this->m_comp_0 = tensor::new_1d(m_units);
+	this->m_comp_1 = tensor::new_1d(m_units);
+	m_forget_gate->compile();
+	m_limit_gate->compile();
+	m_input_gate->compile();
+	m_output_gate->compile();
+	m_tanh_gate->compile();
+	m_gate_x.group_add(m_forget_gate->m_x);
+	m_gate_x.group_add(m_limit_gate->m_x);
+	m_gate_x.group_add(m_input_gate->m_x);
+	m_gate_x.group_add(m_output_gate->m_x);
+	m_cty.group_add(m_tanh_gate->m_x);
+	m_hty.group_add(m_y);
+	m_htx_grad.group_add(m_x_grad);
 }

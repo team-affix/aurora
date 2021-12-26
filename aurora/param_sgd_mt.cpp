@@ -17,9 +17,9 @@ param_sgd_mt::param_sgd_mt(double a_state, double a_learn_rate, double a_gradien
 }
 
 void param_sgd_mt::accum_grad(double a_grad) {
-	accum_grad_mutex.lock();
+	m_accum_grad_mutex.lock();
 	gradient() += a_grad;
-	accum_grad_mutex.unlock();
+	m_accum_grad_mutex.unlock();
 }
 
 param* param_sgd_mt::clone() {

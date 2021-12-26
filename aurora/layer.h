@@ -6,7 +6,7 @@ namespace aurora {
 	namespace models {
 		class layer : public model {
 		public:
-			std::vector<Model> models;
+			std::vector<Model> m_models;
 
 		public:
 			MODEL_FIELDS

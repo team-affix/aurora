@@ -43,6 +43,6 @@ model* model::clone(function<Param(Param&)> a_func) {
 }
 
 void model::compile() {
-	y.group_add(x);
-	y_grad.group_add(x_grad);
+	m_y.group_add(m_x);
+	m_y_grad.group_add(m_x_grad);
 }

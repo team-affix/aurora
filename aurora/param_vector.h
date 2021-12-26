@@ -8,7 +8,9 @@ namespace aurora {
 		class param_vector : public std::vector<Param> {
 		public:
 			void update();
-			void pop(const aurora::maths::tensor& a_states);
+			void pop(
+				const aurora::maths::tensor& a_states
+			);
 
 		public:
 			operator aurora::maths::tensor();

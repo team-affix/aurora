@@ -7,7 +7,7 @@ namespace aurora {
 	namespace evolution {
 		class genome : public aurora::maths::tensor {
 		public:
-			std::function<double(double)> random_change;
+			std::function<double(double)> m_random_change;
 
 		public:
 			genome();

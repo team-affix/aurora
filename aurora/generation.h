@@ -6,8 +6,8 @@ namespace aurora {
 	namespace evolution {
 		class generation {
 		public:
-			std::vector<genome> genomes;
-			std::function<double(genome&)> get_reward;
+			std::vector<genome> m_genomes;
+			std::function<double(genome&)> m_get_reward;
 
 		public:
 			generation();

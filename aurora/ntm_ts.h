@@ -7,33 +7,33 @@ namespace aurora {
 	namespace models {
 		class ntm_ts : public model {
 		public:
-			size_t memory_height = 0;
-			size_t memory_width = 0;
+			size_t m_memory_height = 0;
+			size_t m_memory_width = 0;
 			
 		public:
-			aurora::maths::tensor mx;
-			aurora::maths::tensor mx_grad;
-			aurora::maths::tensor my;
-			aurora::maths::tensor my_grad;
-			aurora::maths::tensor hty_grad;
+			aurora::maths::tensor m_mx;
+			aurora::maths::tensor m_mx_grad;
+			aurora::maths::tensor m_my;
+			aurora::maths::tensor m_my_grad;
+			aurora::maths::tensor m_hty_grad;
 
 		public:
-			aurora::maths::tensor reader_y_grad;
-			aurora::maths::tensor accum_my_grad;
+			aurora::maths::tensor m_reader_y_grad;
+			aurora::maths::tensor m_accum_my_grad;
 
 		public:
-			aurora::maths::tensor read_wx;
-			aurora::maths::tensor read_wx_grad;
-			aurora::maths::tensor read_wy;
-			aurora::maths::tensor read_wy_grad;
-			aurora::maths::tensor write_wx;
-			aurora::maths::tensor write_wx_grad;
-			aurora::maths::tensor write_wy;
-			aurora::maths::tensor write_wy_grad;
+			aurora::maths::tensor m_read_wx;
+			aurora::maths::tensor m_read_wx_grad;
+			aurora::maths::tensor m_read_wy;
+			aurora::maths::tensor m_read_wy_grad;
+			aurora::maths::tensor m_write_wx;
+			aurora::maths::tensor m_write_wx_grad;
+			aurora::maths::tensor m_write_wy;
+			aurora::maths::tensor m_write_wy_grad;
 
 		public:
-			std::vector<Ntm_reader> internal_readers;
-			std::vector<Ntm_writer> internal_writers;
+			std::vector<Ntm_reader> m_internal_readers;
+			std::vector<Ntm_writer> m_internal_writers;
 
 		public:
 			MODEL_FIELDS
@@ -45,7 +45,8 @@ namespace aurora {
 				size_t a_num_readers,
 				size_t a_num_writers,
 				std::vector<int> a_valid_shifts,
-				std::vector<size_t> a_head_hidden_dims);
+				std::vector<size_t> a_head_hidden_dims
+			);
 
 		};
 		typedef affix_base::data::ptr<ntm_ts> Ntm_ts;

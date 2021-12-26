@@ -21,11 +21,11 @@ param_mom::param_mom(double a_state, double a_learn_rate, double a_gradient, dou
 }
 
 double& param_mom::momentum() {
-	return momentum_ptr.val();
+	return m_momentum_ptr.val();
 }
 
 double& param_mom::beta() {
-	return beta_ptr.val();
+	return m_beta_ptr.val();
 }
 
 void param_mom::update() {
