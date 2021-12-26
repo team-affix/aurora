@@ -9,7 +9,10 @@ generation::generation() {
 
 }
 
-generation::generation(vector<genome> a_genomes, std::function<double(genome&)> a_get_reward) {
+generation::generation(
+	const vector<genome>& a_genomes,
+	const std::function<double(genome&)>& a_get_reward
+) {
 	this->m_genomes = a_genomes;
 	this->m_get_reward = a_get_reward;
 }
@@ -18,7 +21,10 @@ aurora::evolution::genome& generation::best() {
 	return m_genomes[sort().front()];
 }
 
-vector<aurora::evolution::genome> generation::best(size_t a_genomes) {
+vector<aurora::evolution::genome> generation::best(
+	const size_t& a_genomes
+)
+{
 	vector<genome> result = vector<genome>(a_genomes);
 	vector<size_t> sorted = sort();
 	for (int i = 0; i < a_genomes; i++)
@@ -30,7 +36,10 @@ aurora::evolution::genome& generation::worst() {
 	return m_genomes[sort().back()];
 }
 
-vector<aurora::evolution::genome> generation::worst(size_t a_genomes) {
+vector<aurora::evolution::genome> generation::worst(
+	const size_t& a_genomes
+)
+{
 	vector<genome> result = vector<genome>(a_genomes);
 	vector<size_t> sorted = sort();
 	for (int i = 0; i < a_genomes; i++)

@@ -7,7 +7,12 @@ genome::genome() {
 
 }
 
-genome::genome(aurora::maths::tensor a_alleles, std::function<double(double)> a_random_change) : aurora::maths::tensor(a_alleles) {
+genome::genome(
+	const aurora::maths::tensor& a_alleles,
+	const std::function<double(double)>& a_random_change
+) : 
+	aurora::maths::tensor(a_alleles)
+{
 	this->m_random_change = a_random_change;
 }
 
@@ -15,21 +20,25 @@ genome::operator aurora::maths::tensor& () {
 	return *this;
 }
 
-genome genome::mutate() {
+genome genome::mutate() const {
 	genome result = clone();
 	for (int allele = 0; allele < result.size(); allele++)
 		result[allele].val() = m_random_change(at(allele));
 	return result;
 }
 
-std::vector<genome> genome::mutate(size_t a_children) {
+std::vector<genome> genome::mutate(const size_t& a_children)
+{
 	std::vector<genome> result = std::vector<genome>(a_children);
 	for (int child = 0; child < a_children; child++)
 		result[child] = mutate();
 	return result;
 }
 
-std::vector<genome> genome::mutate(std::vector<genome> a_genomes) {
+std::vector<genome> genome::mutate(
+	const std::vector<genome>& a_genomes
+)
+{
 	std::vector<genome> result = std::vector<genome>(a_genomes);
 	for (int i = 0; i < result.size(); i++)
 		result[i] = a_genomes[i].mutate();
@@ -43,7 +52,7 @@ genome genome::merge(genome& a_spouse) {
 	return result;
 }
 
-std::vector<genome> genome::merge(genome& a_spouse, size_t a_children) {
+std::vector<genome> genome::merge(genome& a_spouse, const size_t& a_children) {
 	std::vector<genome> result = std::vector<genome>(a_children);
 	for (int child = 0; child < a_children; child++)
 		result[child] = merge(a_spouse);
@@ -58,13 +67,13 @@ genome genome::merge(std::vector<genome> a_parents) {
 	return result;
 }
 
-std::vector<genome> genome::merge(std::vector<genome> a_parents, size_t a_children) {
+std::vector<genome> genome::merge(std::vector<genome> a_parents, const size_t& a_children) {
 	std::vector<genome> result = std::vector<genome>(a_children);
 	for (int child = 0; child < a_children; child++)
 		result[child] = merge(a_parents);
 	return result;
 }
 
-genome genome::clone() {
+genome genome::clone() const {
 	return genome(tensor::clone(), m_random_change);
 }

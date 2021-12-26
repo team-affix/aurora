@@ -12,9 +12,16 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~layer();
 			layer();
-			layer(size_t a_height, Model a_model_template);
-			layer(std::initializer_list<Model> a_models);
-			layer(std::vector<Model> a_models);
+			layer(
+				size_t a_height,
+				Model a_model_template
+			);
+			layer(
+				std::initializer_list<Model> a_models
+			);
+			layer(
+				std::vector<Model> a_models
+			);
 
 		};
 		typedef affix_base::data::ptr<layer> Layer;

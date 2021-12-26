@@ -36,8 +36,17 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~lstm_ts();
 			lstm_ts();
-			lstm_ts(size_t a_units);
-			lstm_ts(size_t a_units, Layer a_forget_gate, Layer a_limit_gate, Layer a_input_gate, Layer a_output_gate, Layer a_tanh_gate);
+			lstm_ts(
+				size_t a_units
+			);
+			lstm_ts(
+				size_t a_units,
+				Layer a_forget_gate,
+				Layer a_limit_gate,
+				Layer a_input_gate,
+				Layer a_output_gate,
+				Layer a_tanh_gate
+			);
 
 		};
 		typedef affix_base::data::ptr<lstm_ts> Lstm_ts;

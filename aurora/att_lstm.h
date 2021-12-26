@@ -19,7 +19,10 @@ namespace aurora {
 			ATTENTION_FIELDS
 			virtual ~att_lstm();
 			att_lstm();
-			att_lstm(size_t a_units, std::vector<size_t> a_h_dims);
+			att_lstm(
+				size_t a_units,
+				std::vector<size_t> a_h_dims
+			);
 
 		};
 		typedef affix_base::data::ptr<att_lstm> Att_lstm;

@@ -18,7 +18,9 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~cos_sim();
 			cos_sim();
-			cos_sim(size_t a_units);
+			cos_sim(
+				size_t a_units
+			);
 
 		};
 		typedef affix_base::data::ptr<cos_sim> Cos_sim;

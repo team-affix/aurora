@@ -11,13 +11,20 @@ namespace aurora {
 
 		public:
 			generation();
-			generation(std::vector<genome> a_genomes, std::function<double(genome&)> a_get_reward);
+			generation(
+				const std::vector<genome>& a_genomes,
+				const std::function<double(genome&)>& a_get_reward
+			);
 
 		public:
 			genome& best();
-			std::vector<genome> best(size_t a_genomes);
+			std::vector<genome> best(
+				const size_t& a_genomes
+			);
 			genome& worst();
-			std::vector<genome> worst(size_t a_genomes);
+			std::vector<genome> worst(
+				const size_t& a_genomes
+			);
 			std::vector<size_t> sort();
 
 		};

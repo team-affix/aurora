@@ -19,7 +19,9 @@ namespace aurora {
 			MODEL_FIELDS
 			virtual ~interpolate();
 			interpolate();
-			interpolate(size_t a_units);
+			interpolate(
+				size_t a_units
+			);
 
 		};
 		typedef affix_base::data::ptr<interpolate> Interpolate;

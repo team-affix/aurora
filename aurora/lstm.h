@@ -30,7 +30,9 @@ namespace aurora {
 			RECURRENT_FIELDS
 			virtual ~lstm();
 			lstm();
-			lstm(size_t a_units);
+			lstm(
+				size_t a_units
+			);
 
 		};
 		typedef affix_base::data::ptr<lstm> Lstm;
