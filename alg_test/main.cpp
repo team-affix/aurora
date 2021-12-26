@@ -3770,11 +3770,19 @@ void spc_model_test() {
 
 }
 
+void tensor_linkage_compute_time_test()
+{
+	Sequential seq = pseudo::tnn({ 100, 1000, 100 }, pseudo::nlr(0.3));
+	std::cout << "Instantiated." << std::endl;
+	seq->compile();
+	std::cout << "Compiled." << std::endl;
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	major_tests();
+	tensor_linkage_compute_time_test();
 
 	return 0;
 

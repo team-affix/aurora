@@ -70,8 +70,8 @@ void weight_junction::compile() {
 	y_grad = tensor::new_1d(b);
 	for (int i = 0; i < weight_sets.size(); i++) {
 		weight_sets[i]->compile();
-		weight_sets[i]->x.group_add(x[i]);
-		weight_sets[i]->x_grad.group_add(x_grad[i]);
-		weight_sets[i]->y_grad.group_add(y_grad);
+		weight_sets[i]->x.group_join(x[i]);
+		weight_sets[i]->x_grad.group_join(x_grad[i]);
+		weight_sets[i]->y_grad.group_join(y_grad);
 	}
 }

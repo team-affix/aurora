@@ -568,26 +568,26 @@ void tensor::unlink() {
 		at(i).unlink();
 }
 
-void tensor::rank_model_recur(std::function<void(tensor*)> a_func) {
+void tensor::rank_recur(const std::function<void(tensor*)>& a_func) {
 	if (size() != 0)
 		for (int i = 0; i < size(); i++)
-			at(i).rank_model_recur(a_func);
+			at(i).rank_recur(a_func);
 	a_func(this);
 }
 
-void tensor::group_recur_fwd(std::function<void(tensor*)> a_func) {
+void tensor::group_recur_fwd(const std::function<void(tensor*)>& a_func) {
 	if (group_next_ptr != nullptr)
 		group_next_ptr->group_recur_fwd(a_func);
 	a_func(this);
 }
 
-void tensor::group_recur_bwd(std::function<void(tensor*)> a_func) {
+void tensor::group_recur_bwd(const std::function<void(tensor*)>& a_func) {
 	if (group_prev_ptr != nullptr)
 		group_prev_ptr->group_recur_bwd(a_func);
 	a_func(this);
 }
 
-void tensor::group_recur(std::function<void(tensor*)> a_func) {
+void tensor::group_recur(const std::function<void(tensor*)>& a_func) {
 	if (group_prev_ptr != nullptr)
 		group_prev_ptr->group_recur_bwd(a_func);
 	if (group_next_ptr != nullptr)
@@ -595,7 +595,7 @@ void tensor::group_recur(std::function<void(tensor*)> a_func) {
 	a_func(this);
 }
 
-bool tensor::group_contains(tensor* a_ptr) {
+bool tensor::group_contains(const tensor* a_ptr) {
 	bool result = false;
 	group_recur([&](tensor* tens) {
 		if (tens == a_ptr)

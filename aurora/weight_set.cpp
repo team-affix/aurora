@@ -66,8 +66,8 @@ void weight_set::compile() {
 	y_grad.resize(a);
 	for (int i = 0; i < a; i++) {
 		weights[i]->compile();
-		weights[i]->x.group_add(x);
-		weights[i]->y.group_add(y[i]);
-		weights[i]->y_grad.group_add(y_grad[i]);
+		weights[i]->x.group_join(x);
+		weights[i]->y.group_join(y[i]);
+		weights[i]->y_grad.group_join(y_grad[i]);
 	}
 }

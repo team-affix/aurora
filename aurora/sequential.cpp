@@ -65,8 +65,8 @@ void sequential::compile() {
 	tensor* gradient = &x_grad;
 	for (int i = 0; i < models.size(); i++) {
 		models[i]->compile();
-		models[i]->x.group_add_all_ranks(*state);
-		models[i]->x_grad.group_add_all_ranks(*gradient);
+		state->group_join_all_ranks(models[i]->x);
+		gradient->group_join_all_ranks(models[i]->x_grad);
 		state = &models[i]->y;
 		gradient = &models[i]->y_grad;
 	}
