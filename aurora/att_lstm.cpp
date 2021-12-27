@@ -18,12 +18,12 @@ att_lstm::att_lstm(size_t a_units, std::vector<size_t> a_h_dims) {
 	m_internal_lstm = new lstm(a_units);
 }
 
-void att_lstm::param_recur(std::function<void(aurora::params::Param&)> a_func) {
+void att_lstm::param_recur(const std::function<void(aurora::params::Param&)>& a_func) {
 	m_models->param_recur(a_func);
 	m_internal_lstm->param_recur(a_func);
 }
 
-aurora::models::model* att_lstm::clone(std::function<aurora::params::Param(aurora::params::Param&)> a_func) {
+aurora::models::model* att_lstm::clone(const std::function<aurora::params::Param(aurora::params::Param&)>& a_func) {
 	att_lstm* result = new att_lstm();
 	result->m_units = m_units;
 	result->m_models = (sync*)m_models->clone(a_func);
@@ -54,7 +54,7 @@ void att_lstm::signal(const aurora::maths::tensor& a_y_des) {
 	m_internal_lstm->signal(a_y_des);
 }
 
-void att_lstm::model_recur(std::function<void(model*)> a_func) {
+void att_lstm::model_recur(const std::function<void(model*)>& a_func) {
 	m_models->model_recur(a_func);
 	m_internal_lstm->model_recur(a_func);
 }

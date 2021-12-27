@@ -1,5 +1,6 @@
 #pragma once
 #include "aurora.h"
+#include "affix-base/threading.h"
 #include <random>
 #include <iostream>
 #include <assert.h>
@@ -1875,6 +1876,44 @@ void proc_generator() {
 
 }
 
+void sum_test()
+{
+	sum_1d l_sum(10);
+	l_sum.compile();
+
+	l_sum.cycle({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 46);
+
+}
+
+void mul_0d_test()
+{
+	mul_0d m;
+	m.compile();
+	m.cycle({ 2, 3 }, 5);
+}
+
+void mul_1d_test()
+{
+	tensor x = {
+		{0, 1, 2, 3, 4},
+		{5, 6, 7, 8, 9}
+	};
+	mul_1d m(5);
+	m.compile();
+	m.cycle(x, { 1, 1, 1, 1, 1 });
+}
+
+void dot_1d_test()
+{
+	tensor x = {
+		{0, 1, 2, 3, 4},
+		{5, 6, 7, 8, 9}
+	};
+	dot_1d d(5);
+	d.compile();
+	d.cycle(x, 81);
+}
+
 void cnl_test() {
 
 	const size_t X_HEIGHT = 10;
@@ -1888,26 +1927,29 @@ void cnl_test() {
 
 	uniform_real_distribution<double> pmt_urd(-1, 1);
 
-	vector<param_mom*> pv;
-	auto pmt_init = [&](Param& pmt) {
-		pmt = new param_mom(pmt_urd(aurora::static_vals::random_engine), 0.0002, 0, 0, 0.9);
-		pv.push_back((param_mom*)pmt.get());
-	};
+	param_vector pv;
 	
-	ptr<cnl> c1 = new cnl(X_HEIGHT, X_WIDTH, 2, 2, 1);
-	ptr<layer> l1 = new layer(c1->y_strides(), new layer(c1->x_strides(), pseudo::nth()));
-	ptr<cnl> c2 = new cnl(c1->y_strides(), c1->x_strides(), 2, 2, 1);
-	ptr<layer> l2 = new layer(c2->y_strides(), new layer(c2->x_strides(), pseudo::nth()));
-	ptr<cnl> c3 = new cnl(c2->y_strides(), c2->x_strides(), 2, 2, 1);
+	ptr<cnl> c1 = new cnl(2, 2, 1);
+	c1->prep(X_HEIGHT, X_WIDTH);
+
+	ptr<layer> l1 = new layer(c1->y_strides(), new layer(c1->x_strides(), pseudo::nlr(0.3)));
+
+	ptr<cnl> c2 = new cnl(2, 2, 1);
+	c2->prep(c1->y_strides(), c1->x_strides());
+
+	ptr<layer> l2 = new layer(c2->y_strides(), new layer(c2->x_strides(), pseudo::nlr(0.3)));
+
+	ptr<cnl> c3 = new cnl(2, 2, 1);
+	c3->prep(c2->y_strides(), c2->x_strides());
 
 	Sequential s = new sequential {
-		c1.get(),
-		l1.get(),
-		c2.get(),
-		l2.get(),
-		c3.get(),
+		c1,
+		l1,
+		c2,
+		l2,
+		c3,
 	};
-	s->param_recur(pmt_init);
+	s->param_recur(PARAM_INIT(param_mom(pmt_urd(aurora::static_vals::random_engine), 0.0002, 0, 0, 0.9), pv));
 
 	std::cout << "COMPILING MODEL" << std::endl;
 	s->compile();
@@ -1924,7 +1966,7 @@ void cnl_test() {
 
 	std::cout << "TRAINING MODEL" << std::endl;
 
-	const int CHECKPOINT_INTERVAL = 10000;
+	const int CHECKPOINT_INTERVAL = 1000;
 
 	for (int epoch = 0; true; epoch++) {
 
@@ -1939,8 +1981,7 @@ void cnl_test() {
 		if (epoch % CHECKPOINT_INTERVAL == 0)
 			std::cout << cost << std::endl;
 
-		for (param_mom* pmt : pv)
-			pmt->update();
+		pv.update();
 
 	}
 
@@ -3301,6 +3342,7 @@ void major_tests() {
 	lstm_test();
 	ntm_test();
 	lstm_mdim_test();
+	cnl_test();
 }
 
 std::uniform_real_distribution<> uniform_zero_to_one(0.0, 1.0);
@@ -3778,11 +3820,19 @@ void tensor_linkage_compute_time_test()
 	std::cout << "Compiled." << std::endl;
 }
 
+void test_function_call_speed(const std::function<void(int)>& a_func, size_t a_recur = 1)
+{
+	if (a_recur == 0)
+		return;
+	a_func(10);
+	test_function_call_speed(a_func, a_recur - 1);
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	major_tests();
+	cnl_test();
 
 	return 0;
 

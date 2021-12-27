@@ -34,3 +34,7 @@
 #include "ntm.h"
 #include "stacked_recurrent.h"
 #include "spc.h"
+#include "sum_1d.h"
+#include "mul_0d.h"
+#include "mul_1d.h"
+#include "dot_1d.h"

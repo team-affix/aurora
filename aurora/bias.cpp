@@ -17,11 +17,11 @@ bias::bias() {
 
 }
 
-void bias::param_recur(function<void(Param&)> a_func) {
+void bias::param_recur(const function<void(Param&)>& a_func) {
 	a_func(m_param);
 }
 
-model* bias::clone(function<Param(Param&)> a_func) {
+model* bias::clone(const function<Param(Param&)>& a_func) {
 	bias* result = new bias();
 	result->m_param = a_func(m_param);
 	return result;
@@ -40,7 +40,7 @@ void bias::signal(const tensor& a_y_des) {
 	m_y_grad.val() = m_y.val() - a_y_des.val();
 }
 
-void bias::model_recur(function<void(model*)> a_func) {
+void bias::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }
 

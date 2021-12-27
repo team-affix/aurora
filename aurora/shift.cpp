@@ -23,11 +23,11 @@ shift::shift(size_t a_units, vector<int> a_valid_shifts) {
 	m_valid_shifts = a_valid_shifts;
 }
 
-void shift::param_recur(function<void(Param&)> a_func) {
+void shift::param_recur(const function<void(Param&)>& a_func) {
 
 }
 
-model* shift::clone(function<Param(Param&)> a_func) {
+model* shift::clone(const function<Param(Param&)>& a_func) {
 	shift* result = new shift();
 	result->m_units = m_units;
 	result->m_valid_shifts = m_valid_shifts;
@@ -58,7 +58,7 @@ void shift::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void shift::model_recur(function<void(model*)> a_func) {
+void shift::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }
 

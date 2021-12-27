@@ -2,15 +2,12 @@
 #include "affix-base/pch.h"
 
 #define MODEL_FIELDS \
-virtual void param_recur(std::function<void(aurora::params::Param&)> a_func); \
-virtual aurora::models::model* clone() { \
-	return clone([](aurora::params::Param& pmt) { return pmt; }); \
-} \
-virtual model* clone(std::function<aurora::params::Param(aurora::params::Param&)> a_func); \
+virtual void param_recur(const std::function<void(aurora::params::Param&)>& a_func); \
+virtual model* clone(const std::function<aurora::params::Param(aurora::params::Param&)>& a_func = [](aurora::params::Param& pmt) { return pmt; }); \
 virtual void fwd(); \
 virtual void bwd(); \
 virtual void signal(const aurora::maths::tensor& a_y_des); \
-virtual void model_recur(std::function<void(model*)> a_func); \
+virtual void model_recur(const std::function<void(model*)>& a_func); \
 virtual void compile(); \
 virtual aurora::maths::tensor& fwd(const aurora::maths::tensor& a_x) { \
 	m_x.pop(a_x); \

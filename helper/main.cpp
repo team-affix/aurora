@@ -4,7 +4,7 @@
 
 int main() {
 
-	std::cout << helper::model_impl("spc", helper::model) << std::endl;
+	std::cout << helper::model_impl("cnl_filter", helper::model) << std::endl;
 
 	return 0;
 }

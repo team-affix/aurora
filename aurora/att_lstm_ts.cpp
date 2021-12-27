@@ -28,11 +28,11 @@ att_lstm_ts::att_lstm_ts(size_t a_units, vector<size_t> a_h_dims) {
 	m_models = new sync(m_model_template);
 }
 
-void att_lstm_ts::param_recur(std::function<void(aurora::params::Param&)> a_func) {
+void att_lstm_ts::param_recur(const std::function<void(aurora::params::Param&)>& a_func) {
 	m_model_template->param_recur(a_func);
 }
 
-aurora::models::model* att_lstm_ts::clone(std::function<aurora::params::Param(aurora::params::Param&)> a_func) {
+aurora::models::model* att_lstm_ts::clone(const std::function<aurora::params::Param(aurora::params::Param&)>& a_func) {
 	att_lstm_ts* result = new att_lstm_ts();
 	result->m_units = m_units;
 	result->m_htx = m_htx.clone();
@@ -78,7 +78,7 @@ void att_lstm_ts::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void att_lstm_ts::model_recur(std::function<void(model*)> a_func) {
+void att_lstm_ts::model_recur(const std::function<void(model*)>& a_func) {
 	m_model_template->model_recur(a_func);
 }
 

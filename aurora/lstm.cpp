@@ -22,11 +22,11 @@ lstm::lstm(size_t a_units) {
 	m_lstm_ts_template = new lstm_ts(m_units);
 }
 
-void lstm::param_recur(function<void(Param&)> a_func) {
+void lstm::param_recur(const function<void(Param&)>& a_func) {
 	m_lstm_ts_template->param_recur(a_func);
 }
 
-model* lstm::clone(function<Param(Param&)> a_func) {
+model* lstm::clone(const function<Param(Param&)>& a_func) {
 	lstm* result = new lstm();
 	result->m_units = m_units;
 	result->m_lstm_ts_template = (lstm_ts*)m_lstm_ts_template->clone(a_func);
@@ -50,7 +50,7 @@ void lstm::signal(const tensor& a_y_des) {
 		m_unrolled[i]->signal(a_y_des[i]);
 }
 
-void lstm::model_recur(function<void(model*)> a_func) {
+void lstm::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_lstm_ts_template->model_recur(a_func);
 }

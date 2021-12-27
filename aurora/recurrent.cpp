@@ -17,11 +17,11 @@ recurrent::recurrent() {
 
 }
 
-void recurrent::param_recur(function<void(Param&)> a_func) {
+void recurrent::param_recur(const function<void(Param&)>& a_func) {
 
 }
 
-model* recurrent::clone(function<Param(Param&)> a_func) {
+model* recurrent::clone(const function<Param(Param&)>& a_func) {
 	recurrent* result = new recurrent();
 	return result;
 }
@@ -38,7 +38,7 @@ void recurrent::signal(const tensor& a_y_des) {
 	
 }
 
-void recurrent::model_recur(function<void(model*)> a_func) {
+void recurrent::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }
 

@@ -34,14 +34,14 @@ ntm_ts::ntm_ts(
 
 }
 
-void ntm_ts::param_recur(function<void(Param&)> a_func) {
+void ntm_ts::param_recur(const function<void(Param&)>& a_func) {
 	for (int i = 0; i < m_internal_readers.size(); i++)
 		m_internal_readers[i]->param_recur(a_func);
 	for (int i = 0; i < m_internal_writers.size(); i++)
 		m_internal_writers[i]->param_recur(a_func);
 }
 
-model* ntm_ts::clone(function<Param(Param&)> a_func) {
+model* ntm_ts::clone(const function<Param(Param&)>& a_func) {
 	ntm_ts* result = new ntm_ts();
 	result->m_memory_height = m_memory_height;
 	result->m_memory_width = m_memory_width;
@@ -81,7 +81,7 @@ void ntm_ts::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void ntm_ts::model_recur(function<void(model*)> a_func) {
+void ntm_ts::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	for (int i = 0; i < m_internal_readers.size(); i++)
 		m_internal_readers[i]->model_recur(a_func);

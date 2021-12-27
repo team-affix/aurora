@@ -39,12 +39,12 @@ ntm::ntm(
 
 }
 
-void ntm::param_recur(function<void(Param&)> a_func) {
+void ntm::param_recur(const function<void(Param&)>& a_func) {
 	m_internal_lstm->param_recur(a_func);
 	m_ntm_ts_template->param_recur(a_func);
 }
 
-model* ntm::clone(function<Param(Param&)> a_func) {
+model* ntm::clone(const function<Param(Param&)>& a_func) {
 	ntm* result = new ntm();
 	result->m_memory_height = m_memory_height;
 	result->m_memory_width = m_memory_width;
@@ -74,7 +74,7 @@ void ntm::signal(const tensor& a_y_des) {
 	m_y.sub_2d(a_y_des, m_y_grad);
 }
 
-void ntm::model_recur(function<void(model*)> a_func) {
+void ntm::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_lstm->model_recur(a_func);
 	m_ntm_ts_template->model_recur(a_func);

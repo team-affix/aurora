@@ -19,11 +19,11 @@ interpolate::interpolate(size_t a_units) {
 	m_units = a_units;
 }
 
-void interpolate::param_recur(function<void(Param&)> a_func) {
+void interpolate::param_recur(const function<void(Param&)>& a_func) {
 
 }
 
-model* interpolate::clone(function<Param(Param&)> a_func) {
+model* interpolate::clone(const function<Param(Param&)>& a_func) {
 	interpolate* result = new interpolate();
 	result->m_units = m_units;
 	return result;
@@ -51,7 +51,7 @@ void interpolate::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void interpolate::model_recur(function<void(model*)> a_func) {
+void interpolate::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }
 

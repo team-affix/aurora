@@ -19,11 +19,11 @@ cos_sim::cos_sim(size_t a_units) {
 	m_units = a_units;
 }
 
-void cos_sim::param_recur(function<void(Param&)> a_func) {
+void cos_sim::param_recur(const function<void(Param&)>& a_func) {
 
 }
 
-model* cos_sim::clone(function<Param(Param&)> a_func) {
+model* cos_sim::clone(const function<Param(Param&)>& a_func) {
 	cos_sim* result = new cos_sim();
 	result->m_units = m_units;
 	result->m_magnitude_0 = m_magnitude_0;
@@ -60,7 +60,7 @@ void cos_sim::signal(const tensor& a_y_des) {
 	m_y_grad.val() = m_y.val() - a_y_des.val();
 }
 
-void cos_sim::model_recur(function<void(model*)> a_func) {
+void cos_sim::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }
 

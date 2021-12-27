@@ -25,12 +25,12 @@ ntm_reader::ntm_reader(size_t a_memory_height, size_t a_memory_width, vector<int
 	m_internal_addresser = new ntm_addresser(a_memory_height, a_memory_width, a_valid_shifts);
 }
 
-void ntm_reader::param_recur(function<void(Param&)> a_func) {
+void ntm_reader::param_recur(const function<void(Param&)>& a_func) {
 	m_internal_head->param_recur(a_func);
 	m_internal_addresser->param_recur(a_func);
 }
 
-model* ntm_reader::clone(function<Param(Param&)> a_func) {
+model* ntm_reader::clone(const function<Param(Param&)>& a_func) {
 	ntm_reader* result = new ntm_reader();
 	result->m_memory_height = m_memory_height;
 	result->m_memory_width = m_memory_width;
@@ -64,7 +64,7 @@ void ntm_reader::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void ntm_reader::model_recur(function<void(model*)> a_func) {
+void ntm_reader::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_head->model_recur(a_func);
 	m_internal_addresser->model_recur(a_func);

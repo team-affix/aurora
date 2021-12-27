@@ -25,12 +25,12 @@ weight_set::weight_set(size_t a_a) {
 		m_weights.push_back(new weight());
 }
 
-void weight_set::param_recur(function<void(Param&)> a_func) {
+void weight_set::param_recur(const function<void(Param&)>& a_func) {
 	for (int i = 0; i < m_weights.size(); i++)
 		m_weights[i]->param_recur(a_func);
 }
 
-model* weight_set::clone(function<Param(Param&)> a_func) {
+model* weight_set::clone(const function<Param(Param&)>& a_func) {
 	weight_set* result = new weight_set();
 	result->m_a = m_a;
 	for (int i = 0; i < m_a; i++)
@@ -55,7 +55,7 @@ void weight_set::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void weight_set::model_recur(function<void(model*)> a_func) {
+void weight_set::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	for (int i = 0; i < m_weights.size(); i++)
 		m_weights[i]->model_recur(a_func);

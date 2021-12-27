@@ -32,12 +32,12 @@ layer::layer(vector<Model> a_models) {
 	m_models = a_models;
 }
 
-void layer::param_recur(function<void(Param&)> a_func) {
+void layer::param_recur(const function<void(Param&)>& a_func) {
 	for (int i = 0; i < m_models.size(); i++)
 		m_models[i]->param_recur(a_func);
 }
 
-model* layer::clone(function<Param(Param&)> a_func) {
+model* layer::clone(const function<Param(Param&)>& a_func) {
 	layer* result = new layer();
 	for (size_t i = 0; i < m_models.size(); i++)
 		result->m_models.push_back(m_models[i]->clone(a_func));
@@ -59,7 +59,7 @@ void layer::signal(const tensor& a_y_des) {
 		m_models[i]->signal(a_y_des[i]);
 }
 
-void layer::model_recur(function<void(model*)> a_func) {
+void layer::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	for (size_t i = 0; i < m_models.size(); i++)
 		m_models[i]->model_recur(a_func);

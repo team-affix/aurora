@@ -28,12 +28,12 @@ stacked_recurrent::stacked_recurrent(size_t a_height, Recurrent a_model_template
 		m_models.push_back((recurrent*)a_model_template->clone());
 }
 
-void stacked_recurrent::param_recur(function<void(Param&)> a_func) {
+void stacked_recurrent::param_recur(const function<void(Param&)>& a_func) {
 	for (int i = 0; i < m_models.size(); i++)
 		m_models[i]->param_recur(a_func);
 }
 
-model* stacked_recurrent::clone(function<Param(Param&)> a_func) {
+model* stacked_recurrent::clone(const function<Param(Param&)>& a_func) {
 	stacked_recurrent* result = new stacked_recurrent();
 	for (int i = 0; i < m_models.size(); i++)
 		result->m_models.push_back((recurrent*)m_models[i]->clone(a_func));
@@ -56,7 +56,7 @@ void stacked_recurrent::signal(const tensor& a_y_des) {
 	m_models.back()->signal(a_y_des);
 }
 
-void stacked_recurrent::model_recur(function<void(model*)> a_func) {
+void stacked_recurrent::model_recur(const function<void(model*)>& a_func) {
 	for (int i = 0; i < m_models.size(); i++)
 		m_models[i]->model_recur(a_func);
 }

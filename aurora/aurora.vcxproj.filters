@@ -228,6 +228,21 @@
     <ClInclude Include="spc.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="sum_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="mul_0d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="mul_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="dot_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="parameterized_dot_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -387,6 +402,21 @@
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
     <ClCompile Include="spc.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="sum_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="mul_0d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="mul_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="dot_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="parameterized_dot_1d.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>

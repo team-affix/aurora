@@ -25,11 +25,11 @@ ntm_content_addresser::ntm_content_addresser(size_t a_memory_height, size_t a_me
 	m_internal_normalize = new normalize(m_memory_height);
 }
 
-void ntm_content_addresser::param_recur(function<void(Param&)> a_func) {
+void ntm_content_addresser::param_recur(const function<void(Param&)>& a_func) {
 
 }
 
-model* ntm_content_addresser::clone(function<Param(Param&)> a_func) {
+model* ntm_content_addresser::clone(const function<Param(Param&)>& a_func) {
 	ntm_content_addresser* result = new ntm_content_addresser();
 	result->m_memory_height = m_memory_height;
 	result->m_memory_width = m_memory_width;
@@ -59,7 +59,7 @@ void ntm_content_addresser::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void ntm_content_addresser::model_recur(function<void(model*)> a_func) {
+void ntm_content_addresser::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_similarity->model_recur(a_func);
 	m_internal_sparsify->model_recur(a_func);

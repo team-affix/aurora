@@ -20,11 +20,11 @@ leaky_rexu::leaky_rexu(double a_k) {
 	m_k = a_k;
 }
 
-void leaky_rexu::param_recur(function<void(Param&)> a_func) {
+void leaky_rexu::param_recur(const function<void(Param&)>& a_func) {
 
 }
 
-model* leaky_rexu::clone(function<Param(Param&)> a_func) {
+model* leaky_rexu::clone(const function<Param(Param&)>& a_func) {
 	leaky_rexu* result = new leaky_rexu();
 	result->m_k = m_k;
 	return result;
@@ -48,7 +48,7 @@ void leaky_rexu::signal(const tensor& a_y_des) {
 	m_y_grad.val() = m_y - a_y_des;
 }
 
-void leaky_rexu::model_recur(function<void(model*)> a_func) {
+void leaky_rexu::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }
 

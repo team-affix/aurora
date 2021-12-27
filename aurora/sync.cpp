@@ -19,11 +19,11 @@ sync::sync(Model a_model_template) {
 	this->m_model_template = a_model_template;
 }
 
-void sync::param_recur(function<void(Param&)> a_func) {
+void sync::param_recur(const function<void(Param&)>& a_func) {
 	m_model_template->param_recur(a_func);
 }
 
-model* sync::clone(function<Param(Param&)> a_func) {
+model* sync::clone(const function<Param(Param&)>& a_func) {
 	sync* result = new sync(m_model_template->clone(a_func));
 	result->prep(m_prepared.size());
 	result->unroll(m_unrolled.size());
@@ -45,7 +45,7 @@ void sync::signal(const tensor& a_y_des) {
 		m_unrolled[i]->signal(a_y_des[i]);
 }
 
-void sync::model_recur(function<void(model*)> a_func) {
+void sync::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_model_template->model_recur(a_func);
 }

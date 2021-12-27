@@ -68,7 +68,7 @@ ntm_rh::ntm_rh(size_t a_units, vector<size_t> a_head_h_dims, size_t a_shift_unit
 	m_gamma_model = pseudo::tnn(gamma_dims, gamma_neurons);
 }
 
-void ntm_rh::param_recur(function<void(Param&)> a_func) {
+void ntm_rh::param_recur(const function<void(Param&)>& a_func) {
 	m_key_model->param_recur(a_func);
 	m_beta_model->param_recur(a_func);
 	m_g_model->param_recur(a_func);
@@ -76,7 +76,7 @@ void ntm_rh::param_recur(function<void(Param&)> a_func) {
 	m_gamma_model->param_recur(a_func);
 }
 
-model* ntm_rh::clone(function<Param(Param&)> a_func) {
+model* ntm_rh::clone(const function<Param(Param&)>& a_func) {
 	ntm_rh* result = new ntm_rh();
 	result->m_units = m_units;
 	result->m_shift_units = m_shift_units;
@@ -115,7 +115,7 @@ void ntm_rh::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void ntm_rh::model_recur(function<void(model*)> a_func) {
+void ntm_rh::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_key_model->model_recur(a_func);
 	m_beta_model->model_recur(a_func);

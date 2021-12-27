@@ -38,6 +38,11 @@
     <ClInclude Include="att_lstm.h" />
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
+    <ClInclude Include="dot_1d.h" />
+    <ClInclude Include="parameterized_dot_1d.h" />
+    <ClInclude Include="mul_1d.h" />
+    <ClInclude Include="sum_1d.h" />
+    <ClInclude Include="mul_0d.h" />
     <ClInclude Include="pseudo_lstm_hyperparams.h" />
     <ClInclude Include="pseudo_ntm_hyperparams.h" />
     <ClInclude Include="pseudo_tnn_hyperparams.h" />
@@ -100,6 +105,11 @@
   <ItemGroup>
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
+    <ClCompile Include="parameterized_dot_1d.cpp" />
+    <ClCompile Include="dot_1d.cpp" />
+    <ClCompile Include="mul_0d.cpp" />
+    <ClCompile Include="mul_1d.cpp" />
+    <ClCompile Include="sum_1d.cpp" />
     <ClCompile Include="pseudo_lstm_hyperparams.cpp" />
     <ClCompile Include="pseudo_ntm_hyperparams.cpp" />
     <ClCompile Include="pseudo_tnn_hyperparams.cpp" />

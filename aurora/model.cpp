@@ -30,15 +30,15 @@ void model::signal(const tensor& a_y_des) {
 	
 }
 
-void model::model_recur(function<void(model*)> a_func) {
+void model::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }
 
-void model::param_recur(function<void(Param&)> a_func) {
+void model::param_recur(const function<void(Param&)>& a_func) {
 
 }
 
-model* model::clone(function<Param(Param&)> a_func) {
+model* model::clone(const function<Param(Param&)>& a_func) {
 	return new model();
 }
 

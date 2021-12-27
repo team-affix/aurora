@@ -26,14 +26,14 @@ ntm_location_addresser::ntm_location_addresser(size_t a_memory_height, vector<in
 	m_internal_normalize = new normalize(a_memory_height);
 }
 
-void ntm_location_addresser::param_recur(function<void(Param&)> a_func) {
+void ntm_location_addresser::param_recur(const function<void(Param&)>& a_func) {
 	m_internal_interpolate->param_recur(a_func);
 	m_internal_shift->param_recur(a_func);
 	m_internal_power->param_recur(a_func);
 	m_internal_normalize->param_recur(a_func);
 }
 
-model* ntm_location_addresser::clone(function<Param(Param&)> a_func) {
+model* ntm_location_addresser::clone(const function<Param(Param&)>& a_func) {
 	ntm_location_addresser* result = new ntm_location_addresser();
 	result->m_memory_height = m_memory_height;
 	result->m_shift_units = m_shift_units;
@@ -63,7 +63,7 @@ void ntm_location_addresser::signal(const tensor& a_y_des) {
 	m_y.sub_1d(a_y_des, m_y_grad);
 }
 
-void ntm_location_addresser::model_recur(function<void(model*)> a_func) {
+void ntm_location_addresser::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_interpolate->model_recur(a_func);
 	m_internal_shift->model_recur(a_func);

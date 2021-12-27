@@ -27,12 +27,12 @@ sequential::sequential(vector<Model> a_models) {
 	m_models = a_models;
 }
 
-void sequential::param_recur(function<void(Param&)> a_func) {
+void sequential::param_recur(const function<void(Param&)>& a_func) {
 	for (int i = 0; i < m_models.size(); i++)
 		m_models[i]->param_recur(a_func);
 }
 
-model* sequential::clone(function<Param(Param&)> a_func) {
+model* sequential::clone(const function<Param(Param&)>& a_func) {
 	sequential* result = new sequential();
 	result->m_models.resize(m_models.size());
 	for (int i = 0; i < m_models.size(); i++)
@@ -54,7 +54,7 @@ void sequential::signal(const tensor& a_y_des) {
 	m_models.back()->signal(a_y_des);
 }
 
-void sequential::model_recur(function<void(model*)> a_func) {
+void sequential::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	for (int i = 0; i < m_models.size(); i++)
 		m_models[i]->model_recur(a_func);
