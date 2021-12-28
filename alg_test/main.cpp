@@ -1917,7 +1917,7 @@ void dot_1d_test()
 void cnl_test()
 {
 	const size_t FILTER_HEIGHT = 2;
-	const size_t FILTER_WIDTH = 2;
+	const size_t FILTER_WIDTH = 10;
 	const size_t MAX_INPUT_HEIGHT = 10;
 	const size_t MAX_INPUT_WIDTH = 10;
 

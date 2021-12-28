@@ -90,13 +90,14 @@ void cnl::compile()
 	m_y_grad = tensor::new_2d(y_strides(), x_strides());
 
 	m_filters->compile();
-
+	
+	const size_t l_x_strides = x_strides();
 	const size_t l_y_strides = y_strides();
 
  	for (int i = 0; i < m_filters->m_prepared.size(); i++)
 	{
-		size_t l_row = i / l_y_strides;
-		size_t l_col = i % l_y_strides;
+		size_t l_row = i / l_x_strides;
+		size_t l_col = i % l_x_strides;
 		m_x.range_2d(l_row, l_col, m_filter_height, m_filter_width).unroll().group_join_all_ranks(m_filters->m_x[i]);
 		m_x_grad.range_2d(l_row, l_col, m_filter_height, m_filter_width).unroll().group_join_all_ranks(m_filters->m_x_grad[i]);
 		m_y[l_row][l_col].group_join_all_ranks(m_filters->m_y[i]);
