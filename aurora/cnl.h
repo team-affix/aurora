@@ -8,37 +8,49 @@ namespace aurora {
 	namespace models {
 		class cnl : public model
 		{
-		private:
-			aurora::maths::tensor m_y_des;
-			aurora::maths::tensor m_y_des_reshaped;
-
 		public:
 			size_t m_filter_height = 0;
 			size_t m_filter_width = 0;
-			size_t m_input_max_height = 0;
-			size_t m_input_max_width = 0;
-			size_t m_stride_len = 0;
-			Parameterized_dot_1d m_filter_template;
+			size_t m_x_stride = 0;
+			size_t m_y_stride = 0;
+
+		public:
+			size_t m_max_input_height = 0;
+			size_t m_max_input_width = 0;
+
+		public:
 			Sync m_filters;
 
 		public:
-			ATTENTION_FIELDS
+			MODEL_FIELDS
 			virtual ~cnl();
 			cnl();
 			cnl(
-				size_t a_filter_height, 
-				size_t a_filter_width, 
-				size_t a_stride_len
+				const size_t& a_filter_height,
+				const size_t& a_filter_width,
+				const size_t& a_x_stride = 1,
+				const size_t& a_y_stride = 1
 			);
 
-			size_t x_strides(
-				size_t a_width
+		public:
+			void prep_for_input(
+				const size_t& a_input_height,
+				const size_t& a_input_width
 			);
-			size_t x_strides();
+			void unroll_for_input(
+				const size_t& a_input_height,
+				const size_t& a_input_width
+			);
+
+		public:
 			size_t y_strides(
-				size_t a_height
-			);
-			size_t y_strides();
+				const size_t& a_input_height
+			) const;
+			size_t x_strides(
+				const size_t& a_input_width
+			) const;
+			size_t y_strides() const;
+			size_t x_strides() const;
 
 		};
 		typedef affix_base::data::ptr<cnl> Cnl;

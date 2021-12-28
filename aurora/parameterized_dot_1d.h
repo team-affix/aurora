@@ -10,7 +10,7 @@ namespace aurora
 		class parameterized_dot_1d : public model
 		{
 		public:
-			size_t m_units;
+			size_t m_units = 0;
 
 		public:
 			Layer m_layer;
@@ -19,6 +19,7 @@ namespace aurora
 		public:
 			MODEL_FIELDS
 			virtual ~parameterized_dot_1d();
+			parameterized_dot_1d();
 			parameterized_dot_1d(
 				const size_t& a_units
 			);

@@ -1914,15 +1914,47 @@ void dot_1d_test()
 	d.cycle(x, 81);
 }
 
-void cnl_test() {
+void cnl_test()
+{
+	const size_t FILTER_HEIGHT = 2;
+	const size_t FILTER_WIDTH = 2;
+	const size_t MAX_INPUT_HEIGHT = 10;
+	const size_t MAX_INPUT_WIDTH = 10;
+
+	tensor x = tensor::new_2d(MAX_INPUT_HEIGHT, MAX_INPUT_WIDTH, 1);
+
+	uniform_real_distribution<double> l_urd(-1, 1);
+	param_vector pv;
+
+	Cnl c = new cnl(FILTER_HEIGHT, FILTER_WIDTH);
+	c->param_recur(PARAM_INIT(param_mom(l_urd(static_vals::random_engine), 0.0002, 0, 0, 0.9), pv));
+	c->prep_for_input(MAX_INPUT_HEIGHT, MAX_INPUT_WIDTH);
+	c->compile();
+	c->unroll_for_input(MAX_INPUT_HEIGHT, MAX_INPUT_WIDTH);
+
+	tensor y = tensor::new_2d(c->y_strides(), c->x_strides(), 3);
+
+	for (int epoch = 0; true; epoch++)
+	{
+		c->cycle(x, y);
+		pv.update();
+
+		if (epoch % 1000 == 0)
+			std::cout << c->m_y[0][0].to_string() << std::endl;
+
+	}
+
+}
+
+void cnn_test() {
 
 	const size_t X_HEIGHT = 10;
 	const size_t X_WIDTH = 10;
 
 	tensor x = {
-		tensor::new_2d(X_HEIGHT, X_WIDTH, 0),
 		tensor::new_2d(X_HEIGHT, X_WIDTH, 1),
 		tensor::new_2d(X_HEIGHT, X_WIDTH, 2),
+		tensor::new_2d(X_HEIGHT, X_WIDTH, 3),
 	};
 
 	uniform_real_distribution<double> pmt_urd(-1, 1);
@@ -1930,17 +1962,17 @@ void cnl_test() {
 	param_vector pv;
 	
 	ptr<cnl> c1 = new cnl(2, 2, 1);
-	c1->prep(X_HEIGHT, X_WIDTH);
+	c1->prep_for_input(X_HEIGHT, X_WIDTH);
 
 	ptr<layer> l1 = new layer(c1->y_strides(), new layer(c1->x_strides(), pseudo::nlr(0.3)));
 
 	ptr<cnl> c2 = new cnl(2, 2, 1);
-	c2->prep(c1->y_strides(), c1->x_strides());
+	c2->prep_for_input(c1->y_strides(), c1->x_strides());
 
 	ptr<layer> l2 = new layer(c2->y_strides(), new layer(c2->x_strides(), pseudo::nlr(0.3)));
 
 	ptr<cnl> c3 = new cnl(2, 2, 1);
-	c3->prep(c2->y_strides(), c2->x_strides());
+	c3->prep_for_input(c2->y_strides(), c2->x_strides());
 
 	Sequential s = new sequential {
 		c1,
@@ -1955,14 +1987,14 @@ void cnl_test() {
 	s->compile();
 
 	tensor y = {
-		tensor::new_2d(c3->y_strides(), c3->x_strides(), 3),
+		tensor::new_2d(c3->y_strides(), c3->x_strides(), 1),
 		tensor::new_2d(c3->y_strides(), c3->x_strides(), 2),
-		tensor::new_2d(c3 ->y_strides(), c3->x_strides(), 1),
+		tensor::new_2d(c3 ->y_strides(), c3->x_strides(), 3),
 	};
 
-	c1->unroll(X_HEIGHT, X_WIDTH);
-	c2->unroll(c1->y_strides(), c1->x_strides());
-	c3->unroll(c2->y_strides(), c2->x_strides());
+	c1->unroll_for_input(X_HEIGHT, X_WIDTH);
+	c2->unroll_for_input(c1->y_strides(), c1->x_strides());
+	c3->unroll_for_input(c2->y_strides(), c2->x_strides());
 
 	std::cout << "TRAINING MODEL" << std::endl;
 

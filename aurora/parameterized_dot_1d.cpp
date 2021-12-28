@@ -13,6 +13,11 @@ parameterized_dot_1d::~parameterized_dot_1d()
 
 }
 
+parameterized_dot_1d::parameterized_dot_1d()
+{
+
+}
+
 parameterized_dot_1d::parameterized_dot_1d(
 	const size_t& a_units
 )
@@ -30,8 +35,10 @@ void parameterized_dot_1d::param_recur(const function<void(Param&)>& a_func)
 
 model* parameterized_dot_1d::clone(const function<Param(Param&)>& a_func)
 {
-	parameterized_dot_1d* result = new parameterized_dot_1d(m_units);
+	parameterized_dot_1d* result = new parameterized_dot_1d();
+	result->m_units = m_units;
 	result->m_layer = m_layer->clone(a_func);
+	result->m_sum_1d = m_sum_1d->clone(a_func);
 	return result;
 }
 
