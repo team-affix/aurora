@@ -24,13 +24,13 @@ cnl::cnl()
 cnl::cnl(
 	const size_t& a_filter_height,
 	const size_t& a_filter_width,
-	const size_t& a_x_stride,
-	const size_t& a_y_stride
+	const size_t& a_y_stride,
+	const size_t& a_x_stride
 ) :
 	m_filter_height(a_filter_height),
 	m_filter_width(a_filter_width),
-	m_x_stride(a_x_stride),
-	m_y_stride(a_y_stride)
+	m_y_stride(a_y_stride),
+	m_x_stride(a_x_stride)
 {
 	m_filters = new sync(new parameterized_dot_1d(m_filter_height * m_filter_width));
 }
@@ -96,12 +96,14 @@ void cnl::compile()
 
  	for (int i = 0; i < m_filters->m_prepared.size(); i++)
 	{
-		size_t l_row = i / l_x_strides;
-		size_t l_col = i % l_x_strides;
-		m_x.range_2d(l_row, l_col, m_filter_height, m_filter_width).unroll().group_join_all_ranks(m_filters->m_x[i]);
-		m_x_grad.range_2d(l_row, l_col, m_filter_height, m_filter_width).unroll().group_join_all_ranks(m_filters->m_x_grad[i]);
-		m_y[l_row][l_col].group_join_all_ranks(m_filters->m_y[i]);
-		m_y_grad[l_row][l_col].group_join_all_ranks(m_filters->m_y_grad[i]);
+		size_t l_output_row = i / l_x_strides;
+		size_t l_output_col = i % l_x_strides;
+		size_t l_input_row = l_output_row * m_y_stride;
+		size_t l_input_col = l_output_col * m_x_stride;
+		m_x.range_2d(l_input_row, l_input_col, m_filter_height, m_filter_width).unroll().group_join_all_ranks(m_filters->m_x[i]);
+		m_x_grad.range_2d(l_input_row, l_input_col, m_filter_height, m_filter_width).unroll().group_join_all_ranks(m_filters->m_x_grad[i]);
+		m_y[l_output_row][l_output_col].group_join_all_ranks(m_filters->m_y[i]);
+		m_y_grad[l_output_row][l_output_col].group_join_all_ranks(m_filters->m_y_grad[i]);
 	}
 
 }

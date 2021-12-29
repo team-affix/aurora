@@ -1917,30 +1917,38 @@ void dot_1d_test()
 void cnl_test()
 {
 	const size_t FILTER_HEIGHT = 2;
-	const size_t FILTER_WIDTH = 10;
+	const size_t FILTER_WIDTH = 3;
 	const size_t MAX_INPUT_HEIGHT = 10;
 	const size_t MAX_INPUT_WIDTH = 10;
 
-	tensor x = tensor::new_2d(MAX_INPUT_HEIGHT, MAX_INPUT_WIDTH, 1);
+	tensor x = tensor::new_2d(MAX_INPUT_HEIGHT, MAX_INPUT_WIDTH);
+	for (int i = 0; i < x.height(); i++)
+		for (int j = 0; j < x.width(); j++)
+			x[i][j].val() = i * x.width() + j;
+
+	std::cout << "X of first filter should be: " << x.range_2d(0,0,FILTER_HEIGHT,FILTER_WIDTH).to_string() << std::endl;
 
 	uniform_real_distribution<double> l_urd(-1, 1);
 	param_vector pv;
 
-	Cnl c = new cnl(FILTER_HEIGHT, FILTER_WIDTH);
-	c->param_recur(PARAM_INIT(param_mom(l_urd(static_vals::random_engine), 0.0002, 0, 0, 0.9), pv));
+	Cnl c = new cnl(FILTER_HEIGHT, FILTER_WIDTH, 1, 2);
+	c->param_recur(PARAM_INIT(param_mom(l_urd(static_vals::random_engine), 0.00002, 0, 0, 0.9), pv));
 	c->prep_for_input(MAX_INPUT_HEIGHT, MAX_INPUT_WIDTH);
 	c->compile();
 	c->unroll_for_input(MAX_INPUT_HEIGHT, MAX_INPUT_WIDTH);
 
+	c->m_x.pop(x);
+	std::cout << "X of first filter is:        " << c->m_filters->m_unrolled[0]->m_x.roll(FILTER_WIDTH).to_string() << std::endl;
+
 	tensor y = tensor::new_2d(c->y_strides(), c->x_strides(), 3);
 
-	for (int epoch = 0; true; epoch++)
+	for (int epoch = 0; epoch < 10000; epoch++)
 	{
 		c->cycle(x, y);
 		pv.update();
 
 		if (epoch % 1000 == 0)
-			std::cout << c->m_y[0][0].to_string() << std::endl;
+			std::cout << c->m_y_grad.abs_2d().sum_2d().sum_1d() << std::endl;
 
 	}
 

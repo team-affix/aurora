@@ -28,8 +28,8 @@ namespace aurora {
 			cnl(
 				const size_t& a_filter_height,
 				const size_t& a_filter_width,
-				const size_t& a_x_stride = 1,
-				const size_t& a_y_stride = 1
+				const size_t& a_y_stride = 1,
+				const size_t& a_x_stride = 1
 			);
 
 		public:
