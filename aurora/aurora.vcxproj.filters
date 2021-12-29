@@ -243,6 +243,12 @@
     <ClInclude Include="parameterized_dot_1d.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="add_0d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="add_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -417,6 +423,12 @@
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="parameterized_dot_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="add_0d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="add_1d.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>

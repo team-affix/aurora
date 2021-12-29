@@ -2027,6 +2027,25 @@ void cnn_test() {
 
 }
 
+void add_0d_test()
+{
+	add_0d a;
+	a.compile();
+	a.cycle({ 1, 2 }, 2);
+}
+
+void add_1d_test()
+{
+	add_1d a(2);
+	a.compile();
+	a.cycle(
+		{ 
+		{1, 2}, 
+		{3, 4} 
+		}, 
+		{3, 4});
+}
+
 void auto_encoder() {
 
 	const size_t H_LEN = 100;
@@ -3872,7 +3891,7 @@ int main() {
 
 	srand(time(NULL));
 
-	cnl_test();
+	add_1d_test();
 
 	return 0;
 

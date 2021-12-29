@@ -35,6 +35,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="add_0d.h" />
+    <ClInclude Include="add_1d.h" />
     <ClInclude Include="att_lstm.h" />
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
@@ -103,6 +105,8 @@
     <ClInclude Include="weight_set.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="add_0d.cpp" />
+    <ClCompile Include="add_1d.cpp" />
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
     <ClCompile Include="parameterized_dot_1d.cpp" />

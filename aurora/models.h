@@ -38,3 +38,5 @@
 #include "mul_0d.h"
 #include "mul_1d.h"
 #include "dot_1d.h"
+#include "add_0d.h"
+#include "add_1d.h"
