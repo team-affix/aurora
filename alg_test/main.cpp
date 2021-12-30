@@ -2908,12 +2908,12 @@ void ntm_writer_test() {
 
 void ntm_test() {
 
-	size_t memory_height = 2;
+	size_t memory_height = 1;
 	size_t memory_width = 5;
 	size_t num_readers = 1;
 	size_t num_writers = 1;
 	vector<int> valid_shifts = { -1, 0, 1 };
-	vector<size_t> head_hidden_dims = { memory_width };
+	vector<size_t> head_hidden_dims = {  };
 
 	uniform_real_distribution<double> pmt_urd(-1, 1);
 	uniform_real_distribution<double> ts_urd(-10, 10);
@@ -2922,7 +2922,7 @@ void ntm_test() {
 
 	param_vector pv;
 
-	auto pmt_init = pseudo::param_init(new param_mom(0.02, 0.9), pv);
+	auto pmt_init = pseudo::param_init(new param_mom(1, 0.9), pv);
 
 	Sync s_in = new sync(pseudo::tnn({ 2, memory_width }, pseudo::nlr(0.3)));
 
@@ -2982,7 +2982,7 @@ void ntm_test() {
 		},
 	};
 
-	const size_t checkpoint_interval = 10;
+	const size_t checkpoint_interval = 100;
 
 	double cost = INFINITY;
 
@@ -3897,7 +3897,7 @@ int main() {
 
 	srand(time(NULL));
 
-	ntm_test();
+	major_tests();
 
 	return 0;
 
