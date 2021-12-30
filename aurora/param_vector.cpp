@@ -24,6 +24,12 @@ void param_vector::normalize()
 	pop((operator tensor()).signed_norm_1d());
 }
 
+void param_vector::rand_norm()
+{
+	randomize();
+	normalize();
+}
+
 void param_vector::update() {
 	for (int i = 0; i < size(); i++)
 		at(i)->update();

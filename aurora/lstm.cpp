@@ -45,11 +45,6 @@ void lstm::bwd() {
 		m_unrolled[i]->bwd();
 }
 
-void lstm::signal(const tensor& a_y_des) {
-	for (int i = 0; i < m_unrolled.size(); i++)
-		m_unrolled[i]->signal(a_y_des[i]);
-}
-
 void lstm::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_lstm_ts_template->model_recur(a_func);

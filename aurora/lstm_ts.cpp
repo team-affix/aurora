@@ -88,10 +88,6 @@ void lstm_ts::bwd() {
 	m_comp_0.add_1d(m_comp_1, m_htx_grad);
 }
 
-void lstm_ts::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void lstm_ts::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_forget_gate->model_recur(a_func);

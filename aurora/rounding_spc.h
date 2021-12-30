@@ -16,5 +16,6 @@ namespace aurora
 			rounding_spc();
 
 		};
+		typedef affix_base::data::ptr<rounding_spc> Rounding_spc;
 	}
 }

@@ -40,11 +40,6 @@ void sync::bwd() {
 		m_unrolled[i]->bwd();
 }
 
-void sync::signal(const tensor& a_y_des) {
-	for (int i = 0; i < m_unrolled.size(); i++)
-		m_unrolled[i]->signal(a_y_des[i]);
-}
-
 void sync::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_model_template->model_recur(a_func);

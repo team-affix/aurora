@@ -50,10 +50,6 @@ void att_lstm::bwd() {
 	}
 }
 
-void att_lstm::signal(const aurora::maths::tensor& a_y_des) {
-	m_internal_lstm->signal(a_y_des);
-}
-
 void att_lstm::model_recur(const std::function<void(model*)>& a_func) {
 	m_models->model_recur(a_func);
 	m_internal_lstm->model_recur(a_func);

@@ -47,13 +47,6 @@ void mul_1d::bwd()
 	m_layer->bwd();
 }
 
-void mul_1d::signal(
-	const tensor& a_y_des
-)
-{
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void mul_1d::model_recur(
 	const function<void(model*)>& a_func
 )

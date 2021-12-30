@@ -246,6 +246,9 @@
     <ClInclude Include="rounding_spc.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="mse_loss.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -423,6 +426,9 @@
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="rounding_spc_0d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="mse_loss.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>

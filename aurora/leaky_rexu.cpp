@@ -44,10 +44,6 @@ void leaky_rexu::bwd() {
 		m_x_grad.val() = m_y_grad;
 }
 
-void leaky_rexu::signal(const tensor& a_y_des) {
-	m_y_grad.val() = m_y - a_y_des;
-}
-
 void leaky_rexu::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

@@ -54,11 +54,6 @@ void parameterized_dot_1d::bwd()
 	m_layer->bwd();
 }
 
-void parameterized_dot_1d::signal(const tensor& a_y_des)
-{
-	m_y_grad.val() = m_y.val() - a_y_des.val();
-}
-
 void parameterized_dot_1d::model_recur(const function<void(model*)>& a_func)
 {
 	m_layer->model_recur(a_func);

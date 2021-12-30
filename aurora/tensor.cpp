@@ -631,6 +631,28 @@ void tensor::rank_recur(const std::function<void(tensor*)>& a_func) {
 	a_func(this);
 }
 
+void tensor::lowest_rank_recur(
+	const std::function<void(tensor*)>& a_func
+)
+{
+	if (size() != 0)
+		for (int i = 0; i < size(); i++)
+			at(i).lowest_rank_recur(a_func);
+	else
+		a_func(this);
+}
+
+size_t tensor::lowest_rank_count()
+{
+	size_t l_result = 0;
+	lowest_rank_recur(
+		[&](tensor*)
+		{
+			l_result++;
+		});
+	return l_result;
+}
+
 void tensor::group_recur_fwd(const std::function<void(tensor*)>& a_func) {
 	if (m_group_next_ptr != nullptr)
 		m_group_next_ptr->group_recur_fwd(a_func);

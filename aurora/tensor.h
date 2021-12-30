@@ -288,6 +288,10 @@ namespace aurora {
 			void rank_recur(
 				const std::function<void(tensor*)>& a_func
 			);
+			void lowest_rank_recur(
+				const std::function<void(tensor*)>& a_func
+			);
+			size_t lowest_rank_count();
 
 		public:
 			void group_recur_fwd(

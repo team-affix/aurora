@@ -74,10 +74,6 @@ void att_lstm_ts::bwd() {
 	}
 }
 
-void att_lstm_ts::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void att_lstm_ts::model_recur(const std::function<void(model*)>& a_func) {
 	m_model_template->model_recur(a_func);
 }

@@ -34,10 +34,6 @@ void sigmoid::bwd() {
 	m_x_grad.val() = m_y_grad.val() * m_y.val() * (1 - m_y.val());
 }
 
-void sigmoid::signal(const tensor& a_y_des) {
-	m_y_grad.val() = m_y.val() - a_y_des.val();
-}
-
 void sigmoid::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

@@ -46,10 +46,6 @@ void onehot_spc::bwd() {
 
 }
 
-void onehot_spc::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void onehot_spc::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

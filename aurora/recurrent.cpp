@@ -34,10 +34,6 @@ void recurrent::bwd() {
 
 }
 
-void recurrent::signal(const tensor& a_y_des) {
-	
-}
-
 void recurrent::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

@@ -44,10 +44,6 @@ void ntm_sparsify::bwd() {
 	}
 }
 
-void ntm_sparsify::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void ntm_sparsify::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

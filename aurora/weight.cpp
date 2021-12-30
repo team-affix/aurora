@@ -39,10 +39,6 @@ void weight::bwd() {
 	m_x_grad.val() = m_y_grad.val() * m_pmt->state();
 }
 
-void weight::signal(const tensor& a_y_des) {
-	m_y_grad.val() = m_y.val() - a_y_des.val();
-}
-
 void weight::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

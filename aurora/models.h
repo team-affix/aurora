@@ -41,3 +41,4 @@
 #include "add_0d.h"
 #include "add_1d.h"
 #include "rounding_spc.h"
+#include "mse_loss.h"

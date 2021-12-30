@@ -37,10 +37,6 @@ void leaky_relu::bwd() {
 		m_x_grad.val() = m_y_grad.val() * m_m.val();
 }
 
-void leaky_relu::signal(const tensor& a_y_des) {
-	m_y_grad.val() = m_y.val() - a_y_des.val();
-}
-
 void leaky_relu::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

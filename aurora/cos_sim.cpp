@@ -56,10 +56,6 @@ void cos_sim::bwd() {
 	}
 }
 
-void cos_sim::signal(const tensor& a_y_des) {
-	m_y_grad.val() = m_y.val() - a_y_des.val();
-}
-
 void cos_sim::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

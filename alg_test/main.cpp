@@ -177,7 +177,9 @@ void tnn_xor_test() {
 		pmt = new param_mom(0.02, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	});
-	s->compile();
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -194,7 +196,7 @@ void tnn_xor_test() {
 		}
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
-			s->cycle(x[tsIndex], y[tsIndex]);
+			m->cycle(x[tsIndex], y[tsIndex]);
 			if (epoch % checkpoint_interval == 0)
 				std::cout << x[tsIndex].to_string() << " " << s->m_y.to_string() << std::endl;
 		}
@@ -206,6 +208,7 @@ void tnn_xor_test() {
 	for (param_mom* pmt : pv) {
 		std::cout << pmt->state() << std::endl;
 	}
+
 }
 
 void tnn_compiled_xor_test() {
@@ -214,6 +217,9 @@ void tnn_compiled_xor_test() {
 
 	param_vector pv;
 	Model s = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
 	
 	tensor x = {
 		{0, 0},
@@ -238,7 +244,7 @@ void tnn_compiled_xor_test() {
 		}
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
-			s->cycle(x[tsIndex], y[tsIndex]);
+			m->cycle(x[tsIndex], y[tsIndex]);
 			if (epoch % checkpoint_interval == 0)
 				std::cout << x[tsIndex].to_string() << " " << s->m_y.to_string() << std::endl;
 		}
@@ -313,7 +319,9 @@ void tnn_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 	Sequential s = pseudo::tnn({ 2, 17, 1 }, pseudo::nlr(0.3));
 	s->param_recur(pseudo::param_init(new param_mom(0.0002, 0.9), pl));
-	s->compile();
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
 
 	pl.randomize();
 	pl.normalize();
@@ -328,7 +336,7 @@ void tnn_test() {
 		double cost = 0;
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
-			s->cycle(x[tsIndex], y[tsIndex]);
+			m->cycle(x[tsIndex], y[tsIndex]);
 			cost += s->m_y_grad.abs_1d().sum_1d();
 		}
 
@@ -376,7 +384,8 @@ void sync_xor_test() {
 
 	Sync s = (sync*)s_prev->clone();
 	
-	s->compile();
+	Mse_loss m = new mse_loss(s);
+	m->compile();
 
 	pl.randomize();
 	pl.normalize();
@@ -384,7 +393,7 @@ void sync_xor_test() {
 	s->unroll(4);
 
 	for (int epoch = 0; epoch < 1000000; epoch++) {
-		s->cycle(x, y);
+		m->cycle(x, y);
 
 		if (epoch % 10000 == 0) {
 			printf("\033[%d;%dH", 0, 0);
@@ -484,7 +493,9 @@ void encoder_test() {
 	}
 
 	std::cout << "COMPILING MODEL" << std::endl;
-	s->compile();
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
 
 	double best_cost = INFINITY;
 
@@ -499,7 +510,7 @@ void encoder_test() {
 		double epoch_cost = 0;
 		for (int i = 0; i < mini_batch_len; i++) {
 			int ts_index = random(0, x_order_2_len);
-			s->cycle(train_x[ts_index], train_x[ts_index]);
+			m->cycle(train_x[ts_index], train_x[ts_index]);
 			if(epoch % checkpoint_interval == 0)
 				epoch_cost += s->m_y_grad.abs_1d().sum_1d();
 		}
@@ -585,14 +596,15 @@ void lstm_test() {
 	ptr<lstm> l0_ptr = l;
 	Sync s1_ptr = s1;
 
-	sequential s = sequential({ s0, l, s1 });
-	s.param_recur(pmt_init);
+	Sequential s = new sequential({ s0, l, s1 });
+	s->param_recur(pmt_init);
 
 	s0->prep(4);
 	l->prep(4);
 	s1->prep(4);
 
-	s.compile();
+	Mse_loss m = new mse_loss(s);
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -604,269 +616,16 @@ void lstm_test() {
 	const int checkpoint_interval = 10000;
 
 	for (int epoch = 0; epoch < 100000; epoch++) {
-		s.cycle(x0, y0);
+		m->cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
-			std::cout << "S0: " << s.m_y.to_string() << std::endl;
-		s.cycle(x1, y1);
+			std::cout << "S0: " << s->m_y.to_string() << std::endl;
+		m->cycle(x1, y1);
 		if (epoch % checkpoint_interval == 0)
-			std::cout << "S1: " << s.m_y.to_string() << std::endl;
+			std::cout << "S1: " << s->m_y.to_string() << std::endl;
 		for (param_sgd* pmt : pv) {
 			pmt->state() -= pmt->learn_rate() * pmt->gradient();
 			pmt->gradient() = 0;
 		}
-	}
-}
-
-void input_gd() {
-
-#pragma region HYPER CONFIGURE
-	const double learn_rate = 0.002;
-	const double beta = 0.9;
-#pragma endregion
-#pragma region RANDOM INSTANTIATE
-	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(25);
-#pragma endregion
-#pragma region ORDER 0 INSTANTIATE
-	tensor x_0 = {
-		{0, 0},
-		{0, 1},
-		{1, 0},
-		{1, 1},
-	};
-	tensor y_0 = {
-		{0},
-		{1},
-		{1},
-		{0},
-	};
-
-	param_vector pv_0;
-	Sync s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3)));
-	s_0->param_recur([&](Param& pmt) {
-		pmt = new param_mom(learn_rate, beta);
-		pv_0.push_back((param_mom*)pmt.get());
-	});
-#pragma endregion
-#pragma region ORDER 1 INSTANTIATE
-	const int x_1_height = 20;
-	tensor x_1 = tensor::new_2d(x_1_height, pv_0.size(), urd, re);
-	param_vector pv_1;
-	Sequential s_1 = pseudo::tnn({ pv_0.size(), pv_0.size() * 2, 1 }, pseudo::nlr(0.3));
-	s_1->param_recur([&](Param& pmt) {
-		pmt = new param_mom(learn_rate, beta);
-		pv_1.push_back((param_mom*)pmt.get());
-	});
-#pragma endregion
-#pragma region TENSOR INSTANTIATE
-	tensor pv_0_states = tensor::new_1d(pv_0.size());
-	for (int i = 0; i < pv_0.size(); i++)
-		pv_0_states[i].m_val_ptr.link(pv_0[i]->m_state_ptr);
-	tensor deviant_input = tensor::new_1d(pv_0.size(), urd, re);
-	tensor deviant_output = { 0 };
-	tensor deviant_learn_rate_tensor = tensor::new_1d(pv_0.size(), learn_rate);
-	tensor deviant_momentum_tensor = tensor::new_1d(pv_0.size(), 0);
-	tensor deviant_beta_tensor = tensor::new_1d(pv_0.size(), beta);
-	tensor deviant_beta_compliment_tensor = tensor::new_1d(pv_0.size(), 1 - beta);
-#pragma endregion
-#pragma region COMPILE
-
-	s_0->prep(x_0.size());
-	s_0->compile();
-	s_0->unroll(x_0.size());
-	s_1->compile();
-
-	pv_0.randomize();
-	pv_0.normalize();
-	pv_1.randomize();
-	pv_1.normalize();
-
-#pragma endregion
-#pragma region CONFIGURE TRAINING
-	const double min_ts_cost = 1E-1;
-	const int checkpoint_interval = 100;
-	const int deviant_update_amount = 10;
-#pragma endregion
-#pragma region GET ORDER 1 TRAINING SET Y
-	tensor y_1 = tensor::new_2d(x_1.size(), 1);
-	auto get_tsy_1 = [&](tensor tsx_1) {
-		pv_0_states.pop(tsx_1);
-		s_0->fwd(x_0);
-		s_0->signal(y_0);
-		return s_0->m_y_grad.abs_2d().sum_2d();
-	};
-	for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
-		y_1[tsIndex] = get_tsy_1(x_1[tsIndex]);
-	}
-#pragma endregion
-
-	auto update_params = [&](param_vector& pv) {
-		for (param_mom* pmt : pv) {
-			pmt->momentum() = pmt->beta() * pmt->momentum() + (1 - pmt->beta()) * pmt->gradient();
-			pmt->state() -= pmt->learn_rate() * pmt->gradient();
-			pmt->gradient() = 0;
-		}
-	};
-
-	for (int epoch = 0; true; epoch++) {
-		double epoch_cost = 0;
-		for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
-			s_1->cycle(x_1[tsIndex], y_1[tsIndex]);
-			epoch_cost += s_1->m_y_grad.abs_1d().sum_1d() / x_1.size();
-		}
-
-		if (epoch % checkpoint_interval == 0)
-			std::cout << epoch_cost << std::endl;
-
-		bool cost_low = epoch_cost < min_ts_cost;
-
-		if (cost_low && epoch % checkpoint_interval == 0) {
-			std::cout << "NEW INPUT" << std::endl;
-			// GET NEW ORDER 1 TRAINING SET
-			for (int deviant_update = 0; deviant_update < deviant_update_amount; deviant_update++) {
-				s_1->cycle(deviant_input, deviant_output);
-				deviant_momentum_tensor = deviant_momentum_tensor.mul_1d(deviant_beta_tensor).add_1d(deviant_beta_compliment_tensor.mul_1d(s_1->m_x_grad));
-				deviant_input = deviant_input.sub_1d(deviant_momentum_tensor.mul_1d(deviant_learn_rate_tensor));
-			}
-
-			// POP BACK OF ORDER 1 TS VECTORS
-			if (x_1.size() >= 25) {
-				x_1.vec().pop_back();
-				y_1.vec().pop_back();
-			}
-
-			// APPEND NEW TRAINING SET
-			x_1.vec().push_back(deviant_input.clone());
-			y_1.vec().push_back(get_tsy_1(deviant_input));
-
-		}
-
-		if (epoch % checkpoint_interval == 0 && cost_low)
-			std::cout << "TEST COST: " << get_tsy_1(deviant_input).sum_1d() << std::endl;
-
-		update_params(pv_1);
-	}
-}
-
-void loss_map() {
-
-#pragma region HYPER CONFIGURE
-	const double learn_rate = 0.002;
-	const double beta = 0.9;
-#pragma endregion
-#pragma region RANDOM INSTANTIATE
-	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(25);
-#pragma endregion
-#pragma region ORDER 0 INSTANTIATE
-	tensor x_0 = {
-		{0, 0},
-		{0, 1},
-		{1, 0},
-		{1, 1},
-	};
-	tensor y_0 = {
-		{0},
-		{1},
-		{1},
-		{0},
-	};
-
-	param_vector pv_0;
-	Sync s_0 = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3)));
-	s_0->param_recur([&](Param& pmt) {
-		pmt = new param_mom(learn_rate, beta);
-		pv_0.push_back((param_mom*)pmt.get());
-	});
-#pragma endregion
-#pragma region ORDER 1 INSTANTIATE
-	const int x_1_height = 50;
-	tensor x_1 = tensor::new_2d(x_1_height, 1, urd, re);
-	param_vector pv_1;
-	Sequential s_1 = pseudo::tnn({ 1, pv_0.size(), pv_0.size() }, pseudo::nlr(0.3));
-	s_1->param_recur([&](Param& pmt) {
-		pmt = new param_mom(learn_rate, beta);
-		pv_1.push_back((param_mom*)pmt.get());
-	});
-#pragma endregion
-#pragma region TENSOR INSTANTIATE
-	tensor pv_0_states = tensor::new_1d(pv_0.size());
-	for (int i = 0; i < pv_0.size(); i++)
-		pv_0_states[i].m_val_ptr.link(pv_0[i]->m_state_ptr);
-	tensor deviant_x = { 0 };
-#pragma endregion
-#pragma region COMPILE
-
-	s_0->prep(x_0.size());
-	s_0->compile();
-	s_0->unroll(x_0.size());
-	s_1->compile();
-
-	pv_0.randomize();
-	pv_0.normalize();
-	pv_1.randomize();
-	pv_1.normalize();
-
-#pragma endregion
-#pragma region CONFIGURE TRAINING
-	const double min_ts_cost = 8;
-	const int checkpoint_interval = 1000;
-	const tensor deviant_update_amount = { 0.1 };
-#pragma endregion
-#pragma region GET ORDER 1 TRAINING SET Y
-	tensor y_1 = tensor::new_2d(x_1.size(), pv_0.size(), urd, re);
-	auto get_tsx_1 = [&](tensor tsy_1) {
-		pv_0_states.pop(tsy_1);
-		s_0->fwd(x_0);
-		s_0->signal(y_0);
-		return s_0->m_y_grad.abs_2d().sum_2d();
-	};
-	for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++)
-		x_1[tsIndex] = get_tsx_1(y_1[tsIndex]);
-#pragma endregion
-
-	auto update_params = [&](param_vector& pv) {
-		for (param_mom* pmt : pv)
-			pmt->update();
-	};
-
-	double prev_test_cost = 10;
-
-	for (int epoch = 0; true; epoch++) {
-		double epoch_cost = 0;
-		for (int tsIndex = 0; tsIndex < x_1.size(); tsIndex++) {
-			s_1->cycle(x_1[tsIndex], y_1[tsIndex]);
-			epoch_cost += s_1->m_y_grad.abs_1d().sum_1d() / x_1.size();
-		}
-
-		if (epoch % checkpoint_interval == 0)
-			std::cout << epoch_cost << std::endl;
-
-		bool cost_low = epoch_cost < min_ts_cost;
-
-		if (cost_low && epoch % checkpoint_interval == 0) {
-			std::cout << "NEW INPUT" << std::endl;
-			// GET NEW ORDER 1 TRAINING SET
-			deviant_x.pop(tensor({ prev_test_cost }).sub_1d(deviant_update_amount));
-			s_1->fwd(deviant_x);
-
-			// POP BACK OF ORDER 1 TS VECTORS
-			x_1.vec().erase(x_1.vec().begin());
-			y_1.vec().erase(y_1.vec().begin());
-
-			// APPEND NEW TRAINING SET
-			x_1.vec().push_back(get_tsx_1(s_1->m_y));
-			y_1.vec().push_back(s_1->m_y);
-
-		}
-
-		if (epoch % checkpoint_interval == 0 && cost_low) {
-			prev_test_cost = get_tsx_1(s_1->fwd(deviant_x)).abs_1d().sum_1d();
-			std::cout << "TEST COST: " << prev_test_cost << std::endl;
-
-		}
-
-		update_params(pv_1);
 	}
 }
 
@@ -1140,8 +899,8 @@ void task_encoder() {
 	ptr<lstm> l_2 = new lstm(lstm_units);
 	ptr<lstm> l_3 = new lstm(lstm_units);
 	Sync s_out = new sync(pseudo::tnn({ lstm_units, 1 }, pseudo::nlr(0.3)));
-	sequential s = { s_in.get(), l_1.get(), l_2.get(), l_3.get(), s_out.get() };
-	s.param_recur(pmt_init);
+	Sequential s = new sequential{ s_in.get(), l_1.get(), l_2.get(), l_3.get(), s_out.get() };
+	s->param_recur(pmt_init);
 
 	double state_structure = 0.001 / (double)pv.size();
 	double learn_rate_structure = 0.02 / (double)pv.size();
@@ -1157,7 +916,10 @@ void task_encoder() {
 	l_2->prep(order_1_set_len);
 	l_3->prep(order_1_set_len);
 	s_out->prep(order_1_set_len);
-	s.compile();
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
+
 	s_in->unroll(order_1_set_len);
 	l_1->unroll(order_1_set_len);
 	l_2->unroll(order_1_set_len);
@@ -1175,15 +937,15 @@ void task_encoder() {
 		double train_cost = 0;
 		for (int i = 0; i < 3; i++) {
 			int ts = random(0, order_2_set_len);
-			s.cycle(train_x[ts], train_y[ts]);
-			train_cost += s.m_y_grad.abs_2d().sum_2d().sum_1d() * cost_structure;
+			m->cycle(train_x[ts], train_y[ts]);
+			train_cost += m->m_y_grad.abs_2d().sum_2d().sum_1d() * cost_structure;
 		}
 
 		double test_cost = 0;
 		for (int ts = 0; ts < order_2_set_len; ts++) {
-			s.fwd(test_x[ts]);
-			s.signal(test_y[ts]);
-			test_cost += s.m_y_grad.abs_2d().sum_2d().sum_1d() * cost_structure;
+			m->fwd(test_x[ts]);
+			m->signal(test_y[ts]);
+			test_cost += m->m_y_grad.abs_2d().sum_2d().sum_1d() * cost_structure;
 		}
 
 		for (param_mom* pmt : pv)
@@ -1218,7 +980,8 @@ void genome_test() {
 		pmt = new param(pmt_urd(re));
 		pv.push_back(pmt.get());
 	});
-	s->compile();
+	Mse_loss m = new mse_loss(s);
+	m->compile();
 #pragma endregion
 #pragma region LINK TENSOR
 	tensor pmt_link_tensor = tensor::new_1d(pv.size());
@@ -1231,7 +994,7 @@ void genome_test() {
 		double cost = 0;
 		for (int i = 0; i < x.size(); i++) {
 			s->fwd(x[i]);
-			s->signal(y[i]);
+			m->signal(y[i]);
 			cost += s->m_y_grad.abs_1d().sum_1d();
 		}
 		return 1 / cost;
@@ -1254,211 +1017,6 @@ void genome_test() {
 			std::cout << 1 / get_reward(parents[0]) << std::endl;
 	}
 #pragma endregion
-
-}
-
-void pablo_guesser() {
-
-	tensor x {
-		{ 22, 48, 97,  2, 12, 62, 51, 90, 49, 35 },
-		{ 13, 22, 49, 57, 61,  5, 17, 72, 86, 91 },
-	};
-
-	tensor y {
-		{ 48, 97,  2, 12, 62, 51, 90, 49, 35, 26 },
-		{ 22, 49, 57, 61,  5, 17, 72, 86, 91, 87 },
-	};
-
-	for (int i = 0; i < x.size(); i++) {
-		x[i] = x[i].roll(1);
-		y[i] = y[i].roll(1);
-	}
-	// TRAINING EXAMPLES DONE
-
-	uniform_real_distribution<double> urd(-0.1, 0.1);
-	default_random_engine re(25);
-
-	param_vector pv;
-	auto pmt_init = [&](Param& pmt) {
-		pmt = new param_mom(0.0002, 0.9);
-		pv.push_back((param_mom*)pmt.get());
-	};
-
-	const int LSTM_UNITS = 35;
-
-	Sync s_in = new sync(pseudo::tnn({ 1, LSTM_UNITS }, pseudo::nlr(0.3)));
-	ptr<lstm> l_0 = new lstm(LSTM_UNITS);
-	ptr<lstm> l_1 = new lstm(LSTM_UNITS);
-	Sync s_out = new sync(pseudo::tnn({ LSTM_UNITS, 1 }, pseudo::nlr(0.3)));
-	sequential seq { s_in.get(), l_0.get(), l_1.get(), s_out.get() };
-	seq.param_recur(pmt_init);
-
-	s_in->prep(x.width());
-	l_0->prep(x.width());
-	l_1->prep(x.width());
-	s_out->prep(x.width());
-	seq.compile();
-
-	pv.randomize();
-	pv.normalize();
-
-	s_in->unroll(x.width());
-	l_0->unroll(x.width());
-	l_1->unroll(x.width());
-	s_out->unroll(x.width());
-
-	const int CHECKPOINT = 1000;
-
-	for (int epoch = 0; true; epoch++) {
-
-		if (epoch % CHECKPOINT == 0) {
-			system("cls");
-			printf("\033[%d;%dH", 0, 0);
-		}
-
-		for (int ts = 0; ts < x.height(); ts++) {
-			seq.cycle(x[ts], y[ts]);
-			if (epoch % CHECKPOINT == 0) {
-				std::cout << y[ts].to_string() << std::endl;
-				std::cout << seq.m_y.to_string() << std::endl << std::endl;
-			}
-		}
-
-
-		for (param_mom* pmt : pv)
-			pmt->update();
-
-	}
-
-}
-
-class mm {
-public:
-	mm() {
-
-	}
-	mm(double a_state, double a_gamma, double a_beta) {
-		m_s = a_state;
-		m_gamma = a_gamma;
-		m_beta = a_beta;
-	}
-
-	double sign(double x) {
-		if (x >= 0) return 1;
-		else return -1;
-	}
-	double& state() { return m_s; }
-	double& gamma() { return m_gamma; }
-	double alpha() { return 1 - m_beta; }
-	double& beta() { return m_beta; }
-	double& momentum() { return m_momentum; }
-	void update(double a_c) {
-		m_ds = gamma() * (beta() * momentum() + alpha() * a_c);
-		m_s += m_ds;
-	}
-	void reward(double a_R) {
-		m_dR = a_R - m_R;
-		m_R = a_R;
-		double slope = (m_dR * m_ds);
-		m_momentum = beta() * momentum() + alpha() * sign(slope);
-	}
-	void change_reward(double a_dR) {
-		m_dR = a_dR;
-		m_R = m_R + m_dR;
-		double slope = (m_dR * m_ds);
-		m_momentum = beta() * momentum() + alpha() * sign(slope);
-	}
-
-private:
-	double m_s = 0;
-	double m_ds = 0;
-	double m_R = 0;
-	double m_dR = 0;
-	double m_gamma = 0;
-	double m_beta = 0;
-	double m_momentum = 0;
-
-};
-
-void test_mm() {
-
-	tensor x = {
-		{0, 0},
-		{0, 1},
-		{1, 0},
-		{1, 1},
-		{1, 2},
-		{3, 4}
-	};
-
-	tensor y = {
-		{0},
-		{1},
-		{1},
-		{0},
-		{5},
-		{12},
-	};
-
-	uniform_real_distribution<double> urd(-1, 1);
-	default_random_engine re(35);
-
-	vector<param*> pv;
-
-	auto pmt_init = [&](Param& pmt) {
-		pmt = new param(urd(re));
-		pv.push_back(pmt.get());
-	};
-
-	Model s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3));
-	s->param_recur(pmt_init);
-	s->compile();
-
-	const double GAMMA = 0.002;
-	const double BETA = 0.9;
-
-	vector<mm> pmm = vector<mm>(pv.size());
-	for (int i = 0; i < pv.size(); i++)
-		pmm[i] = mm(pv[i]->state(), GAMMA, BETA);
-
-	std::normal_distribution<double> nd(0, 1);
-
-	auto get_rcv = [&]() {
-		/*if (rand() % pv.size() == 0)
-			return nd(re);
-		else*/
-			return nd(re);
-	};
-
-	auto get_reward = [&]() {
-		double cost = 0;
-		for (int ts = 0; ts < x.size(); ts++) {
-			s->fwd(x[ts]);
-			s->signal(y[ts]);
-			cost += s->m_y_grad.abs_1d().sum_1d();
-		}
-		return 1 / cost;
-	};
-
-	for (int epoch = 0; true; epoch++) {
-		for (int i = 0; i < pmm.size(); i++) {
-			pmm[i].update(get_rcv());
-			pv[i]->state() = pmm[i].state();
-		}
-		double reward = get_reward();
-		double cost = 1 / reward;
-		for (int i = 0; i < pmm.size(); i++)
-			pmm[i].reward(reward);
-
-		if(epoch % 10000 == 0)
-			for (int i = 0; i < pmm.size(); i++) {
-				pmm[i].gamma() = 0.002 * std::tanh(cost);
-			}
-
-		if (epoch % 10000 == 0) {
-			std::cout << "REWARD: " << reward << ", COST: " << 1 / reward << std::endl;
-		}
-	}
 
 }
 
@@ -1488,11 +1046,13 @@ void test_param_rcv() {
 
 	Model s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3));
 
+	Mse_loss m = new mse_loss(s);
+
 	const double GAMMA = 0.002;
 	const double BETA = 0.9;
 
 	s->param_recur(pseudo::param_init(new param_rcv(GAMMA, BETA), pv));
-	s->compile();
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -1507,7 +1067,7 @@ void test_param_rcv() {
 		double cost = 0;
 		for (int ts = 0; ts < x.size(); ts++) {
 			s->fwd(x[ts]);
-			s->signal(y[ts]);
+			m->signal(y[ts]);
 			cost += s->m_y_grad.abs_1d().sum_1d();
 		}
 		return 1 / cost;
@@ -1532,101 +1092,6 @@ void test_param_rcv() {
 		}
 	}
 
-}
-
-void test_srtt() {
-
-	default_random_engine re(27);
-	std::normal_distribution<double> pmt_nd(0, 0.1);
-
-	vector<param*> pv_0;
-	auto pmt_0_init = [&](Param& pmt) {
-		pmt = new param(pmt_nd(re));
-		pv_0.push_back(pmt.get());
-	};
-
-	vector<param*> pv_1;
-	auto pmt_1_init = [&](Param& pmt) {
-		pmt = new param(pmt_nd(re));
-		pv_1.push_back(pmt.get());
-	};
-
-	Model m_0 = pseudo::tnn({ 1, 10, 1 }, pseudo::nlr(0.3));
-	m_0->param_recur(pmt_0_init);
-
-	Model m_1 = pseudo::tnn({ 2, 64, pv_0.size() }, pseudo::nth());
-	m_1->param_recur(pmt_1_init);
-
-	m_0->compile();
-	m_1->compile();
-
-	tensor order_0_states = tensor::new_1d(pv_0.size());
-	for (int i = 0; i < order_0_states.size(); i++)
-		order_0_states[i].m_val_ptr.link(pv_0[i]->m_state_ptr);
-	tensor order_0_save = order_0_states.clone();
-
-	const double GAMMA = 0.00002;
-	const double BETA = 0.99;
-
-	vector<mm> mm_1 = vector<mm>(pv_1.size());
-	for (int i = 0; i < mm_1.size(); i++)
-		mm_1[i] = mm(pv_1[i]->state(), GAMMA, BETA);
-
-	const size_t ORDER_0_MAX_COMPLEXITY = 1;
-	const size_t ORDER_0_MAX_TRAINING_SETS = 300;
-	const size_t ORDER_0_MAX_TESTING_SETS = 100;
-	uniform_real_distribution<double> ts_0_urd(-10, 10);
-
-	std::normal_distribution<double> training_nd(0, 1);
-
-	auto get_rcv = [&]() {
-		return training_nd(re);
-	};
-
-	for (int epoch = 0; true; epoch++) {
-		
-		for (int i = 0; i < mm_1.size(); i++) {
-			mm_1[i].update(get_rcv());
-			pv_1[i]->state() = mm_1[i].state();
-		}
-
-		composite_function func = get_composite_fn(ORDER_0_MAX_COMPLEXITY, -10, 10, re);
-		
-		order_0_states.pop(order_0_save); // RELOAD ORDER 0 STATES FROM START
-
-		for (int ts = 0; ts < ORDER_0_MAX_TRAINING_SETS; ts++) {
-			double x = ts_0_urd(re);
-			double y = func(x);
-			m_1->m_x[0].val() = x;
-			m_1->m_x[1].val() = y;
-			m_1->fwd();
-			order_0_states.add_1d(m_1->m_y, order_0_states);
-		}
-
-		double cost = 0;
-
-		for (int ts = 0; ts < ORDER_0_MAX_TESTING_SETS; ts++) {
-			double x = ts_0_urd(re);
-			double y = func(x);
-			m_0->m_x[0].val() = x;
-			m_0->fwd();
-			cost += abs(m_0->m_y[0] - y);
-		}
-
-		double reward = 1 / cost;
-
-		for (int i = 0; i < mm_1.size(); i++)
-			mm_1[i].reward(reward);
-
-		if (epoch % 1000 == 0) {
-			std::cout << cost << std::endl;
-			for (int i = 0; i < mm_1.size(); i++) {
-				mm_1[i].gamma() *= 0.7;
-			}
-		}
-
-	}
-		
 }
 
 void self_aware() {
@@ -1682,175 +1147,6 @@ void self_aware() {
 
 }
 
-void proc_generator() {
-
-	tensor train_x {
-		{{0,0,4,0,0,0,1.722584,1,9.860078,},
-		{-1.8,-0.77,-0.53,-0.7071068,0,0,1,1.5289,1,},
-		{-2.11,0.68,-0.754,-0.7071068,0,0,1,1.5289,1,},
-		{2.11,0.68,-0.754,-0.7071068,0,0,1,1.5289,1,},
-		{1.8,-0.77,-0.53,-0.7071068,0,0,1,1.5289,1,},
-		{0,0,0,0,0,0,4.043402,1.846521,2.5525,},
-		},
-		{{0,0,4,0,0,0,1.722584,1,5.540674,},
-		{-2.26,-0.18,-1.3784,-0.7071068,0,0,1,2.482169,1,},
-		{-2.27,0.55,-0.60562,-0.7071068,0,0,1,2.482169,1,},
-		{2.27,0.55,-0.60562,-0.7071068,0,0,1,2.482169,1,},
-		{2.26,-0.18,-1.3784,-0.7071068,0,0,1,2.482169,1,},
-		{0,0,0,0,0,0,4.043402,1.846521,2.5525,},
-		},
-		{{0,0,4,0,0,0,1.722584,1.846521,5.540674,},
-		{-2.26,-0.18,0.5400001,-0.7071068,0,0,1,2.482169,1,},
-		{-2.27,0.55,0,-0.7071068,0,0,1,2.482169,1,},
-		{2.27,0.55,0,-0.7071068,0,0,1,2.482169,1,},
-		{2.26,-0.18,0.54,-0.7071068,0,0,1,2.482169,1,},
-		{0,0,0,0,0,0,4.043402,1.846521,2.5525,},
-		},
-		{{0,0,2.63,0,0,0,1.722584,1.846521,5.920644,},
-		{-2.26,-1.01,-1,-0.7071068,0,0,1,2,1,},
-		{-2.27,1.27,-1,-0.7071068,0,0,1,2,1,},
-		{2.27,1.27,-1,-0.7071068,0,0,1,2,1,},
-		{2.26,-1.01,-1,-0.7071068,0,0,1,2,1,},
-		{0,0,0,0,0,0,4.043402,1.846521,2.5525,},
-		},
-		{{0,0,1.11,0,0,0,1.722584,1.846521,1.559083,},
-		{-2,-1,-1,-0.7071068,0,0,0.5,2,0.5,},
-		{-2,1,-1,-0.7071068,0,0,0.5,2,0.5,},
-		{2,1,-1,-0.7071068,0,0,0.5,2,0.5,},
-		{2,-1,-1,-0.7071068,0,0,0.5,2,0.5,},
-		{0,0,0,0,0,0,4.043402,2.199021,1.148651,},
-		},
-	};
-	tensor test_x{
-		{{0,0,3.7,0,0,0,1.722584,2.661576,7.680356,},
-		{-2,-1,-1,-0.7071068,0,0,1.5,2,1.5,},
-		{-2,1,-1,-0.7071068,0,0,1.5,2,1.5,},
-		{2,1,-1,-0.7071068,0,0,1.5,2,1.5,},
-		{2,-1,-1,-0.7071068,0,0,1.5,2,1.5,},
-		{0,0,0,0,0,0,4.043402,2.199021,1.148651,},
-		},
-		{{0,0,2.82,0,0,0,1.722584,2.661576,5.722557,},
-		{-2,-1,0.53,-0.7071068,0,0,1.5,2,1.5,},
-		{-2,1,0.53,-0.7071068,0,0,1.5,2,1.5,},
-		{2,1,0.53,-0.7071068,0,0,1.5,2,1.5,},
-		{2,-1,0.53,-0.7071068,0,0,1.5,2,1.5,},
-		{0,0,0,0,0,0,4.043402,2.199021,1.148651,},
-		},
-		{{0,0,2.82,0,0,0,1.722584,0.6529909,5.722557,},
-		{-2,-0.45,0.53,-0.7071068,0,0,0.3,2,0.3,},
-		{-2,0.45,0.53,-0.7071068,0,0,0.3,2,0.3,},
-		{2,0.45,0.53,-0.7071068,0,0,0.3,2,0.3,},
-		{2,-0.45,0.53,-0.7071068,0,0,0.3,2,0.3,},
-		{0,0,0,0,0,0,4.043402,0.8935723,1.148651,},
-		},
-		{{0,0,2.56,0,0,0,1.722584,0.6529909,4.349715,},
-		{-2,-0.45,0.53,-0.7071068,0,0,0.3,1.24754,0.3,},
-		{-2,0.45,0.53,-0.7071068,0,0,0.3,1.24754,0.3,},
-		{2,0.45,0.53,-0.7071068,0,0,0.3,1.24754,0.3,},
-		{2,-0.45,0.53,-0.7071068,0,0,0.3,1.24754,0.3,},
-		{0,0,0,0,0,0,4.043402,0.8935723,1.148651,},
-		},
-		{{0,0,2.56,0,0,0,1.722584,0.6529909,4.349715,},
-		{-0.9,-0.45,0.53,-0.7071068,0,0,0.3,1.24754,0.3,},
-		{-0.9,0.45,0.53,-0.7071068,0,0,0.3,1.24754,0.3,},
-		{0.9,0.45,0.53,-0.7071068,0,0,0.3,1.24754,0.3,},
-		{0.9,-0.45,0.53,-0.7071068,0,0,0.3,1.24754,0.3,},
-		{0,0,0,0,0,0,1.972978,0.8935723,1.148651,},
-		},
-	};
-
-	for (int i = 0; i < train_x.size(); i++)
-		train_x[i] = train_x[i].unroll();
-	for (int i = 0; i < test_x.size(); i++)
-		test_x[i] = test_x[i].unroll();
-
-	uniform_real_distribution<double> pmt_urd(-0.1, 0.1);
-	default_random_engine re(27);
-
-	vector<param_mom*> pv;
-
-	auto pmt_init = [&](Param& pmt) {
-		pmt = new param_mom(0.002, 0.9);
-		pv.push_back((param_mom*)pmt.get());
-	};
-
-	Sequential compressor = pseudo::tnn({ 54, 30, 5, 30, 54 }, pseudo::nlr(0.3));
-	compressor->param_recur(pmt_init);
-
-	Model second_half = new sequential(vector<Model>(compressor->m_models.begin() + 4, compressor->m_models.end()));
-	compressor->compile();
-	second_half->compile();
-
-	const int CHECKPOINT = 1000;
-
-	for (int epoch = 0; epoch / CHECKPOINT < 100; epoch++) {
-
-		double train_cost = 0;
-		double test_cost = 0;
-
-		for (int ts = 0; ts < train_x.size(); ts++) {
-			compressor->cycle(train_x[ts], train_x[ts]);
-			if(epoch % CHECKPOINT == 0)
-				train_cost += compressor->m_y_grad.abs_1d().sum_1d();
-		}
-		if(epoch % CHECKPOINT == 0)
-			for (int ts = 0; ts < test_x.size(); ts++) {
-				compressor->fwd(test_x[ts]);
-				compressor->signal(test_x[ts]);
-				if (epoch % CHECKPOINT == 0)
-					test_cost += compressor->m_y_grad.abs_1d().sum_1d();
-				std::cout << "COMPRESSED: " << second_half->m_x.to_string() << std::endl;
-			}
-
-		if (epoch % CHECKPOINT == 0)
-			std::cout << "TRAIN: " << train_cost << ", TEST: " << test_cost << std::endl;
-
-		for (param_mom* pmt : pv)
-			pmt->update();
-	}
-
-
-
-}
-
-void sum_test()
-{
-	sum_1d l_sum(10);
-	l_sum.compile();
-
-	l_sum.cycle({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 46);
-
-}
-
-void mul_0d_test()
-{
-	mul_0d m;
-	m.compile();
-	m.cycle({ 2, 3 }, 5);
-}
-
-void mul_1d_test()
-{
-	tensor x = {
-		{0, 1, 2, 3, 4},
-		{5, 6, 7, 8, 9}
-	};
-	mul_1d m(5);
-	m.compile();
-	m.cycle(x, { 1, 1, 1, 1, 1 });
-}
-
-void dot_1d_test()
-{
-	tensor x = {
-		{0, 1, 2, 3, 4},
-		{5, 6, 7, 8, 9}
-	};
-	dot_1d d(5);
-	d.compile();
-	d.cycle(x, 81);
-}
-
 void cnl_test()
 {
 	const size_t FILTER_HEIGHT = 2;
@@ -1871,7 +1167,10 @@ void cnl_test()
 	Cnl c = new cnl(FILTER_HEIGHT, FILTER_WIDTH, 1, 2);
 	c->param_recur(pseudo::param_init(new param_mom(0.00002, 0.9), pv));
 	c->prep_for_input(MAX_INPUT_HEIGHT, MAX_INPUT_WIDTH);
-	c->compile();
+
+	Mse_loss m = new mse_loss(c);
+
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -1885,7 +1184,7 @@ void cnl_test()
 
 	for (int epoch = 0; epoch < 10000; epoch++)
 	{
-		c->cycle(x, y);
+		m->cycle(x, y);
 		pv.update();
 
 		if (epoch % 1000 == 0)
@@ -1932,8 +1231,10 @@ void cnn_test() {
 	};
 	s->param_recur(pseudo::param_init(new param_mom(0.0002, 0.9), pv));
 
+	Mse_loss m = new mse_loss(s);
+
 	std::cout << "COMPILING MODEL" << std::endl;
-	s->compile();
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -1956,7 +1257,7 @@ void cnn_test() {
 
 		double cost = 0;
 		for (int ts = 0; ts < x.size(); ts++) {
-			s->cycle(x[ts], y[ts]);
+			m->cycle(x[ts], y[ts]);
 			cost += s->m_y_grad.abs_2d().sum_2d().sum_1d();
 			/*if(epoch % CHECKPOINT_INTERVAL == 0)
 				std::cout << s->y.to_string() << std::endl;*/
@@ -1967,79 +1268,6 @@ void cnn_test() {
 
 		pv.update();
 
-	}
-
-}
-
-void add_0d_test()
-{
-	add_0d a;
-	a.compile();
-	a.cycle({ 1, 2 }, 2);
-}
-
-void add_1d_test()
-{
-	add_1d a(2);
-	a.compile();
-	a.cycle(
-		{ 
-		{1, 2}, 
-		{3, 4} 
-		}, 
-		{3, 4});
-}
-
-void auto_encoder() {
-
-	const size_t H_LEN = 100;
-	const size_t X_LEN = H_LEN * 8 + 1;
-	const size_t NUM_TRAINING_SETS = 1000;
-	tensor x = tensor::new_2d(NUM_TRAINING_SETS, X_LEN);
-
-	for (int i = 0; i < x.size(); i++)
-		for (int j = 0; j < x[i].size(); j++)
-			x[i][j] = (rand() % 256 - 128) / (double)64;
-
-	uniform_real_distribution<double> pmt_urd(-1, 1);
-	default_random_engine re(27);
-
-	param_vector pv;
-	auto pmt_init = [&](Param& pmt) {
-		pmt = new param_mom(0.0002 / NUM_TRAINING_SETS, 0.9);
-		pv.push_back((param_mom*)pmt.get());
-	};
-
-	Model m = pseudo::tnn({ X_LEN, X_LEN / 2, H_LEN, X_LEN / 2, X_LEN }, pseudo::nlr(0.3));
-	m->param_recur(pmt_init);
-	m->compile();
-
-	pv.randomize();
-	pv.normalize();
-
-	const string file_name = "auto_encoder";
-
-	const bool IMPORT_FROM_FILE = true;
-
-	if (IMPORT_FROM_FILE)
-		pl_import_from_file(file_name, pv);
-
-	const int CHECKPOINT_INTERVAL = 100;
-
-	for (int epoch = 0; true; epoch++) {
-		double cost = 0;
-		for (int ts = 0; ts < x.size(); ts++) {
-			m->cycle(x[ts], x[ts]);
-			cost += m->m_y_grad.abs_1d().sum_1d();
-		}
-		for (param_mom* pmt : pv)
-			pmt->update();
-		if (epoch % CHECKPOINT_INTERVAL == 0) {
-			std::cout << "COST: " << cost / NUM_TRAINING_SETS * 255 << std::endl;
-			std::cout << "DES: " << x[x.size() - 1].to_string() << std::endl;
-			std::cout << "ACT: " << m->m_y.to_string() << std::endl;
-			pl_export_to_file(file_name, pv);
-		}
 	}
 
 }
@@ -2069,7 +1297,10 @@ void att_lstm_ts_test() {
 	ptr<att_lstm_ts> a = new att_lstm_ts(2, { 3 });
 	a->param_recur(pmt_init);
 	a->prep(4);
-	a->compile();
+
+	Mse_loss m = new mse_loss(a);
+
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -2080,7 +1311,7 @@ void att_lstm_ts_test() {
 		double cost = 0;
 		//TS 0
 		a->m_htx.pop(ht0);
-		a->cycle(x, y0);
+		m->cycle(x, y0);
 		ht0.sub_1d(a->m_htx_grad, ht0);
 		cost += a->m_y_grad.abs_1d().sum_1d();
 		//TS 1
@@ -2145,14 +1376,16 @@ void att_lstm_test() {
 	ptr<att_lstm> l0_ptr = l;
 	Sync s1_ptr = s1;
 
-	sequential s = sequential({ s0, l, s1 });
-	s.param_recur(pmt_init);
+	Sequential s = new sequential({ s0, l, s1 });
+	s->param_recur(pmt_init);
 
 	s0->prep(4);
 	l->prep(4, 4); // OUTPUT LENGTH, THEN INPUT LENGTH
 	s1->prep(4);
 
-	s.compile();
+	Mse_loss m = new mse_loss(s);
+
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -2164,12 +1397,12 @@ void att_lstm_test() {
 	const int checkpoint_interval = 10000;
 
 	for (int epoch = 0; true; epoch++) {
-		s.cycle(x0, y0);
+		m->cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
-			std::cout << "S0: " << s.m_y.to_string() << std::endl;
-		s.cycle(x1, y1);
+			std::cout << "S0: " << m->m_y.to_string() << std::endl;
+		m->cycle(x1, y1);
 		if (epoch % checkpoint_interval == 0)
-			std::cout << "S1: " << s.m_y.to_string() << std::endl;
+			std::cout << "S1: " << m->m_y.to_string() << std::endl;
 		for (param_sgd* pmt : pv)
 			pmt->update();
 	}
@@ -2227,7 +1460,10 @@ void cos_sim_test() {
 	size_t units = 4;
 
 	ptr<cos_sim> p = new cos_sim(units);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 	uniform_real_distribution<double> urd(-100, 100);
 	p->m_x.pop(tensor::new_2d(2, units, urd, aurora::static_vals::random_engine));
@@ -2236,7 +1472,7 @@ void cos_sim_test() {
 
 	for (int epoch = 0; true; epoch++) {
 
-		p->cycle(p->m_x, desired);
+		m->cycle(p->m_x, desired);
 
 		tensor update = p->m_x_grad.mul_2d(tensor::new_2d(2, units, 2));
 
@@ -2256,7 +1492,10 @@ void ntm_sparsify_test() {
 	size_t memory_height = 5;
 
 	ptr<ntm_sparsify> p = new ntm_sparsify(memory_height);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 
 	uniform_real_distribution<double> urd(0, 1);
@@ -2272,7 +1511,7 @@ void ntm_sparsify_test() {
 
 	for (int epoch = 0; true; epoch++) {
 
-		p->cycle(x, y);
+		m->cycle(x, y);
 
 		p->m_beta[0].val() -= 0.0002 * p->m_beta_grad[0];
 
@@ -2293,7 +1532,10 @@ void normalize_test() {
 	size_t units = 5;
 
 	ptr<normalize> p = new normalize(units);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 	uniform_real_distribution<double> urd(-10, 10);
 
@@ -2304,7 +1546,7 @@ void normalize_test() {
 
 	for (int epoch = 0; true; epoch++) {
 
-		p->cycle(p->m_x, y);
+		m->cycle(p->m_x, y);
 
 		tensor update = p->m_x_grad.mul_1d(lr_tensor);
 
@@ -2323,7 +1565,10 @@ void ntm_content_addresser_test() {
 	size_t memory_width = 10;
 
 	ptr<ntm_content_addresser> p = new ntm_content_addresser(memory_height, memory_width);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 	uniform_real_distribution<double> urd(-1, 1);
 
@@ -2343,7 +1588,7 @@ void ntm_content_addresser_test() {
 
 	for (int epoch = 0; true; epoch++) {
 
-		p->cycle(p->m_x, y);
+		m->cycle(p->m_x, y);
 
 		tensor beta_update = p->m_beta_grad.mul_1d(beta_lr_tensor);
 		tensor key_update = p->m_key_grad.mul_1d(key_lr_tensor);
@@ -2375,7 +1620,10 @@ void interpolate_test() {
 	ptr<layer> l_softmax = new layer(1, new sigmoid());
 	l_softmax->compile();
 	ptr<interpolate> l_interpolate = new interpolate(units);
-	l_interpolate->compile();
+
+	Mse_loss m = new mse_loss(l_interpolate);
+
+	m->compile();
 
 	l_softmax->m_y.group_join(l_interpolate->m_amount);
 	l_softmax->m_y_grad.group_join(l_interpolate->m_amount_grad);
@@ -2395,7 +1643,7 @@ void interpolate_test() {
 	for (int epoch = 0; true; epoch++) {
 
 		l_softmax->fwd();
-		l_interpolate->cycle(x, y);
+		m->cycle(x, y);
 		l_softmax->bwd();
 
 		tensor update = l_softmax->m_x_grad.mul_1d(lr_tensor);
@@ -2423,7 +1671,10 @@ void shift_test() {
 	ptr<layer> l_softmax = new layer(valid_shifts.size(), new sigmoid());
 	l_softmax->compile();
 	ptr<shift> l_shift = new shift(5, valid_shifts);
-	l_shift->compile();
+
+	Mse_loss m = new mse_loss(l_shift);
+
+	m->compile();
 
 	l_softmax->m_y.group_join(l_shift->m_amount);
 	l_softmax->m_y_grad.group_join(l_shift->m_amount_grad);
@@ -2445,7 +1696,7 @@ void shift_test() {
 	for (int epoch = 0; true; epoch++) {
 
 		l_softmax->fwd();
-		l_shift->cycle(x, y);
+		m->cycle(x, y);
 		l_softmax->bwd();
 
 		tensor update = l_softmax->m_x_grad.mul_1d(lr_tensor);
@@ -2463,7 +1714,10 @@ void power_test() {
 	size_t units = 5;
 
 	ptr<power> p = new power(units);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 	uniform_real_distribution<double> urd(0, 1);
 
@@ -2478,7 +1732,7 @@ void power_test() {
 
 	for (int epoch = 0; true; epoch++) {
 
-		p->cycle(x, y);
+		m->cycle(x, y);
 
 		tensor update = p->m_amount_grad.mul_1d(lr_tensor);
 
@@ -2501,7 +1755,10 @@ void ntm_location_addresser_test() {
 	ptr<layer> l_s_sm = new layer(valid_shifts.size(), new sigmoid());
 	l_s_sm->compile();
 	ptr<ntm_location_addresser> p = new ntm_location_addresser(memory_height, valid_shifts);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 	l_g_sm->m_y.group_join(p->m_g);
 	l_g_sm->m_y_grad.group_join(p->m_g_grad);
@@ -2531,7 +1788,7 @@ void ntm_location_addresser_test() {
 
 		l_g_sm->fwd();
 		l_s_sm->fwd();
-		p->cycle(x, y);
+		m->cycle(x, y);
 		l_s_sm->bwd();
 		l_g_sm->bwd();
 
@@ -2564,7 +1821,10 @@ void ntm_addresser_test() {
 	ptr<layer> l_s_sm = new layer(valid_shifts.size(), new sigmoid());
 	l_s_sm->compile();
 	ptr<ntm_addresser> p = new ntm_addresser(memory_height, memory_width, valid_shifts);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 	uniform_real_distribution<double> urd(-1, 1);
 	uniform_real_distribution<double> sm_urd(0, 1);
@@ -2605,7 +1865,7 @@ void ntm_addresser_test() {
 
 		l_g_sm->fwd();
 		l_s_sm->fwd();
-		p->cycle(p->m_x, y);
+		m->cycle(p->m_x, y);
 		l_s_sm->bwd();
 		l_g_sm->bwd();
 
@@ -2813,7 +2073,10 @@ void ntm_reader_test() {
 
 	Ntm_reader p = new ntm_reader(memory_height, memory_width, valid_shifts, {memory_width, memory_width + 5});
 	p->param_recur(pmt_init);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -2830,7 +2093,7 @@ void ntm_reader_test() {
 
 	for (int epoch = 0; true; epoch++) {
 
-		p->cycle(p->m_x, y);
+		m->cycle(p->m_x, y);
 
 		for (param_sgd* pmt : pv)
 			pmt->update();
@@ -2864,7 +2127,10 @@ void ntm_writer_test() {
 
 	ptr<ntm_writer> p = new ntm_writer(memory_height, memory_width, valid_shifts, { memory_width });
 	p->param_recur(pmt_init);
-	p->compile();
+
+	Mse_loss m = new mse_loss(p);
+
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -2883,7 +2149,7 @@ void ntm_writer_test() {
 
 	for (int epoch = 0; true; epoch++) {
 
-		p->cycle(p->m_x, y);
+		m->cycle(p->m_x, y);
 
 		for (param_mom* pmt : pv)
 			pmt->update();
@@ -2944,7 +2210,10 @@ void ntm_test() {
 	s_in->prep(num_ts);
 	p->prep(num_ts);
 	s_out->prep(num_ts);
-	s->compile();
+
+	Mse_loss m = new mse_loss(s);
+
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -2991,7 +2260,7 @@ void ntm_test() {
 		cost = 0;
 
 		for (int ts = 0; ts < x.size(); ts++) {
-			s->cycle(x[ts], y[ts]);
+			m->cycle(x[ts], y[ts]);
 			cost += s->m_y_grad.abs_2d().sum_2d().sum_1d();
 
 			if (epoch % checkpoint_interval == 0)
@@ -3053,7 +2322,10 @@ void stacked_recurrent_test() {
 	s->param_recur(pmt_init);
 
 	s->prep(4);
-	s->compile();
+
+	Mse_loss m = new mse_loss(s);
+
+	m->compile();
 
 	pv.randomize();
 	pv.normalize();
@@ -3063,10 +2335,10 @@ void stacked_recurrent_test() {
 	const int checkpoint_interval = 10000;
 
 	for (int epoch = 0; true; epoch++) {
-		s->cycle(x0, y0);
+		m->cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S0: " << s->m_y.to_string() << std::endl;
-		s->cycle(x1, y1);
+		m->cycle(x1, y1);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S1: " << s->m_y.to_string() << std::endl;
 		for (param_sgd* pmt : pv) {
@@ -3081,6 +2353,10 @@ void lstm_mdim_test() {
 
 	param_vector pv;
 	Stacked_recurrent s = pseudo::lstm_mdim_compiled(2, 5, 1, 4, pv);
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
+
 	s->unroll(4);
 
 	tensor x0 = {
@@ -3112,10 +2388,10 @@ void lstm_mdim_test() {
 	const int checkpoint_interval = 10000;
 
 	for (int epoch = 0; epoch < 100000; epoch++) {
-		s->cycle(x0, y0);
+		m->cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S0: " << s->m_y.to_string() << std::endl;
-		s->cycle(x1, y1);
+		m->cycle(x1, y1);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S1: " << s->m_y.to_string() << std::endl;
 		pv.update();
@@ -3127,6 +2403,10 @@ void lstm_stacked_mdim_test() {
 
 	param_vector pv;
 	Stacked_recurrent s = pseudo::lstm_stacked_mdim_compiled(2, 10, 1, 1, 4, pv);
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
+
 	s->unroll(4);
 
 	tensor x0 = {
@@ -3158,10 +2438,10 @@ void lstm_stacked_mdim_test() {
 	const int checkpoint_interval = 10000;
 
 	for (int epoch = 0; epoch < 100000; epoch++) {
-		s->cycle(x0, y0);
+		m->cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S0: " << s->m_y.to_string() << std::endl;
-		s->cycle(x1, y1);
+		m->cycle(x1, y1);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S1: " << s->m_y.to_string() << std::endl;
 		pv.update();
@@ -3192,6 +2472,10 @@ void ntm_mdim_test() {
 
 	param_vector param_vec;
 	Stacked_recurrent s = pseudo::ntm_mdim_compiled(2, 1, 10, 5, 1, 1, { -1, 0, 1 }, { 5, 10 }, 4, param_vec);
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
+
 	s->unroll(4);
 
 	tensor x = {
@@ -3233,7 +2517,7 @@ void ntm_mdim_test() {
 
 		for (int mb_ts = 0; mb_ts < MINI_BATCH_SIZE; mb_ts++) {
 			size_t ts = random(0, x.size());
-			s->cycle(x[ts], y[ts]);
+			m->cycle(x[ts], y[ts]);
 			cost += s->m_y_grad.abs_2d().sum_2d().sum_1d();
 		}
 
@@ -3243,119 +2527,6 @@ void ntm_mdim_test() {
 			std::cout << cost << std::endl;
 	}
 
-}
-
-void transfer_learn() {
-
-	uniform_real_distribution<double> urd(-1, 1);
-
-	tensor x0 = {
-		{0, 0},
-		{0, 1},
-		{1, 0},
-		{1, 1},
-	};
-	tensor y0 = {
-		{0},
-		{1},
-		{1},
-		{0},
-	};
-	tensor x1 = {
-		{0, 0},
-		{0, 1},
-		{1, 0},
-		{1, 1}
-	};
-	tensor y1 = {
-		{0},
-		{0},
-		{0},
-		{1}
-	};
-
-	param_vector pv;
-	Sync s = new sync(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3)));
-	s->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), pv));
-	s->prep(4);
-	s->compile();
-
-	pv.randomize();
-	pv.normalize();
-
-	s->unroll(4);
-
-	const size_t MAX_EPOCHS = 1000;
-	const size_t CHECKPOINT = 100;
-
-	for (int epoch = 0; epoch < MAX_EPOCHS; epoch++) {
-		s->cycle(x0, y0);
-		pv.update();
-		if (epoch % CHECKPOINT == 0)
-			std::cout << s->m_y_grad.abs_2d().sum_2d().sum_1d() << std::endl;
-	}
-
-	std::cout << "TRANSFER" << std::endl;
-
-	for (int epoch = 0; epoch < MAX_EPOCHS; epoch++) {
-		s->cycle(x1, y1);
-		pv.update();
-		if (epoch % CHECKPOINT == 0)
-			std::cout << s->m_y_grad.abs_2d().sum_2d().sum_1d() << std::endl;
-	}
-
-}
-
-void ae_test() {
-
-	const size_t MID_LEN = 30;
-	const size_t H_LEN = MID_LEN * 2;
-	const size_t OUT_LEN = MID_LEN * 8 + 1;
-	const size_t MID_BYTES = MID_LEN * 8;
-	const size_t OUT_BYTES = OUT_LEN;
-
-	default_random_engine re(25);
-	std::normal_distribution<double> nd(0, 0.1);
-	param_vector pv;
-	Sequential s = pseudo::tnn({ OUT_LEN, H_LEN, MID_LEN, H_LEN, OUT_LEN }, pseudo::nth());
-	s->param_recur(pseudo::param_init(new param_mom(0.0002, 0.9), pv));
-	s->compile();
-
-	pv.randomize();
-	pv.normalize();
-
-	const size_t TRAIN_SETS = 1000;
-	const size_t TEST_SETS = 1000;
-
-	tensor train = tensor::new_1d(TRAIN_SETS);
-	tensor test = tensor::new_1d(TEST_SETS);
-
-	function<tensor()> new_set = [&] {
-		tensor result = tensor::new_1d(OUT_LEN);
-		for (int i = 0; i < OUT_LEN; i++)
-			result[i].val() = (double)random(0, 256) / 255;
-		return result;
-	};
-
-	for (int i = 0; i < TRAIN_SETS; i++)
-		train[i] = new_set();
-	for (int i = 0; i < TEST_SETS; i++)
-		test[i] = new_set();
-
-	const size_t CHECKPOINT = 10;
-
-	for (int epoch = 0; true; epoch++) {
-		double cost = 0;
-		for (int ts = 0; ts < train.size(); ts++) {
-			s->cycle(train[ts], train[ts]);
-			if (epoch % CHECKPOINT == 0)
-				cost += s->m_y_grad.abs_1d().sum_1d();
-		}
-		pv.update();
-		if (epoch % CHECKPOINT == 0)
-			std::cout << cost << std::endl;
-	}
-	 
 }
 
 void ptr_test() {
@@ -3434,49 +2605,6 @@ void drew_neural_net() {
 
 
 
-void feed_forward_neural_net() {
-
-	tensor x = {
-		{ 0, 0 },
-		{ 0, 1 },
-		{ 1, 0 },
-		{ 1, 1 }
-	};
-
-	tensor y = {
-		{ 0 },
-		{ 1 },
-		{ 1 },
-		{ 0 }
-	};
-
-	param_vector pv;
-	Sequential neural_net = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
-	
-	const int CHECKPOINT = 10000;
-
-	for (int epoch = 0; epoch < 100000000; epoch++) {
-
-		double cost = 0;
-
-		for (int i = 0; i < x.size(); i++) {
-			neural_net->cycle(x[i], y[i]);
-			if (epoch % CHECKPOINT == 0)
-				cost += neural_net->m_y_grad.abs_1d().sum_1d();
-		}
-
-		pv.update();
-
-		if (epoch % CHECKPOINT == 0) {
-			std::cout << cost << std::endl;
-		}
-
-	}
-
-	//delete neural_net;
-
-}
-
 tensor get_random_integer_tensor_1d(int a_min, int a_max, size_t a_size) {
 	uniform_int_distribution<int> uid(a_min, a_max);
 	tensor result = tensor::new_1d(a_size);
@@ -3515,75 +2643,6 @@ void shuffle_tensor(tensor& a_x) {
 	a_x.pop(temp);
 }
 
-void bit_compressor() {
-
-	const int DOUBLES_IN_COMPRESSED_STATE = 10;
-	const int BITS_IN_INPUT = DOUBLES_IN_COMPRESSED_STATE * 8 + 1;
-	const int H1_SIZE = DOUBLES_IN_COMPRESSED_STATE * 2;
-	const int H0_SIZE = DOUBLES_IN_COMPRESSED_STATE * 3;
-
-	const int TRAINING_DATA_SIZE = 10000;
-
-	tensor training_data = get_random_integer_tensor_2d(0, 1, TRAINING_DATA_SIZE, BITS_IN_INPUT);
-
-	uniform_real_distribution<double> urd(-1, 1);
-
-	param_vector pv;
-	Sequential seq = pseudo::tnn({ BITS_IN_INPUT, H0_SIZE, H1_SIZE, DOUBLES_IN_COMPRESSED_STATE, H1_SIZE, H0_SIZE, BITS_IN_INPUT }, {pseudo::nth(), pseudo::nth(), pseudo::nth(), pseudo::nth(), pseudo::nth(), pseudo::nth(), pseudo::nsm()});
-
-	const string file_name = "bit_compressor";
-
-	const double LEARN_RATE = 0.0002;
-	const bool IMPORT_FROM_FILE = true;
-
-	if (IMPORT_FROM_FILE) {
-		seq->param_recur(pseudo::param_init(new param_mom(LEARN_RATE, 0.9), pv));
-		pl_import_from_file(file_name, pv);
-	}
-	else {
-		seq->param_recur(pseudo::param_init(new param_mom(LEARN_RATE, 0.9), pv));
-		pv.randomize();
-		pv.normalize();
-	}
-
-	seq->compile();
-
-	const int MINI_BATCH_SIZE = 10;
-	const int NUM_REPEATS = MINI_BATCH_SIZE;
-
-	const int CHECKPOINT = 10;
-	
-	for (int epoch = 0; epoch < 100000000; epoch++) {
-
-		double cost = 0;
-
-		tensor mini_batch_indices = get_random_integer_tensor_1d(0, training_data.size() - 1, MINI_BATCH_SIZE);
-
-		for (int repeat = 0; repeat < NUM_REPEATS; repeat++) {
-			shuffle_tensor(mini_batch_indices);
-			for (int i = 0; i < mini_batch_indices.size(); i++) {
-				tensor& training_example = training_data[mini_batch_indices[i]];
-				seq->cycle(training_example, training_example);
-				if (epoch % CHECKPOINT == 0)
-					cost += get_rounded_1d(seq->m_y).sub_1d(training_example).abs_1d().sum_1d();
-			}
-		}
-
-		pv.update();
-
-		if (epoch % CHECKPOINT == 0) {
-			std::cout << training_data[training_data.size() - 1].to_string() << std::endl << seq->m_y.to_string() << std::endl;
-			std::cout << cost / MINI_BATCH_SIZE << std::endl << std::endl;
-			pl_export_to_file(file_name, pv);
-		}
-
-	}
-
-}
-
-
-
-
 template<typename CONTAINER_TYPE>
 void append_params_to_file(const string& a_file_name, CONTAINER_TYPE a_param_container) {
 	ofstream ofs(a_file_name, std::ios::app | std::ios::out);
@@ -3620,7 +2679,10 @@ void tnn_xor_test_param_export() {
 		pmt = new param_mom(0.02, 0.9);
 		pl.push_back((param_mom*)pmt.get());
 	});
-	s->compile();
+
+	Mse_loss m = new mse_loss(s);
+
+	m->compile();
 
 	pl.randomize();
 	pl.normalize();
@@ -3649,7 +2711,7 @@ void tnn_xor_test_param_export() {
 		}
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
-			s->cycle(x[tsIndex], y[tsIndex]);
+			m->cycle(x[tsIndex], y[tsIndex]);
 			if (epoch % checkpoint_interval == 0)
 				std::cout << x[tsIndex].to_string() << " " << s->m_y.to_string() << std::endl;
 		}
@@ -3837,7 +2899,10 @@ void spc_model_test() {
 	const int SP_SIZE = 4;
 
 	Sequential s = new sequential({new layer(SP_SIZE, new sigmoid()), new normalize(SP_SIZE), new onehot_spc(SP_SIZE)});
-	s->compile();
+
+	Mse_loss m = new mse_loss(s);
+
+	m->compile();
 
 	tensor desired_output = tensor::new_1d(SP_SIZE);
 	desired_output[3].val() = 1;
@@ -3846,7 +2911,7 @@ void spc_model_test() {
 
 	for (int i = 0; true; i++) {
 
-		s->cycle(s->m_x, desired_output);
+		m->cycle(s->m_x, desired_output);
 
 		tensor update_tensor = learn_rate_tensor.mul_1d(s->m_x_grad);
 		s->m_x.sub_1d(update_tensor, s->m_x);
@@ -3877,18 +2942,61 @@ void test_function_call_speed(const std::function<void(int)>& a_func, size_t a_r
 
 void test_rounding_spc()
 {
-	rounding_spc r;
-	r.compile();
+	Rounding_spc r = new rounding_spc();
+
+	Mse_loss m = new mse_loss(r);
+
+	m->compile();
 
 	tensor x = 100;
 	tensor y = 2;
 
 	for (int epoch = 0; true; epoch++)
 	{
-		r.cycle(x, y);
-		x.val() -= 0.002 * r.m_x_grad.val();
+		m->cycle(x, y);
+		x.val() -= 0.002 * m->m_x_grad.val();
 		if (epoch % 1000 == 0)
-			std::cout << r.m_y.val() << std::endl;
+			std::cout << m->m_y.val() << std::endl;
+	}
+
+}
+
+void example_tnn_setup()
+{
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1}
+	};
+
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0}
+	};
+
+	param_vector pv;
+	Sequential s = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
+
+	Mse_loss m = new mse_loss(s);
+	m->compile();
+	
+	for (int epoch = 0; epoch < 1000; epoch++)
+	{
+		double cost = 0;
+		for (int ts = 0; ts < x.size(); ts++)
+		{
+			m->cycle(x[ts], y[ts]);
+			cost += s->m_y_grad.abs_1d().sum_1d();
+		}
+
+		pv.update();
+
+		if (epoch % 999 == 0)
+			std::cout << cost << std::endl;
+
 	}
 
 }

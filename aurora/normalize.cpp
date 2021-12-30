@@ -48,10 +48,6 @@ void normalize::bwd() {
 	}
 }
 
-void normalize::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void normalize::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

@@ -41,10 +41,6 @@ void tanh::bwd() {
 	m_x_grad.val() = m_y_grad.val() * m_a / pow(cosh(m_b * m_x.val()), 2) * m_b;
 }
 
-void tanh::signal(const tensor& a_y_des) {
-	m_y_grad.val() = m_y.val() - a_y_des.val();
-}
-
 void tanh::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

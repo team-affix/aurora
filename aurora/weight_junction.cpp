@@ -53,10 +53,6 @@ void weight_junction::bwd() {
 		m_weight_sets[i]->bwd();
 }
 
-void weight_junction::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void weight_junction::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	for (int i = 0; i < m_weight_sets.size(); i++)

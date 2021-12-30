@@ -50,10 +50,6 @@ void sequential::bwd() {
 		m_models[i]->bwd();
 }
 
-void sequential::signal(const tensor& a_y_des) {
-	m_models.back()->signal(a_y_des);
-}
-
 void sequential::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	for (int i = 0; i < m_models.size(); i++)

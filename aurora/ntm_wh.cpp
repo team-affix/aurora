@@ -69,10 +69,6 @@ void ntm_wh::bwd() {
 	m_x_grad.add_1d(m_e_model->m_x_grad, m_x_grad);
 }
 
-void ntm_wh::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void ntm_wh::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_rh->model_recur(a_func);

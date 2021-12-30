@@ -10,6 +10,26 @@ using aurora::params::param_sgd;
 using aurora::maths::tensor;
 using std::vector;
 
+tensor& model::x()
+{
+	return m_x;
+}
+
+tensor& model::y()
+{
+	return m_y;
+}
+
+tensor& model::x_grad()
+{
+	return m_x_grad;
+}
+
+tensor& model::y_grad()
+{
+	return m_y_grad;
+}
+
 model::~model() {
 
 }
@@ -24,10 +44,6 @@ void model::fwd() {
 
 void model::bwd() {
 
-}
-
-void model::signal(const tensor& a_y_des) {
-	
 }
 
 void model::model_recur(const function<void(model*)>& a_func) {

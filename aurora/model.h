@@ -18,6 +18,12 @@ namespace aurora {
 			aurora::maths::tensor m_y_grad = 0;
 
 		public:
+			aurora::maths::tensor& x();
+			aurora::maths::tensor& y();
+			aurora::maths::tensor& x_grad();
+			aurora::maths::tensor& y_grad();
+
+		public:
 			MODEL_FIELDS
 			virtual ~model();
 			model();

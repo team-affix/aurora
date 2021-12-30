@@ -54,11 +54,6 @@ void layer::bwd() {
 		m_models[i]->bwd();
 }
 
-void layer::signal(const tensor& a_y_des) {
-	for (size_t i = 0; i < m_models.size(); i++)
-		m_models[i]->signal(a_y_des[i]);
-}
-
 void layer::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	for (size_t i = 0; i < m_models.size(); i++)

@@ -55,10 +55,6 @@ void ntm_content_addresser::bwd() {
 		m_key_grad.add_1d(m_internal_similarity->m_x_grad[i][0], m_key_grad);
 }
 
-void ntm_content_addresser::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void ntm_content_addresser::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_similarity->model_recur(a_func);

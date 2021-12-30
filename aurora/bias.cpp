@@ -36,10 +36,6 @@ void bias::bwd() {
 	pmt_sgd->accum_grad(m_y_grad.val());
 }
 
-void bias::signal(const tensor& a_y_des) {
-	m_y_grad.val() = m_y.val() - a_y_des.val();
-}
-
 void bias::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }

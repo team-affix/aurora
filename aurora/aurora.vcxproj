@@ -41,6 +41,7 @@
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
     <ClInclude Include="dot_1d.h" />
+    <ClInclude Include="mse_loss.h" />
     <ClInclude Include="parameterized_dot_1d.h" />
     <ClInclude Include="mul_1d.h" />
     <ClInclude Include="rounding_spc.h" />
@@ -108,6 +109,7 @@
     <ClCompile Include="add_1d.cpp" />
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
+    <ClCompile Include="mse_loss.cpp" />
     <ClCompile Include="parameterized_dot_1d.cpp" />
     <ClCompile Include="dot_1d.cpp" />
     <ClCompile Include="mul_0d.cpp" />

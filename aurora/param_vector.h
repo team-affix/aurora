@@ -15,6 +15,7 @@ namespace aurora {
 			);
 			void randomize();
 			void normalize();
+			void rand_norm();
 
 		public:
 			void update();

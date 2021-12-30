@@ -72,10 +72,6 @@ void ntm_writer::bwd() {
 	m_internal_head->bwd();
 }
 
-void ntm_writer::signal(const tensor& a_y_des) {
-	m_y.sub_2d(a_y_des, m_y_grad);
-}
-
 void ntm_writer::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_head->model_recur(a_func);

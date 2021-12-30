@@ -50,10 +50,6 @@ void ntm_addresser::bwd() {
 	m_internal_content_addresser->bwd();
 }
 
-void ntm_addresser::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void ntm_addresser::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_content_addresser->model_recur(a_func);

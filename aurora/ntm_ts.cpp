@@ -77,10 +77,6 @@ void ntm_ts::bwd() {
 	}
 }
 
-void ntm_ts::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void ntm_ts::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	for (int i = 0; i < m_internal_readers.size(); i++)

@@ -60,10 +60,6 @@ void ntm_reader::bwd() {
 	m_internal_head->bwd();
 }
 
-void ntm_reader::signal(const tensor& a_y_des) {
-	m_y.sub_1d(a_y_des, m_y_grad);
-}
-
 void ntm_reader::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 	m_internal_head->model_recur(a_func);

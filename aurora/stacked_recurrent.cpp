@@ -52,10 +52,6 @@ void stacked_recurrent::bwd() {
 		m_models[i]->bwd();
 }
 
-void stacked_recurrent::signal(const tensor& a_y_des) {
-	m_models.back()->signal(a_y_des);
-}
-
 void stacked_recurrent::model_recur(const function<void(model*)>& a_func) {
 	for (int i = 0; i < m_models.size(); i++)
 		m_models[i]->model_recur(a_func);

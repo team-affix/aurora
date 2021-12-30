@@ -51,13 +51,6 @@ void dot_1d::bwd()
 	m_mul_1d->bwd();
 }
 
-void dot_1d::signal(
-	const tensor& a_y_des
-)
-{
-	m_y_grad.val() = m_y.val() - a_y_des.val();
-}
-
 void dot_1d::model_recur(
 	const function<void(model*)>& a_func
 )
