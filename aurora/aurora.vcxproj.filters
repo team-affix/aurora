@@ -225,7 +225,7 @@
     <ClInclude Include="pseudo_tnn_hyperparams.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="spc.h">
+    <ClInclude Include="onehot_spc.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
     <ClInclude Include="sum_1d.h">
@@ -247,6 +247,9 @@
       <Filter>Header Files\models</Filter>
     </ClInclude>
     <ClInclude Include="add_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="rounding_spc.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
   </ItemGroup>
@@ -407,7 +410,7 @@
     <ClCompile Include="pseudo_tnn_hyperparams.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
-    <ClCompile Include="spc.cpp">
+    <ClCompile Include="onehot_spc.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="sum_1d.cpp">
@@ -429,6 +432,9 @@
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="add_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="rounding_spc_0d.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,7 +5,7 @@
 
 namespace aurora {
 	namespace models {
-		class spc : public model {
+		class onehot_spc : public model {
 		protected:
 			static std::uniform_real_distribution<double> s_urd;
 
@@ -14,9 +14,9 @@ namespace aurora {
 
 		public:
 			MODEL_FIELDS
-			virtual ~spc();
-			spc();
-			spc(
+			virtual ~onehot_spc();
+			onehot_spc();
+			onehot_spc(
 				size_t a_units
 			);
 

@@ -3848,7 +3848,7 @@ void spc_model_test() {
 
 	const int SP_SIZE = 4;
 
-	Sequential s = new sequential({new layer(SP_SIZE, new sigmoid()), new normalize(SP_SIZE), new spc(SP_SIZE)});
+	Sequential s = new sequential({new layer(SP_SIZE, new sigmoid()), new normalize(SP_SIZE), new onehot_spc(SP_SIZE)});
 	s->compile();
 
 	tensor desired_output = tensor::new_1d(SP_SIZE);
@@ -3864,7 +3864,7 @@ void spc_model_test() {
 		s->m_x.sub_1d(update_tensor, s->m_x);
 
 		if (i % 1000 == 0) {
-			std::cout << ((spc*)s->m_models.back())->m_x.to_string() << std::endl;
+			std::cout << ((onehot_spc*)s->m_models.back())->m_x.to_string() << std::endl;
 		}
 
 	}
@@ -3887,11 +3887,29 @@ void test_function_call_speed(const std::function<void(int)>& a_func, size_t a_r
 	test_function_call_speed(a_func, a_recur - 1);
 }
 
+void test_rounding_spc()
+{
+	rounding_spc r;
+	r.compile();
+
+	tensor x = 100;
+	tensor y = 2;
+
+	for (int epoch = 0; true; epoch++)
+	{
+		r.cycle(x, y);
+		x.val() -= 0.002 * r.m_x_grad.val();
+		if (epoch % 1000 == 0)
+			std::cout << r.m_y.val() << std::endl;
+	}
+
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	add_1d_test();
+	test_rounding_spc();
 
 	return 0;
 

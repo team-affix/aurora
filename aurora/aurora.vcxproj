@@ -43,6 +43,7 @@
     <ClInclude Include="dot_1d.h" />
     <ClInclude Include="parameterized_dot_1d.h" />
     <ClInclude Include="mul_1d.h" />
+    <ClInclude Include="rounding_spc.h" />
     <ClInclude Include="sum_1d.h" />
     <ClInclude Include="mul_0d.h" />
     <ClInclude Include="pseudo_lstm_hyperparams.h" />
@@ -88,7 +89,7 @@
     <ClInclude Include="power.h" />
     <ClInclude Include="pseudo.h" />
     <ClInclude Include="shift.h" />
-    <ClInclude Include="spc.h" />
+    <ClInclude Include="onehot_spc.h" />
     <ClInclude Include="stacked_recurrent.h" />
     <ClInclude Include="static_vals.h" />
     <ClInclude Include="sequential.h" />
@@ -113,6 +114,7 @@
     <ClCompile Include="dot_1d.cpp" />
     <ClCompile Include="mul_0d.cpp" />
     <ClCompile Include="mul_1d.cpp" />
+    <ClCompile Include="rounding_spc_0d.cpp" />
     <ClCompile Include="sum_1d.cpp" />
     <ClCompile Include="pseudo_lstm_hyperparams.cpp" />
     <ClCompile Include="pseudo_ntm_hyperparams.cpp" />
@@ -155,7 +157,7 @@
     <ClCompile Include="sequential.cpp" />
     <ClCompile Include="shift.cpp" />
     <ClCompile Include="sigmoid.cpp" />
-    <ClCompile Include="spc.cpp" />
+    <ClCompile Include="onehot_spc.cpp" />
     <ClCompile Include="stacked_recurrent.cpp" />
     <ClCompile Include="static_vals.cpp" />
     <ClCompile Include="sync.cpp" />
