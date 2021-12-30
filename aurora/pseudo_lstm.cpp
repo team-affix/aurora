@@ -39,7 +39,7 @@ Stacked_recurrent pseudo::lstm_mdim_compiled(size_t a_x_units, size_t a_h_units,
 	Stacked_recurrent result = lstm_mdim(a_x_units, a_h_units, a_y_units);
 
 	size_t param_count = 0;
-	result->param_recur(PARAM_COUNT(param_count));
+	result->param_recur(pseudo::param_count(param_count));
 
 	double learn_rate = 0;
 	double beta = 0;
@@ -47,10 +47,13 @@ Stacked_recurrent pseudo::lstm_mdim_compiled(size_t a_x_units, size_t a_h_units,
 
 	lstm_hyperparams(param_count, learn_rate, beta, urd);
 
-	result->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
+	result->param_recur(pseudo::param_init(new param_mom(learn_rate, beta), a_param_vec));
 
 	result->prep(a_max_timesteps);
 	result->compile();
+
+	a_param_vec.randomize();
+	a_param_vec.normalize();
 
 	return result;
 
@@ -70,7 +73,7 @@ Stacked_recurrent pseudo::lstm_stacked_compiled(size_t a_units, size_t a_stack_h
 	Stacked_recurrent result = lstm_stacked(a_units, a_stack_height);
 
 	size_t param_count = 0;
-	result->param_recur(PARAM_COUNT(param_count));
+	result->param_recur(pseudo::param_count(param_count));
 
 	double learn_rate = 0;
 	double beta = 0;
@@ -78,10 +81,13 @@ Stacked_recurrent pseudo::lstm_stacked_compiled(size_t a_units, size_t a_stack_h
 
 	lstm_hyperparams(param_count, learn_rate, beta, urd);
 
-	result->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
+	result->param_recur(pseudo::param_init(new param_mom(learn_rate, beta), a_param_vec));
 
 	result->prep(a_max_timesteps);
 	result->compile();
+
+	a_param_vec.randomize();
+	a_param_vec.normalize();
 
 	return result;
 
@@ -108,7 +114,7 @@ Stacked_recurrent pseudo::lstm_stacked_mdim_compiled(size_t a_x_units, size_t a_
 	});
 
 	size_t param_count = 0;
-	result->param_recur(PARAM_COUNT(param_count));
+	result->param_recur(pseudo::param_count(param_count));
 
 	double learn_rate = 0;
 	double beta = 0;
@@ -116,10 +122,13 @@ Stacked_recurrent pseudo::lstm_stacked_mdim_compiled(size_t a_x_units, size_t a_
 
 	lstm_hyperparams(param_count, learn_rate, beta, urd);
 
-	result->param_recur(PARAM_INIT(param_mom(urd(aurora::static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
+	result->param_recur(pseudo::param_init(new param_mom(learn_rate, beta), a_param_vec));
 
 	result->prep(a_max_timesteps);
 	result->compile();
+
+	a_param_vec.randomize();
+	a_param_vec.normalize();
 
 	return result;
 

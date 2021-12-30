@@ -23,11 +23,17 @@ double& param::state() {
 	return m_state_ptr.val();
 }
 
+const double& param::state() const
+{
+	return m_state_ptr.val();
+}
+
 void param::update() {
 
 }
 
-param* param::clone() {
+param* param::clone() const
+{
 	param* result = new param();
 	result->state() = state();
 	return result;

@@ -19,10 +19,11 @@ namespace aurora {
 
 		public:
 			virtual double& state();
+			virtual const double& state() const;
 
 		public:
 			virtual void update();
-			virtual param* clone();
+			virtual param* clone() const;
 
 		};
 		typedef affix_base::data::ptr<param> Param;

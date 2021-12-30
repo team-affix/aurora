@@ -149,19 +149,44 @@ void tensor::tanh_2d(tensor& a_output) {
 }
 
 void tensor::norm_1d(tensor& a_output) {
-	double l_sum = abs_1d().sum_1d();
+
+	a_output = clone();
+
+	double l_min = min_1d();
+	if (l_min < 0)
+		// OFFSET BY NEGATIVE VALUES FIRST
+		a_output.add_1d(tensor::new_1d(a_output.size(), l_min), a_output);
+
+	double l_sum = a_output.sum_1d();
 	for (int i = 0; i < size(); i++) {
-		a_output[i].val() = at(i).val() / l_sum;
+		a_output[i].val() = a_output[i].val() / l_sum;
 	}
+
+}
+
+void tensor::signed_norm_1d(tensor& a_output)
+{
+	double l_sum = abs_1d().sum_1d();
+	for (int i = 0; i < a_output.size(); i++)
+		a_output[i].val() = at(i).val() / l_sum;
 }
 
 void tensor::norm_2d(tensor& a_output) {
-	double l_sum = abs_2d().sum_2d().sum_1d();
+
+	a_output = clone();
+
+	double l_min = min_2d();
+	if (l_min < 0)
+		// OFFSET BY NEGATIVE VALUES FIRST
+		a_output.add_2d(tensor::new_2d(a_output.height(), a_output.width(), l_min), a_output);
+
+	double l_sum = a_output.sum_2d();
 	for (int i = 0; i < height(); i++) {
 		for (int j = 0; j < width(); j++) {
-			a_output[i][j].val() = at(i).at(j).val() / l_sum;
+			a_output[i][j].val() = a_output[i][j].val() / l_sum;
 		}
 	}
+
 }
 
 double tensor::mag_1d() {
@@ -278,7 +303,7 @@ size_t tensor::height() const {
 	return size();
 }
 
-double tensor::max() {
+double tensor::max_1d() {
 	double result = -INFINITY;
 	for (int i = 0; i < size(); i++)
 		if (at(i) > result)
@@ -286,7 +311,7 @@ double tensor::max() {
 	return result;
 }
 
-double tensor::min() {
+double tensor::min_1d() {
 	double result = INFINITY;
 	for (int i = 0; i < size(); i++)
 		if (at(i) < result)
@@ -294,9 +319,9 @@ double tensor::min() {
 	return result;
 }
 
-int tensor::arg_max() {
+size_t tensor::arg_max_1d() {
 	double val = -INFINITY;
-	int result = -1;
+	size_t result = -1;
 	for (int i = 0; i < size(); i++)
 		if (at(i) > val) {
 			val = at(i);
@@ -305,9 +330,9 @@ int tensor::arg_max() {
 	return result;
 }
 
-int tensor::arg_min() {
+size_t tensor::arg_min_1d() {
 	double val = INFINITY;
-	int result = -1;
+	size_t result = -1;
 	for (int i = 0; i < size(); i++)
 		if (at(i) < val) {
 			val = at(i);
@@ -316,9 +341,40 @@ int tensor::arg_min() {
 	return result;
 }
 
+double tensor::max_2d()
+{
+	double result = -INFINITY;
+	for (int i = 0; i < size(); i++)
+	{
+		double l_max_1d = at(i).max_1d();
+		if (l_max_1d > result)
+			result = l_max_1d;
+	}
+	return result;
+}
+
+double tensor::min_2d()
+{
+	double result = INFINITY;
+	for (int i = 0; i < size(); i++)
+	{
+		double l_min_1d = at(i).min_1d();
+		if (l_min_1d < result)
+			result = l_min_1d;
+	}
+	return result;
+}
+
 tensor tensor::norm_1d() {
 	tensor result = tensor::new_1d(size());
 	norm_1d(result);
+	return result;
+}
+
+tensor tensor::signed_norm_1d()
+{
+	tensor result = tensor::new_1d(size());
+	signed_norm_1d(result);
 	return result;
 }
 
@@ -680,7 +736,8 @@ tensor tensor::link() {
 	return result;
 }
 
-std::string tensor::to_string() {
+std::string tensor::to_string() const
+{
 	if (vec().size() == 0)
 		return std::to_string(val());
 	std::string result = "[";

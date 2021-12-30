@@ -111,12 +111,6 @@
     <ClInclude Include="lstm.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="param_sgd_mt.h">
-      <Filter>Header Files\params</Filter>
-    </ClInclude>
-    <ClInclude Include="param_mom_mt.h">
-      <Filter>Header Files\params</Filter>
-    </ClInclude>
     <ClInclude Include="models.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
@@ -307,12 +301,6 @@
     </ClCompile>
     <ClCompile Include="lstm.cpp">
       <Filter>Source Files\models</Filter>
-    </ClCompile>
-    <ClCompile Include="param_sgd_mt.cpp">
-      <Filter>Source Files\params</Filter>
-    </ClCompile>
-    <ClCompile Include="param_mom_mt.cpp">
-      <Filter>Source Files\params</Filter>
     </ClCompile>
     <ClCompile Include="genome.cpp">
       <Filter>Source Files\evolution</Filter>

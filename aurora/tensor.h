@@ -152,6 +152,9 @@ namespace aurora {
 			void norm_1d(
 				tensor& a_output
 			);
+			void signed_norm_1d(
+				tensor& a_output
+			);
 			void norm_2d(
 				tensor& a_output
 			);
@@ -167,11 +170,14 @@ namespace aurora {
 			tensor tanh_1d();
 			tensor tanh_2d();
 			double mag_1d();
-			double max();
-			double min();
-			int arg_max();
-			int arg_min();
+			double max_1d();
+			double min_1d();
+			size_t arg_max_1d();
+			size_t arg_min_1d();
+			double max_2d();
+			double min_2d();
 			tensor norm_1d();
+			tensor signed_norm_1d();
 			tensor norm_2d();
 
 		public:
@@ -326,7 +332,7 @@ namespace aurora {
 			tensor link();
 
 		public:
-			std::string to_string();
+			std::string to_string() const;
 
 		public:
 			void clear();

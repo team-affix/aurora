@@ -83,8 +83,6 @@
     <ClInclude Include="ntm_wh.h" />
     <ClInclude Include="ntm_writer.h" />
     <ClInclude Include="params.h" />
-    <ClInclude Include="param_mom_mt.h" />
-    <ClInclude Include="param_sgd_mt.h" />
     <ClInclude Include="param_init.h" />
     <ClInclude Include="power.h" />
     <ClInclude Include="pseudo.h" />
@@ -147,10 +145,8 @@
     <ClCompile Include="ntm_writer.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_mom.cpp" />
-    <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_rcv.cpp" />
     <ClCompile Include="param_sgd.cpp" />
-    <ClCompile Include="param_sgd_mt.cpp" />
     <ClCompile Include="param_vector.cpp" />
     <ClCompile Include="power.cpp" />
     <ClCompile Include="recurrent.cpp" />

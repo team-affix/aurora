@@ -13,14 +13,17 @@ namespace aurora {
 			virtual ~param_sgd();
 			param_sgd();
 			param_sgd(
-				double a_state,
-				double a_learn_rate,
-				double a_gradient
+				double a_learn_rate
 			);
 
 		public:
 			virtual double& learn_rate();
+			virtual const double& learn_rate() const;
+
+		public:
 			virtual double& gradient();
+			virtual const double& gradient() const;
+
 
 		public:
 			virtual void accum_grad(
@@ -29,7 +32,9 @@ namespace aurora {
 
 		public:
 			virtual void update();
-			virtual param* clone();
+
+		public:
+			virtual param* clone() const;
 
 		};
 		typedef affix_base::data::ptr<param_sgd> Param_sgd;

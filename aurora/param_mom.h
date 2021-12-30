@@ -13,20 +13,23 @@ namespace aurora {
 			virtual ~param_mom();
 			param_mom();
 			param_mom(
-				double a_state,
 				double a_learn_rate,
-				double a_gradient,
-				double a_momentum,
 				double a_beta
 			);
 
 		public:
 			virtual double& momentum();
+			virtual const double& momentum() const;
+
+		public:
 			virtual double& beta();
+			virtual const double& beta() const;
 
 		public:
 			virtual void update();
-			virtual param* clone();
+
+		public:
+			virtual param* clone() const;
 
 		};
 		typedef affix_base::data::ptr<param_mom> Param_mom;

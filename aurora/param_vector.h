@@ -6,14 +6,22 @@
 namespace aurora {
 	namespace params {
 		class param_vector : public std::vector<Param> {
+		protected:
+			static std::uniform_real_distribution<double> s_urd;
+
 		public:
-			void update();
 			void pop(
 				const aurora::maths::tensor& a_states
 			);
+			void randomize();
+			void normalize();
 
 		public:
-			operator aurora::maths::tensor();
+			void update();
+
+		public:
+			operator aurora::maths::tensor() const;
+			std::string to_string() const;
 
 		};
 	}

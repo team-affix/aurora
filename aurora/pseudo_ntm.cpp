@@ -39,14 +39,17 @@ Ntm pseudo::ntm_compiled(
 	Ntm result = new ntm(a_memory_height, a_memory_width, a_num_readers, a_num_writers, a_valid_shifts, a_head_hidden_dims);
 
 	size_t param_count = 0;
-	result->param_recur(PARAM_COUNT(param_count));
+	result->param_recur(pseudo::param_count(param_count));
 
 	pseudo::ntm_hyperparams(param_count, learn_rate, beta, param_urd);
 
-	result->param_recur(PARAM_INIT(param_mom(param_urd(static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
+	result->param_recur(pseudo::param_init(new param_mom(learn_rate, beta), a_param_vec));
 
 	result->prep(a_max_timesteps);
 	result->compile();
+
+	a_param_vec.randomize();
+	a_param_vec.normalize();
 
 	return result;
 }
@@ -73,11 +76,14 @@ Stacked_recurrent pseudo::ntm_mdim(
 	Stacked_recurrent result = new stacked_recurrent({ in, mid, out });
 
 	size_t param_count = 0;
-	result->param_recur(PARAM_COUNT(param_count));
+	result->param_recur(pseudo::param_count(param_count));
 
 	pseudo::ntm_hyperparams(param_count, learn_rate, beta, param_urd);
 
-	result->param_recur(PARAM_INIT(param_mom(param_urd(static_vals::random_engine), learn_rate, 0, 0, beta), a_param_vec));
+	result->param_recur(pseudo::param_init(new param_mom(learn_rate, beta), a_param_vec));
+
+	a_param_vec.randomize();
+	a_param_vec.normalize();
 
 	return result;
 

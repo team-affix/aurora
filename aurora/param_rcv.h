@@ -18,7 +18,6 @@ namespace aurora {
 			virtual ~param_rcv();
 			param_rcv();
 			param_rcv(
-				const double& a_state,
 				const double& a_learn_rate,
 				const double& a_beta
 			);
@@ -30,8 +29,14 @@ namespace aurora {
 			double& dstate();
 			double& reward();
 			double& dreward();
+
+		public:
 			double& learn_rate();
-			const double& beta();
+			const double& learn_rate() const;
+
+		public:
+			const double& beta() const;
+
 			double& momentum();
 			const double& alpha();
 
@@ -52,7 +57,7 @@ namespace aurora {
 			);
 
 		public:
-			virtual param* clone();
+			virtual param* clone() const;
 
 		};
 		typedef affix_base::data::ptr<param_rcv> Param_rcv;
