@@ -41,15 +41,13 @@
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
     <ClInclude Include="dot_1d.h" />
+    <ClInclude Include="loss.h" />
     <ClInclude Include="mse_loss.h" />
     <ClInclude Include="parameterized_dot_1d.h" />
     <ClInclude Include="mul_1d.h" />
     <ClInclude Include="rounding_spc.h" />
     <ClInclude Include="sum_1d.h" />
     <ClInclude Include="mul_0d.h" />
-    <ClInclude Include="pseudo_lstm_hyperparams.h" />
-    <ClInclude Include="pseudo_ntm_hyperparams.h" />
-    <ClInclude Include="pseudo_tnn_hyperparams.h" />
     <ClInclude Include="pseudo_lstm.h" />
     <ClInclude Include="pseudo_ntm.h" />
     <ClInclude Include="pseudo_tnn.h" />
@@ -109,6 +107,7 @@
     <ClCompile Include="add_1d.cpp" />
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
+    <ClCompile Include="loss.cpp" />
     <ClCompile Include="mse_loss.cpp" />
     <ClCompile Include="parameterized_dot_1d.cpp" />
     <ClCompile Include="dot_1d.cpp" />
@@ -116,9 +115,6 @@
     <ClCompile Include="mul_1d.cpp" />
     <ClCompile Include="rounding_spc_0d.cpp" />
     <ClCompile Include="sum_1d.cpp" />
-    <ClCompile Include="pseudo_lstm_hyperparams.cpp" />
-    <ClCompile Include="pseudo_ntm_hyperparams.cpp" />
-    <ClCompile Include="pseudo_tnn_hyperparams.cpp" />
     <ClCompile Include="pseudo_lstm.cpp" />
     <ClCompile Include="pseudo_ntm.cpp" />
     <ClCompile Include="pseudo_tnn.cpp" />

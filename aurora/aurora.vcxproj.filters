@@ -204,19 +204,10 @@
     <ClInclude Include="pseudo_lstm.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="pseudo_lstm_hyperparams.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
     <ClInclude Include="pseudo_ntm.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
     <ClInclude Include="pseudo_tnn.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
-    <ClInclude Include="pseudo_ntm_hyperparams.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
-    <ClInclude Include="pseudo_tnn_hyperparams.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
     <ClInclude Include="onehot_spc.h">
@@ -247,6 +238,9 @@
       <Filter>Header Files\models</Filter>
     </ClInclude>
     <ClInclude Include="mse_loss.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="loss.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
   </ItemGroup>
@@ -386,19 +380,10 @@
     <ClCompile Include="pseudo_lstm.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
-    <ClCompile Include="pseudo_lstm_hyperparams.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
     <ClCompile Include="pseudo_ntm.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
-    <ClCompile Include="pseudo_ntm_hyperparams.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
     <ClCompile Include="pseudo_tnn.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
-    <ClCompile Include="pseudo_tnn_hyperparams.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
     <ClCompile Include="onehot_spc.cpp">
@@ -429,6 +414,9 @@
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="mse_loss.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="loss.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>

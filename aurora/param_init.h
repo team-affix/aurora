@@ -33,21 +33,5 @@ namespace aurora {
 			};
 		}
 
-		/*#define PARAM_INIT(right_side, param_vec) \
-		[&](aurora::params::Param& pmt) { \
-		pmt = new right_side; \
-		param_vec.push_back(pmt); \
-		}
-
-		#define PARAM_DUMP(param_vec) \
-		[&](aurora::params::Param& pmt) { \
-		param_vec.push_back(pmt.get()); \
-		}
-
-		#define PARAM_COUNT(incrementer) \
-		[&](aurora::params::Param& pmt) { \
-			incrementer++; \
-		} \*/
-
 	}
 }

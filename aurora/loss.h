@@ -1,26 +1,20 @@
 #pragma once
 #include "model.h"
-#include "loss.h"
-#include "tensor.h"
 
 namespace aurora
 {
 	namespace models
 	{
-		class mse_loss : public loss
+		class loss : public model
 		{
-		public:
-			double m_y_lowest_rank_count = 0;
-			double m_2_over_y_lowest_rank_count = 0;
-
 		public:
 			Model m_model;
 
 		public:
 			MODEL_FIELDS
-			virtual ~mse_loss();
-			mse_loss();
-			mse_loss(
+			virtual ~loss();
+			loss();
+			loss(
 				const Model& a_model
 			);
 
@@ -36,6 +30,5 @@ namespace aurora
 			);
 
 		};
-		typedef affix_base::data::ptr<mse_loss> Mse_loss;
 	}
 }

@@ -216,9 +216,14 @@ void tnn_compiled_xor_test() {
 	using aurora::params::param_vector;
 
 	param_vector pv;
-	Model s = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
+
+	Model s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3));
+
+	s->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), pv));
+	pv.rand_norm();
 
 	Mse_loss m = new mse_loss(s);
+
 	m->compile();
 	
 	tensor x = {
@@ -2352,11 +2357,15 @@ void stacked_recurrent_test() {
 void lstm_mdim_test() {
 
 	param_vector pv;
-	Stacked_recurrent s = pseudo::lstm_mdim_compiled(2, 5, 1, 4, pv);
+	Stacked_recurrent s = pseudo::lstm_mdim(2, 5, 1);
 
 	Mse_loss m = new mse_loss(s);
-	m->compile();
 
+	m->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), pv));
+	pv.rand_norm();
+
+	s->prep(4);
+	m->compile();
 	s->unroll(4);
 
 	tensor x0 = {
@@ -2387,7 +2396,8 @@ void lstm_mdim_test() {
 
 	const int checkpoint_interval = 10000;
 
-	for (int epoch = 0; epoch < 100000; epoch++) {
+	for (int epoch = 0; epoch < 100000; epoch++)
+	{
 		m->cycle(x0, y0);
 		if (epoch % checkpoint_interval == 0)
 			std::cout << "S0: " << s->m_y.to_string() << std::endl;
@@ -2402,7 +2412,12 @@ void lstm_mdim_test() {
 void lstm_stacked_mdim_test() {
 
 	param_vector pv;
-	Stacked_recurrent s = pseudo::lstm_stacked_mdim_compiled(2, 10, 1, 1, 4, pv);
+	Stacked_recurrent s = pseudo::lstm_stacked_mdim(2, 10, 1, 1);
+
+	s->prep(4);
+
+	s->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), pv));
+	pv.rand_norm();
 
 	Mse_loss m = new mse_loss(s);
 	m->compile();
@@ -2462,19 +2477,18 @@ void test_test() {
 
 }
 
-void new_ptr_test() {
-	param_vector p;
-	Sequential s = pseudo::tnn_compiled({ 1, 5, 1 }, p);
-	Lstm l = s;
-}
-
 void ntm_mdim_test() {
 
 	param_vector param_vec;
-	Stacked_recurrent s = pseudo::ntm_mdim_compiled(2, 1, 10, 5, 1, 1, { -1, 0, 1 }, { 5, 10 }, 4, param_vec);
+	Stacked_recurrent s = pseudo::ntm_mdim(2, 1, 10, 5, 1, 1, { -1, 0, 1 }, { 5, 10 });
+
+	s->prep(4);
 
 	Mse_loss m = new mse_loss(s);
 	m->compile();
+
+	m->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), param_vec));
+	param_vec.rand_norm();
 
 	s->unroll(4);
 
@@ -2573,19 +2587,6 @@ bool random_bool_with_prob(const double& prob)  // probability between 0.0 and 1
 
 
 
-
-
-
-void drew_neural_net() {
-
-	param_vector pv;
-
-	Sequential neural_net = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
-
-	tensor x1 = { 69, 420 };
-	neural_net->m_x = x1;
-
-}
 
 
 
@@ -2726,7 +2727,6 @@ void tnn_xor_test_param_export() {
 	}
 
 }
-
 
 int collapse_sp_onehot_index(const tensor& a_probability_tensor) {
 	tensor result = tensor::new_1d(a_probability_tensor.size());
@@ -2978,10 +2978,13 @@ void example_tnn_setup()
 	};
 
 	param_vector pv;
-	Sequential s = pseudo::tnn_compiled({ 2, 5, 1 }, pv);
+	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3));
 
 	Mse_loss m = new mse_loss(s);
 	m->compile();
+
+	m->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), pv));
+	pv.rand_norm();
 	
 	for (int epoch = 0; epoch < 1000; epoch++)
 	{
