@@ -172,13 +172,13 @@ void tnn_xor_test() {
 	uniform_real_distribution<double> urd(-1, 1);
 	default_random_engine re(25);
 
-	Sequential s = pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3));
+	Sequential s = pseudo::tnn({ 2, 5, 1 }, { pseudo::nlr(0.3), pseudo::nlr(0.3), pseudo::nsm() });
 	s->param_recur([&](Param& pmt) {
 		pmt = new param_mom(0.02, 0.9);
 		pv.push_back((param_mom*)pmt.get());
 	});
 
-	Mse_loss m = new mse_loss(s);
+	Ce_loss m = new ce_loss(s);
 	m->compile();
 
 	pv.randomize();

@@ -243,6 +243,9 @@
     <ClInclude Include="loss.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="ce_loss.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
@@ -417,6 +420,9 @@
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="loss.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ce_loss.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
