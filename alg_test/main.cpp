@@ -3009,7 +3009,7 @@ void example_tnn_setup()
 
 void test_large_model_linkage()
 {
-	Sequential s = pseudo::tnn({ 100, 1000, 100 }, pseudo::nlr(0.3));
+	Sequential s = pseudo::tnn({ 1000, 1000, 1000 }, pseudo::nlr(0.3));
 	s->compile();
 }
 
