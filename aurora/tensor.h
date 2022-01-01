@@ -18,6 +18,8 @@ namespace aurora {
 
 		public:
 			virtual ~tensor();
+
+		public:
 			tensor();
 			tensor(
 				const double& a_val
