@@ -142,22 +142,22 @@ void ntm_rh::compile() {
 	m_s_model->compile();
 	m_gamma_model->compile();
 
-	m_key_model->m_x.group_join(m_x);
-	m_beta_model->m_x.group_join(m_x);
-	m_g_model->m_x.group_join(m_x);
-	m_s_model->m_x.group_join(m_x);
-	m_gamma_model->m_x.group_join(m_x);
+	m_key_model->m_x.link(m_x);
+	m_beta_model->m_x.link(m_x);
+	m_g_model->m_x.link(m_x);
+	m_s_model->m_x.link(m_x);
+	m_gamma_model->m_x.link(m_x);
 
-	m_key.group_join_all_ranks(m_key_model->m_y);
-	m_key_grad.group_join_all_ranks(m_key_model->m_y_grad);
-	m_beta.group_join_all_ranks(m_beta_model->m_y);
-	m_beta_grad.group_join_all_ranks(m_beta_model->m_y_grad);
-	m_g.group_join_all_ranks(m_g_model->m_y);
-	m_g_grad.group_join_all_ranks(m_g_model->m_y_grad);
-	m_s.group_join_all_ranks(m_s_model->m_y);
-	m_s_grad.group_join_all_ranks(m_s_model->m_y_grad);
-	m_gamma.group_join_all_ranks(m_gamma_model->m_y);
-	m_gamma_grad.group_join_all_ranks(m_gamma_model->m_y_grad);
+	m_key.link(m_key_model->m_y);
+	m_key_grad.link(m_key_model->m_y_grad);
+	m_beta.link(m_beta_model->m_y);
+	m_beta_grad.link(m_beta_model->m_y_grad);
+	m_g.link(m_g_model->m_y);
+	m_g_grad.link(m_g_model->m_y_grad);
+	m_s.link(m_s_model->m_y);
+	m_s_grad.link(m_s_model->m_y_grad);
+	m_gamma.link(m_gamma_model->m_y);
+	m_gamma_grad.link(m_gamma_model->m_y_grad);
 
 	m_y = m_key.cat(m_beta).cat(m_g).cat(m_s).cat(m_gamma);
 	m_y_grad = m_key_grad.cat(m_beta_grad).cat(m_g_grad).cat(m_s_grad).cat(m_gamma_grad);

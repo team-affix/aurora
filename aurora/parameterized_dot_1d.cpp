@@ -70,13 +70,13 @@ void parameterized_dot_1d::compile()
 	m_layer->compile();
 	m_sum_1d->compile();
 
-	m_x.group_join_all_ranks(m_layer->m_x);
-	m_x_grad.group_join_all_ranks(m_layer->m_x_grad);
+	m_x.link(m_layer->m_x);
+	m_x_grad.link(m_layer->m_x_grad);
 
-	m_layer->m_y.group_join_all_ranks(m_sum_1d->m_x);
-	m_layer->m_y_grad.group_join_all_ranks(m_sum_1d->m_x_grad);
+	m_layer->m_y.link(m_sum_1d->m_x);
+	m_layer->m_y_grad.link(m_sum_1d->m_x_grad);
 
-	m_y.group_join_all_ranks(m_sum_1d->m_y);
-	m_y_grad.group_join_all_ranks(m_sum_1d->m_y_grad);
+	m_y.link(m_sum_1d->m_y);
+	m_y_grad.link(m_sum_1d->m_y_grad);
 
 }

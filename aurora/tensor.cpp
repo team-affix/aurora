@@ -20,28 +20,8 @@ const std::vector<tensor>& tensor::vec() const {
 	return m_vec_ptr.val();
 }
 
-tensor& tensor::group_head() {
-	if (m_group_prev_ptr == nullptr)
-		return *this;
-	else
-		return m_group_prev_ptr->group_head();
-}
-
-tensor& tensor::group_tail() {
-	if (m_group_next_ptr == nullptr)
-		return *this;
-	else
-		return m_group_next_ptr->group_tail();
-}
-
-size_t tensor::group_size() {
-	size_t result = 0;
-	group_recur([&](tensor* elem) { result += 1; });
-	return result;
-}
-
 tensor::~tensor() {
-	group_leave();
+
 }
 
 tensor::tensor() {
@@ -281,7 +261,7 @@ tensor tensor::unroll() {
 	tensor result = new_1d(w * h);
 	for (int i = 0; i < h; i++)
 		for (size_t j = 0; j < w; j++)
-			result[i * w + j].group_join_all_ranks(at(i)[j]);
+			result[i * w + j].link(at(i)[j]);
 	return result;
 }
 
@@ -291,7 +271,7 @@ tensor tensor::roll(size_t a_width) {
 	size_t h = s / a_width;
 	tensor result = new_2d(h, a_width);
 	for (int i = 0; i < vec().size(); i++)
-		result[i / a_width][i % a_width].group_join_all_ranks(at(i));
+		result[i / a_width][i % a_width].link(at(i));
 	return result;
 }
 
@@ -386,14 +366,14 @@ tensor tensor::norm_2d() {
 
 tensor tensor::row(size_t a_a) {
 	tensor result;
-	result.group_join_all_ranks(at(a_a));
+	result.link(at(a_a));
 	return result;
 }
 
 tensor tensor::col(size_t a_a) {
 	tensor result = new_1d(vec().size());
 	for (int i = 0; i < size(); i++)
-		result[i].group_join_all_ranks(at(i)[a_a]);
+		result[i].link(at(i)[a_a]);
 	return result;
 }
 
@@ -403,7 +383,7 @@ tensor tensor::range(size_t a_start, size_t a_len) {
 	{
 		size_t src = a_start + i;
 		size_t dst = i;
-		result[dst].group_join_all_ranks(at(src));
+		result[dst].link(at(src));
 	}
 	return result;
 }
@@ -415,7 +395,7 @@ tensor tensor::range_2d(size_t a_row, size_t a_col, size_t a_height, size_t a_wi
 		size_t src = a_row + i;
 		size_t dst = i;
 		tensor row_section = at(src).range(a_col, a_width);
-		result[dst].group_join_all_ranks(row_section);
+		result[dst].link(row_section);
 	}
 	return result;
 }
@@ -590,9 +570,9 @@ void tensor::dot_2d(const tensor& a_other, tensor& a_output) {
 
 void tensor::cat(tensor& a_other, tensor& a_output) {
 	for (int i = 0; i < size(); i++)
-		a_output[i].group_join_all_ranks(at(i));
+		a_output[i].link(at(i));
 	for (int i = 0; i < a_other.size(); i++)
-		a_output[i + size()].group_join_all_ranks(a_other.at(i));
+		a_output[i + size()].link(a_other.at(i));
 }
 
 double tensor::cos_sim(tensor& a_other) {
@@ -606,22 +586,6 @@ tensor tensor::cat(tensor& a_other) {
 	tensor result = tensor::new_1d(size() + a_other.size());
 	cat(a_other, result);
 	return result;
-}
-
-void tensor::link(tensor& a_other) {
-	group_recur([&](tensor* elem) {
-		elem->m_val_ptr.link(a_other.m_val_ptr);
-		if (elem->size() != a_other.size())
-			elem->resize(a_other.size());
-		for (int i = 0; i < a_other.size(); i++)
-			elem->at(i).link(a_other.at(i));
-	});
-}
-
-void tensor::unlink() {
-	m_val_ptr = nullptr;
-	for (int i = 0; i < size(); i++)
-		at(i).unlink();
 }
 
 void tensor::rank_recur(const std::function<void(tensor*)>& a_func) {
@@ -653,95 +617,24 @@ size_t tensor::lowest_rank_count()
 	return l_result;
 }
 
-void tensor::group_recur_fwd(const std::function<void(tensor*)>& a_func) {
-	if (m_group_next_ptr != nullptr)
-		m_group_next_ptr->group_recur_fwd(a_func);
-	a_func(this);
-}
+void tensor::link(
+	tensor& a_other
+)
+{
 
-void tensor::group_recur_bwd(const std::function<void(tensor*)>& a_func) {
-	if (m_group_prev_ptr != nullptr)
-		m_group_prev_ptr->group_recur_bwd(a_func);
-	a_func(this);
-}
+	m_val_ptr.group_link(a_other.m_val_ptr);
 
-void tensor::group_recur(const std::function<void(tensor*)>& a_func) {
-	if (m_group_prev_ptr != nullptr)
-		m_group_prev_ptr->group_recur_bwd(a_func);
-	if (m_group_next_ptr != nullptr)
-		m_group_next_ptr->group_recur_fwd(a_func);
-	a_func(this);
-}
+	resize(a_other.size());
 
-bool tensor::group_contains(const tensor* a_ptr) {
-	bool result = false;
-	group_recur([&](tensor* tens) {
-		if (tens == a_ptr)
-			result = true;
-	});
-	return result;
-}
-
-void tensor::group_add(tensor& a_other) {
-	a_other.group_join(*this);
-}
-
-void tensor::group_remove(tensor& a_other) {
-	a_other.group_leave();
-}
-
-void tensor::group_join(tensor& a_other) {
-	link(a_other); // LINKS ENTIRE GROUP TO a_other's GROUP
-	group_recur([&](tensor* elem) {
-		// PREVENT ADDING NODES TO SAME GROUP TWICE
-		if (!a_other.group_contains(elem)) {
-			tensor& l_group_tail = a_other.group_tail();
-			l_group_tail.m_group_next_ptr = elem;
-			elem->m_group_prev_ptr = &l_group_tail;
-			elem->m_group_next_ptr = nullptr;
-		}
-	});
-}
-
-void tensor::group_leave() {
-	if (m_group_prev_ptr != nullptr)
-		m_group_prev_ptr->m_group_next_ptr = m_group_next_ptr;
-	if (m_group_next_ptr != nullptr)
-		m_group_next_ptr->m_group_prev_ptr = m_group_prev_ptr;
-	m_group_prev_ptr = nullptr;
-	m_group_next_ptr = nullptr;
-}
-
-void tensor::group_disband() {
-	group_recur([](tensor* elem) { elem->group_leave(); });
-}
-
-void tensor::group_add_all_ranks(tensor& a_other) {
-	a_other.group_join_all_ranks(*this);
-}
-
-void tensor::group_remove_all_ranks(tensor& a_other) {
-	a_other.group_leave_all_ranks();
-}
-
-void tensor::group_join_all_ranks(tensor& a_other) {
-	group_recur([&](tensor* elem) {
-		group_join(a_other);
-		for (int i = 0; i < size(); i++)
-			at(i).group_join_all_ranks(a_other.at(i));
-	});
-}
-
-void tensor::group_leave_all_ranks() {
 	for (int i = 0; i < size(); i++)
-		at(i).group_leave_all_ranks();
-	group_leave();
+		at(i).link(a_other.at(i));
+
 }
 
-void tensor::group_disband_all_ranks() {
-	for (int i = 0; i < size(); i++)
-		at(i).group_disband_all_ranks();
-	group_disband();
+void tensor::unlink()
+{
+	m_val_ptr.group_unlink();
+	m_vec_ptr.group_unlink();
 }
 
 tensor tensor::clone() const {

@@ -52,10 +52,10 @@ void sync::compile() {
 	m_y_grad.resize(m_prepared.size());
 	for (int i = 0; i < m_prepared.size(); i++) {
 		m_prepared[i]->compile();
-		m_x[i].group_join_all_ranks(m_prepared[i]->m_x);
-		m_y[i].group_join_all_ranks(m_prepared[i]->m_y);
-		m_x_grad[i].group_join_all_ranks(m_prepared[i]->m_x_grad);
-		m_y_grad[i].group_join_all_ranks(m_prepared[i]->m_y_grad);
+		m_x[i].link(m_prepared[i]->m_x);
+		m_y[i].link(m_prepared[i]->m_y);
+		m_x_grad[i].link(m_prepared[i]->m_x_grad);
+		m_y_grad[i].link(m_prepared[i]->m_y_grad);
 	}
 }
 

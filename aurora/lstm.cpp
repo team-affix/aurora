@@ -69,23 +69,23 @@ void lstm::compile() {
 	tensor* ht_grad = &m_htx_grad;
 	for (int i = 0; i < m_prepared.size(); i++) {
 		m_prepared[i]->compile();
-		m_prepared[i]->m_x.group_add(m_x[i]);
-		m_prepared[i]->m_y.group_add(m_y[i]);
-		m_prepared[i]->m_x_grad.group_add(m_x_grad[i]);
-		m_prepared[i]->m_y_grad.group_add(m_y_grad[i]);
-		ct->group_add(m_prepared[i]->m_ctx);
-		ht->group_add(m_prepared[i]->m_htx);
-		ct_grad->group_add(m_prepared[i]->m_ctx_grad);
-		ht_grad->group_add(m_prepared[i]->m_htx_grad);
+		m_x[i].link(m_prepared[i]->m_x);
+		m_y[i].link(m_prepared[i]->m_y);
+		m_x_grad[i].link(m_prepared[i]->m_x_grad);
+		m_y_grad[i].link(m_prepared[i]->m_y_grad);
+		m_prepared[i]->m_ctx.link(*ct);
+		m_prepared[i]->m_htx.link(*ht);
+		m_prepared[i]->m_ctx_grad.link(*ct_grad);
+		m_prepared[i]->m_htx_grad.link(*ht_grad);
 		ct = &m_prepared[i]->m_cty;
 		ht = &m_prepared[i]->m_hty;
 		ct_grad = &m_prepared[i]->m_cty_grad;
 		ht_grad = &m_prepared[i]->m_hty_grad;
 	}
-	ct->group_add(m_cty);
-	ht->group_add(m_hty);
-	ct_grad->group_add(m_cty_grad);
-	ht_grad->group_add(m_hty_grad);
+	m_cty.link(*ct);
+	m_hty.link(*ht);
+	m_cty_grad.link(*ct_grad);
+	m_hty_grad.link(*ht_grad);
 }
 
 void lstm::prep(size_t a_n) {

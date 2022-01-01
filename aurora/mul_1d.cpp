@@ -66,13 +66,13 @@ void mul_1d::compile()
 
 	for (int i = 0; i < m_units; i++)
 	{
-		m_x[0][i].group_join_all_ranks(m_layer->m_x[i][0]);
-		m_x_grad[0][i].group_join_all_ranks(m_layer->m_x_grad[i][0]);
-		m_x[1][i].group_join_all_ranks(m_layer->m_x[i][1]);
-		m_x_grad[1][i].group_join_all_ranks(m_layer->m_x_grad[i][1]);
+		m_x[0][i].link(m_layer->m_x[i][0]);
+		m_x_grad[0][i].link(m_layer->m_x_grad[i][0]);
+		m_x[1][i].link(m_layer->m_x[i][1]);
+		m_x_grad[1][i].link(m_layer->m_x_grad[i][1]);
 	}
 
-	m_y.group_join_all_ranks(m_layer->m_y);
-	m_y_grad.group_join_all_ranks(m_layer->m_y_grad);
+	m_y.link(m_layer->m_y);
+	m_y_grad.link(m_layer->m_y_grad);
 
 }

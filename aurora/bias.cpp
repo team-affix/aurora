@@ -41,5 +41,7 @@ void bias::model_recur(const function<void(model*)>& a_func) {
 }
 
 void bias::compile() {
-	m_x_grad.group_add(m_y_grad);
+
+	m_y_grad.link(m_x_grad);
+
 }

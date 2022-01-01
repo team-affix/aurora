@@ -61,15 +61,18 @@ void layer::model_recur(const function<void(model*)>& a_func) {
 }
 
 void layer::compile() {
-	m_x.resize(m_models.size());
-	m_y.resize(m_models.size());
-	m_x_grad.resize(m_models.size());
-	m_y_grad.resize(m_models.size());
+
+	m_x = tensor::new_1d(m_models.size());
+	m_x_grad = tensor::new_1d(m_models.size());
+	m_y = tensor::new_1d(m_models.size());
+	m_y_grad = tensor::new_1d(m_models.size());
+
 	for (size_t i = 0; i < m_models.size(); i++) {
 		m_models[i]->compile();
-		m_models[i]->m_x.group_add(m_x[i]);
-		m_models[i]->m_x_grad.group_add(m_x_grad[i]);
-		m_models[i]->m_y.group_add(m_y[i]);
-		m_models[i]->m_y_grad.group_add(m_y_grad[i]);
+		m_x[i].link(m_models[i]->m_x);
+		m_x_grad[i].link(m_models[i]->m_x_grad);
+		m_y[i].link(m_models[i]->m_y);
+		m_y_grad[i].link(m_models[i]->m_y_grad);
 	}
+
 }

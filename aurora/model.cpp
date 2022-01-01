@@ -59,6 +59,6 @@ model* model::clone(const function<Param(Param&)>& a_func) {
 }
 
 void model::compile() {
-	m_y.group_add(m_x);
-	m_y_grad.group_add(m_x_grad);
+	m_x.link(m_y);
+	m_x_grad.link(m_y_grad);
 }

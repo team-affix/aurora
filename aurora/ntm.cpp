@@ -97,8 +97,8 @@ void ntm::compile() {
 	m_write_wy_grad = tensor::new_2d(m_ntm_ts_template->m_internal_writers.size(), m_memory_height);
 
 	m_internal_lstm->compile();
-	m_x.group_join_all_ranks(m_internal_lstm->m_x);
-	m_x_grad.group_join_all_ranks(m_internal_lstm->m_x_grad);
+	m_x.link(m_internal_lstm->m_x);
+	m_x_grad.link(m_internal_lstm->m_x_grad);
 
 	tensor* l_mx = &m_mx;
 	tensor* l_mx_grad = &m_mx_grad;
@@ -111,22 +111,22 @@ void ntm::compile() {
 	for (int i = 0; i < m_prepared.size(); i++) {
 		
 		m_prepared[i]->compile();
-		m_internal_lstm->m_y[i].group_join(m_prepared[i]->m_x);
-		m_internal_lstm->m_y_grad[i].group_join(m_prepared[i]->m_x_grad);
-		m_prepared[i]->m_y.group_join(m_y[i]);
-		m_prepared[i]->m_y_grad.group_join(m_y_grad[i]);
-		m_prepared[i]->m_hty_grad.group_join(m_internal_lstm->m_prepared[i]->m_hty_grad);
+		m_internal_lstm->m_y[i].link(m_prepared[i]->m_x);
+		m_internal_lstm->m_y_grad[i].link(m_prepared[i]->m_x_grad);
+		m_prepared[i]->m_y.link(m_y[i]);
+		m_prepared[i]->m_y_grad.link(m_y_grad[i]);
+		m_prepared[i]->m_hty_grad.link(m_internal_lstm->m_prepared[i]->m_hty_grad);
 		
-		m_prepared[i]->m_mx.group_join(*l_mx);
-		l_mx_grad->group_join(m_prepared[i]->m_mx_grad);
+		m_prepared[i]->m_mx.link(*l_mx);
+		l_mx_grad->link(m_prepared[i]->m_mx_grad);
 
 		l_mx = &m_prepared[i]->m_my;
 		l_mx_grad = &m_prepared[i]->m_my_grad;
 
-		l_read_wx->group_join_all_ranks(m_prepared[i]->m_read_wx);
-		l_read_wx_grad->group_join_all_ranks(m_prepared[i]->m_read_wx_grad);
-		l_write_wx->group_join_all_ranks(m_prepared[i]->m_write_wx);
-		l_write_wx_grad->group_join_all_ranks(m_prepared[i]->m_write_wx_grad);
+		l_read_wx->link(m_prepared[i]->m_read_wx);
+		l_read_wx_grad->link(m_prepared[i]->m_read_wx_grad);
+		l_write_wx->link(m_prepared[i]->m_write_wx);
+		l_write_wx_grad->link(m_prepared[i]->m_write_wx_grad);
 
 		l_read_wx = &m_prepared[i]->m_read_wy;
 		l_read_wx_grad = &m_prepared[i]->m_read_wy_grad;
@@ -135,13 +135,13 @@ void ntm::compile() {
 
 	}
 
-	l_mx->group_join(m_my);
-	l_mx_grad->group_join(m_my_grad);
+	l_mx->link(m_my);
+	l_mx_grad->link(m_my_grad);
 
-	l_read_wx->group_join_all_ranks(m_read_wy);
-	l_read_wx_grad->group_join_all_ranks(m_read_wy_grad);
-	l_write_wx->group_join_all_ranks(m_write_wy);
-	l_write_wx_grad->group_join_all_ranks(m_write_wy_grad);
+	l_read_wx->link(m_read_wy);
+	l_read_wx_grad->link(m_read_wy_grad);
+	l_write_wx->link(m_write_wy);
+	l_write_wx_grad->link(m_write_wy_grad);
 
 }
 

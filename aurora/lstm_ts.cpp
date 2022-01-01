@@ -118,11 +118,11 @@ void lstm_ts::compile() {
 	m_input_gate->compile();
 	m_output_gate->compile();
 	m_tanh_gate->compile();
-	m_gate_x.group_add(m_forget_gate->m_x);
-	m_gate_x.group_add(m_limit_gate->m_x);
-	m_gate_x.group_add(m_input_gate->m_x);
-	m_gate_x.group_add(m_output_gate->m_x);
-	m_cty.group_add(m_tanh_gate->m_x);
-	m_hty.group_add(m_y);
-	m_htx_grad.group_add(m_x_grad);
+	m_forget_gate->m_x.link(m_gate_x);
+	m_limit_gate->m_x.link(m_gate_x);
+	m_input_gate->m_x.link(m_gate_x);
+	m_output_gate->m_x.link(m_gate_x);
+	m_tanh_gate->m_x.link(m_cty);
+	m_y.link(m_hty);
+	m_x_grad.link(m_htx_grad);
 }

@@ -59,4 +59,3 @@ void normalize::compile() {
 	m_y_grad = tensor::new_1d(m_units);
 	m_x_abs = tensor::new_1d(m_units);
 }
-

@@ -64,15 +64,15 @@ void att_lstm::compile() {
 	this->m_y_grad = tensor::new_2d(l_a, m_units);
 	m_models->compile();
 	m_internal_lstm->compile();
-	this->m_y.group_join(m_internal_lstm->m_y);
-	this->m_y_grad.group_join(m_internal_lstm->m_y_grad);
+	this->m_y.link(m_internal_lstm->m_y);
+	this->m_y_grad.link(m_internal_lstm->m_y_grad);
 	for (int i = 0; i < l_a; i++) {
 		att_lstm_ts* ats = (att_lstm_ts*)m_models->m_prepared[i].get();
 		lstm_ts* lts = m_internal_lstm->m_prepared[i].get();
-		this->m_x.group_join(ats->m_x);
-		ats->m_htx.group_join(lts->m_htx);
-		lts->m_x.group_join(ats->m_y);
-		lts->m_x_grad.group_join(ats->m_y_grad);
+		this->m_x.link(ats->m_x);
+		ats->m_htx.link(lts->m_htx);
+		lts->m_x.link(ats->m_y);
+		lts->m_x_grad.link(ats->m_y_grad);
 	}
 }
 

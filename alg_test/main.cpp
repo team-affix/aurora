@@ -118,7 +118,7 @@ void tensor_test() {
 		tensor mat_4;
 		{
 			tensor mat_5 = mat_3.range_2d(0, 0, 2, 2);
-			mat_4.group_join(mat_5);
+			mat_4.link(mat_5);
 		}
 		mat_4.pop(tensor::new_2d(2, 2, 1));
 		assert(mat_3[0][0] == 1);
@@ -131,7 +131,7 @@ void tensor_test() {
 		tensor t1 = { 1, 2, 3, 4 };
 		tensor t2 = t1.range(0, 2);
 		tensor t3 = { 5, 6 };
-		t2[0].group_join_all_ranks(t3[0]);
+		t2[0].link(t3[0]);
 		assert(t1[0] == 5);
 	}
 
@@ -141,14 +141,16 @@ void tensor_test() {
 
 	}
 
-	tensor vec_3;
-	tensor vec_4 = tensor::new_1d(2);
 	{
-		tensor t1 = tensor::new_1d(1);
-		tensor t2 = tensor::new_1d(1);
-		vec_3 = t1.cat(t2);
+		tensor t1 = tensor::new_1d(1, 1);
+		tensor t2 = tensor::new_1d(1, 2);
+
+		tensor t3 = t1.cat(t2);
+
+		t3[0].val() = 3;
+		assert(t1[0].val() == 3);
+
 	}
-	vec_3.group_join_all_ranks(vec_4);
 
 }
 
@@ -197,6 +199,7 @@ void tnn_xor_test() {
 
 		for (int tsIndex = 0; tsIndex < x.size(); tsIndex++) {
 			m->cycle(x[tsIndex], y[tsIndex]);
+
 			if (epoch % checkpoint_interval == 0)
 				std::cout << x[tsIndex].to_string() << " " << s->m_y.to_string() << std::endl;
 		}
@@ -1630,8 +1633,8 @@ void interpolate_test() {
 
 	m->compile();
 
-	l_softmax->m_y.group_join(l_interpolate->m_amount);
-	l_softmax->m_y_grad.group_join(l_interpolate->m_amount_grad);
+	l_softmax->m_y.link(l_interpolate->m_amount);
+	l_softmax->m_y_grad.link(l_interpolate->m_amount_grad);
 
 	uniform_real_distribution<double> urd(-10, 10);
 
@@ -1681,8 +1684,8 @@ void shift_test() {
 
 	m->compile();
 
-	l_softmax->m_y.group_join(l_shift->m_amount);
-	l_softmax->m_y_grad.group_join(l_shift->m_amount_grad);
+	l_softmax->m_y.link(l_shift->m_amount);
+	l_softmax->m_y_grad.link(l_shift->m_amount_grad);
 
 	uniform_real_distribution<double> urd(0, 1);
 
@@ -1765,11 +1768,11 @@ void ntm_location_addresser_test() {
 
 	m->compile();
 
-	l_g_sm->m_y.group_join(p->m_g);
-	l_g_sm->m_y_grad.group_join(p->m_g_grad);
+	l_g_sm->m_y.link(p->m_g);
+	l_g_sm->m_y_grad.link(p->m_g_grad);
 
-	l_s_sm->m_y.group_join(p->m_s);
-	l_s_sm->m_y_grad.group_join(p->m_s_grad);
+	l_s_sm->m_y.link(p->m_s);
+	l_s_sm->m_y_grad.link(p->m_s_grad);
 
 	uniform_real_distribution<double> urd(0, 1);
 
@@ -1847,10 +1850,10 @@ void ntm_addresser_test() {
 	l_g_sm->m_x.pop(tensor::new_1d(1, sm_urd, aurora::static_vals::random_engine));
 	l_s_sm->m_x.pop(tensor::new_1d(valid_shifts.size(), sm_urd, aurora::static_vals::random_engine));
 
-	l_g_sm->m_y.group_join(p->m_g);
-	l_g_sm->m_y_grad.group_join(p->m_g_grad);
-	l_s_sm->m_y.group_join(p->m_s);
-	l_s_sm->m_y_grad.group_join(p->m_s_grad);
+	l_g_sm->m_y.link(p->m_g);
+	l_g_sm->m_y_grad.link(p->m_g_grad);
+	l_s_sm->m_y.link(p->m_s);
+	l_s_sm->m_y_grad.link(p->m_s_grad);
 
 	const size_t selected_index = 1;
 	tensor y = tensor::new_1d(memory_height);
@@ -2782,14 +2785,14 @@ void spc_raw_test() {
 	Sequential s = new sequential({ new layer(SP_SIZE, new sigmoid()), new normalize(SP_SIZE) });
 	s->compile();
 
-	x.group_join(s->m_x);
-	x_error.group_join(s->m_x_grad);
+	x.link(s->m_x);
+	x_error.link(s->m_x_grad);
 
 	tensor p = tensor::new_1d(x.size());
-	p.group_join(s->m_y);
+	p.link(s->m_y);
 
 	tensor p_error = tensor::new_1d(x.size());
-	p_error.group_join(s->m_y_grad);
+	p_error.link(s->m_y_grad);
 
 	// starting x values (not probabilities, but will be converted to (+) values through sigmoid, and then normalized to make probabilities.)
 	uniform_real_distribution<double> x_urd(-3, 3);
@@ -2848,14 +2851,14 @@ void binary_choice_test() {
 	Sigmoid s = new sigmoid();
 	s->compile();
 
-	x.group_join(s->m_x);
-	x_error.group_join(s->m_x_grad);
+	x.link(s->m_x);
+	x_error.link(s->m_x_grad);
 
 	tensor p = 0;
-	p.group_join(s->m_y);
+	p.link(s->m_y);
 
 	tensor p_error = 0;
-	p_error.group_join(s->m_y_grad);
+	p_error.link(s->m_y_grad);
 
 	x.pop(0.5);
 
@@ -3004,11 +3007,17 @@ void example_tnn_setup()
 
 }
 
+void test_large_model_linkage()
+{
+	Sequential s = pseudo::tnn({ 100, 1000, 100 }, pseudo::nlr(0.3));
+	s->compile();
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	major_tests();
+	test_large_model_linkage();
 
 	return 0;
 

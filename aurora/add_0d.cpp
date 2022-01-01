@@ -54,7 +54,7 @@ void add_0d::compile()
 	m_x = tensor::new_1d(2);
 	m_x_grad = tensor::new_1d(2);
 	
-	m_x_grad[0].group_join_all_ranks(m_y_grad);
-	m_x_grad[1].group_join_all_ranks(m_y_grad);
+	m_x_grad[0].link(m_y_grad);
+	m_x_grad[1].link(m_y_grad);
 
 }

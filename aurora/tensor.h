@@ -9,21 +9,12 @@ namespace aurora {
 		public:
 			affix_base::data::ptr<double> m_val_ptr = new double(0);
 			affix_base::data::ptr<std::vector<tensor>> m_vec_ptr = new std::vector<tensor>();
-			
-		public:
-			tensor* m_group_prev_ptr = nullptr;
-			tensor* m_group_next_ptr = nullptr;
 
 		public:
 			double& val();
 			double val() const;
 			std::vector<tensor>& vec();
 			const std::vector<tensor>& vec() const;
-
-		public:
-			tensor& group_head();
-			tensor& group_tail();
-			size_t group_size();
 
 		public:
 			virtual ~tensor();
@@ -279,6 +270,7 @@ namespace aurora {
 			);
 
 		public:
+		public:
 			void link(
 				tensor& a_other
 			);
@@ -292,44 +284,6 @@ namespace aurora {
 				const std::function<void(tensor*)>& a_func
 			);
 			size_t lowest_rank_count();
-
-		public:
-			void group_recur_fwd(
-				const std::function<void(tensor*)>& a_func
-			);
-			void group_recur_bwd(
-				const std::function<void(tensor*)>& a_func
-			);
-			void group_recur(
-				const std::function<void(tensor*)>& a_func
-			);
-
-		public:
-			bool group_contains(
-				const tensor* a_ptr
-			);
-			void group_add(
-				tensor& a_other
-			);
-			void group_remove(
-				tensor& a_other
-			);
-			void group_join(
-				tensor& a_other
-			);
-			void group_leave();
-			void group_disband();
-			void group_add_all_ranks(
-				tensor& a_other
-			);
-			void group_remove_all_ranks(
-				tensor& a_other
-			);
-			void group_join_all_ranks(
-				tensor& a_other
-			);
-			void group_leave_all_ranks();
-			void group_disband_all_ranks();
 
 		public:
 			tensor clone() const;
@@ -353,10 +307,10 @@ namespace aurora {
 			operator const double& () const;
 			tensor& operator[](
 				size_t a_a
-				);
+			);
 			const tensor& operator[](
 				size_t a_a
-				) const;
+			) const;
 
 		};
 	}

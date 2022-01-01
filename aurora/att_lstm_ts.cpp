@@ -91,9 +91,9 @@ void att_lstm_ts::compile() {
 		tensor htx_range = m_models->m_prepared[i]->m_x.range(0, m_units);
 		tensor x_range = m_models->m_prepared[i]->m_x.range(m_units, m_units);
 		tensor x_grad_range = m_models->m_prepared[i]->m_x_grad.range(m_units, m_units);
-		m_htx.group_add_all_ranks(htx_range);
-		m_x[i].group_join_all_ranks(x_range);
-		m_x_grad[i].group_join_all_ranks(x_grad_range);
+		htx_range.link(m_htx);
+		x_range.link(m_x[i]);
+		x_grad_range.link(m_x_grad[i]);
 	}
 }
 

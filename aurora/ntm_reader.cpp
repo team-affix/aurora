@@ -81,23 +81,23 @@ void ntm_reader::compile() {
 	m_internal_head->compile();
 	m_internal_addresser->compile();
 
-	m_internal_head->m_key.group_join(m_internal_addresser->m_key);
-	m_internal_head->m_key_grad.group_join(m_internal_addresser->m_key_grad);
-	m_internal_head->m_beta.group_join(m_internal_addresser->m_beta);
-	m_internal_head->m_beta_grad.group_join(m_internal_addresser->m_beta_grad);
-	m_internal_head->m_g.group_join(m_internal_addresser->m_g);
-	m_internal_head->m_g_grad.group_join(m_internal_addresser->m_g_grad);
-	m_internal_head->m_s.group_join(m_internal_addresser->m_s);
-	m_internal_head->m_s_grad.group_join(m_internal_addresser->m_s_grad);
-	m_internal_head->m_gamma.group_join(m_internal_addresser->m_gamma);
-	m_internal_head->m_gamma_grad.group_join(m_internal_addresser->m_gamma_grad);
+	m_internal_head->m_key.link(m_internal_addresser->m_key);
+	m_internal_head->m_key_grad.link(m_internal_addresser->m_key_grad);
+	m_internal_head->m_beta.link(m_internal_addresser->m_beta);
+	m_internal_head->m_beta_grad.link(m_internal_addresser->m_beta_grad);
+	m_internal_head->m_g.link(m_internal_addresser->m_g);
+	m_internal_head->m_g_grad.link(m_internal_addresser->m_g_grad);
+	m_internal_head->m_s.link(m_internal_addresser->m_s);
+	m_internal_head->m_s_grad.link(m_internal_addresser->m_s_grad);
+	m_internal_head->m_gamma.link(m_internal_addresser->m_gamma);
+	m_internal_head->m_gamma_grad.link(m_internal_addresser->m_gamma_grad);
 
-	m_x.group_join_all_ranks(m_internal_head->m_x);
-	m_x_grad.group_join_all_ranks(m_internal_head->m_x_grad);
-	m_mx.group_join_all_ranks(m_internal_addresser->m_x);
-	m_wx.group_join_all_ranks(m_internal_addresser->m_wx);
-	m_wx_grad.group_join_all_ranks(m_internal_addresser->m_wx_grad);
-	m_internal_addresser->m_wy.group_join_all_ranks(m_wy);
-	m_internal_addresser->m_wy_grad.group_join_all_ranks(m_wy_grad);
+	m_x.link(m_internal_head->m_x);
+	m_x_grad.link(m_internal_head->m_x_grad);
+	m_mx.link(m_internal_addresser->m_x);
+	m_wx.link(m_internal_addresser->m_wx);
+	m_wx_grad.link(m_internal_addresser->m_wx_grad);
+	m_internal_addresser->m_wy.link(m_wy);
+	m_internal_addresser->m_wy_grad.link(m_wy_grad);
 
 }
