@@ -13,6 +13,8 @@
 #include <fstream>
 #include <random>
 #include <csignal>
+#include "affix-base/timing.h"
+
 #define L(call) [&]{call;}
 
 using namespace aurora;
@@ -3010,8 +3012,15 @@ void example_tnn_setup()
 
 void test_large_model_linkage()
 {
+
 	Sequential s = pseudo::tnn({ 100, 1000, 100 }, pseudo::nlr(0.3));
+
+	affix_base::timing::stopwatch l_stopwatch;
+	l_stopwatch.start();
+
 	s->compile();
+	std::cout << l_stopwatch.duration_milliseconds();
+
 }
 
 int main() {
