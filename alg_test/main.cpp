@@ -3012,14 +3012,31 @@ void example_tnn_setup()
 
 void test_large_model_linkage()
 {
-
-	Sequential s = pseudo::tnn({ 100, 1000, 100 }, pseudo::nlr(0.3));
-
 	affix_base::timing::stopwatch l_stopwatch;
-	l_stopwatch.start();
 
-	s->compile();
-	std::cout << l_stopwatch.duration_milliseconds();
+	{
+		param_vector pv;
+
+		l_stopwatch.start();
+		Sequential s = pseudo::tnn({ 1000, 1000, 1000 }, pseudo::nlr(0.3));
+		std::cout << "MODEL INSTANTIATION:                   " << l_stopwatch.duration_milliseconds() << " ms" << std::endl;
+
+		l_stopwatch.start();
+		s->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), pv));
+		std::cout << "PARAM INSTANTIATION:                   " << l_stopwatch.duration_milliseconds() << " ms" << std::endl;
+
+		l_stopwatch.start();
+		s->compile();
+		std::cout << "MODEL COMPILATION:                     " << l_stopwatch.duration_milliseconds() << " ms" << std::endl;
+
+		l_stopwatch.start();
+		pv.rand_norm();
+		std::cout << "PARAM RANDOMIZATION AND NORMALIZATION: " << l_stopwatch.duration_milliseconds() << " ms" << std::endl;
+
+		l_stopwatch.start();
+	}
+
+	std::cout << "DISPOSING OF RESOURCES:                " << l_stopwatch.duration_milliseconds() << " ms" << std::endl;
 
 }
 
@@ -3027,7 +3044,7 @@ int main() {
 
 	srand(time(NULL));
 
-	major_tests();
+	test_large_model_linkage();
 
 	return 0;
 
