@@ -61,11 +61,11 @@ void sequential::compile() {
 	tensor* gradient = &m_x_grad;
 	for (int i = 0; i < m_models.size(); i++) {
 		m_models[i]->compile();
-		state->link(m_models[i]->m_x);
-		gradient->link(m_models[i]->m_x_grad);
+		state->group_link(m_models[i]->m_x);
+		gradient->group_link(m_models[i]->m_x_grad);
 		state = &m_models[i]->m_y;
 		gradient = &m_models[i]->m_y_grad;
 	}
-	m_y.link(*state);
-	m_y_grad.link(*gradient);
+	m_y.group_link(*state);
+	m_y_grad.group_link(*gradient);
 }

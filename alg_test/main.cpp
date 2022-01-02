@@ -97,7 +97,7 @@ int num_lines(std::string file_name) {
 void tensor_test() {
 
 	tensor vec_1 = { 0, 1, 2 };
-	tensor vec_2 = vec_1.link();
+	tensor vec_2 = vec_1.group_link();
 	vec_2[0].val() = 10;
 	assert(vec_1[0].val() == 10);
 
@@ -121,7 +121,7 @@ void tensor_test() {
 		tensor mat_4;
 		{
 			tensor mat_5 = mat_3.range_2d(0, 0, 2, 2);
-			mat_4.link(mat_5);
+			mat_4.group_link(mat_5);
 		}
 		mat_4.pop(tensor::new_2d(2, 2, 1));
 		assert(mat_3[0][0] == 1);
@@ -134,7 +134,7 @@ void tensor_test() {
 		tensor t1 = { 1, 2, 3, 4 };
 		tensor t2 = t1.range(0, 2);
 		tensor t3 = { 5, 6 };
-		t2[0].link(t3[0]);
+		t2[0].group_link(t3[0]);
 		assert(t1[0] == 5);
 	}
 
@@ -152,6 +152,25 @@ void tensor_test() {
 
 		t3[0].val() = 3;
 		assert(t1[0].val() == 3);
+
+	}
+
+	{
+		tensor t1 = { 1, 2, 3 };
+		tensor t2 = { 4, 5, 6 };
+		tensor t3;
+		
+		t3.link(t1);
+		assert(t3[0] == 1);
+
+		t3.link(t2);
+		assert(t3[0] == 4);
+		assert(t1[0] == 1);
+
+		t3.link(t1);
+		t3.group_link(t2);
+
+		assert(t1[0] == 4);
 
 	}
 
@@ -1124,11 +1143,11 @@ void self_aware() {
 	for (int i = 0; i < pmt_link.size(); i++)
 		pmt_link[i].m_val_ptr.link(pv[i]->m_state_ptr);
 
-	tensor order_0_x = m->m_x[0].link();
-	tensor order_0_y_hat = m->m_y[0].link();
-	tensor order_1_x = m->m_x[1].link();
-	tensor order_1_param_index = m->m_y[0].link();
-	tensor order_1_param_state = m->m_y[1].link();
+	tensor order_0_x = m->m_x[0].group_link();
+	tensor order_0_y_hat = m->m_y[0].group_link();
+	tensor order_1_x = m->m_x[1].group_link();
+	tensor order_1_param_index = m->m_y[0].group_link();
+	tensor order_1_param_state = m->m_y[1].group_link();
 
 	uniform_real_distribution<double> pmt_x_0(-10, 10);
 
@@ -1636,8 +1655,8 @@ void interpolate_test() {
 
 	m->compile();
 
-	l_softmax->m_y.link(l_interpolate->m_amount);
-	l_softmax->m_y_grad.link(l_interpolate->m_amount_grad);
+	l_softmax->m_y.group_link(l_interpolate->m_amount);
+	l_softmax->m_y_grad.group_link(l_interpolate->m_amount_grad);
 
 	uniform_real_distribution<double> urd(-10, 10);
 
@@ -1687,8 +1706,8 @@ void shift_test() {
 
 	m->compile();
 
-	l_softmax->m_y.link(l_shift->m_amount);
-	l_softmax->m_y_grad.link(l_shift->m_amount_grad);
+	l_softmax->m_y.group_link(l_shift->m_amount);
+	l_softmax->m_y_grad.group_link(l_shift->m_amount_grad);
 
 	uniform_real_distribution<double> urd(0, 1);
 
@@ -1771,11 +1790,11 @@ void ntm_location_addresser_test() {
 
 	m->compile();
 
-	l_g_sm->m_y.link(p->m_g);
-	l_g_sm->m_y_grad.link(p->m_g_grad);
+	l_g_sm->m_y.group_link(p->m_g);
+	l_g_sm->m_y_grad.group_link(p->m_g_grad);
 
-	l_s_sm->m_y.link(p->m_s);
-	l_s_sm->m_y_grad.link(p->m_s_grad);
+	l_s_sm->m_y.group_link(p->m_s);
+	l_s_sm->m_y_grad.group_link(p->m_s_grad);
 
 	uniform_real_distribution<double> urd(0, 1);
 
@@ -1853,10 +1872,10 @@ void ntm_addresser_test() {
 	l_g_sm->m_x.pop(tensor::new_1d(1, sm_urd, aurora::static_vals::random_engine));
 	l_s_sm->m_x.pop(tensor::new_1d(valid_shifts.size(), sm_urd, aurora::static_vals::random_engine));
 
-	l_g_sm->m_y.link(p->m_g);
-	l_g_sm->m_y_grad.link(p->m_g_grad);
-	l_s_sm->m_y.link(p->m_s);
-	l_s_sm->m_y_grad.link(p->m_s_grad);
+	l_g_sm->m_y.group_link(p->m_g);
+	l_g_sm->m_y_grad.group_link(p->m_g_grad);
+	l_s_sm->m_y.group_link(p->m_s);
+	l_s_sm->m_y_grad.group_link(p->m_s_grad);
 
 	const size_t selected_index = 1;
 	tensor y = tensor::new_1d(memory_height);
@@ -2788,14 +2807,14 @@ void spc_raw_test() {
 	Sequential s = new sequential({ new layer(SP_SIZE, new sigmoid()), new normalize(SP_SIZE) });
 	s->compile();
 
-	x.link(s->m_x);
-	x_error.link(s->m_x_grad);
+	x.group_link(s->m_x);
+	x_error.group_link(s->m_x_grad);
 
 	tensor p = tensor::new_1d(x.size());
-	p.link(s->m_y);
+	p.group_link(s->m_y);
 
 	tensor p_error = tensor::new_1d(x.size());
-	p_error.link(s->m_y_grad);
+	p_error.group_link(s->m_y_grad);
 
 	// starting x values (not probabilities, but will be converted to (+) values through sigmoid, and then normalized to make probabilities.)
 	uniform_real_distribution<double> x_urd(-3, 3);
@@ -2854,14 +2873,14 @@ void binary_choice_test() {
 	Sigmoid s = new sigmoid();
 	s->compile();
 
-	x.link(s->m_x);
-	x_error.link(s->m_x_grad);
+	x.group_link(s->m_x);
+	x_error.group_link(s->m_x_grad);
 
 	tensor p = 0;
-	p.link(s->m_y);
+	p.group_link(s->m_y);
 
 	tensor p_error = 0;
-	p_error.link(s->m_y_grad);
+	p_error.group_link(s->m_y_grad);
 
 	x.pop(0.5);
 
@@ -3044,7 +3063,7 @@ int main() {
 
 	srand(time(NULL));
 
-	test_large_model_linkage();
+	major_tests();
 
 	return 0;
 

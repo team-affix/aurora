@@ -69,10 +69,10 @@ void layer::compile() {
 
 	for (size_t i = 0; i < m_models.size(); i++) {
 		m_models[i]->compile();
-		m_x[i].link(m_models[i]->m_x);
-		m_x_grad[i].link(m_models[i]->m_x_grad);
-		m_y[i].link(m_models[i]->m_y);
-		m_y_grad[i].link(m_models[i]->m_y_grad);
+		m_x[i].group_link(m_models[i]->m_x);
+		m_x_grad[i].group_link(m_models[i]->m_x_grad);
+		m_y[i].group_link(m_models[i]->m_y);
+		m_y_grad[i].group_link(m_models[i]->m_y_grad);
 	}
 
 }

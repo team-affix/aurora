@@ -79,26 +79,26 @@ void ntm_addresser::compile() {
 	m_internal_content_addresser->compile();
 	m_internal_location_addresser->compile();
 
-	m_key.link(m_internal_content_addresser->m_key);
-	m_key_grad.link(m_internal_content_addresser->m_key_grad);
-	m_beta.link(m_internal_content_addresser->m_beta);
-	m_beta_grad.link(m_internal_content_addresser->m_beta_grad);
-	m_wx.link(m_internal_location_addresser->m_wx);
-	m_wx_grad.link(m_internal_location_addresser->m_wx_grad);
-	m_wy.link(m_internal_location_addresser->m_wy);
-	m_wy_grad.link(m_internal_location_addresser->m_wy_grad);
-	m_g.link(m_internal_location_addresser->m_g);
-	m_g_grad.link(m_internal_location_addresser->m_g_grad);
-	m_s.link(m_internal_location_addresser->m_s);
-	m_s_grad.link(m_internal_location_addresser->m_s_grad);
-	m_gamma.link(m_internal_location_addresser->m_gamma);
-	m_gamma_grad.link(m_internal_location_addresser->m_gamma_grad);
+	m_key.group_link(m_internal_content_addresser->m_key);
+	m_key_grad.group_link(m_internal_content_addresser->m_key_grad);
+	m_beta.group_link(m_internal_content_addresser->m_beta);
+	m_beta_grad.group_link(m_internal_content_addresser->m_beta_grad);
+	m_wx.group_link(m_internal_location_addresser->m_wx);
+	m_wx_grad.group_link(m_internal_location_addresser->m_wx_grad);
+	m_wy.group_link(m_internal_location_addresser->m_wy);
+	m_wy_grad.group_link(m_internal_location_addresser->m_wy_grad);
+	m_g.group_link(m_internal_location_addresser->m_g);
+	m_g_grad.group_link(m_internal_location_addresser->m_g_grad);
+	m_s.group_link(m_internal_location_addresser->m_s);
+	m_s_grad.group_link(m_internal_location_addresser->m_s_grad);
+	m_gamma.group_link(m_internal_location_addresser->m_gamma);
+	m_gamma_grad.group_link(m_internal_location_addresser->m_gamma_grad);
 
-	m_x.link(m_internal_content_addresser->m_x);
-	m_x_grad.link(m_internal_content_addresser->m_x_grad);
-	m_internal_content_addresser->m_y.link(m_internal_location_addresser->m_x);
-	m_internal_content_addresser->m_y_grad.link(m_internal_location_addresser->m_x_grad);
-	m_internal_location_addresser->m_y.link(m_y);
-	m_internal_location_addresser->m_y_grad.link(m_y_grad);
+	m_x.group_link(m_internal_content_addresser->m_x);
+	m_x_grad.group_link(m_internal_content_addresser->m_x_grad);
+	m_internal_content_addresser->m_y.group_link(m_internal_location_addresser->m_x);
+	m_internal_content_addresser->m_y_grad.group_link(m_internal_location_addresser->m_x_grad);
+	m_internal_location_addresser->m_y.group_link(m_y);
+	m_internal_location_addresser->m_y_grad.group_link(m_y_grad);
 
 }

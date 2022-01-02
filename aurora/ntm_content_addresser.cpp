@@ -80,21 +80,21 @@ void ntm_content_addresser::compile() {
 	m_internal_normalize->compile();
 
 	for (int i = 0; i < m_memory_height; i++) {
-		m_key.link(m_internal_similarity->m_x[i][0]);
-		m_x[i].link(m_internal_similarity->m_x[i][1]);
-		m_x_grad[i].link(m_internal_similarity->m_x_grad[i][1]);
+		m_key.group_link(m_internal_similarity->m_x[i][0]);
+		m_x[i].group_link(m_internal_similarity->m_x[i][1]);
+		m_x_grad[i].group_link(m_internal_similarity->m_x_grad[i][1]);
 	}
 
-	m_internal_similarity->m_y.link(m_internal_sparsify->m_x);
-	m_internal_similarity->m_y_grad.link(m_internal_sparsify->m_x_grad);
+	m_internal_similarity->m_y.group_link(m_internal_sparsify->m_x);
+	m_internal_similarity->m_y_grad.group_link(m_internal_sparsify->m_x_grad);
 
-	m_internal_sparsify->m_y.link(m_internal_normalize->m_x);
-	m_internal_sparsify->m_y_grad.link(m_internal_normalize->m_x_grad);
+	m_internal_sparsify->m_y.group_link(m_internal_normalize->m_x);
+	m_internal_sparsify->m_y_grad.group_link(m_internal_normalize->m_x_grad);
 
-	m_internal_normalize->m_y.link(m_y);
-	m_internal_normalize->m_y_grad.link(m_y_grad);
+	m_internal_normalize->m_y.group_link(m_y);
+	m_internal_normalize->m_y_grad.group_link(m_y_grad);
 
-	m_beta.link(m_internal_sparsify->m_beta);
-	m_beta_grad.link(m_internal_sparsify->m_beta_grad);
+	m_beta.group_link(m_internal_sparsify->m_beta);
+	m_beta_grad.group_link(m_internal_sparsify->m_beta_grad);
 
 }

@@ -72,10 +72,10 @@ void add_1d::compile()
 
 	for (int i = 0; i < m_units; i++)
 	{
-		m_x.col(i).link(m_layer->m_x[i]);
-		m_x_grad.col(i).link(m_layer->m_x_grad[i]);
-		m_y[i].link(m_layer->m_y[i]);
-		m_y_grad[i].link(m_layer->m_y_grad[i]);
+		m_x.col(i).group_link(m_layer->m_x[i]);
+		m_x_grad.col(i).group_link(m_layer->m_x_grad[i]);
+		m_y[i].group_link(m_layer->m_y[i]);
+		m_y_grad[i].group_link(m_layer->m_y_grad[i]);
 	}
 
 }

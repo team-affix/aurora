@@ -68,13 +68,13 @@ void dot_1d::compile()
 	m_mul_1d->compile();
 	m_sum_1d->compile();
 
-	m_x.link(m_mul_1d->m_x);
-	m_x_grad.link(m_mul_1d->m_x_grad);
+	m_x.group_link(m_mul_1d->m_x);
+	m_x_grad.group_link(m_mul_1d->m_x_grad);
 
-	m_mul_1d->m_y.link(m_sum_1d->m_x);
-	m_mul_1d->m_y_grad.link(m_sum_1d->m_x_grad);
+	m_mul_1d->m_y.group_link(m_sum_1d->m_x);
+	m_mul_1d->m_y_grad.group_link(m_sum_1d->m_x_grad);
 
-	m_y.link(m_sum_1d->m_y);
-	m_y_grad.link(m_sum_1d->m_y_grad);
+	m_y.group_link(m_sum_1d->m_y);
+	m_y_grad.group_link(m_sum_1d->m_y_grad);
 
 }

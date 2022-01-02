@@ -93,10 +93,10 @@ void cnl::compile()
 		size_t l_output_col = i % l_x_strides;
 		size_t l_input_row = l_output_row * m_y_stride;
 		size_t l_input_col = l_output_col * m_x_stride;
-		m_x.range_2d(l_input_row, l_input_col, m_filter_height, m_filter_width).unroll().link(m_filters->m_x[i]);
-		m_x_grad.range_2d(l_input_row, l_input_col, m_filter_height, m_filter_width).unroll().link(m_filters->m_x_grad[i]);
-		m_y[l_output_row][l_output_col].link(m_filters->m_y[i]);
-		m_y_grad[l_output_row][l_output_col].link(m_filters->m_y_grad[i]);
+		m_x.range_2d(l_input_row, l_input_col, m_filter_height, m_filter_width).unroll().group_link(m_filters->m_x[i]);
+		m_x_grad.range_2d(l_input_row, l_input_col, m_filter_height, m_filter_width).unroll().group_link(m_filters->m_x_grad[i]);
+		m_y[l_output_row][l_output_col].group_link(m_filters->m_y[i]);
+		m_y_grad[l_output_row][l_output_col].group_link(m_filters->m_y_grad[i]);
 	}
 
 }

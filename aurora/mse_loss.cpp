@@ -102,10 +102,10 @@ void mse_loss::compile()
 
 	m_model->compile();
 
-	m_x.link(m_model->m_x);
-	m_x_grad.link(m_model->m_x_grad);
-	m_y.link(m_model->m_y);
-	m_y_grad.link(m_model->m_y_grad);
+	m_x.group_link(m_model->m_x);
+	m_x_grad.group_link(m_model->m_x_grad);
+	m_y.group_link(m_model->m_y);
+	m_y_grad.group_link(m_model->m_y_grad);
 
 	m_y_lowest_rank_count = m_y.lowest_rank_count();
 	m_2_over_y_lowest_rank_count = 2.0 / m_y_lowest_rank_count;

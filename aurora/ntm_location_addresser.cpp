@@ -88,25 +88,25 @@ void ntm_location_addresser::compile() {
 	m_internal_power->compile();
 	m_internal_normalize->compile();
 	
-	m_g.link(m_internal_interpolate->m_amount);
-	m_g_grad.link(m_internal_interpolate->m_amount_grad);
-	m_s.link(m_internal_shift->m_amount);
-	m_s_grad.link(m_internal_shift->m_amount_grad);
-	m_gamma.link(m_internal_power->m_amount);
-	m_gamma_grad.link(m_internal_power->m_amount_grad);
+	m_g.group_link(m_internal_interpolate->m_amount);
+	m_g_grad.group_link(m_internal_interpolate->m_amount_grad);
+	m_s.group_link(m_internal_shift->m_amount);
+	m_s_grad.group_link(m_internal_shift->m_amount_grad);
+	m_gamma.group_link(m_internal_power->m_amount);
+	m_gamma_grad.group_link(m_internal_power->m_amount_grad);
 
-	m_wx.link(m_internal_interpolate->m_x[0]);
+	m_wx.group_link(m_internal_interpolate->m_x[0]);
 	m_wx[0].val() = 1; // MUST INITIALIZE wx TO BE A NORMALIZED DISTRIBUTION
-	m_wx_grad.link(m_internal_interpolate->m_x_grad[0]);
-	m_x.link(m_internal_interpolate->m_x[1]);
-	m_x_grad.link(m_internal_interpolate->m_x_grad[1]);
-	m_internal_interpolate->m_y.link(m_internal_shift->m_x);
-	m_internal_interpolate->m_y_grad.link(m_internal_shift->m_x_grad);
-	m_internal_shift->m_y.link(m_internal_power->m_x);
-	m_internal_shift->m_y_grad.link(m_internal_power->m_x_grad);
-	m_internal_power->m_y.link(m_internal_normalize->m_x);
-	m_internal_power->m_y_grad.link(m_internal_normalize->m_x_grad);
-	m_internal_normalize->m_y.link(m_y);
-	m_y.link(m_wy);
+	m_wx_grad.group_link(m_internal_interpolate->m_x_grad[0]);
+	m_x.group_link(m_internal_interpolate->m_x[1]);
+	m_x_grad.group_link(m_internal_interpolate->m_x_grad[1]);
+	m_internal_interpolate->m_y.group_link(m_internal_shift->m_x);
+	m_internal_interpolate->m_y_grad.group_link(m_internal_shift->m_x_grad);
+	m_internal_shift->m_y.group_link(m_internal_power->m_x);
+	m_internal_shift->m_y_grad.group_link(m_internal_power->m_x_grad);
+	m_internal_power->m_y.group_link(m_internal_normalize->m_x);
+	m_internal_power->m_y_grad.group_link(m_internal_normalize->m_x_grad);
+	m_internal_normalize->m_y.group_link(m_y);
+	m_y.group_link(m_wy);
 
 }

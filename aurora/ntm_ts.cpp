@@ -112,31 +112,31 @@ void ntm_ts::compile() {
 
 	for (int i = 0; i < m_internal_writers.size(); i++) {
 		m_internal_writers[i]->compile();
-		m_internal_writers[i]->m_x.link(m_x);
-		m_internal_writers[i]->m_mx.link(*l_mx);
-		m_internal_writers[i]->m_mx_grad.link(*l_mx_grad);
+		m_internal_writers[i]->m_x.group_link(m_x);
+		m_internal_writers[i]->m_mx.group_link(*l_mx);
+		m_internal_writers[i]->m_mx_grad.group_link(*l_mx_grad);
 		l_mx = &m_internal_writers[i]->m_y;
 		l_mx_grad = &m_internal_writers[i]->m_y_grad;
 
-		m_write_wx[i].link(m_internal_writers[i]->m_wx);
-		m_write_wx_grad[i].link(m_internal_writers[i]->m_wx_grad);
-		m_write_wy[i].link(m_internal_writers[i]->m_wy);
-		m_write_wy_grad[i].link(m_internal_writers[i]->m_wy_grad);
+		m_write_wx[i].group_link(m_internal_writers[i]->m_wx);
+		m_write_wx_grad[i].group_link(m_internal_writers[i]->m_wx_grad);
+		m_write_wy[i].group_link(m_internal_writers[i]->m_wy);
+		m_write_wy_grad[i].group_link(m_internal_writers[i]->m_wy_grad);
 	}
 
-	l_mx->link(m_my);
-	l_mx_grad->link(m_accum_my_grad);
+	l_mx->group_link(m_my);
+	l_mx_grad->group_link(m_accum_my_grad);
 
 	for (int i = 0; i < m_internal_readers.size(); i++) {
 		m_internal_readers[i]->compile();
-		m_internal_readers[i]->m_x.link(m_x);
-		m_internal_readers[i]->m_mx.link(m_my);
-		m_internal_readers[i]->m_y_grad.link(m_reader_y_grad);
+		m_internal_readers[i]->m_x.group_link(m_x);
+		m_internal_readers[i]->m_mx.group_link(m_my);
+		m_internal_readers[i]->m_y_grad.group_link(m_reader_y_grad);
 
-		m_read_wx[i].link(m_internal_readers[i]->m_wx);
-		m_read_wx_grad[i].link(m_internal_readers[i]->m_wx_grad);
-		m_read_wy[i].link(m_internal_readers[i]->m_wy);
-		m_read_wy_grad[i].link(m_internal_readers[i]->m_wy_grad);
+		m_read_wx[i].group_link(m_internal_readers[i]->m_wx);
+		m_read_wx_grad[i].group_link(m_internal_readers[i]->m_wx_grad);
+		m_read_wy[i].group_link(m_internal_readers[i]->m_wy);
+		m_read_wy_grad[i].group_link(m_internal_readers[i]->m_wy_grad);
 	}
 
 }

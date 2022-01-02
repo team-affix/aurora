@@ -68,8 +68,8 @@ void weight_junction::compile() {
 
 	for (int i = 0; i < m_weight_sets.size(); i++) {
 		m_weight_sets[i]->compile();
-		m_weight_sets[i]->m_x.link(m_x[i]);
-		m_weight_sets[i]->m_x_grad.link(m_x_grad[i]);
-		m_weight_sets[i]->m_y_grad.link(m_y_grad);
+		m_weight_sets[i]->m_x.group_link(m_x[i]);
+		m_weight_sets[i]->m_x_grad.group_link(m_x_grad[i]);
+		m_weight_sets[i]->m_y_grad.group_link(m_y_grad);
 	}
 }

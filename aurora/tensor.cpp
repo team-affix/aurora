@@ -261,7 +261,7 @@ tensor tensor::unroll() {
 	tensor result = new_1d(w * h);
 	for (int i = 0; i < h; i++)
 		for (size_t j = 0; j < w; j++)
-			result[i * w + j].link(at(i)[j]);
+			result[i * w + j].group_link(at(i)[j]);
 	return result;
 }
 
@@ -271,7 +271,7 @@ tensor tensor::roll(size_t a_width) {
 	size_t h = s / a_width;
 	tensor result = new_2d(h, a_width);
 	for (int i = 0; i < vec().size(); i++)
-		result[i / a_width][i % a_width].link(at(i));
+		result[i / a_width][i % a_width].group_link(at(i));
 	return result;
 }
 
@@ -366,14 +366,14 @@ tensor tensor::norm_2d() {
 
 tensor tensor::row(size_t a_a) {
 	tensor result;
-	result.link(at(a_a));
+	result.group_link(at(a_a));
 	return result;
 }
 
 tensor tensor::col(size_t a_a) {
 	tensor result = new_1d(vec().size());
 	for (int i = 0; i < size(); i++)
-		result[i].link(at(i)[a_a]);
+		result[i].group_link(at(i)[a_a]);
 	return result;
 }
 
@@ -383,7 +383,7 @@ tensor tensor::range(size_t a_start, size_t a_len) {
 	{
 		size_t src = a_start + i;
 		size_t dst = i;
-		result[dst].link(at(src));
+		result[dst].group_link(at(src));
 	}
 	return result;
 }
@@ -395,7 +395,7 @@ tensor tensor::range_2d(size_t a_row, size_t a_col, size_t a_height, size_t a_wi
 		size_t src = a_row + i;
 		size_t dst = i;
 		tensor row_section = at(src).range(a_col, a_width);
-		result[dst].link(row_section);
+		result[dst].group_link(row_section);
 	}
 	return result;
 }
@@ -570,9 +570,9 @@ void tensor::dot_2d(const tensor& a_other, tensor& a_output) {
 
 void tensor::cat(tensor& a_other, tensor& a_output) {
 	for (int i = 0; i < size(); i++)
-		a_output[i].link(at(i));
+		a_output[i].group_link(at(i));
 	for (int i = 0; i < a_other.size(); i++)
-		a_output[i + size()].link(a_other.at(i));
+		a_output[i + size()].group_link(a_other.at(i));
 }
 
 double tensor::cos_sim(tensor& a_other) {
@@ -621,8 +621,7 @@ void tensor::link(
 	tensor& a_other
 )
 {
-
-	m_val_ptr.group_link(a_other.m_val_ptr);
+	m_val_ptr.link(a_other.m_val_ptr);
 
 	resize(a_other.size());
 
@@ -632,6 +631,26 @@ void tensor::link(
 }
 
 void tensor::unlink()
+{
+	m_val_ptr.unlink();
+	m_vec_ptr.unlink();
+}
+
+void tensor::group_link(
+	tensor& a_other
+)
+{
+
+	m_val_ptr.group_link(a_other.m_val_ptr);
+
+	resize(a_other.size());
+
+	for (int i = 0; i < size(); i++)
+		at(i).group_link(a_other.at(i));
+
+}
+
+void tensor::group_unlink()
 {
 	m_val_ptr.group_unlink();
 	m_vec_ptr.group_unlink();
@@ -645,9 +664,9 @@ tensor tensor::clone() const {
 	return result;
 }
 
-tensor tensor::link() {
+tensor tensor::group_link() {
 	tensor result = tensor();
-	result.link(*this);
+	result.group_link(*this);
 	return result;
 }
 

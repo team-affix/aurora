@@ -67,6 +67,6 @@ void rounding_spc::model_recur(
 void rounding_spc::compile()
 {
 
-	m_x_grad.link(m_y_grad);
+	m_x_grad.group_link(m_y_grad);
 
 }

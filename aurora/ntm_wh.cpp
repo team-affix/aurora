@@ -90,15 +90,15 @@ void ntm_wh::compile() {
 	m_a_model->compile();
 	m_e_model->compile();
 
-	m_x.link(m_internal_rh->m_x);
-	m_x.link(m_a_model->m_x);
-	m_x.link(m_e_model->m_x);
+	m_x.group_link(m_internal_rh->m_x);
+	m_x.group_link(m_a_model->m_x);
+	m_x.group_link(m_e_model->m_x);
 
-	m_a.link(m_a_model->m_y);
-	m_a_grad.link(m_a_model->m_y_grad);
-	m_e.link(m_e_model->m_y);
-	m_e_grad.link(m_e_model->m_y_grad);
+	m_a.group_link(m_a_model->m_y);
+	m_a_grad.group_link(m_a_model->m_y_grad);
+	m_e.group_link(m_e_model->m_y);
+	m_e_grad.group_link(m_e_model->m_y_grad);
 
-	m_internal_rh->m_y.link(m_y);
-	m_internal_rh->m_y_grad.link(m_y_grad);
+	m_internal_rh->m_y.group_link(m_y);
+	m_internal_rh->m_y_grad.group_link(m_y_grad);
 }

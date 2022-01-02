@@ -57,6 +57,6 @@ void sum_1d::compile()
 	m_x_grad = tensor::new_1d(m_units);
 
 	for (int i = 0; i < m_units; i++)
-		m_x_grad[i].link(m_y_grad);
+		m_x_grad[i].group_link(m_y_grad);
 
 }

@@ -56,7 +56,7 @@ void onehot_spc::compile() {
 	m_y = tensor::new_1d(m_units);
 	m_y_grad = tensor::new_1d(m_units);
 
-	m_x_grad.link(m_y_grad);
+	m_x_grad.group_link(m_y_grad);
 }
 
 int onehot_spc::collapse(const tensor& a_probability_tensor) {

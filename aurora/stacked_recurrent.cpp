@@ -68,14 +68,14 @@ void stacked_recurrent::compile() {
 
 	for (int i = 0; i < m_models.size(); i++) {
 		m_models[i]->compile();
-		l_x->link(m_models[i]->m_x);
-		l_x_grad->link(m_models[i]->m_x_grad);
+		l_x->group_link(m_models[i]->m_x);
+		l_x_grad->group_link(m_models[i]->m_x_grad);
 		l_x = &m_models[i]->m_y;
 		l_x_grad = &m_models[i]->m_y_grad;
 	}
 
-	m_y.link(*l_x);
-	m_y_grad.link(*l_x_grad);
+	m_y.group_link(*l_x);
+	m_y_grad.group_link(*l_x_grad);
 }
 
 void stacked_recurrent::prep(size_t a_n) {
