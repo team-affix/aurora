@@ -3059,11 +3059,106 @@ void test_large_model_linkage()
 
 }
 
+void stock_market_choice_AIs()
+{
+	const size_t X_SIZE = 1;
+	const size_t Y_SIZE = 3;
+	const size_t MEMORY_HEIGHT = 5;
+	const size_t MEMORY_WIDTH = 20;
+	const size_t NUMBER_OF_READERS = 1;
+	const size_t NUMBER_OF_WRITERS = 1;
+	const vector<int> VALID_SHIFTS = { -1, 0, 1 };
+	const vector<size_t> HEAD_HIDDEN_DIMENSIONS = { 10 };
+
+	const size_t NUMBER_OF_TIMESTEPS = 1200;
+
+	param_vector pv;
+	Ntm n = pseudo::ntm_mdim(
+		X_SIZE,
+		Y_SIZE,
+		MEMORY_HEIGHT,
+		MEMORY_WIDTH,
+		NUMBER_OF_READERS,
+		NUMBER_OF_WRITERS,
+		VALID_SHIFTS,
+		HEAD_HIDDEN_DIMENSIONS);
+
+	Model output_model = new sequential({new layer(Y_SIZE, new sigmoid()),new normalize(Y_SIZE), new onehot_spc(Y_SIZE)});
+	Sync s = new sync(output_model);
+	Stacked_recurrent AI = new stacked_recurrent({n, s });
+	AI->param_recur(pseudo::param_init(new param_mom(0.002, 0.9), pv));
+	
+	pv.rand_norm();
+
+	uniform_real_distribution<double> urd(0, 1);
+
+	AI->prep(NUMBER_OF_TIMESTEPS);
+	AI->compile();
+	AI->unroll(NUMBER_OF_TIMESTEPS);
+	AI->fwd(tensor::new_2d(NUMBER_OF_TIMESTEPS, X_SIZE, urd, static_vals::random_engine));
+	std::cout << AI->y().to_string() << std::endl;
+
+}
+
+void first_order_optimizer_instantiation_test()
+{
+	affix_base::timing::stopwatch l_stopwatch;
+
+	const size_t N = 23;
+	const size_t M = 10;
+	const vector<size_t> ATTENTION_HIDDEN_DIMS = { 8 };
+
+	{
+		param_vector pv;
+
+		l_stopwatch.start();
+		Att_lstm l_att_lstm = new att_lstm(M, ATTENTION_HIDDEN_DIMS);
+		Sync l_sync = new sync(pseudo::tnn({ M, 1 }, pseudo::nlr(0.3)));
+		std::cout << "MODEL INSTANTIATION: " << std::to_string(l_stopwatch.duration_milliseconds()) << " ms" << std::endl;
+
+		l_stopwatch.start();
+		l_att_lstm->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), pv));
+		l_sync->param_recur(pseudo::param_init(new param_mom(0.02, 0.9), pv));
+		std::cout << "PARAMETER INSTANTIATION: " << std::to_string(l_stopwatch.duration_milliseconds()) << " ms" << std::endl;
+
+		l_stopwatch.start();
+		l_att_lstm->prep(N, N);
+		l_sync->prep(N);
+		std::cout << "MODEL PREPARATION: " << std::to_string(l_stopwatch.duration_milliseconds()) << " ms" << std::endl;
+
+		Sequential l_seq = new sequential({ l_att_lstm, l_sync });
+
+		Mse_loss l_mse_loss = new mse_loss(l_seq);
+
+		l_stopwatch.start();
+		l_mse_loss->compile();
+		std::cout << "COMPILATION: " << std::to_string(l_stopwatch.duration_milliseconds()) << " ms" << std::endl;
+
+		const tensor x = tensor::new_2d(N, M);
+		const tensor y = tensor::new_2d(N, M);
+
+
+		const size_t NUMBER_CYCLE_ITERATIONS = 100000;
+		l_stopwatch.start();
+
+		for (int i = 0; i < NUMBER_CYCLE_ITERATIONS; i++)
+		{
+			l_mse_loss->cycle(x, y);
+		}
+		std::cout << "CYCLING ONCE: " << std::to_string((double)l_stopwatch.duration_milliseconds() / (double)NUMBER_CYCLE_ITERATIONS) << " ms" << std::endl;
+
+		l_stopwatch.start();
+	}
+
+	std::cout << "DISPOSING OF RESOURCES: " << std::to_string(l_stopwatch.duration_milliseconds()) << " ms" << std::endl;
+
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	major_tests();
+	first_order_optimizer_instantiation_test();
 
 	return 0;
 
