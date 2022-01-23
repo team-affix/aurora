@@ -1,14 +1,12 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
-
-using aurora::models::model;
 
 namespace aurora {
 	namespace models {
 		class bias : public model {
 		public:
-			Param pmt = new param();
+			aurora::params::Param m_param = new aurora::params::param();
 
 		public:
 			MODEL_FIELDS
@@ -16,6 +14,6 @@ namespace aurora {
 			bias();
 
 		};
-		typedef ptr<bias> Bias;
+		typedef affix_base::data::ptr<bias> Bias;
 	}
 }

@@ -1,29 +1,28 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "param.h"
 #include "param_sgd.h"
 #include "param_mom.h"
 
-using aurora::models::model;
-using std::vector;
-using std::initializer_list;
-using std::back_inserter;
-
 namespace aurora {
 	namespace models {
 		class sequential : public model {
 		public:
-			vector<Model> models;
+			std::vector<Model> m_models;
 
 		public:
 			MODEL_FIELDS
 			virtual ~sequential();
 			sequential();
-			sequential(initializer_list<Model> a_models);
-			sequential(vector<Model> a_models);
+			sequential(
+				std::initializer_list<Model> a_models
+			);
+			sequential(
+				std::vector<Model> a_models
+			);
 
 		};
-		typedef ptr<sequential> Sequential;
+		typedef affix_base::data::ptr<sequential> Sequential;
 	}
 }

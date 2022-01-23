@@ -1,15 +1,13 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "param.h"
-
-using aurora::models::model;
 
 namespace aurora {
 	namespace models {
 		class weight : public model {
 		public:
-			Param pmt = new param();
+			aurora::params::Param m_pmt = new aurora::params::param();
 
 		public:
 			MODEL_FIELDS
@@ -17,6 +15,6 @@ namespace aurora {
 			weight();
 
 		};
-		typedef ptr<weight> Weight;
+		typedef affix_base::data::ptr<weight> Weight;
 	}
 }

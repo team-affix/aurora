@@ -1,28 +1,28 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
-
-using aurora::models::model;
 
 namespace aurora {
 	namespace models {
 		class normalize : public model {
 		public:
-			size_t units = 0;
+			size_t m_units = 0;
 
 		public:
-			tensor x_abs;
+			aurora::maths::tensor m_x_abs;
 
 		public:
-			double sum = 0;
+			double m_sum = 0;
 
 		public:
 			MODEL_FIELDS
 			virtual ~normalize();
 			normalize();
-			normalize(size_t a_units);
+			normalize(
+				size_t a_units
+			);
 
 		};
-		typedef ptr<normalize> Normalize;
+		typedef affix_base::data::ptr<normalize> Normalize;
 	}
 }

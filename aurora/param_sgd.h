@@ -1,33 +1,42 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param.h"
-
-using aurora::params::param;
 
 namespace aurora {
 	namespace params {
-		class param_sgd : public param {
+		class param_sgd : public aurora::params::param {
 		public:
-			ptr<double> learn_rate_ptr = new double(0);
-			ptr<double> gradient_ptr = new double(0);
+			affix_base::data::ptr<double> m_learn_rate_ptr = new double(0);
+			affix_base::data::ptr<double> m_gradient_ptr = new double(0);
 
 		public:
 			virtual ~param_sgd();
 			param_sgd();
-			param_sgd(double a_state, double a_learn_rate, double a_gradient);
+			param_sgd(
+				double a_learn_rate
+			);
 
 		public:
 			virtual double& learn_rate();
-			virtual double& gradient();
+			virtual const double& learn_rate() const;
 
 		public:
-			virtual void accum_grad(double a_grad);
+			virtual double& gradient();
+			virtual const double& gradient() const;
+
+
+		public:
+			virtual void accum_grad(
+				double a_grad
+			);
 
 		public:
 			virtual void update();
-			virtual param* clone();
+
+		public:
+			virtual param* clone() const;
 
 		};
-		typedef ptr<param_sgd> Param_sgd;
+		typedef affix_base::data::ptr<param_sgd> Param_sgd;
 	}
 }

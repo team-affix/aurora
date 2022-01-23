@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param.h"
 #include "param_sgd.h"
 #include "param_mom.h"
@@ -15,17 +15,29 @@ param_sgd::param_sgd() {
 
 }
 
-param_sgd::param_sgd(double a_state, double a_learn_rate, double a_gradient) : param(a_state) {
+param_sgd::param_sgd(
+	double a_learn_rate
+)
+{
 	this->learn_rate() = a_learn_rate;
-	this->gradient() = a_gradient;
 }
 
 double& param_sgd::learn_rate() {
-	return learn_rate_ptr.val();
+	return m_learn_rate_ptr.val();
+}
+
+const double& param_sgd::learn_rate() const
+{
+	return m_learn_rate_ptr.val();
 }
 
 double& param_sgd::gradient() {
-	return gradient_ptr.val();
+	return m_gradient_ptr.val();
+}
+
+const double& param_sgd::gradient() const
+{
+	return m_gradient_ptr.val();
 }
 
 void param_sgd::accum_grad(double a_grad) {
@@ -38,7 +50,8 @@ void param_sgd::update() {
 	gradient() = 0;
 }
 
-param* param_sgd::clone() {
+param* param_sgd::clone() const
+{
 	param_sgd* result = new param_sgd();
 	result->state() = state();
 	result->learn_rate() = learn_rate();

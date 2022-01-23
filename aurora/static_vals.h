@@ -1,12 +1,10 @@
 #pragma once
-#include "pch.h"
-
-using std::default_random_engine;
+#include "affix-base/pch.h"
 
 namespace aurora {
 	class static_vals {
 	public:
-		static default_random_engine random_engine;
+		static std::default_random_engine random_engine;
 
 	};
 }

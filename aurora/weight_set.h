@@ -1,24 +1,24 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "weight.h"
-
-using aurora::models::weight;
 
 namespace aurora {
 	namespace models {
 		class weight_set : public model {
 		public:
-			size_t a;
-			vector<Weight> weights;
+			size_t m_a;
+			std::vector<Weight> m_weights;
 
 		public:
 			MODEL_FIELDS
 			virtual ~weight_set();
 			weight_set();
-			weight_set(size_t a_a);
+			weight_set(
+				size_t a_a
+			);
 
 		};
-		typedef ptr<weight_set> Weight_set;
+		typedef affix_base::data::ptr<weight_set> Weight_set;
 	}
 }

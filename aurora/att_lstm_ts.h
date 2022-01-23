@@ -1,34 +1,34 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "sync.h"
 #include "pseudo_tnn.h"
 #include "neuron.h"
 
-using aurora::models::model;
-using aurora::models::sync;
-
 namespace aurora {
 	namespace models {
 		class att_lstm_ts : public recurrent {
 		public:
-			size_t units;
+			size_t m_units;
 
 		public:
-			tensor htx;
-			tensor htx_grad;
+			aurora::maths::tensor m_htx;
+			aurora::maths::tensor m_htx_grad;
 
 		public:
-			Model model_template;
-			Sync models;
+			Model m_model_template;
+			Sync m_models;
 
 		public:
 			RECURRENT_FIELDS
 			virtual ~att_lstm_ts();
 			att_lstm_ts();
-			att_lstm_ts(size_t a_units, vector<size_t> a_h_dims);
+			att_lstm_ts(
+				size_t a_units,
+				std::vector<size_t> a_h_dims
+			);
 
 		};
-		typedef ptr<att_lstm_ts> Att_lstm_ts;
+		typedef affix_base::data::ptr<att_lstm_ts> Att_lstm_ts;
 	}
 }

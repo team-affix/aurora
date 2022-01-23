@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "param.h"
 #include "param_sgd.h"
 #include "param_mom.h"
@@ -20,14 +20,20 @@ param::param(double a_state) {
 }
 
 double& param::state() {
-	return state_ptr.val();
+	return m_state_ptr.val();
+}
+
+const double& param::state() const
+{
+	return m_state_ptr.val();
 }
 
 void param::update() {
 
 }
 
-param* param::clone() {
+param* param::clone() const
+{
 	param* result = new param();
 	result->state() = state();
 	return result;

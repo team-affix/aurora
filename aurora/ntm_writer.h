@@ -1,39 +1,42 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "ntm_wh.h"
 #include "ntm_addresser.h"
-
-using aurora::models::model;
 
 namespace aurora {
 	namespace models {
 		class ntm_writer : public model {
 		public:
-			size_t memory_height = 0;
-			size_t memory_width = 0;
+			size_t m_memory_height = 0;
+			size_t m_memory_width = 0;
 
 		public:
-			tensor weighted_erase_compliment;
+			aurora::maths::tensor m_weighted_erase_compliment;
 
 		public:
-			tensor mx;
-			tensor mx_grad;
-			tensor wx;
-			tensor wx_grad;
-			tensor wy;
-			tensor wy_grad;
+			aurora::maths::tensor m_mx;
+			aurora::maths::tensor m_mx_grad;
+			aurora::maths::tensor m_wx;
+			aurora::maths::tensor m_wx_grad;
+			aurora::maths::tensor m_wy;
+			aurora::maths::tensor m_wy_grad;
 
 		public:
-			Ntm_wh internal_head;
-			Ntm_addresser internal_addresser;
+			Ntm_wh m_internal_head;
+			Ntm_addresser m_internal_addresser;
 
 		public:
 			MODEL_FIELDS
 			virtual ~ntm_writer();
 			ntm_writer();
-			ntm_writer(size_t a_memory_height, size_t a_memory_width, vector<int> a_valid_shifts, vector<size_t> a_head_hidden_dims);
+			ntm_writer(
+				size_t a_memory_height,
+				size_t a_memory_width,
+				std::vector<int> a_valid_shifts,
+				std::vector<size_t> a_head_hidden_dims
+			);
 
 		};
-		typedef ptr<ntm_writer> Ntm_writer;
+		typedef affix_base::data::ptr<ntm_writer> Ntm_writer;
 	}
 }

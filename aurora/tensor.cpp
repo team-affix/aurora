@@ -1,47 +1,27 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "tensor.h"
 
 using namespace aurora;
 using namespace maths;
 
 double& tensor::val() {
-	return val_ptr.val();
+	return m_val_ptr.val();
 }
 
 double tensor::val() const {
-	return val_ptr.val();
+	return m_val_ptr.val();
 }
 
-vector<tensor>& tensor::vec() {
-	return vec_ptr.val();
+std::vector<tensor>& tensor::vec() {
+	return m_vec_ptr.val();
 }
 
-const vector<tensor>& tensor::vec() const {
-	return vec_ptr.val();
-}
-
-tensor& tensor::group_head() {
-	if (group_prev_ptr == nullptr)
-		return *this;
-	else
-		return group_prev_ptr->group_head();
-}
-
-tensor& tensor::group_tail() {
-	if (group_next_ptr == nullptr)
-		return *this;
-	else
-		return group_next_ptr->group_tail();
-}
-
-size_t tensor::group_size() {
-	size_t result = 0;
-	group_recur([&](tensor* elem) { result += 1; });
-	return result;
+const std::vector<tensor>& tensor::vec() const {
+	return m_vec_ptr.val();
 }
 
 tensor::~tensor() {
-	group_leave();
+
 }
 
 tensor::tensor() {
@@ -52,11 +32,11 @@ tensor::tensor(const double& a_val) {
 	this->val() = a_val;
 }
 
-tensor::tensor(const vector<tensor>& a_vec) {
+tensor::tensor(const std::vector<tensor>& a_vec) {
 	std::copy(a_vec.begin(), a_vec.end(), back_inserter(vec()));
 }
 
-tensor::tensor(const initializer_list<tensor>& a_il) {
+tensor::tensor(const std::initializer_list<tensor>& a_il) {
 	std::copy(a_il.begin(), a_il.end(), back_inserter(vec()));
 }
 
@@ -90,7 +70,7 @@ tensor tensor::new_1d(size_t a_a, tensor a_val) {
 	return result;
 }
 
-tensor tensor::new_1d(size_t a_a, uniform_real_distribution<double>& a_urd, default_random_engine& a_re) {
+tensor tensor::new_1d(size_t a_a, std::uniform_real_distribution<double>& a_urd, std::default_random_engine& a_re) {
 	tensor result = new_1d(a_a);
 	for (int i = 0; i < a_a; i++)
 		result[i].val() = a_urd(a_re);
@@ -110,7 +90,7 @@ tensor tensor::new_2d(size_t a_a, size_t a_b, tensor a_val) {
 	return result;
 }
 
-tensor tensor::new_2d(size_t a_a, size_t a_b, uniform_real_distribution<double>& a_urd, default_random_engine& a_re) {
+tensor tensor::new_2d(size_t a_a, size_t a_b, std::uniform_real_distribution<double>& a_urd, std::default_random_engine& a_re) {
 	tensor result = new_1d(a_a);
 	for (int i = 0; i < a_a; i++)
 		result[i] = new_1d(a_b, a_urd, a_re);
@@ -146,6 +126,47 @@ void tensor::tanh_1d(tensor& a_output) {
 void tensor::tanh_2d(tensor& a_output) {
 	for (int i = 0; i < size(); i++)
 		at(i).tanh_1d(a_output.at(i));
+}
+
+void tensor::norm_1d(tensor& a_output) {
+
+	a_output = clone();
+
+	double l_min = min_1d();
+	if (l_min < 0)
+		// OFFSET BY NEGATIVE VALUES FIRST
+		a_output.add_1d(tensor::new_1d(a_output.size(), l_min), a_output);
+
+	double l_sum = a_output.sum_1d();
+	for (int i = 0; i < size(); i++) {
+		a_output[i].val() = a_output[i].val() / l_sum;
+	}
+
+}
+
+void tensor::signed_norm_1d(tensor& a_output)
+{
+	double l_sum = abs_1d().sum_1d();
+	for (int i = 0; i < a_output.size(); i++)
+		a_output[i].val() = at(i).val() / l_sum;
+}
+
+void tensor::norm_2d(tensor& a_output) {
+
+	a_output = clone();
+
+	double l_min = min_2d();
+	if (l_min < 0)
+		// OFFSET BY NEGATIVE VALUES FIRST
+		a_output.add_2d(tensor::new_2d(a_output.height(), a_output.width(), l_min), a_output);
+
+	double l_sum = a_output.sum_2d();
+	for (int i = 0; i < height(); i++) {
+		for (int j = 0; j < width(); j++) {
+			a_output[i][j].val() = a_output[i][j].val() / l_sum;
+		}
+	}
+
 }
 
 double tensor::mag_1d() {
@@ -240,7 +261,7 @@ tensor tensor::unroll() {
 	tensor result = new_1d(w * h);
 	for (int i = 0; i < h; i++)
 		for (size_t j = 0; j < w; j++)
-			result[i * w + j].group_join_all_ranks(at(i)[j]);
+			result[i * w + j].group_link(at(i)[j]);
 	return result;
 }
 
@@ -250,7 +271,7 @@ tensor tensor::roll(size_t a_width) {
 	size_t h = s / a_width;
 	tensor result = new_2d(h, a_width);
 	for (int i = 0; i < vec().size(); i++)
-		result[i / a_width][i % a_width].group_join_all_ranks(at(i));
+		result[i / a_width][i % a_width].group_link(at(i));
 	return result;
 }
 
@@ -262,7 +283,7 @@ size_t tensor::height() const {
 	return size();
 }
 
-double tensor::max() {
+double tensor::max_1d() {
 	double result = -INFINITY;
 	for (int i = 0; i < size(); i++)
 		if (at(i) > result)
@@ -270,7 +291,7 @@ double tensor::max() {
 	return result;
 }
 
-double tensor::min() {
+double tensor::min_1d() {
 	double result = INFINITY;
 	for (int i = 0; i < size(); i++)
 		if (at(i) < result)
@@ -278,9 +299,9 @@ double tensor::min() {
 	return result;
 }
 
-int tensor::arg_max() {
+size_t tensor::arg_max_1d() {
 	double val = -INFINITY;
-	int result = -1;
+	size_t result = -1;
 	for (int i = 0; i < size(); i++)
 		if (at(i) > val) {
 			val = at(i);
@@ -289,9 +310,9 @@ int tensor::arg_max() {
 	return result;
 }
 
-int tensor::arg_min() {
+size_t tensor::arg_min_1d() {
 	double val = INFINITY;
-	int result = -1;
+	size_t result = -1;
 	for (int i = 0; i < size(); i++)
 		if (at(i) < val) {
 			val = at(i);
@@ -300,16 +321,59 @@ int tensor::arg_min() {
 	return result;
 }
 
+double tensor::max_2d()
+{
+	double result = -INFINITY;
+	for (int i = 0; i < size(); i++)
+	{
+		double l_max_1d = at(i).max_1d();
+		if (l_max_1d > result)
+			result = l_max_1d;
+	}
+	return result;
+}
+
+double tensor::min_2d()
+{
+	double result = INFINITY;
+	for (int i = 0; i < size(); i++)
+	{
+		double l_min_1d = at(i).min_1d();
+		if (l_min_1d < result)
+			result = l_min_1d;
+	}
+	return result;
+}
+
+tensor tensor::norm_1d() {
+	tensor result = tensor::new_1d(size());
+	norm_1d(result);
+	return result;
+}
+
+tensor tensor::signed_norm_1d()
+{
+	tensor result = tensor::new_1d(size());
+	signed_norm_1d(result);
+	return result;
+}
+
+tensor tensor::norm_2d() {
+	tensor result = tensor::new_2d(height(), width());
+	norm_2d(result);
+	return result;
+}
+
 tensor tensor::row(size_t a_a) {
 	tensor result;
-	result.group_join_all_ranks(at(a_a));
+	result.group_link(at(a_a));
 	return result;
 }
 
 tensor tensor::col(size_t a_a) {
 	tensor result = new_1d(vec().size());
 	for (int i = 0; i < size(); i++)
-		result[i].group_join_all_ranks(at(i)[a_a]);
+		result[i].group_link(at(i)[a_a]);
 	return result;
 }
 
@@ -319,7 +383,7 @@ tensor tensor::range(size_t a_start, size_t a_len) {
 	{
 		size_t src = a_start + i;
 		size_t dst = i;
-		result[dst].group_join_all_ranks(at(src));
+		result[dst].group_link(at(src));
 	}
 	return result;
 }
@@ -331,7 +395,7 @@ tensor tensor::range_2d(size_t a_row, size_t a_col, size_t a_height, size_t a_wi
 		size_t src = a_row + i;
 		size_t dst = i;
 		tensor row_section = at(src).range(a_col, a_width);
-		result[dst].group_join_all_ranks(row_section);
+		result[dst].group_link(row_section);
 	}
 	return result;
 }
@@ -506,9 +570,9 @@ void tensor::dot_2d(const tensor& a_other, tensor& a_output) {
 
 void tensor::cat(tensor& a_other, tensor& a_output) {
 	for (int i = 0; i < size(); i++)
-		a_output[i].group_join_all_ranks(at(i));
+		a_output[i].group_link(at(i));
 	for (int i = 0; i < a_other.size(); i++)
-		a_output[i + size()].group_join_all_ranks(a_other.at(i));
+		a_output[i + size()].group_link(a_other.at(i));
 }
 
 double tensor::cos_sim(tensor& a_other) {
@@ -524,118 +588,72 @@ tensor tensor::cat(tensor& a_other) {
 	return result;
 }
 
-void tensor::link(tensor& a_other) {
-	group_recur([&](tensor* elem) {
-		elem->val_ptr.link(a_other.val_ptr);
-		if (elem->size() != a_other.size())
-			elem->resize(a_other.size());
-		for (int i = 0; i < a_other.size(); i++)
-			elem->at(i).link(a_other.at(i));
-	});
-}
-
-void tensor::unlink() {
-	val_ptr = nullptr;
-	for (int i = 0; i < size(); i++)
-		at(i).unlink();
-}
-
-void tensor::rank_model_recur(function<void(tensor*)> a_func) {
+void tensor::rank_recur(const std::function<void(tensor*)>& a_func) {
 	if (size() != 0)
 		for (int i = 0; i < size(); i++)
-			at(i).rank_model_recur(a_func);
+			at(i).rank_recur(a_func);
 	a_func(this);
 }
 
-void tensor::group_recur_fwd(function<void(tensor*)> a_func) {
-	if (group_next_ptr != nullptr)
-		group_next_ptr->group_recur_fwd(a_func);
-	a_func(this);
-}
-
-void tensor::group_recur_bwd(function<void(tensor*)> a_func) {
-	if (group_prev_ptr != nullptr)
-		group_prev_ptr->group_recur_bwd(a_func);
-	a_func(this);
-}
-
-void tensor::group_recur(function<void(tensor*)> a_func) {
-	if (group_prev_ptr != nullptr)
-		group_prev_ptr->group_recur_bwd(a_func);
-	if (group_next_ptr != nullptr)
-		group_next_ptr->group_recur_fwd(a_func);
-	a_func(this);
-}
-
-bool tensor::group_contains(tensor* a_ptr) {
-	bool result = false;
-	group_recur([&](tensor* tens) {
-		if (tens == a_ptr)
-			result = true;
-	});
-	return result;
-}
-
-void tensor::group_add(tensor& a_other) {
-	a_other.group_join(*this);
-}
-
-void tensor::group_remove(tensor& a_other) {
-	a_other.group_leave();
-}
-
-void tensor::group_join(tensor& a_other) {
-	link(a_other); // LINKS ENTIRE GROUP TO a_other's GROUP
-	group_recur([&](tensor* elem) {
-		// PREVENT ADDING NODES TO SAME GROUP TWICE
-		if (!a_other.group_contains(elem)) {
-			tensor& l_group_tail = a_other.group_tail();
-			l_group_tail.group_next_ptr = elem;
-			elem->group_prev_ptr = &l_group_tail;
-			elem->group_next_ptr = nullptr;
-		}
-	});
-}
-
-void tensor::group_leave() {
-	if (group_prev_ptr != nullptr)
-		group_prev_ptr->group_next_ptr = group_next_ptr;
-	if (group_next_ptr != nullptr)
-		group_next_ptr->group_prev_ptr = group_prev_ptr;
-	group_prev_ptr = nullptr;
-	group_next_ptr = nullptr;
-}
-
-void tensor::group_disband() {
-	group_recur([](tensor* elem) { elem->group_leave(); });
-}
-
-void tensor::group_add_all_ranks(tensor& a_other) {
-	a_other.group_join_all_ranks(*this);
-}
-
-void tensor::group_remove_all_ranks(tensor& a_other) {
-	a_other.group_leave_all_ranks();
-}
-
-void tensor::group_join_all_ranks(tensor& a_other) {
-	group_recur([&](tensor* elem) {
-		group_join(a_other);
+void tensor::lowest_rank_recur(
+	const std::function<void(tensor*)>& a_func
+)
+{
+	if (size() != 0)
 		for (int i = 0; i < size(); i++)
-			at(i).group_join_all_ranks(a_other.at(i));
-	});
+			at(i).lowest_rank_recur(a_func);
+	else
+		a_func(this);
 }
 
-void tensor::group_leave_all_ranks() {
-	for (int i = 0; i < size(); i++)
-		at(i).group_leave_all_ranks();
-	group_leave();
+size_t tensor::lowest_rank_count()
+{
+	size_t l_result = 0;
+	lowest_rank_recur(
+		[&](tensor*)
+		{
+			l_result++;
+		});
+	return l_result;
 }
 
-void tensor::group_disband_all_ranks() {
+void tensor::link(
+	tensor& a_other
+)
+{
+	m_val_ptr.link(a_other.m_val_ptr);
+
+	resize(a_other.size());
+
 	for (int i = 0; i < size(); i++)
-		at(i).group_disband_all_ranks();
-	group_disband();
+		at(i).link(a_other.at(i));
+
+}
+
+void tensor::unlink()
+{
+	m_val_ptr.unlink();
+	m_vec_ptr.unlink();
+}
+
+void tensor::group_link(
+	tensor& a_other
+)
+{
+
+	m_val_ptr.group_link(a_other.m_val_ptr);
+
+	resize(a_other.size());
+
+	for (int i = 0; i < size(); i++)
+		at(i).group_link(a_other.at(i));
+
+}
+
+void tensor::group_unlink()
+{
+	m_val_ptr.group_unlink();
+	m_vec_ptr.group_unlink();
 }
 
 tensor tensor::clone() const {
@@ -646,16 +664,17 @@ tensor tensor::clone() const {
 	return result;
 }
 
-tensor tensor::link() {
+tensor tensor::group_link() {
 	tensor result = tensor();
-	result.link(*this);
+	result.group_link(*this);
 	return result;
 }
 
-string tensor::to_string() {
+std::string tensor::to_string() const
+{
 	if (vec().size() == 0)
 		return std::to_string(val());
-	string result = "[";
+	std::string result = "[";
 	for (int i = 0; i < vec().size() - 1; i++)
 		result += vec().at(i).to_string() + " ";
 	result += vec().at(vec().size() - 1).to_string() + "]";

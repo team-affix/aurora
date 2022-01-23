@@ -1,25 +1,29 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
-
-using aurora::models::model;
-using std::vector;
 
 namespace aurora {
 	namespace models {
 		class layer : public model {
 		public:
-			vector<Model> models;
+			std::vector<Model> m_models;
 
 		public:
 			MODEL_FIELDS
 			virtual ~layer();
 			layer();
-			layer(size_t a_height, Model a_model_template);
-			layer(initializer_list<Model> a_models);
-			layer(vector<Model> a_models);
+			layer(
+				size_t a_height,
+				Model a_model_template
+			);
+			layer(
+				std::initializer_list<Model> a_models
+			);
+			layer(
+				std::vector<Model> a_models
+			);
 
 		};
-		typedef ptr<layer> Layer;
+		typedef affix_base::data::ptr<layer> Layer;
 	}
 }

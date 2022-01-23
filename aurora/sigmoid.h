@@ -1,8 +1,6 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
-
-using aurora::models::model;
 
 namespace aurora {
 	namespace models {
@@ -13,6 +11,6 @@ namespace aurora {
 			sigmoid();
 
 		};
-		typedef ptr<sigmoid> Sigmoid;
+		typedef affix_base::data::ptr<sigmoid> Sigmoid;
 	}
 }

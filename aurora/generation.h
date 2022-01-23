@@ -1,26 +1,31 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "genome.h"
-
-using aurora::evolution::genome;
 
 namespace aurora {
 	namespace evolution {
 		class generation {
 		public:
-			vector<genome> genomes;
-			function<double(genome&)> get_reward;
+			std::vector<genome> m_genomes;
+			std::function<double(genome&)> m_get_reward;
 
 		public:
 			generation();
-			generation(vector<genome> a_genomes, function<double(genome&)> a_get_reward);
+			generation(
+				const std::vector<genome>& a_genomes,
+				const std::function<double(genome&)>& a_get_reward
+			);
 
 		public:
 			genome& best();
-			vector<genome> best(size_t a_genomes);
+			std::vector<genome> best(
+				const size_t& a_genomes
+			);
 			genome& worst();
-			vector<genome> worst(size_t a_genomes);
-			vector<size_t> sort();
+			std::vector<genome> worst(
+				const size_t& a_genomes
+			);
+			std::vector<size_t> sort();
 
 		};
 	}

@@ -1,34 +1,49 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "tensor.h"
 
-using aurora::maths::tensor;
-using std::function;
 
 namespace aurora {
 	namespace evolution {
-		class genome : public tensor {
+		class genome : public aurora::maths::tensor {
 		public:
-			function<double(double)> random_change;
+			std::function<double(double)> m_random_change;
 
 		public:
 			genome();
-			genome(tensor a_alleles, function<double(double)> a_random_change);
-			operator tensor& ();
+			genome(
+				const aurora::maths::tensor& a_alleles,
+				const std::function<double(double)>& a_random_change
+			);
+			operator aurora::maths::tensor& ();
 
 		public:
-			genome mutate();
-			vector<genome> mutate(size_t a_children);
-			static vector<genome> mutate(vector<genome> a_genomes);
+			genome mutate() const;
+			std::vector<genome> mutate(
+				const size_t& a_children
+			);
+			static std::vector<genome> mutate(
+				const std::vector<genome>& a_genomes
+			);
 			
 		public:
-			genome merge(genome& a_spouse);
-			vector<genome> merge(genome& a_spouse, size_t a_children);
-			static genome merge(vector<genome> a_parents);
-			static vector<genome> merge(vector<genome> a_parents, size_t a_children);
+			genome merge(
+				genome& a_spouse
+			);
+			std::vector<genome> merge(
+				genome& a_spouse,
+				const size_t& a_children
+			);
+			static genome merge(
+				std::vector<genome> a_parents
+			);
+			static std::vector<genome> merge(
+				std::vector<genome> a_parents,
+				const size_t& a_children
+			);
 
 		public:
-			genome clone();
+			genome clone() const;
 
 		};
 

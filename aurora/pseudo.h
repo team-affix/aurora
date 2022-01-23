@@ -1,11 +1,8 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "neuron.h"
 #include "pseudo_tnn.h"
 #include "param_init.h"
 #include "pseudo_tnn.h"
-#include "pseudo_tnn_hyperparams.h"
 #include "pseudo_lstm.h"
-#include "pseudo_lstm_hyperparams.h"
 #include "pseudo_ntm.h"
-#include "pseudo_ntm_hyperparams.h"

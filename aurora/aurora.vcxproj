@@ -35,12 +35,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="add_0d.h" />
+    <ClInclude Include="add_1d.h" />
     <ClInclude Include="att_lstm.h" />
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
-    <ClInclude Include="pseudo_lstm_hyperparams.h" />
-    <ClInclude Include="pseudo_ntm_hyperparams.h" />
-    <ClInclude Include="pseudo_tnn_hyperparams.h" />
+    <ClInclude Include="ce_loss.h" />
+    <ClInclude Include="dot_1d.h" />
+    <ClInclude Include="loss.h" />
+    <ClInclude Include="mse_loss.h" />
+    <ClInclude Include="parameterized_dot_1d.h" />
+    <ClInclude Include="mul_1d.h" />
+    <ClInclude Include="rounding_spc.h" />
+    <ClInclude Include="sum_1d.h" />
+    <ClInclude Include="mul_0d.h" />
     <ClInclude Include="pseudo_lstm.h" />
     <ClInclude Include="pseudo_ntm.h" />
     <ClInclude Include="pseudo_tnn.h" />
@@ -75,12 +83,11 @@
     <ClInclude Include="ntm_wh.h" />
     <ClInclude Include="ntm_writer.h" />
     <ClInclude Include="params.h" />
-    <ClInclude Include="param_mom_mt.h" />
-    <ClInclude Include="param_sgd_mt.h" />
     <ClInclude Include="param_init.h" />
     <ClInclude Include="power.h" />
     <ClInclude Include="pseudo.h" />
     <ClInclude Include="shift.h" />
+    <ClInclude Include="onehot_spc.h" />
     <ClInclude Include="stacked_recurrent.h" />
     <ClInclude Include="static_vals.h" />
     <ClInclude Include="sequential.h" />
@@ -97,11 +104,19 @@
     <ClInclude Include="weight_set.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="add_0d.cpp" />
+    <ClCompile Include="add_1d.cpp" />
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
-    <ClCompile Include="pseudo_lstm_hyperparams.cpp" />
-    <ClCompile Include="pseudo_ntm_hyperparams.cpp" />
-    <ClCompile Include="pseudo_tnn_hyperparams.cpp" />
+    <ClCompile Include="ce_loss.cpp" />
+    <ClCompile Include="loss.cpp" />
+    <ClCompile Include="mse_loss.cpp" />
+    <ClCompile Include="parameterized_dot_1d.cpp" />
+    <ClCompile Include="dot_1d.cpp" />
+    <ClCompile Include="mul_0d.cpp" />
+    <ClCompile Include="mul_1d.cpp" />
+    <ClCompile Include="rounding_spc_0d.cpp" />
+    <ClCompile Include="sum_1d.cpp" />
     <ClCompile Include="pseudo_lstm.cpp" />
     <ClCompile Include="pseudo_ntm.cpp" />
     <ClCompile Include="pseudo_tnn.cpp" />
@@ -130,16 +145,15 @@
     <ClCompile Include="ntm_writer.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="param_mom.cpp" />
-    <ClCompile Include="param_mom_mt.cpp" />
     <ClCompile Include="param_rcv.cpp" />
     <ClCompile Include="param_sgd.cpp" />
-    <ClCompile Include="param_sgd_mt.cpp" />
     <ClCompile Include="param_vector.cpp" />
     <ClCompile Include="power.cpp" />
     <ClCompile Include="recurrent.cpp" />
     <ClCompile Include="sequential.cpp" />
     <ClCompile Include="shift.cpp" />
     <ClCompile Include="sigmoid.cpp" />
+    <ClCompile Include="onehot_spc.cpp" />
     <ClCompile Include="stacked_recurrent.cpp" />
     <ClCompile Include="static_vals.cpp" />
     <ClCompile Include="sync.cpp" />
@@ -166,52 +180,52 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Standalone Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Standalone Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Standalone Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Standalone Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -281,14 +295,16 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>build-info\post-build-increment.exe build-info\revision.txt</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Standalone Debug|Win32'">
@@ -303,14 +319,15 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>build-info\post-build-increment.exe build-info\revision.txt</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -327,7 +344,8 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -350,7 +368,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -372,14 +390,16 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>build-info\post-build-increment.exe build-info\revision.txt</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Standalone Debug|x64'">
@@ -395,14 +415,15 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>build-info\post-build-increment.exe build-info\revision.txt</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -420,7 +441,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -444,7 +466,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../affix-base/affix-base/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../affix-base/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

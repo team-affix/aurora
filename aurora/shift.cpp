@@ -1,7 +1,14 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "shift.h"
 
 using aurora::models::shift;
+using std::function;
+using aurora::params::Param;
+using aurora::models::model;
+using aurora::params::param_sgd;
+using aurora::maths::tensor;
+using std::vector;
+using std::initializer_list;
 
 shift::~shift() {
 
@@ -12,56 +19,52 @@ shift::shift() {
 }
 
 shift::shift(size_t a_units, vector<int> a_valid_shifts) {
-	units = a_units;
-	valid_shifts = a_valid_shifts;
+	m_units = a_units;
+	m_valid_shifts = a_valid_shifts;
 }
 
-void shift::param_recur(function<void(Param&)> a_func) {
+void shift::param_recur(const function<void(Param&)>& a_func) {
 
 }
 
-model* shift::clone(function<Param(Param&)> a_func) {
+model* shift::clone(const function<Param(Param&)>& a_func) {
 	shift* result = new shift();
-	result->units = units;
-	result->valid_shifts = valid_shifts;
+	result->m_units = m_units;
+	result->m_valid_shifts = m_valid_shifts;
 	return result;
 }
 
 void shift::fwd() {
-	y.clear();
-	for (int i = 0; i < units; i++)
-		for (int j = 0; j < valid_shifts.size(); j++) {
-			int dst = positive_modulo(i + valid_shifts[j], units);
-			y[dst].val() += x[i] * amount[j];
+	m_y.clear();
+	for (int i = 0; i < m_units; i++)
+		for (int j = 0; j < m_valid_shifts.size(); j++) {
+			int dst = positive_modulo(i + m_valid_shifts[j], m_units);
+			m_y[dst].val() += m_x[i] * m_amount[j];
 		}
 }
 
 void shift::bwd() {
-	x_grad.clear();
-	amount_grad.clear();
-	for (int i = 0; i < units; i++)
-		for (int j = 0; j < valid_shifts.size(); j++) {
-			int src = positive_modulo(i - valid_shifts[j], units);
-			x_grad[src].val() += y_grad[i] * amount[j];
-			amount_grad[j].val() += y_grad[i] * x[src];
+	m_x_grad.clear();
+	m_amount_grad.clear();
+	for (int i = 0; i < m_units; i++)
+		for (int j = 0; j < m_valid_shifts.size(); j++) {
+			int src = positive_modulo(i - m_valid_shifts[j], m_units);
+			m_x_grad[src].val() += m_y_grad[i] * m_amount[j];
+			m_amount_grad[j].val() += m_y_grad[i] * m_x[src];
 		}
 }
 
-void shift::signal(const tensor& a_y_des) {
-	y.sub_1d(a_y_des, y_grad);
-}
-
-void shift::model_recur(function<void(model*)> a_func) {
+void shift::model_recur(const function<void(model*)>& a_func) {
 	a_func(this);
 }
 
 void shift::compile() {
-	x = tensor::new_1d(units);
-	x_grad = tensor::new_1d(units);
-	y = tensor::new_1d(units);
-	y_grad = tensor::new_1d(units);
-	amount = tensor::new_1d(valid_shifts.size());
-	amount_grad = tensor::new_1d(valid_shifts.size());
+	m_x = tensor::new_1d(m_units);
+	m_x_grad = tensor::new_1d(m_units);
+	m_y = tensor::new_1d(m_units);
+	m_y_grad = tensor::new_1d(m_units);
+	m_amount = tensor::new_1d(m_valid_shifts.size());
+	m_amount_grad = tensor::new_1d(m_valid_shifts.size());
 }
 
 int shift::positive_modulo(int i, int n) {

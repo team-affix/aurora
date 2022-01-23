@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "genome.h"
 
 using aurora::evolution::genome;
@@ -7,30 +7,39 @@ genome::genome() {
 
 }
 
-genome::genome(tensor a_alleles, function<double(double)> a_random_change) : tensor(a_alleles) {
-	this->random_change = a_random_change;
+genome::genome(
+	const aurora::maths::tensor& a_alleles,
+	const std::function<double(double)>& a_random_change
+) : 
+	aurora::maths::tensor(a_alleles)
+{
+	this->m_random_change = a_random_change;
 }
 
-genome::operator tensor& () {
+genome::operator aurora::maths::tensor& () {
 	return *this;
 }
 
-genome genome::mutate() {
+genome genome::mutate() const {
 	genome result = clone();
 	for (int allele = 0; allele < result.size(); allele++)
-		result[allele].val() = random_change(at(allele));
+		result[allele].val() = m_random_change(at(allele));
 	return result;
 }
 
-vector<genome> genome::mutate(size_t a_children) {
-	vector<genome> result = vector<genome>(a_children);
+std::vector<genome> genome::mutate(const size_t& a_children)
+{
+	std::vector<genome> result = std::vector<genome>(a_children);
 	for (int child = 0; child < a_children; child++)
 		result[child] = mutate();
 	return result;
 }
 
-vector<genome> genome::mutate(vector<genome> a_genomes) {
-	vector<genome> result = vector<genome>(a_genomes);
+std::vector<genome> genome::mutate(
+	const std::vector<genome>& a_genomes
+)
+{
+	std::vector<genome> result = std::vector<genome>(a_genomes);
 	for (int i = 0; i < result.size(); i++)
 		result[i] = a_genomes[i].mutate();
 	return result;
@@ -43,14 +52,14 @@ genome genome::merge(genome& a_spouse) {
 	return result;
 }
 
-vector<genome> genome::merge(genome& a_spouse, size_t a_children) {
-	vector<genome> result = vector<genome>(a_children);
+std::vector<genome> genome::merge(genome& a_spouse, const size_t& a_children) {
+	std::vector<genome> result = std::vector<genome>(a_children);
 	for (int child = 0; child < a_children; child++)
 		result[child] = merge(a_spouse);
 	return result;
 }
 
-genome genome::merge(vector<genome> a_parents) {
+genome genome::merge(std::vector<genome> a_parents) {
 	assert(a_parents.size() >= 2);
 	genome result = a_parents.front().clone();
 	for (int parent = 1; parent < a_parents.size(); parent++)
@@ -58,13 +67,13 @@ genome genome::merge(vector<genome> a_parents) {
 	return result;
 }
 
-vector<genome> genome::merge(vector<genome> a_parents, size_t a_children) {
-	vector<genome> result = vector<genome>(a_children);
+std::vector<genome> genome::merge(std::vector<genome> a_parents, const size_t& a_children) {
+	std::vector<genome> result = std::vector<genome>(a_children);
 	for (int child = 0; child < a_children; child++)
 		result[child] = merge(a_parents);
 	return result;
 }
 
-genome genome::clone() {
-	return genome(tensor::clone(), random_change);
+genome genome::clone() const {
+	return genome(tensor::clone(), m_random_change);
 }

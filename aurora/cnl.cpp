@@ -1,124 +1,148 @@
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "cnl.h"
 #include "weight_junction.h"
+#include "layer.h"
+#include "parameterized_dot_1d.h"
 
 using aurora::models::cnl;
+using std::function;
+using aurora::params::Param;
+using aurora::maths::tensor;
+using aurora::models::model;
+using aurora::models::layer;
 
-cnl::~cnl() {
+cnl::~cnl()
+{
 
 }
 
-cnl::cnl() {
+cnl::cnl()
+{
 
 }
 
-cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len) {
-	this->filter_height = a_filter_height;
-	this->filter_width = a_filter_width;
-	this->stride_len = a_stride_len;
-	filter_template = new weight_junction(filter_height * filter_width, 1);
-	filters = new sync(new sync(filter_template));
-	prep(a_input_max_height, a_input_max_width);
+cnl::cnl(
+	const size_t& a_filter_height,
+	const size_t& a_filter_width,
+	const size_t& a_y_stride,
+	const size_t& a_x_stride
+) :
+	m_filter_height(a_filter_height),
+	m_filter_width(a_filter_width),
+	m_y_stride(a_y_stride),
+	m_x_stride(a_x_stride)
+{
+	m_filters = new sync(new parameterized_dot_1d(m_filter_height * m_filter_width));
 }
 
-cnl::cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, Model a_filter_template) {
-	this->filter_height = a_filter_height;
-	this->filter_width = a_filter_width;
-	this->stride_len = a_stride_len;
-	filter_template = a_filter_template;
-	filters = new sync(new sync(filter_template));
-	prep(a_input_max_height, a_input_max_width);
+void cnl::param_recur(
+	const function<void(Param&)>& a_func
+)
+{
+	m_filters->param_recur(a_func);
 }
 
-void cnl::param_recur(function<void(Param&)> a_func) {
-	filter_template->param_recur(a_func);
-}
-
-model* cnl::clone(function<Param(Param&)> a_func) {
-	cnl* result = new cnl(input_max_height, input_max_width, filter_height, filter_width, stride_len, filter_template->clone(a_func));
+model* cnl::clone(
+	const function<Param(Param&)>& a_func
+)
+{
+	cnl* result = new cnl();
+	result->m_filter_height = m_filter_height;
+	result->m_filter_width = m_filter_width;
+	result->m_x_stride = m_x_stride;
+	result->m_y_stride = m_y_stride;
+	result->m_max_input_height = m_max_input_height;
+	result->m_max_input_width = m_max_input_width;
+	result->m_filters = m_filters->clone(a_func);
 	return result;
 }
 
-void cnl::fwd() {
-	filters->fwd();
+void cnl::fwd()
+{
+	m_filters->fwd();
 }
 
-void cnl::bwd() {
-	filters->bwd();
+void cnl::bwd()
+{
+	m_filters->bwd();
 }
 
-void cnl::signal(const tensor& a_y_des) {
-	y_des.pop(a_y_des);
-	filters->signal(y_des_reshaped);
-}
-
-void cnl::model_recur(function<void(model*)> a_func) {
+void cnl::model_recur(
+	const function<void(model*)>& a_func
+)
+{
+	m_filters->model_recur(a_func);
 	a_func(this);
-	filter_template->model_recur(a_func);
 }
 
-void cnl::compile() {
-	this->x = tensor::new_2d(input_max_height, input_max_width);
-	this->x_grad = tensor::new_2d(input_max_height, input_max_width);
-	this->y = tensor::new_2d(y_strides(input_max_height), x_strides(input_max_width));
-	this->y_grad = tensor::new_2d(y_strides(input_max_height), x_strides(input_max_width));
-	this->y_des = tensor::new_2d(y_strides(input_max_height), x_strides(input_max_width));
-	this->y_des_reshaped = tensor::new_2d(y_strides(input_max_height), x_strides(input_max_width), { 0 });
+void cnl::compile()
+{
+	m_x = tensor::new_2d(m_max_input_height, m_max_input_width);
+	m_x_grad = tensor::new_2d(m_max_input_height, m_max_input_width);
+	m_y = tensor::new_2d(y_strides(), x_strides());
+	m_y_grad = tensor::new_2d(y_strides(), x_strides());
 
-	// JOIN RESHAPED_Y TO Y
-	for(int i = 0; i < y_des.height(); i++)
-		for (int j = 0; j < y_des.width(); j++)
-			y_des_reshaped[i][j][0].group_join(y_des[i][j]);
+	m_filters->compile();
+	
+	const size_t l_x_strides = x_strides();
+	const size_t l_y_strides = y_strides();
 
-	filters->compile();
-	for (int i = 0; i < y_strides(input_max_height); i++) {
-		int y_start = i * stride_len;
-		sync* row = (sync*)filters->prepared[i].get();
-		for (int j = 0; j < x_strides(input_max_width); j++) {
-			int x_start = j * stride_len;
-			Model& filter = row->prepared[j];
-			tensor filter_range_x = x.range_2d(y_start, x_start, filter_height, filter_width).unroll();
-			tensor filter_range_x_grad = x_grad.range_2d(y_start, x_start, filter_height, filter_width).unroll();
-			tensor filter_range_y = y.range_2d(i, j, 1, 1).unroll();
-			tensor filter_range_y_grad = y_grad.range_2d(i, j, 1, 1).unroll();
-			filter_range_x.group_join_all_ranks(filter->x);
-			filter_range_x_grad.group_join_all_ranks(filter->x_grad);
-			filter_range_y.group_join_all_ranks(filter->y);
-			filter_range_y_grad.group_join_all_ranks(filter->y_grad);
-		}
+ 	for (int i = 0; i < m_filters->m_prepared.size(); i++)
+	{
+		size_t l_output_row = i / l_x_strides;
+		size_t l_output_col = i % l_x_strides;
+		size_t l_input_row = l_output_row * m_y_stride;
+		size_t l_input_col = l_output_col * m_x_stride;
+		m_x.range_2d(l_input_row, l_input_col, m_filter_height, m_filter_width).unroll().group_link(m_filters->m_x[i]);
+		m_x_grad.range_2d(l_input_row, l_input_col, m_filter_height, m_filter_width).unroll().group_link(m_filters->m_x_grad[i]);
+		m_y[l_output_row][l_output_col].group_link(m_filters->m_y[i]);
+		m_y_grad[l_output_row][l_output_col].group_link(m_filters->m_y_grad[i]);
 	}
+
 }
 
-void cnl::prep(size_t a_a, size_t a_b) {
-	this->input_max_height = a_a;
-	this->input_max_width = a_b;
-	sync* row_sync = (sync*)filters->model_template.get();
-	row_sync->prep(x_strides(a_b));
-	filters->prep(y_strides(a_a));
+void cnl::prep_for_input(
+	const size_t& a_input_height,
+	const size_t& a_input_width
+)
+{
+	m_max_input_height = a_input_height;
+	m_max_input_width = a_input_width;
+	m_filters->prep(y_strides(a_input_height) * x_strides(a_input_width));
 }
 
-void cnl::unroll(size_t a_a, size_t a_b) {
-	size_t x_filters = x_strides(a_b);
-	size_t y_filters = y_strides(a_a);
-	filters->unroll(y_filters);
-	for (int i = 0; i < filters->unrolled.size(); i++) {
-		sync* row_sync = (sync*)filters->unrolled[i].get();
-		row_sync->unroll(x_filters);
-	}
+void cnl::unroll_for_input(
+	const size_t& a_input_height,
+	const size_t& a_input_width
+)
+{
+	assert(a_input_height <= m_max_input_height);
+	assert(a_input_width <= m_max_input_width);
+
+	m_filters->unroll(y_strides(a_input_height) * x_strides(a_input_width));
+
 }
 
-size_t cnl::x_strides(size_t a_width) {
-	return (a_width - filter_width) / stride_len + 1;
+size_t cnl::y_strides(
+	const size_t& a_height
+) const
+{
+	return (a_height - m_filter_height) / m_y_stride + 1;
 }
 
-size_t cnl::x_strides() {
-	return (input_max_width - filter_width) / stride_len + 1;
+size_t cnl::x_strides(
+	const size_t& a_width
+) const
+{
+	return (a_width - m_filter_width) / m_x_stride + 1;
 }
 
-size_t cnl::y_strides(size_t a_height) {
-	return (a_height - filter_height) / stride_len + 1;
+size_t cnl::y_strides() const
+{
+	return y_strides(m_max_input_height);
 }
 
-size_t cnl::y_strides() {
-	return (input_max_height - filter_height) / stride_len + 1;
+size_t cnl::x_strides() const 
+{
+	return x_strides(m_max_input_width);
 }

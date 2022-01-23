@@ -1,40 +1,58 @@
 #pragma once
-#include "pch.h"
+#include "affix-base/pch.h"
 #include "model.h"
 #include "sync.h"
-
-using aurora::models::model;
-using aurora::models::sync;
+#include "parameterized_dot_1d.h"
 
 namespace aurora {
 	namespace models {
-		class cnl : public model {
-		private:
-			tensor y_des;
-			tensor y_des_reshaped;
+		class cnl : public model
+		{
+		public:
+			size_t m_filter_height = 0;
+			size_t m_filter_width = 0;
+			size_t m_x_stride = 0;
+			size_t m_y_stride = 0;
 
 		public:
-			size_t filter_height = 0;
-			size_t filter_width = 0;
-			size_t input_max_height = 0;
-			size_t input_max_width = 0;
-			size_t stride_len = 0;
-			Model filter_template;
-			Sync filters;
+			size_t m_max_input_height = 0;
+			size_t m_max_input_width = 0;
 
 		public:
-			ATTENTION_FIELDS
+			Sync m_filters;
+
+		public:
+			MODEL_FIELDS
 			virtual ~cnl();
 			cnl();
-			cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len);
-			cnl(size_t a_input_max_height, size_t a_input_max_width, size_t a_filter_height, size_t a_filter_width, size_t a_stride_len, Model a_filter_template);
+			cnl(
+				const size_t& a_filter_height,
+				const size_t& a_filter_width,
+				const size_t& a_y_stride = 1,
+				const size_t& a_x_stride = 1
+			);
 
-			size_t x_strides(size_t a_width);
-			size_t x_strides();
-			size_t y_strides(size_t a_height);
-			size_t y_strides();
+		public:
+			void prep_for_input(
+				const size_t& a_input_height,
+				const size_t& a_input_width
+			);
+			void unroll_for_input(
+				const size_t& a_input_height,
+				const size_t& a_input_width
+			);
+
+		public:
+			size_t y_strides(
+				const size_t& a_input_height
+			) const;
+			size_t x_strides(
+				const size_t& a_input_width
+			) const;
+			size_t y_strides() const;
+			size_t x_strides() const;
 
 		};
-		typedef ptr<cnl> Cnl;
+		typedef affix_base::data::ptr<cnl> Cnl;
 	}
 }

@@ -111,12 +111,6 @@
     <ClInclude Include="lstm.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="param_sgd_mt.h">
-      <Filter>Header Files\params</Filter>
-    </ClInclude>
-    <ClInclude Include="param_mom_mt.h">
-      <Filter>Header Files\params</Filter>
-    </ClInclude>
     <ClInclude Include="models.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
@@ -210,20 +204,47 @@
     <ClInclude Include="pseudo_lstm.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="pseudo_lstm_hyperparams.h">
-      <Filter>Header Files\pseudo</Filter>
-    </ClInclude>
     <ClInclude Include="pseudo_ntm.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
     <ClInclude Include="pseudo_tnn.h">
       <Filter>Header Files\pseudo</Filter>
     </ClInclude>
-    <ClInclude Include="pseudo_ntm_hyperparams.h">
-      <Filter>Header Files\pseudo</Filter>
+    <ClInclude Include="onehot_spc.h">
+      <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="pseudo_tnn_hyperparams.h">
-      <Filter>Header Files\pseudo</Filter>
+    <ClInclude Include="sum_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="mul_0d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="mul_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="dot_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="parameterized_dot_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="add_0d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="add_1d.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="rounding_spc.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="mse_loss.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="loss.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="ce_loss.h">
+      <Filter>Header Files\models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -280,12 +301,6 @@
     </ClCompile>
     <ClCompile Include="lstm.cpp">
       <Filter>Source Files\models</Filter>
-    </ClCompile>
-    <ClCompile Include="param_sgd_mt.cpp">
-      <Filter>Source Files\params</Filter>
-    </ClCompile>
-    <ClCompile Include="param_mom_mt.cpp">
-      <Filter>Source Files\params</Filter>
     </ClCompile>
     <ClCompile Include="genome.cpp">
       <Filter>Source Files\evolution</Filter>
@@ -368,20 +383,47 @@
     <ClCompile Include="pseudo_lstm.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
-    <ClCompile Include="pseudo_lstm_hyperparams.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
     <ClCompile Include="pseudo_ntm.cpp">
-      <Filter>Source Files\pseudo</Filter>
-    </ClCompile>
-    <ClCompile Include="pseudo_ntm_hyperparams.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
     <ClCompile Include="pseudo_tnn.cpp">
       <Filter>Source Files\pseudo</Filter>
     </ClCompile>
-    <ClCompile Include="pseudo_tnn_hyperparams.cpp">
-      <Filter>Source Files\pseudo</Filter>
+    <ClCompile Include="onehot_spc.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="sum_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="mul_0d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="mul_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="dot_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="parameterized_dot_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="add_0d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="add_1d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="rounding_spc_0d.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="mse_loss.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="loss.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="ce_loss.cpp">
+      <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
