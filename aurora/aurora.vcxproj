@@ -41,6 +41,7 @@
     <ClInclude Include="att_lstm_ts.h" />
     <ClInclude Include="aurora.h" />
     <ClInclude Include="ce_loss.h" />
+    <ClInclude Include="concat.h" />
     <ClInclude Include="dot_1d.h" />
     <ClInclude Include="loss.h" />
     <ClInclude Include="mse_loss.h" />
@@ -110,6 +111,7 @@
     <ClCompile Include="att_lstm.cpp" />
     <ClCompile Include="att_lstm_ts.cpp" />
     <ClCompile Include="ce_loss.cpp" />
+    <ClCompile Include="concat.cpp" />
     <ClCompile Include="loss.cpp" />
     <ClCompile Include="mse_loss.cpp" />
     <ClCompile Include="parameterized_dot_1d.cpp" />

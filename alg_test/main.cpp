@@ -3186,11 +3186,36 @@ void split_test()
 
 }
 
+void concat_test()
+{
+	Concat l_concat(new concat({ 3, 3 }));
+
+	l_concat->compile();
+
+	l_concat->fwd({ { 1, 2, 3 }, { 4, 5, 6 } });
+	l_concat->bwd({ 7, 8, 9, 10, 11, 12 });
+
+	assert(l_concat->y()[0] == 1);
+	assert(l_concat->y()[1] == 2);
+	assert(l_concat->y()[2] == 3);
+	assert(l_concat->y()[3] == 4);
+	assert(l_concat->y()[4] == 5);
+	assert(l_concat->y()[5] == 6);
+
+	assert(l_concat->x_grad()[0][0] == 7);
+	assert(l_concat->x_grad()[0][1] == 8);
+	assert(l_concat->x_grad()[0][2] == 9);
+	assert(l_concat->x_grad()[1][0] == 10);
+	assert(l_concat->x_grad()[1][1] == 11);
+	assert(l_concat->x_grad()[1][2] == 12);
+
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	split_test();
+	concat_test();
 
 	return 0;
 

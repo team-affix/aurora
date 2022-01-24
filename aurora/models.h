@@ -44,3 +44,4 @@
 #include "mse_loss.h"
 #include "ce_loss.h"
 #include "split.h"
+#include "concat.h"
