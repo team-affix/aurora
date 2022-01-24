@@ -47,6 +47,7 @@
     <ClInclude Include="parameterized_dot_1d.h" />
     <ClInclude Include="mul_1d.h" />
     <ClInclude Include="rounding_spc.h" />
+    <ClInclude Include="split.h" />
     <ClInclude Include="sum_1d.h" />
     <ClInclude Include="mul_0d.h" />
     <ClInclude Include="pseudo_lstm.h" />
@@ -116,6 +117,7 @@
     <ClCompile Include="mul_0d.cpp" />
     <ClCompile Include="mul_1d.cpp" />
     <ClCompile Include="rounding_spc_0d.cpp" />
+    <ClCompile Include="split.cpp" />
     <ClCompile Include="sum_1d.cpp" />
     <ClCompile Include="pseudo_lstm.cpp" />
     <ClCompile Include="pseudo_ntm.cpp" />

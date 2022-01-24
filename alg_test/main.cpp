@@ -3154,11 +3154,43 @@ void first_order_optimizer_instantiation_test()
 
 }
 
+void split_test()
+{
+	Split l_split(new split({ 3, 3 }));
+	l_split->compile();
+
+	l_split->fwd({ 1, 2, 3, 4, 5, 6 });
+	l_split->bwd({ { 7, 8, 9 }, { 10, 11, 12 } });
+
+	assert(l_split->y().height() == 2);
+	assert(l_split->y().width() == 3);
+	assert(l_split->y_grad().height() == 2);
+	assert(l_split->y_grad().width() == 3);
+
+	assert(l_split->y()[0][0] == 1);
+	assert(l_split->y()[0][1] == 2);
+	assert(l_split->y()[0][2] == 3);
+	assert(l_split->y()[1][0] == 4);
+	assert(l_split->y()[1][1] == 5);
+	assert(l_split->y()[1][2] == 6);
+
+	assert(l_split->x().size() == 6);
+	assert(l_split->x_grad().size() == 6);
+
+	assert(l_split->x_grad()[0] == 7);
+	assert(l_split->x_grad()[1] == 8);
+	assert(l_split->x_grad()[2] == 9);
+	assert(l_split->x_grad()[3] == 10);
+	assert(l_split->x_grad()[4] == 11);
+	assert(l_split->x_grad()[5] == 12);
+
+}
+
 int main() {
 
 	srand(time(NULL));
 
-	first_order_optimizer_instantiation_test();
+	split_test();
 
 	return 0;
 
