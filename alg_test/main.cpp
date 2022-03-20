@@ -3211,11 +3211,13 @@ void concat_test()
 
 }
 
+
+
 int main() {
 
 	srand(time(NULL));
 
-	concat_test();
+	test_large_model_linkage();
 
 	return 0;
 
