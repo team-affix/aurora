@@ -20,24 +20,66 @@ const std::vector<tensor>& tensor::vec() const {
 	return m_vec_ptr.val();
 }
 
-tensor::~tensor() {
+tensor::~tensor()
+{
 
 }
 
-tensor::tensor() {
+tensor::tensor() :
+	m_val_ptr(new double(0)),
+	m_vec_ptr(new std::vector<tensor>())
+{
 
 }
 
-tensor::tensor(const double& a_val) {
-	this->val() = a_val;
+tensor::tensor(const double& a_val) :
+	m_val_ptr(new double(a_val)),
+	m_vec_ptr(new std::vector<tensor>())
+{
+
 }
 
-tensor::tensor(const std::vector<tensor>& a_vec) {
-	std::copy(a_vec.begin(), a_vec.end(), back_inserter(vec()));
+tensor::tensor(const std::vector<tensor>& a_vec) :
+	m_val_ptr(new double(0)),
+	m_vec_ptr(new std::vector<tensor>(a_vec))
+{
+
 }
 
-tensor::tensor(const std::initializer_list<tensor>& a_il) {
-	std::copy(a_il.begin(), a_il.end(), back_inserter(vec()));
+tensor::tensor(const std::initializer_list<tensor>& a_il) :
+	m_val_ptr(new double(0)),
+	m_vec_ptr(new std::vector<tensor>(a_il))
+{
+
+}
+
+tensor::tensor(const tensor& a_tensor) :
+	m_val_ptr(new double(a_tensor.val())),
+	m_vec_ptr(new std::vector<tensor>(a_tensor.vec()))
+{
+
+}
+
+bool tensor::serialize(
+	affix_base::data::byte_buffer& a_byte_buffer
+) const
+{
+	if (!a_byte_buffer.push_back(val()))
+		return false;
+	if (!a_byte_buffer.push_back(vec()))
+		return false;
+	return true;
+}
+
+bool tensor::deserialize(
+	affix_base::data::byte_buffer& a_byte_buffer
+)
+{
+	if (!a_byte_buffer.pop_front(val()))
+		return false;
+	if (!a_byte_buffer.pop_front(vec()))
+		return false;
+	return true;
 }
 
 void tensor::set(const tensor& a_other) {

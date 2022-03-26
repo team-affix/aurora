@@ -1,14 +1,15 @@
 #pragma once
 #include "affix-base/pch.h"
 #include "affix-base/ptr.h"
+#include "affix-base/serializable.h"
 
 namespace aurora {
 	namespace maths {
 
 		class tensor {
 		public:
-			affix_base::data::ptr<double> m_val_ptr = new double(0);
-			affix_base::data::ptr<std::vector<tensor>> m_vec_ptr = new std::vector<tensor>();
+			affix_base::data::ptr<double> m_val_ptr;
+			affix_base::data::ptr<std::vector<tensor>> m_vec_ptr;
 
 		public:
 			double& val();
@@ -29,6 +30,17 @@ namespace aurora {
 			);
 			tensor(
 				const std::initializer_list<tensor>& a_il
+			);
+			tensor(
+				const tensor& a_tensor
+			);
+
+		public:
+			bool serialize(
+				affix_base::data::byte_buffer& a_byte_buffer
+			) const;
+			bool deserialize(
+				affix_base::data::byte_buffer& a_byte_buffer
 			);
 
 		public:
