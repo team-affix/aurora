@@ -3217,7 +3217,7 @@ int main() {
 
 	srand(time(NULL));
 
-	test_large_model_linkage();
+	major_tests();
 
 	return 0;
 
