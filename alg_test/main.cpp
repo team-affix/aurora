@@ -3211,8 +3211,6 @@ void concat_test()
 
 }
 
-
-
 int main() {
 
 	srand(time(NULL));
