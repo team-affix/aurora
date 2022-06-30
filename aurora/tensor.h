@@ -285,13 +285,13 @@ namespace aurora {
 
 		public:
 			void link(
-				tensor& a_other
+				const tensor& a_other
 			);
 			void unlink();
 			
 		public:
 			void group_link(
-				tensor& a_other
+				const tensor& a_other
 			);
 			void group_unlink();
 

@@ -54,8 +54,8 @@ tensor::tensor(const std::initializer_list<tensor>& a_il) :
 }
 
 tensor::tensor(const tensor& a_tensor) :
-	m_val_ptr(new double(a_tensor.val())),
-	m_vec_ptr(new std::vector<tensor>(a_tensor.vec()))
+	m_val_ptr(a_tensor.m_val_ptr),
+	m_vec_ptr(a_tensor.m_vec_ptr)
 {
 
 }
@@ -660,7 +660,7 @@ size_t tensor::lowest_rank_count()
 }
 
 void tensor::link(
-	tensor& a_other
+	const tensor& a_other
 )
 {
 	m_val_ptr.link(a_other.m_val_ptr);
@@ -679,7 +679,7 @@ void tensor::unlink()
 }
 
 void tensor::group_link(
-	tensor& a_other
+	const tensor& a_other
 )
 {
 

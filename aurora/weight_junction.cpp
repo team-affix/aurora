@@ -41,10 +41,8 @@ model* weight_junction::clone(const function<Param(Param&)>& a_func) {
 }
 
 void weight_junction::fwd() {
-	m_y.clear();
 	for (int i = 0; i < m_weight_sets.size(); i++) {
 		m_weight_sets[i]->fwd();
-		m_y.add_1d(m_weight_sets[i]->m_y, m_y);
 	}
 }
 
@@ -63,13 +61,15 @@ void weight_junction::compile() {
 
 	m_x = tensor::new_1d(m_a);
 	m_x_grad = tensor::new_1d(m_a);
-	m_y = tensor::new_1d(m_b);
-	m_y_grad = tensor::new_1d(m_b);
+	m_y = tensor::new_2d(m_b, m_a);
+	m_y_grad = tensor::new_2d(m_b, m_a);
 
 	for (int i = 0; i < m_weight_sets.size(); i++) {
 		m_weight_sets[i]->compile();
 		m_weight_sets[i]->m_x.group_link(m_x[i]);
 		m_weight_sets[i]->m_x_grad.group_link(m_x_grad[i]);
-		m_weight_sets[i]->m_y_grad.group_link(m_y_grad);
+		m_weight_sets[i]->m_y.group_link(m_y.col(i));
+		m_weight_sets[i]->m_y_grad.group_link(m_y_grad.col(i));
 	}
+
 }

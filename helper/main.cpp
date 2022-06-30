@@ -4,7 +4,7 @@
 
 int main() {
 
-	std::cout << helper::model_impl("cnl_filter", helper::model) << std::endl;
+	std::cout << helper::model_impl("mul_agg_1d", model_types::model) << std::endl;
 
 	return 0;
 }

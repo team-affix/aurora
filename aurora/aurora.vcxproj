@@ -45,6 +45,7 @@
     <ClInclude Include="dot_1d.h" />
     <ClInclude Include="loss.h" />
     <ClInclude Include="mse_loss.h" />
+    <ClInclude Include="mul_agg_1d.h" />
     <ClInclude Include="parameterized_dot_1d.h" />
     <ClInclude Include="mul_1d.h" />
     <ClInclude Include="rounding_spc.h" />
@@ -114,6 +115,7 @@
     <ClCompile Include="concat.cpp" />
     <ClCompile Include="loss.cpp" />
     <ClCompile Include="mse_loss.cpp" />
+    <ClCompile Include="mul_agg_1d.cpp" />
     <ClCompile Include="parameterized_dot_1d.cpp" />
     <ClCompile Include="dot_1d.cpp" />
     <ClCompile Include="mul_0d.cpp" />

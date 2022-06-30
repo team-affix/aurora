@@ -2789,6 +2789,14 @@ double sign_d(double a_x) {
 	else return -1;
 }
 
+tensor sign_1d(const tensor& a_tensor)
+{
+	tensor l_result = tensor::new_1d(a_tensor.size());
+	for (int i = 0; i < a_tensor.size(); i++)
+		l_result[i].val() = sign_d(a_tensor[i]);
+	return l_result;
+}
+
 double sech_d(double a_x) {
 	return 1.0 / cosh(a_x);
 }
@@ -3208,6 +3216,127 @@ void concat_test()
 	assert(l_concat->x_grad()[1][0] == 10);
 	assert(l_concat->x_grad()[1][1] == 11);
 	assert(l_concat->x_grad()[1][2] == 12);
+
+}
+
+tensor int_to_bytes(int a_arg, int a_total_bytes)
+{
+	tensor l_result = tensor::new_1d(a_total_bytes);
+	for (int i = 0; i < a_total_bytes; i++)
+	{
+		if ((a_arg & (int)pow(2, i)) != 0)
+		{
+			l_result[i] = 1;
+		}
+	}
+	return l_result;
+}
+
+int bytes_to_int(tensor a_bytes)
+{
+	int l_result = 0;
+	for (int i = 0; i < a_bytes.size(); i++)
+	{
+		l_result += a_bytes[i] * pow(2, i);
+	}
+	return l_result;
+}
+
+void self_aware_tnn(
+
+)
+{
+
+}
+
+void policy_gradients()
+{
+	Mse_loss l_loss = new mse_loss(pseudo::tnn({ 2, 5, 1 }, pseudo::nlr(0.3)));
+
+	param_vector pv;
+
+	l_loss->param_recur(pseudo::param_init(new param_sgd(0.002), pv));
+
+	l_loss->compile();
+
+	pv.rand_norm();
+
+	tensor x = {
+		{0, 0},
+		{0, 1},
+		{1, 0},
+		{1, 1}
+	};
+	tensor y = {
+		{0},
+		{1},
+		{1},
+		{0}
+	};
+
+	tensor l_previous_cost = tensor::new_1d(x.size());
+	tensor l_previous_outputs = tensor::new_2d(x.size(), 1);
+
+	for (int epoch = 0; true; epoch++)
+	{
+		double l_epoch_cost = 0;
+		for (int i = 0; i < x.size(); i++)
+		{
+			l_loss->fwd(x[i]);
+			double l_ts_cost = l_loss->signal(y[i]);
+			tensor l_output_change_tensor = l_loss->y().sub_1d(l_previous_outputs[i]);
+
+			// Scale signal tensor by change in cost
+			double l_ts_reward_change = l_previous_cost[i] - l_ts_cost;
+
+			tensor l_ts_reward_change_tensor = tensor::new_1d(l_output_change_tensor.size(), sign_d(l_ts_reward_change));
+			tensor l_next_change_tensor = sign_1d(l_output_change_tensor).mul_1d(l_ts_reward_change_tensor);
+
+			tensor l_desired_output_tensor = l_loss->y().add_1d(l_next_change_tensor);
+
+			l_loss->signal(l_desired_output_tensor);
+
+			l_loss->bwd();
+
+			l_previous_cost[i] = l_ts_cost;
+			l_previous_outputs[i] = l_loss->y();
+			l_epoch_cost += l_ts_cost;
+
+		}
+
+		pv.update();
+
+		if (epoch % 1000 == 0)
+			std::cout << "COST: " << l_epoch_cost << std::endl;
+
+	}
+
+}
+
+void weight_junction_test(
+
+)
+{
+	Mse_loss m = new mse_loss(new weight_junction(2, 3));
+
+	param_vector pv;
+
+	m->param_recur(pseudo::param_init(new param_sgd(0.02), pv));
+
+	m->compile();
+
+	pv.rand_norm();
+
+	tensor x = { 1.5, 2.3 };
+	tensor y = { {1, 2}, {2, 3}, {3, 4} };
+
+	m->m_x.pop(x);
+
+	m->cycle(x, y);
+
+	std::cout << m->m_x_grad.to_string() << std::endl;
+
+
 
 }
 
