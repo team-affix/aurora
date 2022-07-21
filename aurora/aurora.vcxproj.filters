@@ -255,6 +255,9 @@
     <ClInclude Include="mul_agg_1d.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="multiplicative_aggregate.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="model.cpp">
